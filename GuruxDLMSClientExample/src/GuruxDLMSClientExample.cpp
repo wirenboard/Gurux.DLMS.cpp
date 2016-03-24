@@ -35,10 +35,9 @@
 // GuruxDLMSClientExample.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
-#include "GXClient.h"
-#include "../development/include/GXDLMSConverter.h"
-#include "../development/include/GXDLMSProfileGeneric.h"
+#include "../include/GXClient.h"
+#include "../../development/include/GXDLMSConverter.h"
+#include "../../development/include/GXDLMSProfileGeneric.h"
 
 static void WriteValue(std::string line)
 {

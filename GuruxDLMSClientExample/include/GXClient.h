@@ -36,8 +36,40 @@
 #ifndef GXCLIENT_H
 #define GXCLIENT_H
 
-#include "stdafx.h"
-#include "../development/include/GXDLMSClient.h"
+#include <stdio.h>
+
+#define TRACEUL(text, ul) printf("%s %x%x%x%x\r\n", text, (unsigned char) (ul >> 24) & 0xFF, (unsigned char)(ul >> 16) & 0xFF, (unsigned char) (ul >> 8) & 0xFF, (unsigned char) ul & 0xFF)
+
+#define TRACE1(var) printf(var)
+#define TRACE(var, fmt) printf(var, fmt)
+
+#if defined(_WIN32) || defined(_WIN64)//Windows includes
+#if _MSC_VER > 1400
+#define _CRTDBG_MAP_ALLOC
+#define CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif
+#include <tchar.h>
+#include <Winsock.h> //Add support for sockets
+#include <time.h>
+#else //Linux includes.
+#define INVALID_HANDLE_VALUE -1
+#include <unistd.h>
+#include <stdlib.h>
+#include <errno.h> //Add support for sockets
+#include <netdb.h> //Add support for sockets
+#include <sys/types.h> //Add support for sockets
+#include <sys/socket.h> //Add support for sockets
+#include <netinet/in.h> //Add support for sockets
+#include <arpa/inet.h> //Add support for sockets
+#include <termios.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#endif
+
+#include "../../development/include/GXDLMSClient.h"
 
 class GXClient
 {

@@ -32,8 +32,7 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#include "stdafx.h"
-#include "GXClient.h"
+#include "../include/GXClient.h"
 
 GXClient::GXClient(CGXDLMSClient* pParser, int wt, bool trace) :
     m_WaitTime(wt), m_Parser(pParser),

@@ -11,15 +11,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\GuruxDLMSClientExample.cpp" />
-    <ClCompile Include="..\GXClient.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\GXClient.h" />
-    <ClInclude Include="..\stdafx.h" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\..\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\GXClient.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\GuruxDLMSClientExample.cpp" />
+    <ClCompile Include="..\src\GXClient.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>GuruxDLMSClientExample</ProjectName>
@@ -63,9 +62,13 @@
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Debug\GuruxDLMS.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -81,9 +84,13 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Release\GuruxDLMS.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
