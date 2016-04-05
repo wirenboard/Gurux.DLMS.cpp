@@ -19,6 +19,9 @@ Gurux.DLMS classes only parse the data.
 Before start
 =========================== 
 
+This is ALPHA version. If you find an issue, please report it here:
+http://www.gurux.fi/fi/project/issues/gurux.dlms.cpp
+
 We have made makefile for linux environment. You should go development folder and create lib and obj directories.
 Then run make. gurux_dlms_cpp static library is made.
 

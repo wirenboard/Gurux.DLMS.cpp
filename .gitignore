@@ -16,6 +16,7 @@ local.properties
 .settings/
 .loadpath
 .svn/
+GuruxDLMSTester/
 
 # External tool builders
 .externalToolBuilders/

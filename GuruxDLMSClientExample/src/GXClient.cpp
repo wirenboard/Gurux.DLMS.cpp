@@ -38,6 +38,7 @@ GXClient::GXClient(CGXDLMSClient* pParser, int wt, bool trace) :
     m_WaitTime(wt), m_Parser(pParser),
     m_socket(-1), m_Trace(trace)
 {
+    static CGXDLMS dlms;
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
     ZeroMemory(&m_osReader, sizeof(OVERLAPPED));
     ZeroMemory(&m_osWrite, sizeof(OVERLAPPED));

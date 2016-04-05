@@ -49,6 +49,7 @@
 class CGXDLMS
 {
 private:
+    friend class GXClient;
     //CRC table.
     static unsigned short m_FCS16Table[256];
 
@@ -98,7 +99,7 @@ private:
     //
     /////////////////////////////////////////////////////////////////////////////
     static int CheckWrapperAddress(CGXDLMSSettings& settings,
-                                   CGXByteBuffer buff, CGXReplyData& data);
+                                   CGXByteBuffer& buff, CGXReplyData& data);
 
     /////////////////////////////////////////////////////////////////////////////
     // Get value from data.
@@ -125,12 +126,13 @@ private:
     /////////////////////////////////////////////////////////////////////////////
     static int GetDataFromBlock(CGXByteBuffer& data, int index);
 
-public:
     //Constructor.
     CGXDLMS()
     {
         GenerateFCS16Table();
     }
+
+public:
 
     static unsigned char GetInvokeIDPriority(CGXDLMSSettings& settings);
 
@@ -222,7 +224,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     static int GetTcpData(
         CGXDLMSSettings& settings,
-        CGXByteBuffer buff,
+        CGXByteBuffer& buff,
         CGXReplyData& data);
 
     /////////////////////////////////////////////////////////////////////////////

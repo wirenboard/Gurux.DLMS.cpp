@@ -174,9 +174,7 @@ int CGXDLMSClient::ParseSNObjects(CGXByteBuffer& buff, CGXDLMSObjectCollection& 
     }
     for(unsigned long objPos = 0; objPos != cnt; ++objPos)
     {
-        info.SetType(DLMS_DATA_TYPE_NONE);
-        info.SetIndex(0);
-        info.SetCount(0);
+        info.Clear();
         if ((ret = GXHelpers::GetData(buff, info, value)) != 0)
         {
             return ret;
@@ -519,6 +517,10 @@ int CGXDLMSClient::ParseUAResponse(CGXByteBuffer& data)
     unsigned short ui;
     unsigned long ul;
     int ret;
+    if (data.GetSize() == 0)
+    {
+        return 0;
+    }
     // Skip FromatID
     if ((ret = data.GetUInt8(&ch)) != 0)
     {

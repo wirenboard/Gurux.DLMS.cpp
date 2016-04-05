@@ -115,7 +115,7 @@ enum ERROR_CODE
     ERROR_CODES_RECEIVE_FAILED,
     ERROR_CODES_NOT_IMPLEMENTED,
     //Secure connection is not supported.
-    ERROR_CODES_SECYRITY_NOT_IMPLEMENTED,
+    ERROR_CODES_SECURITY_NOT_IMPLEMENTED,
     //Invalid DLMS command.
     ERROR_CODES_INVALID_COMMAND,
     //Invalid Block number.

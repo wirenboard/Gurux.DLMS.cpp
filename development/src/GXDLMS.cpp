@@ -833,7 +833,7 @@ int CGXDLMS::GetPdu(
     CGXReplyData& data,
     CGXCipher* cipher)
 {
-    int ret;
+    int ret = ERROR_CODES_OK;
     unsigned char ch;
     DLMS_COMMAND cmd = data.GetCommand();
     if (data.GetCommand() == DLMS_COMMAND_PUSH && (data.GetMoreData() & GXDLMS_DATA_REQUEST_TYPES_FRAME) == 0)
@@ -912,7 +912,7 @@ int CGXDLMS::GetPdu(
         case DLMS_COMMAND_GLO_METHOD_REQUEST:
             if (cipher == NULL)
             {
-                return ERROR_CODES_SECYRITY_NOT_IMPLEMENTED;
+                return ERROR_CODES_SECURITY_NOT_IMPLEMENTED;
             }
             data.GetData().SetPosition(data.GetData().GetPosition() - 1);
             if ((ret = cipher->Decrypt(data.GetData())) != 0)
@@ -960,9 +960,9 @@ int CGXDLMS::GetPdu(
     if ((cmd == DLMS_COMMAND_READ_RESPONSE || cmd == DLMS_COMMAND_GET_RESPONSE)
             && (data.GetMoreData() == GXDLMS_DATA_REQUEST_TYPES_NONE || data.GetPeek()))
     {
-        GetValueFromData(settings, data);
+        ret = GetValueFromData(settings, data);
     }
-    return ERROR_CODES_OK;
+    return ret;
 }
 
 
@@ -1221,7 +1221,7 @@ int CGXDLMS::HandleReadResponse(
 
 int CGXDLMS::GetTcpData(
     CGXDLMSSettings& settings,
-    CGXByteBuffer buff,
+    CGXByteBuffer& buff,
     CGXReplyData& data)
 {
     int ret;
@@ -1272,14 +1272,17 @@ int CGXDLMS::GetAddressBytes(unsigned long value, CGXByteBuffer& bytes)
     }
     if (size == 1)
     {
+        bytes.Capacity(1);
         bytes.SetUInt8((unsigned char) address);
     }
     else if (size == 2)
     {
+        bytes.Capacity(2);
         bytes.SetUInt16((unsigned short) address);
     }
     else if (size == 4)
     {
+        bytes.Capacity(4);
         bytes.SetUInt32((unsigned long) address);
     }
     else
@@ -1497,7 +1500,7 @@ void CGXDLMS::GetLLCBytes(bool server, CGXByteBuffer& data)
 }
 
 int CGXDLMS::CheckWrapperAddress(CGXDLMSSettings& settings,
-                                 CGXByteBuffer buff, CGXReplyData& data)
+                                 CGXByteBuffer& buff, CGXReplyData& data)
 {
     int ret;
     unsigned short value;
