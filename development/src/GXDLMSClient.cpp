@@ -837,7 +837,7 @@ void CGXDLMSClient::UpdateOBISCodes(CGXDLMSObjectCollection& objects)
     */
 }
 
-int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer> packets)
+int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets)
 {
     // If connection is not established, there is no need to send DisconnectRequest.
     if (!m_Settings.IsConnected())
@@ -849,7 +849,7 @@ int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer> packets)
         return CGXDLMS::SplitToHdlcFrames(m_Settings, DLMS_FRAME_TYPE_DISCONNECT_REQUEST, NULL, packets);
     }
     CGXByteBuffer bb(2);
-    bb.SetUInt8(DLMS_FRAME_TYPE_DISCONNECT_REQUEST);
+    bb.SetUInt8(DLMS_COMMAND_DISCONNECT_REQUEST);
     bb.SetUInt8(0x0);
     CGXDLMS::SplitToWrapperFrames(m_Settings, &bb, packets);
     return 0;
