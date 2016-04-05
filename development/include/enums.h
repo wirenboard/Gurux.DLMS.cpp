@@ -99,25 +99,17 @@ enum DLMS_FRAME_TYPE
     // This way, it works as an RR. Like RR, it enables transmission of I frames from the opposite side.
     DLMS_FRAME_TYPE_INFORMATION = 0x10, // Information (I)
 
-    /**
-     * AARE frame.
-     */
+    //////////////////////////////////////////////////////////
+    // AARE frame.
+    //////////////////////////////////////////////////////////
     AARE = 0x30,
-
-    //////////////////////////////////////////////////////////
-    // Disconnect request.
-    DLMS_FRAME_TYPE_DISCONNECT_REQUEST = 0x62,
-
-    //////////////////////////////////////////////////////////
-    // Disconnect response.
-    DLMS_FRAME_TYPE_DISCONNECT_RESPONSE = 0x63,
     //////////////////////////////////////////////////////////
     // This response is used to indicate an error condition. The two most likely error conditions are:
     // Invalid command or Sequence number problem.
     DLMS_FRAME_TYPE_REJECTED = 0x97,  // Frame Reject
     //////////////////////////////////////////////////////////
     // This command is used to terminate the connection.
-    DLMS_FRAME_TYPE_DISCONNECT = 0x53,
+    DLMS_FRAME_TYPE_DISCONNECT_REQUEST = 0x53,
     //////////////////////////////////////////////////////////
     // This response is used to inform the primary station that the secondary is disconnected.
     DLMS_FRAME_TYPE_DISCONNECT_MODE = 0x1F // Disconnected Mode

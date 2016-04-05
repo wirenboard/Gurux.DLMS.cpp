@@ -201,7 +201,7 @@ public:
     * Returns error status.
     */
     int DisconnectRequest(
-        std::vector<CGXByteBuffer> packets);
+        std::vector<CGXByteBuffer>& packets);
 
     int GetData(
         CGXByteBuffer& reply,
