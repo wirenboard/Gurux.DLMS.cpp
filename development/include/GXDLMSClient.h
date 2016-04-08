@@ -65,14 +65,15 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     //Constructor
     /////////////////////////////////////////////////////////////////////////////
-    CGXDLMSClient(bool UseLogicalNameReferencing = true,
-                  int ClientAddress = 16,
-                  int ServerAddress = 1,
-                  //Authentication type.
-                  GXDLMS_AUTHENTICATION authentication = GXDLMS_AUTHENTICATION_NONE,
-                  //Password if authentication is used.
-                  const char* password = NULL,
-                  GXDLMS_INTERFACETYPE intefaceType = GXDLMS_INTERFACETYPE_HDLC);
+    CGXDLMSClient(
+        bool UseLogicalNameReferencing = true,
+        int ClientAddress = 16,
+        int ServerAddress = 1,
+        //Authentication type.
+        GXDLMS_AUTHENTICATION authentication = GXDLMS_AUTHENTICATION_NONE,
+        //Password if authentication is used.
+        const char* password = NULL,
+        GXDLMS_INTERFACETYPE intefaceType = GXDLMS_INTERFACETYPE_HDLC);
 
     /////////////////////////////////////////////////////////////////////////////
     //Destructor.
@@ -268,11 +269,12 @@ public:
     *             Generated write message(s).
     * Returns error status.
     */
-    int Write(CGXDLMSVariant name,
-              OBJECT_TYPE objectType,
-              int index,
-              CGXDLMSVariant& data,
-              std::vector<CGXByteBuffer>& reply);
+    int Write(
+        CGXDLMSVariant name,
+        OBJECT_TYPE objectType,
+        int index,
+        CGXDLMSVariant& data,
+        std::vector<CGXByteBuffer>& reply);
 
     /**
      * Generates a write message.
@@ -287,10 +289,11 @@ public:
      *            Generated write message(s).
      * Returns error status.
      */
-    int Write(CGXDLMSObject* pObject,
-              int index,
-              CGXDLMSVariant& data,
-              std::vector<CGXByteBuffer>& reply);
+    int Write(
+        CGXDLMSObject* pObject,
+        int index,
+        CGXDLMSVariant& data,
+        std::vector<CGXByteBuffer>& reply);
 
     /**
     * Generate Method (Action) request.
@@ -305,8 +308,11 @@ public:
     *            Data type.
     * @return DLMS action message.
     */
-    int Method(CGXDLMSObject* item, int index,
-               CGXDLMSVariant& data, std::vector<CGXByteBuffer>& reply);
+    int Method(
+        CGXDLMSObject* item,
+        int index,
+        CGXDLMSVariant& data,
+        std::vector<CGXByteBuffer>& reply);
 
     /**
     * Generate Method (Action) request..
@@ -323,8 +329,12 @@ public:
     *            Data type.
     * @return DLMS action message.
     */
-    int Method(CGXDLMSVariant name, OBJECT_TYPE objectType,
-               int methodIndex, CGXDLMSVariant& data, std::vector<CGXByteBuffer>& reply);
+    int Method(
+        CGXDLMSVariant name,
+        OBJECT_TYPE objectType,
+        int methodIndex,
+        CGXDLMSVariant& data,
+        std::vector<CGXByteBuffer>& reply);
 
     /**
     * Read rows by entry.
@@ -337,8 +347,11 @@ public:
     *            Rows count to read.
     * @return Read message as byte array.
     */
-    int ReadRowsByEntry(CGXDLMSProfileGeneric* pg,
-                        int index, int count, std::vector<CGXByteBuffer>& reply);
+    int ReadRowsByEntry(
+        CGXDLMSProfileGeneric* pg,
+        int index,
+        int count,
+        std::vector<CGXByteBuffer>& reply);
 
     /**
      * Read rows by range. Use this method to read Profile Generic table between
@@ -352,9 +365,42 @@ public:
      *            End time.
      * @return Generated read message.
      */
-    int ReadRowsByRange(CGXDLMSProfileGeneric* pg,
-                        struct tm* start,
-                        struct tm* end,
-                        std::vector<CGXByteBuffer>& reply);
+    int ReadRowsByRange(
+        CGXDLMSProfileGeneric* pg,
+        struct tm* start,
+        struct tm* end,
+        std::vector<CGXByteBuffer>& reply);
+
+    /**
+     * Converts meter serial number to server address. Default formula is used.
+     * All meters do not use standard formula or support serial number
+     * addressing at all.
+     *
+     * @param serialNumber
+     *            Meter serial number
+     * @param formula
+     *            Formula used to convert serial number to server address.
+     *            Set to NULL if standard formula is used.
+     * @return Server address.
+     */
+
+    static int GetServerAddress(
+        unsigned long serialNumber,
+        const char* formula = NULL);
+
+    /**
+     * Convert physical address and logical address to server address.
+     *
+     * @param logicalAddress
+     *            Server logical address.
+     * @param physicalAddress
+     *            Server physical address.
+     * @param addressSize
+     *            Address size in bytes.
+     * @return Server address.
+     */
+    static int  GetServerAddress(unsigned long logicalAddress,
+                                 unsigned long physicalAddress,
+                                 unsigned char addressSize = 0);
 };
 #endif //GXDLMSCLIENT_H

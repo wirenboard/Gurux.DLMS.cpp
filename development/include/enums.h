@@ -47,7 +47,6 @@
 #include <fstream>
 #include <assert.h>
 #include <iostream>
-#include <stdio.h>
 #include <math.h>
 #include <cmath>
 

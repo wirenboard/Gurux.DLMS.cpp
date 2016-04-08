@@ -47,6 +47,16 @@ CGXDLMSLNSettings::~CGXDLMSLNSettings(void)
 {
 }
 
+/**
+* Clear all bits.
+*/
+void CGXDLMSLNSettings::Clear()
+{
+    m_ConformanceBlock[0] = 0;
+    m_ConformanceBlock[1] = 0;
+    m_ConformanceBlock[2] = 0;
+}
+
 //Bit 8
 bool CGXDLMSLNSettings::GetAttribute0SetReferencing()
 {
@@ -149,33 +159,33 @@ void CGXDLMSLNSettings::SetSet(bool newVal)
 //Bit 21
 bool CGXDLMSLNSettings::GetSelectiveAccess()
 {
-    return GXHelpers::GetBits(m_ConformanceBlock[2], 0x2);
+    return GXHelpers::GetBits(m_ConformanceBlock[2], 0x4);
 }
 
 void CGXDLMSLNSettings::SetSelectiveAccess(bool newVal)
 {
-    GXHelpers::SetBits(m_ConformanceBlock[2], 0x2, newVal);
+    GXHelpers::SetBits(m_ConformanceBlock[2], 0x4, newVal);
 }
 
 //Bit 22
 bool CGXDLMSLNSettings::GetAction()
 {
-    return GXHelpers::GetBits(m_ConformanceBlock[2], 0x40);
+    return GXHelpers::GetBits(m_ConformanceBlock[2], 0x1);
 }
 
 void CGXDLMSLNSettings::SetAction(bool newVal)
 {
-    GXHelpers::SetBits(m_ConformanceBlock[2], 0x40, newVal);
+    GXHelpers::SetBits(m_ConformanceBlock[2], 0x1, newVal);
 }
 
 //Bit 23
 bool CGXDLMSLNSettings::GetEventNotification()
 {
-    return GXHelpers::GetBits(m_ConformanceBlock[2], 0x1);
+    return GXHelpers::GetBits(m_ConformanceBlock[2], 0x2);
 }
 
 void CGXDLMSLNSettings::SetEventNotification(bool newVal)
 {
-    GXHelpers::SetBits(m_ConformanceBlock[2], 0x1, newVal);
+    GXHelpers::SetBits(m_ConformanceBlock[2], 0x2, newVal);
 }
 

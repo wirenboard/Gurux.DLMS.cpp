@@ -50,6 +50,11 @@ public:
         //DumpValues();
     }
 
+    /**
+    * Clear all bits.
+    */
+    void Clear();
+
     bool GetAttribute0SetReferencing();
     void SetAttribute0SetReferencing(bool newVal);
     bool GetPriorityManagement();

@@ -38,6 +38,7 @@
 #include "../include/GXAPDU.h"
 #include "../include/GXDLMSObjectFactory.h"
 #include "../include/GXSecure.h"
+#include "../include/GXSerialNumberCounter.h"
 
 CGXDLMSClient::CGXDLMSClient(bool UseLogicalNameReferencing,
                              int clientAddress,
@@ -1182,4 +1183,31 @@ int CGXDLMSClient::ReadRowsByRange(CGXDLMSProfileGeneric* pg,
     // Add item count
     buff.SetUInt8(0x00);
     return Read(pg->GetName(), OBJECT_TYPE_PROFILE_GENERIC, 2, &buff, reply);
+}
+
+int CGXDLMSClient::GetServerAddress(unsigned long serialNumber,
+                                    const char* formula)
+{
+    // If formula is not given use default formula.
+    // This formula is defined in DLMS specification.
+    if (formula == NULL || strlen(formula) == 0)
+    {
+        return CGXSerialNumberCounter::Count(serialNumber, "SN % 10000 + 1000");
+    }
+    return CGXSerialNumberCounter::Count(serialNumber, formula);
+}
+
+int  CGXDLMSClient::GetServerAddress(unsigned long logicalAddress,
+                                     unsigned long physicalAddress, unsigned char addressSize)
+{
+    if (addressSize < 4 && physicalAddress < 0x80
+            && logicalAddress < 0x80)
+    {
+        return logicalAddress << 7 | physicalAddress;
+    }
+    if (physicalAddress < 0x4000 && logicalAddress < 0x4000)
+    {
+        return logicalAddress << 14 | physicalAddress;
+    }
+    return ERROR_CODES_INVALID_PARAMETER;
 }

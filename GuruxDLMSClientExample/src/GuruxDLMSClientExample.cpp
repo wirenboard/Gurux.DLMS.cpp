@@ -63,6 +63,9 @@ int main( int argc, char* argv[] )
         }
 #endif
         int ret;
+        int mikko = CGXDLMSClient::GetServerAddress(1234);
+        mikko = CGXDLMSClient::GetServerAddress(1, 1, 2);
+        mikko = 0;
         ////////////////////////////////////////////////////////////////////////////////////////////////////////
         //TODO: Client and Server addresses are manufacturer dependence. They should be standard values but they are not.
         //Below are some example values. Ask correct values from your meter manufacturer or http://www.gurux.org.

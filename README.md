@@ -44,6 +44,21 @@ CGXDLMSClient client(true);
 
 ```
 
+HDLC addressing
+=========================== 
+
+Each meter has own server address. Server address is divided to Logical address and Physical address.
+Usually you can use value 1 for meter address. You can count server address from serial number of the meter.
+You can use GetServerAddress method for that.
+
+```C++
+//Count server address from serial number.
+int serverAddress = CGXDLMSClient::GetServerAddress(Serial number);
+//Count server address from logican and physical address.
+serverAddress = CGXDLMSClient::GetServerAddress(logical Address, physical Address);
+```
+
+
 If you are using IEC handshake you must first send identify command and move to mode E.
 
 ```C++

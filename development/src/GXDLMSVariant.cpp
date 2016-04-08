@@ -146,8 +146,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #if _MSC_VER > 1000
             sprintf_s(buff, 250, "%lld", tmp.llVal);
 #else
-            //sprintf(buff, "%lld", tmp.llVal);
-            sprintf(buff, "%I64d", tmp.llVal);
+            sprintf(buff, "%lld", tmp.llVal);
 #endif
             item->strVal = buff;
             item->vt = type;
@@ -158,8 +157,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #if _MSC_VER > 1000
             sprintf_s(buff, 250, "%llu", tmp.ullVal);
 #else
-            //sprintf(buff, "%llu", tmp.ullVal);
-            sprintf(buff, "%I64u", tmp.ullVal);
+            sprintf(buff, "%llu", tmp.ullVal);
 #endif
             item->strVal = buff;
             item->vt = type;
@@ -310,8 +308,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #if _MSC_VER > 1000
             sscanf_s(tmp.strVal.c_str(), "%lld", &item->llVal);
 #else
-            //sscanf(tmp.strVal.c_str(), "%lld", &item->llVal);
-            sscanf(tmp.strVal.c_str(), "%I64d", &item->llVal);
+            sscanf(tmp.strVal.c_str(), "%lld", &item->llVal);
 #endif
             item->vt = type;
             return ERROR_CODES_OK;
@@ -321,8 +318,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #if _MSC_VER > 1000
             sscanf_s(tmp.strVal.c_str(), "%llu", &item->ullVal);
 #else
-            //sscanf(tmp.strVal.c_str(), "%llu", &item->ullVal);
-            sscanf(tmp.strVal.c_str(), "%I64u", &item->ullVal);
+            sscanf(tmp.strVal.c_str(), "%llu", &item->ullVal);
 #endif
             item->vt = type;
             return ERROR_CODES_OK;
