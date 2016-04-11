@@ -663,3 +663,14 @@ void CGXByteBuffer::ToArray(unsigned char*& value, int& count)
     value = (unsigned char*) malloc(count);
     memcpy(value, m_Data, count);
 }
+
+CGXByteBuffer& CGXByteBuffer::operator=(CGXByteBuffer& value)
+{
+    Capacity(value.GetSize());
+    m_Size = 0;
+    if (value.GetSize() != 0)
+    {
+        AddRange2(&value, 0, -1);
+    }
+    return *this;
+}

@@ -93,7 +93,7 @@ CGXByteBuffer& CGXDLMSSettings::GetPassword()
     return m_Password;
 }
 
-void CGXDLMSSettings::SetPassword(CGXByteBuffer value)
+void CGXDLMSSettings::SetPassword(CGXByteBuffer& value)
 {
     m_Password = value;
 }

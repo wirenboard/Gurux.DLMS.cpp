@@ -63,9 +63,6 @@ int main( int argc, char* argv[] )
         }
 #endif
         int ret;
-        int mikko = CGXDLMSClient::GetServerAddress(1234);
-        mikko = CGXDLMSClient::GetServerAddress(1, 1, 2);
-        mikko = 0;
         ////////////////////////////////////////////////////////////////////////////////////////////////////////
         //TODO: Client and Server addresses are manufacturer dependence. They should be standard values but they are not.
         //Below are some example values. Ask correct values from your meter manufacturer or http://www.gurux.org.
@@ -85,7 +82,8 @@ int main( int argc, char* argv[] )
         */
         bool trace = true;
         //Landis+Gyr settings.
-        CGXDLMSClient cl(false);
+//        CGXDLMSClient cl(false);
+        CGXDLMSClient cl(true, 1, 1, GXDLMS_AUTHENTICATION_LOW, "12345678", GXDLMS_INTERFACETYPE_WRAPPER);
         //Remove trace file if exists.
         remove("trace.txt");
         remove("LogFile.txt");

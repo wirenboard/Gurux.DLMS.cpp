@@ -157,7 +157,7 @@ public:
     CGXByteBuffer& GetPassword();
 
 // Sets password.
-    void SetPassword(CGXByteBuffer value);
+    void SetPassword(CGXByteBuffer& value);
 
 // Used DLMS version number.
     unsigned char GetDlmsVersionNumber();

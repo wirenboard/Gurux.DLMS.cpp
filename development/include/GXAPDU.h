@@ -112,10 +112,6 @@ public:
             data.SetUInt8(settings.GetAuthentication());
             // Add Calling authentication information.
             int len = 0;
-            if (settings.GetPassword().GetSize())
-            {
-                len = settings.GetPassword().GetSize();
-            }
             if (settings.GetAuthentication() == GXDLMS_AUTHENTICATION_LOW)
             {
                 len = settings.GetPassword().GetSize();

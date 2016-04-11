@@ -178,6 +178,8 @@ public:
     int GetUInt32LE(unsigned long* value);
     int GetUInt32LE(int index, unsigned long* value);
     void SetUInt32ByIndexLE(int index, unsigned long item);
+
+    CGXByteBuffer& operator=(CGXByteBuffer& value);
 };
 
 #endif //GXBYTEBUFFER_H
