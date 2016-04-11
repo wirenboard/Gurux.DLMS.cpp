@@ -221,6 +221,11 @@ int GXClient::Read(unsigned char eop, CGXByteBuffer& reply)
         {
             cnt = comstat.cbInQue;
         }
+        //If there is more data than can fit to buffer.
+        if (cnt > RECEIVE_BUFFER_SIZE)
+        {
+            cnt = RECEIVE_BUFFER_SIZE;
+        }
         if (!ReadFile(m_hComPort, m_Receivebuff, cnt, &bytesRead, &m_osReader))
         {
             DWORD nErr = GetLastError();
@@ -249,6 +254,11 @@ int GXClient::Read(unsigned char eop, CGXByteBuffer& reply)
         if (cnt == 0)
         {
             cnt = 1;
+        }
+        //If there is more data than can fit to buffer.
+        if (cnt > RECEIVE_BUFFER_SIZE)
+        {
+            cnt = RECEIVE_BUFFER_SIZE;
         }
         bytesRead = read(m_hComPort, m_Receivebuff, cnt);
         if (bytesRead == -1)
