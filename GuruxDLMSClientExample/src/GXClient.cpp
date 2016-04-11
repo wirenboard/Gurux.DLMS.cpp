@@ -246,13 +246,14 @@ int GXClient::Read(unsigned char eop, CGXByteBuffer& reply)
 #else
         //Get bytes available.
         ret = ioctl(m_hComPort, FIONREAD, &cnt);
-        if (ret < 0)
+        //If driver is not supporting this functionality.
+        if (ret < 0 || ret == 0xFF)
         {
-            return ERROR_CODES_RECEIVE_FAILED;
+            cnt = RECEIVE_BUFFER_SIZE;
         }
-        //Try to read at least one byte.
-        if (cnt == 0)
+        else if (cnt == 0 || ret == )
         {
+            //Try to read at least one byte.
             cnt = 1;
         }
         //If there is more data than can fit to buffer.
@@ -261,7 +262,7 @@ int GXClient::Read(unsigned char eop, CGXByteBuffer& reply)
             cnt = RECEIVE_BUFFER_SIZE;
         }
         bytesRead = read(m_hComPort, m_Receivebuff, cnt);
-        if (bytesRead == -1)
+        if (bytesRead == 0xFFFF)
         {
             if (errno == EAGAIN)
             {
