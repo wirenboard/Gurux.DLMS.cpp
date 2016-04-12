@@ -32,10 +32,10 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-// GuruxDLMSClientExample.cpp : Defines the entry point for the console application.
+// GuruxDLMSClientExample.cpp : Defines the entry point for the Gurux DLMS Client example.
 //
 
-#include "../include/GXClient.h"
+#include "../include/communication.h"
 #include "../../development/include/GXDLMSConverter.h"
 #include "../../development/include/GXDLMSProfileGeneric.h"
 
@@ -80,15 +80,14 @@ int main( int argc, char* argv[] )
         	//ZIV settings.
         	CGXDLMSClient cl(true, 1, 1, GXDLMS_AUTHENTICATION_NONE, NULL, GXDLMS_INTERFACETYPE_WRAPPER);
         */
-        bool trace = true;
-        //Landis+Gyr settings.
-//        CGXDLMSClient cl(false);
-        CGXDLMSClient cl(true, 1, 1, GXDLMS_AUTHENTICATION_LOW, "12345678", GXDLMS_INTERFACETYPE_WRAPPER);
         //Remove trace file if exists.
         remove("trace.txt");
         remove("LogFile.txt");
-
-        GXClient comm(&cl, 1500, trace);
+        bool trace = true;
+        //Landis+Gyr settings.
+        CGXDLMSClient cl(false);
+        CGXCommunication comm(&cl, 1500, trace);
+        //Serial port settings.
         /*
         if ((ret = comm.Open("COM3", false)) != 0)
         {
@@ -97,6 +96,7 @@ int main( int argc, char* argv[] )
         }
 
         */
+        //TCP/IP settings.
         if ((ret = comm.Connect("localhost", 4060)) != 0)
         {
             TRACE("Connect failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));

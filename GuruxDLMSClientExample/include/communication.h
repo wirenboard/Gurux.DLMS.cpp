@@ -33,8 +33,8 @@
 //---------------------------------------------------------------------------
 
 
-#ifndef GXCLIENT_H
-#define GXCLIENT_H
+#ifndef GXCOMMUNICATION_H
+#define GXCOMMUNICATION_H
 
 #include <stdio.h>
 
@@ -71,7 +71,7 @@
 
 #include "../../development/include/GXDLMSClient.h"
 
-class GXClient
+class CGXCommunication
 {
     static const unsigned int RECEIVE_BUFFER_SIZE = 200;
     int m_WaitTime;
@@ -89,8 +89,8 @@ public:
 public:
     bool m_Trace;
 
-    GXClient(CGXDLMSClient* pCosem, int wt, bool trace);
-    ~GXClient(void);
+    CGXCommunication(CGXDLMSClient* pCosem, int wt, bool trace);
+    ~CGXCommunication(void);
 
     int Close();
     int Connect(const char* pAddress, unsigned short port = 4059);
@@ -146,4 +146,4 @@ public:
     int ReadRowsByRange(CGXDLMSProfileGeneric* pObject, struct tm* start, struct tm* end, CGXDLMSVariant& rows);
     int ReadRowsByEntry(CGXDLMSProfileGeneric* pObject, unsigned int Index, unsigned int Count, CGXDLMSVariant& rows);
 };
-#endif //GXCLIENT_H
+#endif //GXCOMMUNICATION_H

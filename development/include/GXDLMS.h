@@ -49,7 +49,7 @@
 class CGXDLMS
 {
 private:
-    friend class GXClient;
+    friend class CGXDLMSClient;
     //CRC table.
     static unsigned short m_FCS16Table[256];
 

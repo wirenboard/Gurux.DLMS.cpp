@@ -71,7 +71,7 @@ public:
 
     std::vector<CGXDLMSIp4SetupIpOption>& GetIPOptions();
 
-    void SetIPOptions(std::vector<CGXDLMSIp4SetupIpOption> value);
+    void SetIPOptions(std::vector<CGXDLMSIp4SetupIpOption>& value);
 
     unsigned long GetSubnetMask();
     void SetSubnetMask(unsigned long value);

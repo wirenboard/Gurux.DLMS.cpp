@@ -32,13 +32,12 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#include "../include/GXClient.h"
+#include "../include/communication.h"
 
-GXClient::GXClient(CGXDLMSClient* pParser, int wt, bool trace) :
+CGXCommunication::CGXCommunication(CGXDLMSClient* pParser, int wt, bool trace) :
     m_WaitTime(wt), m_Parser(pParser),
     m_socket(-1), m_Trace(trace)
 {
-    static CGXDLMS dlms;
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
     ZeroMemory(&m_osReader, sizeof(OVERLAPPED));
     ZeroMemory(&m_osWrite, sizeof(OVERLAPPED));
@@ -48,13 +47,13 @@ GXClient::GXClient(CGXDLMSClient* pParser, int wt, bool trace) :
 #endif
 }
 
-GXClient::~GXClient(void)
+CGXCommunication::~CGXCommunication(void)
 {
     Close();
 }
 
 //Close connection to the meter.
-int GXClient::Close()
+int CGXCommunication::Close()
 {
     int ret;
     std::vector<CGXByteBuffer> data;
@@ -88,7 +87,7 @@ int GXClient::Close()
 }
 
 //Make TCP/IP connection to the meter.
-int GXClient::Connect(const char* pAddress, unsigned short Port)
+int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
 {
     Close();
     //create socket.
@@ -129,7 +128,7 @@ int GXClient::Connect(const char* pAddress, unsigned short Port)
 }
 
 #if defined(_WIN32) || defined(_WIN64)//Windows
-int GXClient::GXGetCommState(HANDLE hWnd, LPDCB dcb)
+int CGXCommunication::GXGetCommState(HANDLE hWnd, LPDCB dcb)
 {
     ZeroMemory(dcb, sizeof(DCB));
     dcb->DCBlength = sizeof(DCB);
@@ -161,7 +160,7 @@ int GXClient::GXGetCommState(HANDLE hWnd, LPDCB dcb)
     return ERROR_CODES_OK;
 }
 
-int GXClient::GXSetCommState(HANDLE hWnd, LPDCB DCB)
+int CGXCommunication::GXSetCommState(HANDLE hWnd, LPDCB DCB)
 {
     if (!SetCommState(hWnd, DCB))
     {
@@ -193,7 +192,7 @@ int GXClient::GXSetCommState(HANDLE hWnd, LPDCB DCB)
 
 #endif //Windows
 
-int GXClient::Read(unsigned char eop, CGXByteBuffer& reply)
+int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
 {
 #if defined(_WIN32) || defined(_WIN64)//Windows
     unsigned long RecieveErrors;
@@ -203,7 +202,8 @@ int GXClient::Read(unsigned char eop, CGXByteBuffer& reply)
     unsigned short bytesRead = 0;
     int ret;
 #endif
-    int cnt = 1, pos;
+    int pos;
+    unsigned long cnt = 1;
     bool bFound = false;
     int lastReadIndex = 0;
     do
@@ -247,11 +247,11 @@ int GXClient::Read(unsigned char eop, CGXByteBuffer& reply)
         //Get bytes available.
         ret = ioctl(m_hComPort, FIONREAD, &cnt);
         //If driver is not supporting this functionality.
-        if (ret < 0 || ret == 0xFF)
+        if (ret < 0)
         {
             cnt = RECEIVE_BUFFER_SIZE;
         }
-        else if (cnt == 0 || ret == )
+        else if (cnt == 0)
         {
             //Try to read at least one byte.
             cnt = 1;
@@ -264,10 +264,10 @@ int GXClient::Read(unsigned char eop, CGXByteBuffer& reply)
         bytesRead = read(m_hComPort, m_Receivebuff, cnt);
         if (bytesRead == 0xFFFF)
         {
+            //If wait time has elapsed.
             if (errno == EAGAIN)
             {
-                ret = 0;
-                usleep(100000);
+                return ERROR_CODES_RECEIVE_FAILED;
             }
             //If connection is closed.
             else if (errno == EBADF)
@@ -311,7 +311,7 @@ int GXClient::Read(unsigned char eop, CGXByteBuffer& reply)
 }
 
 //Open serial port.
-int GXClient::Open(const char* port, bool iec, int maxBaudrate)
+int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
 {
     Close();
     CGXByteBuffer reply;
@@ -412,7 +412,8 @@ int GXClient::Open(const char* port, bool iec, int maxBaudrate)
         }
         options.c_lflag = 0;
         options.c_cc[VMIN] = 1;
-        options.c_cc[VTIME] = 5;
+        //How long we are waiting reply charachter from serial port.
+        options.c_cc[VTIME] = m_WaitTime / 1000;
         //hardware flow control is used as default.
         //options.c_cflag |= CRTSCTS;
         if (tcsetattr(m_hComPort, TCSAFLUSH, &options) != 0)
@@ -584,7 +585,7 @@ int GXClient::Open(const char* port, bool iec, int maxBaudrate)
 }
 
 //Initialize connection to the meter.
-int GXClient::InitializeConnection()
+int CGXCommunication::InitializeConnection()
 {
     TRACE1("InitializeConnection\r\n");
     std::vector<CGXByteBuffer> data;
@@ -615,7 +616,7 @@ int GXClient::InitializeConnection()
 }
 
 // Read DLMS Data frame from the device.
-int GXClient::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
+int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
 {
     int ret;
     CGXByteBuffer bb;
@@ -693,7 +694,7 @@ int GXClient::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
     return ret;
 }
 
-int GXClient::ReadDataBlock(std::vector<CGXByteBuffer>& data, CGXReplyData& reply)
+int CGXCommunication::ReadDataBlock(std::vector<CGXByteBuffer>& data, CGXReplyData& reply)
 {
     //If ther is no data to send.
     if (data.size() == 0)
@@ -727,7 +728,7 @@ int GXClient::ReadDataBlock(std::vector<CGXByteBuffer>& data, CGXReplyData& repl
 }
 
 //Get Association view.
-int GXClient::GetObjects(CGXDLMSObjectCollection& objects)
+int CGXCommunication::GetObjects(CGXDLMSObjectCollection& objects)
 {
     TRACE1("GetAssociationView\r\n");
     int ret;
@@ -744,7 +745,7 @@ int GXClient::GetObjects(CGXDLMSObjectCollection& objects)
 }
 
 //Update SN or LN access list.
-int GXClient::UpdateAccess(CGXDLMSObject* pObject, CGXDLMSObjectCollection& Objects)
+int CGXCommunication::UpdateAccess(CGXDLMSObject* pObject, CGXDLMSObjectCollection& Objects)
 {
     CGXDLMSVariant data;
     int ret = Read(pObject, 2, data);
@@ -796,7 +797,7 @@ int GXClient::UpdateAccess(CGXDLMSObject* pObject, CGXDLMSObjectCollection& Obje
 }
 
 //Read selected object.
-int GXClient::Read(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& value)
+int CGXCommunication::Read(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& value)
 {
     value.Clear();
     int ret;
@@ -833,7 +834,7 @@ int GXClient::Read(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& v
 }
 
 //Write selected object.
-int GXClient::Write(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& value)
+int CGXCommunication::Write(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& value)
 {
     int ret;
     std::vector<CGXByteBuffer> data;
@@ -847,7 +848,7 @@ int GXClient::Write(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& 
     return ERROR_CODES_OK;
 }
 
-int GXClient::Method(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& value)
+int CGXCommunication::Method(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& value)
 {
     int ret;
     std::vector<CGXByteBuffer> data;
@@ -861,7 +862,7 @@ int GXClient::Method(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant&
     return ERROR_CODES_OK;
 }
 
-int GXClient::ReadRowsByRange(CGXDLMSProfileGeneric* pObject, struct tm* start, struct tm* end, CGXDLMSVariant& rows)
+int CGXCommunication::ReadRowsByRange(CGXDLMSProfileGeneric* pObject, struct tm* start, struct tm* end, CGXDLMSVariant& rows)
 {
     rows.Clear();
     int ret;
@@ -881,7 +882,7 @@ int GXClient::ReadRowsByRange(CGXDLMSProfileGeneric* pObject, struct tm* start, 
     return ERROR_CODES_OK;
 }
 
-int GXClient::ReadRowsByEntry(CGXDLMSProfileGeneric* pObject, unsigned int index, unsigned int count, CGXDLMSVariant& rows)
+int CGXCommunication::ReadRowsByEntry(CGXDLMSProfileGeneric* pObject, unsigned int index, unsigned int count, CGXDLMSVariant& rows)
 {
     rows.Clear();
     int ret;

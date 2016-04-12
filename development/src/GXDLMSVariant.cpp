@@ -143,8 +143,13 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
         }
         if (tmp.vt == DLMS_DATA_TYPE_INT64)
         {
+#if defined(_WIN32) || defined(_WIN64)//Windows
 #if _MSC_VER > 1000
             sprintf_s(buff, 250, "%lld", tmp.llVal);
+#else
+        	sprintf(buff, "%I64d", tmp.llVal);
+#endif
+
 #else
             sprintf(buff, "%lld", tmp.llVal);
 #endif
@@ -154,12 +159,16 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
         }
         if (tmp.vt == DLMS_DATA_TYPE_UINT64)
         {
+#if defined(_WIN32) || defined(_WIN64)//Windows
 #if _MSC_VER > 1000
             sprintf_s(buff, 250, "%llu", tmp.ullVal);
 #else
+        	sprintf(buff, "%I64u", tmp.llVal);
+#endif
+#else
             sprintf(buff, "%llu", tmp.ullVal);
 #endif
-            item->strVal = buff;
+        	item->strVal = buff;
             item->vt = type;
             return ERROR_CODES_OK;
         }
@@ -305,8 +314,12 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
         }
         if (type == DLMS_DATA_TYPE_INT64)
         {
+#if defined(_WIN32) || defined(_WIN64)//Windows
 #if _MSC_VER > 1000
             sscanf_s(tmp.strVal.c_str(), "%lld", &item->llVal);
+#else
+            sscanf(tmp.strVal.c_str(), "%I64d", &item->llVal);
+#endif
 #else
             sscanf(tmp.strVal.c_str(), "%lld", &item->llVal);
 #endif
@@ -315,10 +328,18 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
         }
         if (type == DLMS_DATA_TYPE_UINT64)
         {
+#if defined(_WIN32) || defined(_WIN64)//Windows
 #if _MSC_VER > 1000
             sscanf_s(tmp.strVal.c_str(), "%llu", &item->ullVal);
 #else
+            sscanf(tmp.strVal.c_str(), "%I64u", &item->ullVal);
+#endif
+#else
             sscanf(tmp.strVal.c_str(), "%llu", &item->ullVal);
+#endif
+
+#if _MSC_VER > 1000
+#else
 #endif
             item->vt = type;
             return ERROR_CODES_OK;

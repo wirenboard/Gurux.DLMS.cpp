@@ -39,34 +39,34 @@
 //Constructor.
 CGXDLMSIp4Setup::CGXDLMSIp4Setup() : CGXDLMSObject(OBJECT_TYPE_IP4_SETUP)
 {
-	m_IPAddress = 0;
-	m_SubnetMask = 0;
-	m_GatewayIPAddress = 0;
-	m_UseDHCP = false;
-	m_PrimaryDNSAddress = 0;
-	m_SecondaryDNSAddress = 0;
+    m_IPAddress = 0;
+    m_SubnetMask = 0;
+    m_GatewayIPAddress = 0;
+    m_UseDHCP = false;
+    m_PrimaryDNSAddress = 0;
+    m_SecondaryDNSAddress = 0;
 }
 
 //SN Constructor.
 CGXDLMSIp4Setup::CGXDLMSIp4Setup(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_IP4_SETUP, sn)
 {
-	m_IPAddress = 0;
-	m_SubnetMask = 0;
-	m_GatewayIPAddress = 0;
-	m_UseDHCP = false;
-	m_PrimaryDNSAddress = 0;
-	m_SecondaryDNSAddress = 0;
+    m_IPAddress = 0;
+    m_SubnetMask = 0;
+    m_GatewayIPAddress = 0;
+    m_UseDHCP = false;
+    m_PrimaryDNSAddress = 0;
+    m_SecondaryDNSAddress = 0;
 }
 
 //LN Constructor.
 CGXDLMSIp4Setup::CGXDLMSIp4Setup(std::string ln) : CGXDLMSObject(OBJECT_TYPE_IP4_SETUP, ln)
 {
-	m_IPAddress = 0;
-	m_SubnetMask = 0;
-	m_GatewayIPAddress = 0;
-	m_UseDHCP = false;
-	m_PrimaryDNSAddress = 0;
-	m_SecondaryDNSAddress = 0;
+    m_IPAddress = 0;
+    m_SubnetMask = 0;
+    m_GatewayIPAddress = 0;
+    m_UseDHCP = false;
+    m_PrimaryDNSAddress = 0;
+    m_SecondaryDNSAddress = 0;
 }
 
 std::string& CGXDLMSIp4Setup::GetDataLinkLayerReference()
@@ -97,9 +97,10 @@ std::vector<CGXDLMSIp4SetupIpOption>& CGXDLMSIp4Setup::GetIPOptions()
 {
     return m_IPOptions;
 }
-void CGXDLMSIp4Setup::SetIPOptions(std::vector<CGXDLMSIp4SetupIpOption> value)
+void CGXDLMSIp4Setup::SetIPOptions(std::vector<CGXDLMSIp4SetupIpOption>& value)
 {
-    m_IPOptions = value;
+    m_IPOptions.clear();
+    m_IPOptions.insert(m_IPOptions.end(), value.begin(), value.end());
 }
 
 unsigned long CGXDLMSIp4Setup::GetSubnetMask()
@@ -338,7 +339,7 @@ int CGXDLMSIp4Setup::GetValue(int index, int selector, CGXDLMSVariant& parameter
         CGXDLMSVariant tmp;
         for(std::vector<unsigned long>::iterator it = m_MulticastIPAddress.begin(); it != m_MulticastIPAddress.end(); ++it)
         {
-        	tmp = *it;
+            tmp = *it;
             if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT32, tmp)) != 0)
             {
                 return ret;

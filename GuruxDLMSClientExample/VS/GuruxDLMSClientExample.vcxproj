@@ -14,11 +14,11 @@
     <None Include="..\..\README.md" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\GXClient.h" />
+    <ClInclude Include="..\include\communication.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\GuruxDLMSClientExample.cpp" />
-    <ClCompile Include="..\src\GXClient.cpp" />
+    <ClCompile Include="..\src\communication.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>GuruxDLMSClientExample</ProjectName>

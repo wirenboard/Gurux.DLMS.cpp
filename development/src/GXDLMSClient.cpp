@@ -49,6 +49,7 @@ CGXDLMSClient::CGXDLMSClient(bool UseLogicalNameReferencing,
                              const char* password,
                              GXDLMS_INTERFACETYPE intefaceType) : m_Settings(false)
 {
+    static CGXDLMS dlms;
     m_Cipher = NULL;
     m_IsAuthenticationRequired = false;
     m_Settings.SetUseLogicalNameReferencing(UseLogicalNameReferencing);
