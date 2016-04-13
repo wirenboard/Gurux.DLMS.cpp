@@ -478,7 +478,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
         {
             return ERROR_CODES_SEND_FAILED;
         }
-        switch (ret)
+        switch (ch)
         {
         case '0':
             baudRate = 300;
