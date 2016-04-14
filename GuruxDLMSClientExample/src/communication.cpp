@@ -508,7 +508,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
         buff[0] = 0x06;
         //Send Protocol control character
         buff[1] = '2';// "2" HDLC protocol procedure (Mode E)
-        buff[2] = (char) baudRate;
+        buff[2] = (char) ch;
         buff[3] = '2';
         buff[4] = (char) 0x0D;
         buff[5] = 0x0A;
