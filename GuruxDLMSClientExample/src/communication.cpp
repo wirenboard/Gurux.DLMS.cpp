@@ -393,8 +393,8 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
             options.c_cflag &= ~CSIZE;
             options.c_cflag |= CS7;
             //Set Baud Rates
-            cfsetospeed (&options, 300);
-            cfsetispeed (&options, 300);
+            cfsetospeed (&options, B300);
+            cfsetispeed (&options, B300);
         }
         else
         {
@@ -407,8 +407,8 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
             options.c_cflag |= CS8;
             */
             //Set Baud Rates
-            cfsetospeed(&options, 9600);
-            cfsetispeed(&options, 9600);
+            cfsetospeed(&options, B9600);
+            cfsetispeed(&options, B9600);
         }
         options.c_lflag = 0;
         options.c_cc[VMIN] = 1;
@@ -481,25 +481,53 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
         switch (ch)
         {
         case '0':
+#if defined(_WIN32) || defined(_WIN64)
             baudRate = 300;
+#else
+            baudRate = B300;
+#endif
             break;
         case '1':
+#if defined(_WIN32) || defined(_WIN64)
             baudRate = 600;
+#else
+            baudRate = B600;
+#endif
             break;
         case '2':
+#if defined(_WIN32) || defined(_WIN64)
             baudRate = 1200;
+#else
+            baudRate = B1200;
+#endif
             break;
         case '3':
+#if defined(_WIN32) || defined(_WIN64)
             baudRate = 2400;
+#else
+            baudRate = B2400;
+#endif
             break;
         case '4':
+#if defined(_WIN32) || defined(_WIN64)
             baudRate = 4800;
+#else
+            baudRate = B4800;
+#endif
             break;
         case '5':
+#if defined(_WIN32) || defined(_WIN64)
             baudRate = 9600;
+#else
+            baudRate = B9600;
+#endif
             break;
         case '6':
+#if defined(_WIN32) || defined(_WIN64)
             baudRate = 19200;
+#else
+            baudRate = B19200;
+#endif
             break;
         default:
             return ERROR_CODES_INVALID_PARAMETER;
