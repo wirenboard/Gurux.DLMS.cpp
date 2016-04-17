@@ -55,6 +55,28 @@ public:
     */
     void Clear();
 
+    /**
+     * @return Is general protection supported.
+     */
+    bool GetGeneralProtection();
+
+    /**
+     * @param value
+     *            Is general protection supported.
+     */
+    void SetGeneralProtection(bool value);
+
+    /**
+     * @return Is general block transfer supported.
+     */
+    bool GetGeneralBlockTransfer();
+
+    /**
+     * @param value
+     *            Is general block transfer supported.
+     */
+    void SetGeneralBlockTransfer(bool value);
+
     bool GetAttribute0SetReferencing();
     void SetAttribute0SetReferencing(bool newVal);
     bool GetPriorityManagement();
@@ -69,15 +91,54 @@ public:
     void SetActionBlockTransfer(bool newVal);
     bool GetMultibleReferences();
     void SetMultibleReferences(bool newVal);
+
+    /**
+    * @return Is data notification supported.
+    */
+    bool GetDataNotification();
+
+    /**
+     * @param value
+     *            Is data notification supported.
+     */
+    void SetDataNotification(bool value);
+
+    /**
+     * @return Is access used.
+     */
+    bool GetAccess();
+
+    /**
+     * @param value
+     *            Is access used.
+     */
+    void SetAccess(bool value);
+
     bool GetGet();
     void SetGet(bool newVal);
     bool GetSet();
     void SetSet(bool newVal);
-    bool GetAction();
-    void SetAction(bool newVal);
-    bool GetEventNotification();
-    void SetEventNotification(bool newVal);
     bool GetSelectiveAccess();
     void SetSelectiveAccess(bool newVal);
+
+    /**
+     * @return Is server supporting event notifications.
+     */
+    bool GetEventNotification();
+    /**
+     * @param value
+     *            Is server supporting event notifications.
+     */
+    void SetEventNotification(bool newVal);
+
+    /**
+     * @return Can client call actions (methods).
+     */
+    bool GetAction();
+    /**
+     * @param value
+     *            Can client call actions (methods).
+     */
+    void SetAction(bool newVal);
 };
 #endif //GXDLMSLNSETTINGS_H

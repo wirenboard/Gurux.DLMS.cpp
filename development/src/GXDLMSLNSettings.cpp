@@ -57,6 +57,26 @@ void CGXDLMSLNSettings::Clear()
     m_ConformanceBlock[2] = 0;
 }
 
+bool CGXDLMSLNSettings::GetGeneralProtection()
+{
+    return GXHelpers::GetBits(m_ConformanceBlock[0], 0x40);
+}
+
+void CGXDLMSLNSettings::SetGeneralProtection(bool value)
+{
+    GXHelpers::SetBits(m_ConformanceBlock[0], 0x40, value);
+}
+
+bool CGXDLMSLNSettings::GetGeneralBlockTransfer()
+{
+    return GXHelpers::GetBits(m_ConformanceBlock[0], 0x20);
+}
+
+void CGXDLMSLNSettings::SetGeneralBlockTransfer(bool value)
+{
+    GXHelpers::SetBits(m_ConformanceBlock[1], 0x20, value);
+}
+
 //Bit 8
 bool CGXDLMSLNSettings::GetAttribute0SetReferencing()
 {
@@ -134,7 +154,26 @@ void CGXDLMSLNSettings::SetMultibleReferences(bool newVal)
     GXHelpers::SetBits(m_ConformanceBlock[1], 0x2, newVal);
 }
 
-//Bit 19
+bool CGXDLMSLNSettings::GetDataNotification()
+{
+    return GXHelpers::GetBits(m_ConformanceBlock[2], 0x80);
+}
+
+void CGXDLMSLNSettings::SetDataNotification(bool value)
+{
+    GXHelpers::SetBits(m_ConformanceBlock[2], 0x80, value);
+}
+
+bool CGXDLMSLNSettings::GetAccess()
+{
+    return GXHelpers::GetBits(m_ConformanceBlock[2], 0x40);
+}
+
+void CGXDLMSLNSettings::SetAccess(bool value)
+{
+    GXHelpers::SetBits(m_ConformanceBlock[2], 0x40, value);
+}
+
 bool CGXDLMSLNSettings::GetGet()
 {
     return GXHelpers::GetBits(m_ConformanceBlock[2], 0x10);

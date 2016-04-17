@@ -711,6 +711,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             bb.AddRange(m_Receivebuff, ret);
         }
     }
+    tmp = "";
     Now(tmp);
     tmp = "-> " + tmp;
     tmp += "\t" + bb.ToHexString();
