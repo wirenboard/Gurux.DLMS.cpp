@@ -41,18 +41,18 @@
 class CGXSendDestinationAndMethod
 {
 private:
-    GXDLMS_SERVICE_TYPE m_Service;
+    DLMS_SERVICE_TYPE m_Service;
     std::string m_Destination;
-    GXDLMS_MESSAGE_TYPE m_Message;
+    DLMS_MESSAGE_TYPE m_Message;
 
 public:
-    GXDLMS_SERVICE_TYPE GetService();
-    void SetService(GXDLMS_SERVICE_TYPE value);
+    DLMS_SERVICE_TYPE GetService();
+    void SetService(DLMS_SERVICE_TYPE value);
 
     std::string GetDestination();
     void SetDestination(std::string value);
 
-    GXDLMS_MESSAGE_TYPE GetMessage();
-    void SetMessage(GXDLMS_MESSAGE_TYPE value);
+    DLMS_MESSAGE_TYPE GetMessage();
+    void SetMessage(DLMS_MESSAGE_TYPE value);
 };
 #endif //GXSENDDESTINATIONANDMETHOD_H

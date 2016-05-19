@@ -47,7 +47,7 @@ enum IP_OPTION_TYPE
      value of the Security, Compartments, Handling Restrictions and
      Transmission Control Code values, as specified in STD0005 / RFC791.
     */
-    IP_OPTION_TYPE_SECURITY = 0x82,
+    IP_OPTION_TYPE_DLMS_SECURITY = 0x82,
     /**
      If this option is present, the device shall supply routing information to be
      used by the gateways in forwarding the datagram to the destination, and to

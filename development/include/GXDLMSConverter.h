@@ -44,38 +44,38 @@ public:
     //Get Unit as String.
     static const char* GetUnitAsString(int unit);
     //Get baudrate enum balue as std::string.
-    static const char* ToString(BAUDRATE value);
+    static const char* ToString(DLMS_BAUD_RATE value);
     //Get clock base enum value as std::string.
-    static const char* ToString(CLOCKBASE value);
+    static const char* ToString(DLMS_CLOCK_BASE value);
     //Get clock status enum value as std::string.
-    static const char* ToString(GXDLMS_CLOCK_STATUS value);
+    static const char* ToString(DLMS_CLOCK_STATUS value);
 
     //Get error message as std::string.
     static const char* GetErrorMessage(int error);
 
     //Get address state enum value as std::string.
-    static const char* ToString(ADDRESS_STATE value);
+    static const char* ToString(DLMS_ADDRESS_STATE value);
 
     //Get Disconnect control control state as a std::string.
-    static const char* ToString(CONTROLSTATE value);
+    static const char* ToString(DLMS_CONTROL_STATE value);
 
     //Get Disconnect control control mode as a std::string.
-    static const char* ToString(CONTROLMODE value);
+    static const char* ToString(DLMS_CONTROL_MODE value);
 
     //Get Security Setup security policy as a std::string.
-    static const char* ToString(SECURITY_POLICY value);
+    static const char* ToString(DLMS_SECURITY_POLICY value);
 
     //Get Security Setup security suite as a std::string.
-    static const char* ToString(SECURITY_SUITE value);
+    static const char* ToString(DLMS_SECURITY_SUITE value);
 
     //Get Logical Name association status as a std::string.
-    static const char* ToString(GX_ASSOCIATION_STATUS value);
+    static const char* ToString(DLMS_DLMS_ASSOCIATION_STATUS value);
 
     //Get optical port protocol mode as a std::string.
-    static const char* ToString(OPTICAL_PROTOCOL_MODE value);
+    static const char* ToString(DLMS_OPTICAL_PROTOCOL_MODE value);
 
     //Get optical port response time as a std::string.
-    static const char* ToString(LOCAL_PORT_RESPONSE_TIME value);
+    static const char* ToString(DLMS_LOCAL_PORT_RESPONSE_TIME value);
 
 };
 #endif //GXDLMSCONVERTER_H

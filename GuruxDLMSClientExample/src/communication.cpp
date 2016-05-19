@@ -95,7 +95,7 @@ int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
     if (m_socket == -1)
     {
         assert(0);
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     sockaddr_in add;
     add.sin_port = htons(Port);
@@ -122,9 +122,9 @@ int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
     int ret = connect(m_socket, (sockaddr*)&add, sizeof(sockaddr_in));
     if (ret == -1)
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     };
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 #if defined(_WIN32) || defined(_WIN64)//Windows
@@ -157,7 +157,7 @@ int CGXCommunication::GXGetCommState(HANDLE hWnd, LPDCB dcb)
             }
         }
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 int CGXCommunication::GXSetCommState(HANDLE hWnd, LPDCB DCB)
@@ -187,7 +187,7 @@ int CGXCommunication::GXSetCommState(HANDLE hWnd, LPDCB DCB)
             }
         }
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 #endif //Windows
@@ -212,7 +212,7 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
         //We do not want to read byte at the time.
         if (!ClearCommError(m_hComPort, &RecieveErrors, &comstat))
         {
-            return ERROR_CODES_SEND_FAILED;
+            return DLMS_ERROR_CODE_SEND_FAILED;
         }
         bytesRead = 0;
         cnt = 1;
@@ -231,16 +231,16 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             DWORD nErr = GetLastError();
             if (nErr != ERROR_IO_PENDING)
             {
-                return ERROR_CODES_RECEIVE_FAILED;
+                return DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
             //Wait until data is actually read
             if (::WaitForSingleObject(m_osReader.hEvent, m_WaitTime) != WAIT_OBJECT_0)
             {
-                return ERROR_CODES_RECEIVE_FAILED;
+                return DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
             if (!GetOverlappedResult(m_hComPort, &m_osReader, &bytesRead, TRUE))
             {
-                return ERROR_CODES_RECEIVE_FAILED;
+                return DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
         }
 #else
@@ -267,20 +267,20 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             //If wait time has elapsed.
             if (errno == EAGAIN)
             {
-                return ERROR_CODES_RECEIVE_FAILED;
+                return DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
             //If connection is closed.
             else if (errno == EBADF)
             {
-                return ERROR_CODES_RECEIVE_FAILED;
+                return DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
             else
             {
-                return ERROR_CODES_RECEIVE_FAILED;
+                return DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
         }
 #endif
-        reply.AddRange(m_Receivebuff, bytesRead);
+        reply.Set(m_Receivebuff, bytesRead);
         //Note! Some USB converters can return true for ReadFile and Zero as bytesRead.
         //In that case wait for a while and read again.
         if (bytesRead == 0)
@@ -307,7 +307,7 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
         }
     }
     while(!bFound);
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 //Open serial port.
@@ -334,7 +334,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
                              OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
     if (m_hComPort == INVALID_HANDLE_VALUE)
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     dcb.DCBlength = sizeof(DCB);
     dcb.fBinary = 1;
@@ -357,7 +357,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
     }
     if ((ret = GXSetCommState(m_hComPort, &dcb)) != 0)
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
 #else //#if defined(__LINUX__)
     struct termios options;
@@ -366,20 +366,20 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
     if(m_hComPort == -1) // if open is unsuccessful.
     {
         printf("Failed to Open port.\r");
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     else
     {
         if(!isatty(m_hComPort))
         {
             printf("Failed to Open port. This is not a serial port.\r");
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
 
         if ((ioctl(m_hComPort, TIOCEXCL) == -1))
         {
             printf("Failed to Open port. Exclusive access denied.\r");
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
 
         memset(&options, 0, sizeof(options));
@@ -419,7 +419,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
         if (tcsetattr(m_hComPort, TCSAFLUSH, &options) != 0)
         {
             printf("Failed to Open port. tcsetattr failed.\r");
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
     }
 #endif
@@ -448,7 +448,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
             //If error occurs...
             if (err != ERROR_IO_PENDING)
             {
-                return ERROR_CODES_SEND_FAILED;
+                return DLMS_ERROR_CODE_SEND_FAILED;
             }
             //Wait until data is actually sent
             WaitForSingleObject(m_osWrite.hEvent, INFINITE);
@@ -457,13 +457,13 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
         ret = write(m_hComPort, buff, len);
         if (ret != len)
         {
-            return ERROR_CODES_SEND_FAILED;
+            return DLMS_ERROR_CODE_SEND_FAILED;
         }
 #endif
         //Read reply data.
         if (Read('\n', reply) != 0)
         {
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         if (m_Trace)
         {
@@ -471,12 +471,12 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
         }
         if (reply.GetUInt8(&ch) != 0 || ch != '/')
         {
-            return ERROR_CODES_SEND_FAILED;
+            return DLMS_ERROR_CODE_SEND_FAILED;
         }
         //Get used baud rate.
         if ((ret = reply.GetUInt8(4, &ch)) != 0)
         {
-            return ERROR_CODES_SEND_FAILED;
+            return DLMS_ERROR_CODE_SEND_FAILED;
         }
         switch (ch)
         {
@@ -530,7 +530,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
 #endif
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         //Send ACK
         buff[0] = 0x06;
@@ -560,7 +560,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
             if (err != ERROR_IO_PENDING)
             {
                 printf("WriteFile %d\r\n", err);
-                return ERROR_CODES_SEND_FAILED;
+                return DLMS_ERROR_CODE_SEND_FAILED;
             }
             //Wait until data is actually sent
             WaitForSingleObject(m_osWrite.hEvent, INFINITE);
@@ -569,7 +569,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
         ret = write(m_hComPort, buff, len);
         if (ret != len)
         {
-            return ERROR_CODES_SEND_FAILED;
+            return DLMS_ERROR_CODE_SEND_FAILED;
         }
 #endif
 #if defined(_WIN32) || defined(_WIN64)//Windows
@@ -578,21 +578,21 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
         dcb.BaudRate = baudRate;
         if ((ret = GXSetCommState(m_hComPort, &dcb)) != 0)
         {
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         printf("New baudrate %d\r\n", (int) dcb.BaudRate);
         len = 6;
         if ((ret = Read('\n', reply)) != 0)
         {
             printf("Read %d\r\n", ret);
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         dcb.ByteSize = 8;
         dcb.StopBits = ONESTOPBIT;
         dcb.Parity = NOPARITY;
         if ((ret = GXSetCommState(m_hComPort, &dcb)) != 0)
         {
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
 #else
         //This sleep is in standard. Do not remove.
@@ -605,11 +605,11 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
         if (tcsetattr(m_hComPort, TCSAFLUSH, &options) != 0)
         {
             printf("Failed to Open port. tcsetattr failed.\r");
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
 #endif
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 //Initialize connection to the meter.
@@ -632,7 +632,7 @@ int CGXCommunication::InitializeConnection()
             (ret = ReadDataBlock(data, reply)) != 0 ||
             (ret = m_Parser->ParseAAREResponse(reply.GetData())) != 0)
     {
-        if (ret == ERROR_CODES_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED)
+        if (ret == DLMS_ERROR_CODE_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED)
         {
             TRACE1("Use Logical Name referencing is wrong. Change it!\r\n");
             return ret;
@@ -640,7 +640,7 @@ int CGXCommunication::InitializeConnection()
         TRACE("AARQRequest failed %d.\r\n", ret);
         return ret;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Read DLMS Data frame from the device.
@@ -651,7 +651,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
     std::string tmp;
     if (data.GetSize() == 0)
     {
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     Now(tmp);
     tmp = "<- " + tmp;
@@ -673,7 +673,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             //If error occurs...
             if (err != ERROR_IO_PENDING)
             {
-                return ERROR_CODES_SEND_FAILED;
+                return DLMS_ERROR_CODE_SEND_FAILED;
             }
             //Wait until data is actually sent
             ::WaitForSingleObject(m_osWrite.hEvent, INFINITE);
@@ -682,23 +682,23 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         ret = write(m_hComPort, data.GetData(), len);
         if (ret != len)
         {
-            return ERROR_CODES_SEND_FAILED;
+            return DLMS_ERROR_CODE_SEND_FAILED;
         }
 #endif
     }
     else if (send(m_socket, (const char*) data.GetData(), len, 0) == -1)
     {
         //If error has occured
-        return ERROR_CODES_SEND_FAILED;
+        return DLMS_ERROR_CODE_SEND_FAILED;
     }
     // Loop until whole DLMS packet is received.
-    while ((ret = m_Parser->GetData(bb, reply)) == ERROR_CODES_FALSE)
+    while ((ret = m_Parser->GetData(bb, reply)) == DLMS_ERROR_CODE_FALSE)
     {
         if (m_hComPort != INVALID_HANDLE_VALUE)
         {
             if(Read(0x7E, bb) != 0)
             {
-                return ERROR_CODES_SEND_FAILED;
+                return DLMS_ERROR_CODE_SEND_FAILED;
             }
         }
         else
@@ -706,9 +706,9 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             len = RECEIVE_BUFFER_SIZE;
             if ((ret = recv(m_socket, (char*) m_Receivebuff, len, 0)) == -1)
             {
-                return ERROR_CODES_RECEIVE_FAILED;
+                return DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
-            bb.AddRange(m_Receivebuff, ret);
+            bb.Set(m_Receivebuff, ret);
         }
     }
     tmp = "";
@@ -728,7 +728,7 @@ int CGXCommunication::ReadDataBlock(std::vector<CGXByteBuffer>& data, CGXReplyDa
     //If ther is no data to send.
     if (data.size() == 0)
     {
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     int ret;
     CGXByteBuffer bb;
@@ -736,7 +736,7 @@ int CGXCommunication::ReadDataBlock(std::vector<CGXByteBuffer>& data, CGXReplyDa
     for(std::vector<CGXByteBuffer>::iterator it = data.begin(); it != data.end(); ++it)
     {
         //Send data.
-        if ((ret = ReadDLMSPacket(*it, reply)) != ERROR_CODES_OK)
+        if ((ret = ReadDLMSPacket(*it, reply)) != DLMS_ERROR_CODE_OK)
         {
             return ret;
         }
@@ -747,13 +747,13 @@ int CGXCommunication::ReadDataBlock(std::vector<CGXByteBuffer>& data, CGXReplyDa
             {
                 return ret;
             }
-            if ((ret = ReadDLMSPacket(bb, reply)) != ERROR_CODES_OK)
+            if ((ret = ReadDLMSPacket(bb, reply)) != DLMS_ERROR_CODE_OK)
             {
                 return ret;
             }
         }
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 //Get Association view.
@@ -770,7 +770,7 @@ int CGXCommunication::GetObjects(CGXDLMSObjectCollection& objects)
         TRACE("GetObjects failed %d.\r\n", ret);
         return ret;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 //Update SN or LN access list.
@@ -778,26 +778,26 @@ int CGXCommunication::UpdateAccess(CGXDLMSObject* pObject, CGXDLMSObjectCollecti
 {
     CGXDLMSVariant data;
     int ret = Read(pObject, 2, data);
-    if (ret != ERROR_CODES_OK)
+    if (ret != DLMS_ERROR_CODE_OK)
     {
         return ret;
     }
     if (data.vt != DLMS_DATA_TYPE_ARRAY)
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     for(std::vector<CGXDLMSVariant>::iterator obj = data.Arr.begin(); obj != data.Arr.end(); ++obj)
     {
         if (obj->vt != DLMS_DATA_TYPE_STRUCTURE || obj->Arr.size() != 4)
         {
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         CGXDLMSVariant& access_rights = obj->Arr[3];
         if (access_rights.vt != DLMS_DATA_TYPE_STRUCTURE || access_rights.Arr.size() != 2)
         {
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
-        OBJECT_TYPE type = (OBJECT_TYPE) obj->Arr[0].uiVal;
+        DLMS_OBJECT_TYPE type = (DLMS_OBJECT_TYPE) obj->Arr[0].uiVal;
         // unsigned char version = obj->Arr[1].bVal;
         std::string ln;
         GXHelpers::GetLogicalName(obj->Arr[2].byteArr, ln);
@@ -809,7 +809,7 @@ int CGXCommunication::UpdateAccess(CGXDLMSObject* pObject, CGXDLMSObjectCollecti
                     it != access_rights.Arr[0].Arr.end(); ++it)
             {
                 unsigned char id = it->Arr[0].bVal;
-                ACCESSMODE access = (ACCESSMODE) it->Arr[1].bVal;
+                DLMS_ACCESS_MODE access = (DLMS_ACCESS_MODE) it->Arr[1].bVal;
                 pObj->SetAccess(id, access);
             }
             //Method access.
@@ -817,12 +817,12 @@ int CGXCommunication::UpdateAccess(CGXDLMSObject* pObject, CGXDLMSObjectCollecti
                     it != access_rights.Arr[1].Arr.end(); ++it)
             {
                 unsigned char id = it->Arr[0].bVal;
-                METHOD_ACCESSMODE access = (METHOD_ACCESSMODE) it->Arr[1].bVal;
+                DLMS_METHOD_ACCESS_MODE access = (DLMS_METHOD_ACCESS_MODE) it->Arr[1].bVal;
                 pObj->SetMethodAccess(id, access);
             }
         }
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 //Read selected object.
@@ -859,7 +859,7 @@ int CGXCommunication::Read(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVa
     std::vector<std::string> values;
     pObject->GetValues(values);
     value = values[attributeIndex - 1];
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 //Write selected object.
@@ -874,7 +874,7 @@ int CGXCommunication::Write(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSV
     {
         return ret;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 int CGXCommunication::Method(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& value)
@@ -888,7 +888,7 @@ int CGXCommunication::Method(CGXDLMSObject* pObject, int attributeIndex, CGXDLMS
     {
         return ret;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 int CGXCommunication::ReadRowsByRange(CGXDLMSProfileGeneric* pObject, struct tm* start, struct tm* end, CGXDLMSVariant& rows)
@@ -908,7 +908,7 @@ int CGXCommunication::ReadRowsByRange(CGXDLMSProfileGeneric* pObject, struct tm*
     std::vector<std::string> values;
     pObject->GetValues(values);
     rows = values[2 - 1];
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 int CGXCommunication::ReadRowsByEntry(CGXDLMSProfileGeneric* pObject, unsigned int index, unsigned int count, CGXDLMSVariant& rows)
@@ -928,5 +928,5 @@ int CGXCommunication::ReadRowsByEntry(CGXDLMSProfileGeneric* pObject, unsigned i
     std::vector<std::string> values;
     pObject->GetValues(values);
     rows = values[2 - 1];
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

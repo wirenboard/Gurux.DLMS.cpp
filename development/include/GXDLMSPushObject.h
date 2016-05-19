@@ -40,14 +40,14 @@
 class CGXDLMSPushObject
 {
 private:
-    OBJECT_TYPE m_Type;
+    DLMS_OBJECT_TYPE m_Type;
     std::string m_LogicalName;
     int m_AttributeIndex;
     int m_DataIndex;
 
 public:
-    OBJECT_TYPE GetType();
-    void SetType(OBJECT_TYPE value);
+    DLMS_OBJECT_TYPE GetType();
+    void SetType(DLMS_OBJECT_TYPE value);
 
     std::string GetLogicalName();
     void SetLogicalName(std::string value);

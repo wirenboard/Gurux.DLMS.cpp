@@ -39,7 +39,7 @@
 
 class CGXDLMSMBusMasterPortSetup : public CGXDLMSObject
 {
-    BAUDRATE m_CommSpeed;
+    DLMS_BAUD_RATE m_CommSpeed;
 public:
     //Constructor.
     CGXDLMSMBusMasterPortSetup();
@@ -51,8 +51,8 @@ public:
     CGXDLMSMBusMasterPortSetup(std::string ln);
 
     // The communication speed supported by the port.
-    BAUDRATE GetCommSpeed();
-    void SetCommSpeed(BAUDRATE value);
+    DLMS_BAUD_RATE GetCommSpeed();
+    void SetCommSpeed(DLMS_BAUD_RATE value);
 
     // Returns amount of attributes.
     int GetAttributeCount();
@@ -68,9 +68,9 @@ public:
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
     // Returns value of given attribute.
-    int GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value);
+    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 
     // Set value of given attribute.
-    int SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value);
+    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 };
 #endif //GXDLMSMBUSMASTERPORTSETUP_H

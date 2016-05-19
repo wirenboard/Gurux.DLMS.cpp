@@ -50,11 +50,11 @@ void CGXDLMSScriptAction::SetType(SCRIPT_ACTION_TYPE value)
 /**
  Executed object type.
 */
-OBJECT_TYPE CGXDLMSScriptAction::GetObjectType()
+DLMS_OBJECT_TYPE CGXDLMSScriptAction::GetObjectType()
 {
     return m_ObjectType;
 }
-void CGXDLMSScriptAction::SetObjectType(OBJECT_TYPE value)
+void CGXDLMSScriptAction::SetObjectType(DLMS_OBJECT_TYPE value)
 {
     m_ObjectType = value;
 }

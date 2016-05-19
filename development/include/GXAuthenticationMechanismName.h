@@ -47,7 +47,7 @@ private:
     int m_IdentifiedOrganization;
     int m_DlmsUA;
     int m_AuthenticationMechanismName;
-    GXDLMS_AUTHENTICATION m_MechanismId;
+    DLMS_AUTHENTICATION m_MechanismId;
 
 public:
     /*
@@ -73,8 +73,8 @@ public:
     int GetAuthenticationMechanismName();
     void SetAuthenticationMechanismName(int value);
 
-    GXDLMS_AUTHENTICATION GetMechanismId();
-    void SetMechanismId(GXDLMS_AUTHENTICATION value);
+    DLMS_AUTHENTICATION GetMechanismId();
+    void SetMechanismId(DLMS_AUTHENTICATION value);
 
     std::string ToString();
 };

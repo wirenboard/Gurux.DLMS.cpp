@@ -34,11 +34,11 @@
 
 #include "../include/GXSendDestinationAndMethod.h"
 
-GXDLMS_SERVICE_TYPE CGXSendDestinationAndMethod::GetService()
+DLMS_SERVICE_TYPE CGXSendDestinationAndMethod::GetService()
 {
     return m_Service;
 }
-void CGXSendDestinationAndMethod::SetService(GXDLMS_SERVICE_TYPE value)
+void CGXSendDestinationAndMethod::SetService(DLMS_SERVICE_TYPE value)
 {
     m_Service = value;
 }
@@ -52,11 +52,11 @@ void CGXSendDestinationAndMethod::SetDestination(std::string value)
     m_Destination = value;
 }
 
-GXDLMS_MESSAGE_TYPE CGXSendDestinationAndMethod::GetMessage()
+DLMS_MESSAGE_TYPE CGXSendDestinationAndMethod::GetMessage()
 {
     return m_Message;
 }
-void CGXSendDestinationAndMethod::SetMessage(GXDLMS_MESSAGE_TYPE value)
+void CGXSendDestinationAndMethod::SetMessage(DLMS_MESSAGE_TYPE value)
 {
     m_Message = value;
 }

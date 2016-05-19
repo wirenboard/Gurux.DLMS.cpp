@@ -39,11 +39,11 @@
 
 class CGXDLMSClock : public CGXDLMSObject
 {
-    CLOCKBASE m_ClockBase;
+    DLMS_CLOCK_BASE m_ClockBase;
     char m_Deviation;
     bool m_Enabled;
     CGXDateTime m_End;
-    GXDLMS_CLOCK_STATUS m_Status;
+    DLMS_CLOCK_STATUS m_Status;
     CGXDateTime m_Begin;
     short m_TimeZone;
     CGXDateTime m_Time;
@@ -71,7 +71,7 @@ public:
     /**
      Time of COSEM Clock object.
     */
-    CGXDateTime GetTime();
+    CGXDateTime& GetTime();
 
     void SetTime(CGXDateTime& value);
 
@@ -84,13 +84,13 @@ public:
     /**
      Status of COSEM Clock object.
     */
-    GXDLMS_CLOCK_STATUS GetStatus();
-    void SetStatus(GXDLMS_CLOCK_STATUS value);
+    DLMS_CLOCK_STATUS GetStatus();
+    void SetStatus(DLMS_CLOCK_STATUS value);
 
-    CGXDateTime GetBegin();
+    CGXDateTime& GetBegin();
     void SetBegin(CGXDateTime& value);
 
-    CGXDateTime GetEnd();
+    CGXDateTime& GetEnd();
     void SetEnd(CGXDateTime& value);
 
     char GetDeviation();
@@ -102,8 +102,8 @@ public:
     /**
      Clock base of COSEM Clock object.
     */
-    CLOCKBASE GetClockBase();
-    void SetClockBase(CLOCKBASE value);
+    DLMS_CLOCK_BASE GetClockBase();
+    void SetClockBase(DLMS_CLOCK_BASE value);
 
     // Returns amount of attributes.
     int GetAttributeCount();
@@ -122,11 +122,11 @@ public:
     /*
      * Returns value of given attribute.
      */
-    int GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value);
+    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 
     /*
      * Set value of given attribute.
      */
-    int SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value);
+    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 };
 #endif //GXDLMSCLOCK_H

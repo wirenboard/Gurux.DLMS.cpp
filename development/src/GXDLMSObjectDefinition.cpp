@@ -44,7 +44,7 @@ CGXDLMSObjectDefinition::CGXDLMSObjectDefinition()
 /*
  * Constructor
  */
-CGXDLMSObjectDefinition::CGXDLMSObjectDefinition(OBJECT_TYPE classId, std::string logicalName)
+CGXDLMSObjectDefinition::CGXDLMSObjectDefinition(DLMS_OBJECT_TYPE classId, std::string logicalName)
 {
     m_ClassId = classId;
     m_LogicalName = logicalName;
@@ -59,12 +59,12 @@ std::string CGXDLMSObjectDefinition::ToString()
     return sb.str();
 }
 
-OBJECT_TYPE CGXDLMSObjectDefinition::GetClassId()
+DLMS_OBJECT_TYPE CGXDLMSObjectDefinition::GetClassId()
 {
     return m_ClassId;
 }
 
-void CGXDLMSObjectDefinition::SetClassId(OBJECT_TYPE value)
+void CGXDLMSObjectDefinition::SetClassId(DLMS_OBJECT_TYPE value)
 {
     m_ClassId = value;
 }

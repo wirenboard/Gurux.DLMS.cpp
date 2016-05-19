@@ -42,7 +42,7 @@ class CGXDLMSModemConfiguration : public CGXDLMSObject
 {
     std::vector<CGXDLMSModemInitialisation> m_InitialisationStrings;
     std::vector< std::string > m_ModemProfile;
-    BAUDRATE m_CommunicationSpeed;
+    DLMS_BAUD_RATE m_CommunicationSpeed;
 
     void Init();
 public:
@@ -64,9 +64,9 @@ public:
     */
     CGXDLMSModemConfiguration(int sn);
 
-    BAUDRATE GetCommunicationSpeed();
+    DLMS_BAUD_RATE GetCommunicationSpeed();
 
-    void SetCommunicationSpeed(BAUDRATE value);
+    void SetCommunicationSpeed(DLMS_BAUD_RATE value);
 
     std::vector<CGXDLMSModemInitialisation>& GetInitialisationStrings();
     void SetInitialisationStrings(std::vector<CGXDLMSModemInitialisation>& value);
@@ -88,9 +88,9 @@ public:
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
     // Returns value of given attribute.
-    int GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value);
+    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 
     // Set value of given attribute.
-    int SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value);
+    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 };
 #endif //GXDLMSMODEMCONFIGURATION_H

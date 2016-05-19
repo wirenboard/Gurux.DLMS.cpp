@@ -50,10 +50,7 @@ class CGXDLMS
 {
 private:
     friend class CGXDLMSClient;
-    //CRC table.
-    static unsigned short m_FCS16Table[256];
 
-    static void GenerateFCS16Table();
     static unsigned short CountFCS16(CGXByteBuffer& buff, int index, int count);
 
     /////////////////////////////////////////////////////////////////////////////
@@ -73,19 +70,6 @@ private:
     // Returns Is command reply.
     /////////////////////////////////////////////////////////////////////////////
     static bool IsReplyMessage(DLMS_COMMAND cmd);
-
-    /////////////////////////////////////////////////////////////////////////////
-    //
-    /////////////////////////////////////////////////////////////////////////////
-    static int GetLnPdus(CGXDLMSSettings& settings, int commandParameter,
-                         CGXByteBuffer *buff, DLMS_COMMAND cmd,  ERROR_CODE error,
-                         std::vector<CGXByteBuffer>& reply);
-
-    /////////////////////////////////////////////////////////////////////////////
-    //
-    /////////////////////////////////////////////////////////////////////////////
-    static int GetSnPdus(CGXDLMSSettings& settings, CGXByteBuffer* buff,
-                         DLMS_COMMAND cmd, CGXByteBuffer& reply);
 
     /////////////////////////////////////////////////////////////////////////////
     // Check LLC bytes.
@@ -117,29 +101,56 @@ private:
     /////////////////////////////////////////////////////////////////////////////
     static void GetDataFromFrame(CGXByteBuffer& reply, CGXByteBuffer& data);
 
-    /////////////////////////////////////////////////////////////////////////////
-    // Get data from Block.
-    /////////////////////////////////////////////////////////////////////////////
-    // data : Stored data block.
-    // index : Position where data starts.
-    // Returns : Amount of removed bytes.
-    /////////////////////////////////////////////////////////////////////////////
-    static int GetDataFromBlock(CGXByteBuffer& data, int index);
-
-    //Constructor.
-    CGXDLMS()
-    {
-        GenerateFCS16Table();
-    }
-
 public:
-
-    static unsigned char GetInvokeIDPriority(CGXDLMSSettings& settings);
 
     /////////////////////////////////////////////////////////////////////////////
     // Check client and server addresses. Reserved for internal use.
     /////////////////////////////////////////////////////////////////////////////
     static int CheckInit(CGXDLMSSettings& settings);
+
+    static int GetLNPdu(
+        CGXDLMSSettings& settings,
+        DLMS_COMMAND command,
+        unsigned char commandType,
+        CGXByteBuffer& data,
+        CGXByteBuffer& bb,
+        unsigned char status,
+        bool multipleBlocks,
+        bool lastBlock,
+        struct tm* date);
+
+    static int GetSNPdu(
+        CGXDLMSSettings& settings,
+        DLMS_COMMAND command,
+        CGXByteBuffer& data,
+        CGXByteBuffer& bb);
+
+    /**
+    * Is multiple blocks needed for send data.
+    *
+    * @param settings
+    *            DLMS settings.
+    * @param bb
+    *            Send data.
+    * @return Returns true if multiple blocks are needed.
+    */
+    static bool MultipleBlocks(
+        CGXDLMSSettings& settings,
+        CGXByteBuffer& bb);
+
+    /**
+     * Split DLMS PDU to wrapper frames.
+     *
+     * @param settings
+     *            DLMS settings.
+     * @param data
+     *            Wrapped data.
+     * @return Wrapper frames.
+    */
+    static int GetWrapperFrame(
+        CGXDLMSSettings& settings,
+        CGXByteBuffer& data,
+        CGXByteBuffer& reply);
 
     /////////////////////////////////////////////////////////////////////////////
     // Generates an acknowledgment message, with which the server is informed to
@@ -150,44 +161,36 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     static int ReceiverReady(
         CGXDLMSSettings& settings,
-        GXDLMS_DATA_REQUEST_TYPES type,
+        DLMS_DATA_REQUEST_TYPES type,
         CGXCipher* cipher,
         CGXByteBuffer& reply);
 
+    /**
+    * Get HDLC frame for data.
+    *
+    * @param settings
+    *            DLMS settings.
+    * @param frame
+    *            Frame ID. If zero new is generated.
+    * @param data
+    *            Data to add.
+    * @return HDLC frame.
+    */
+    static int GetHdlcFrame(
+        CGXDLMSSettings& settings,
+        unsigned char frame,
+        CGXByteBuffer* data,
+        CGXByteBuffer& reply);
+
     /////////////////////////////////////////////////////////////////////////////
-    //Split data to frames.
+    //Get messages.
     /////////////////////////////////////////////////////////////////////////////
-    static int SplitPdu(
+    static int GetMessages(
         CGXDLMSSettings& settings,
         DLMS_COMMAND command,
-        int commandParameter,
+        int commandType,
         CGXByteBuffer& data,
-        ERROR_CODE error,
-        CGXCipher* cp,
-        std::vector<CGXByteBuffer>& reply);
-
-    /////////////////////////////////////////////////////////////////////////////
-    // Split DLMS PDU to HDLC frames.
-    /////////////////////////////////////////////////////////////////////////////
-    // settings : DLMS settings.
-    // frame : Frame ID. If zero new is generated.
-    // data : Data to add.
-    /////////////////////////////////////////////////////////////////////////////
-    static int SplitToHdlcFrames(
-        CGXDLMSSettings& settings,
-        int frame,
-        CGXByteBuffer* data,
-        std::vector<CGXByteBuffer>& packets);
-
-    /////////////////////////////////////////////////////////////////////////////
-    // Split DLMS PDU to wrapper frames.
-    /////////////////////////////////////////////////////////////////////////////
-    // settings : DLMS settings.
-    // data : Wrapped data.
-    /////////////////////////////////////////////////////////////////////////////
-    static void SplitToWrapperFrames(
-        CGXDLMSSettings& settings,
-        CGXByteBuffer *data,
+        struct tm* time,
         std::vector<CGXByteBuffer>& reply);
 
     static int GetHdlcData(
@@ -266,7 +269,6 @@ public:
     // reply : Received data from the client.
     /////////////////////////////////////////////////////////////////////////////
     static int HandleWriteResponse(
-        CGXDLMSSettings& settings,
         CGXReplyData& data);
 
     /////////////////////////////////////////////////////////////////////////////
@@ -290,16 +292,15 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     static int GetPdu(
         CGXDLMSSettings& settings,
-        CGXReplyData& data,
-        CGXCipher* cipher);
+        CGXReplyData& data);
 
     /////////////////////////////////////////////////////////////////////////////
     //
     /////////////////////////////////////////////////////////////////////////////
-    static int GetData(CGXDLMSSettings& settings,
-                       CGXByteBuffer& reply,
-                       CGXReplyData& data,
-                       CGXCipher* cipher);
+    static int GetData(
+        CGXDLMSSettings& settings,
+        CGXByteBuffer& reply,
+        CGXReplyData& data);
 
     /////////////////////////////////////////////////////////////////////////////
     // Get action info.
@@ -308,8 +309,16 @@ public:
     // value : Starting address.
     // count : Attribute count.
     /////////////////////////////////////////////////////////////////////////////
-    static int GetActionInfo(OBJECT_TYPE objectType,
-                             int& value,
-                             int& count);
+    static int GetActionInfo(
+        DLMS_OBJECT_TYPE objectType,
+        unsigned char& value,
+        unsigned char& count);
+
+
+    static int AppendData(
+        CGXDLMSObject* obj,
+        unsigned char index,
+        CGXByteBuffer& bb,
+        CGXDLMSVariant& value);
 };
 #endif //GXDLMS_H

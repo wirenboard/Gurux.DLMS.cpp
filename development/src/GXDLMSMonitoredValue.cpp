@@ -37,7 +37,7 @@
 
 CGXDLMSMonitoredValue::CGXDLMSMonitoredValue()
 {
-    m_ObjectType = OBJECT_TYPE_NONE;
+    m_ObjectType = DLMS_OBJECT_TYPE_NONE;
     m_AttributeIndex = 0;
 }
 
@@ -48,11 +48,11 @@ void CGXDLMSMonitoredValue::Update(CGXDLMSObject* pObj, int attributeIndex)
     m_AttributeIndex = attributeIndex;
 }
 
-OBJECT_TYPE CGXDLMSMonitoredValue::GetObjectType()
+DLMS_OBJECT_TYPE CGXDLMSMonitoredValue::GetObjectType()
 {
     return m_ObjectType;
 }
-void CGXDLMSMonitoredValue::SetObjectType(OBJECT_TYPE value)
+void CGXDLMSMonitoredValue::SetObjectType(DLMS_OBJECT_TYPE value)
 {
     m_ObjectType = value;
 }

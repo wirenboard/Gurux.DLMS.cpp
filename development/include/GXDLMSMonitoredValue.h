@@ -39,7 +39,7 @@
 
 class CGXDLMSMonitoredValue
 {
-    OBJECT_TYPE m_ObjectType;
+    DLMS_OBJECT_TYPE m_ObjectType;
     std::string m_LogicalName;
     int m_AttributeIndex;
 public:
@@ -47,8 +47,8 @@ public:
     CGXDLMSMonitoredValue();
     void Update(CGXDLMSObject* pObj, int attributeIndex);
 
-    OBJECT_TYPE GetObjectType();
-    void SetObjectType(OBJECT_TYPE value);
+    DLMS_OBJECT_TYPE GetObjectType();
+    void SetObjectType(DLMS_OBJECT_TYPE value);
 
     std::string GetLogicalName();
     void SetLogicalName(std::string value);

@@ -49,7 +49,7 @@ void CGXDLMSTcpUdpSetup::Init()
 /**
  Constructor.
 */
-CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup() :  CGXDLMSObject(OBJECT_TYPE_TCP_UDP_SETUP, "0.0.25.0.0.255")
+CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup() :  CGXDLMSObject(DLMS_OBJECT_TYPE_TCP_UDP_SETUP, "0.0.25.0.0.255")
 {
     Init();
 }
@@ -59,7 +59,7 @@ CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup() :  CGXDLMSObject(OBJECT_TYPE_TCP_UDP_SE
 
  @param ln Logical Name of the object.
 */
-CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup(std::string ln) : CGXDLMSObject(OBJECT_TYPE_TCP_UDP_SETUP, ln)
+CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_TCP_UDP_SETUP, ln)
 {
     Init();
 }
@@ -70,7 +70,7 @@ CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup(std::string ln) : CGXDLMSObject(OBJECT_TY
  @param ln Logical Name of the object.
  @param sn Short Name of the object.
 */
-CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup(std::string ln, short sn) : CGXDLMSObject(OBJECT_TYPE_TCP_UDP_SETUP, sn)
+CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup(std::string ln, short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_TCP_UDP_SETUP, sn)
 {
     Init();
 }
@@ -208,112 +208,119 @@ int CGXDLMSTcpUdpSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Returns value of given attribute.
-int CGXDLMSTcpUdpSetup::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSTcpUdpSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
-        value = GetPort();
-        return ERROR_CODES_OK;
+        e.SetValue(GetPort());
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 3)
+    if (e.GetIndex() == 3)
     {
-        value = GetIPReference();
-        return ERROR_CODES_OK;
+        e.SetValue(GetIPReference());
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 4)
+    if (e.GetIndex() == 4)
     {
-        value = GetMaximumSegmentSize();
-        return ERROR_CODES_OK;
+        e.SetValue(GetMaximumSegmentSize());
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 5)
+    if (e.GetIndex() == 5)
     {
-        value = GetMaximumSimultaneousConnections();
-        return ERROR_CODES_OK;
+        e.SetValue(GetMaximumSimultaneousConnections());
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 6)
+    if (e.GetIndex() == 6)
     {
-        value = GetInactivityTimeout();
-        return ERROR_CODES_OK;
+        e.SetValue(GetInactivityTimeout());
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Set value of given attribute.
-int CGXDLMSTcpUdpSetup::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSTcpUdpSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        SetPort(value.ToInteger());
-        return ERROR_CODES_OK;
+        SetPort(e.GetValue().ToInteger());
+        return DLMS_ERROR_CODE_OK;
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        if (value.vt == DLMS_DATA_TYPE_NONE)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_NONE)
         {
             SetIPReference("");
         }
         else
         {
-            if (value.vt == DLMS_DATA_TYPE_OCTET_STRING)
+            if (e.GetValue().vt == DLMS_DATA_TYPE_OCTET_STRING)
             {
-                SetIPReference(value.ToString());
+                SetIPReference(e.GetValue().ToString());
             }
             else
             {
-                SetIPReference(value.ToString());
+                SetIPReference(e.GetValue().ToString());
             }
         }
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
-        if (value.vt == DLMS_DATA_TYPE_NONE)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_NONE)
         {
             SetMaximumSegmentSize(576);
         }
         else
         {
-            SetMaximumSegmentSize(value.ToInteger());
+            SetMaximumSegmentSize(e.GetValue().ToInteger());
         }
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
-        if (value.vt == DLMS_DATA_TYPE_NONE)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_NONE)
         {
             SetMaximumSimultaneousConnections(1);
         }
         else
         {
-            SetMaximumSimultaneousConnections(value.ToInteger());
+            SetMaximumSimultaneousConnections(e.GetValue().ToInteger());
         }
     }
-    else if (index == 6)
+    else if (e.GetIndex() == 6)
     {
-        if (value.vt == DLMS_DATA_TYPE_NONE)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_NONE)
         {
             SetInactivityTimeout(180);
         }
         else
         {
-            SetInactivityTimeout(value.ToInteger());
+            SetInactivityTimeout(e.GetValue().ToInteger());
         }
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

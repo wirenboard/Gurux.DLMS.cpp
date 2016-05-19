@@ -36,19 +36,25 @@
 
 CGXDLMSSettings::CGXDLMSSettings(bool isServer)
 {
+    m_CustomChallenges = false;
     m_BlockIndex = 1;
     m_Connected = false;
     m_DlmsVersionNumber = DLMS_VERSION;
     m_Server = isServer;
     ResetFrameSequence();
     m_InvokeID = 1;
-    m_Priority = GXDLMS_PRIORITY_HIGH;
-    m_ServiceClass = GXDLMS_SERVICECLASS_UN_CONFIRMED;
+    m_LongInvokeID = 1;
+    m_Priority = DLMS_PRIORITY_HIGH;
+    m_ServiceClass = DLMS_SERVICE_CLASS_UN_CONFIRMED;
     m_ClientAddress = 0;
     m_ServerAddress = 0;
-    m_InterfaceType = GXDLMS_INTERFACETYPE_HDLC;
-    m_Authentication = GXDLMS_AUTHENTICATION_NONE;
+    m_InterfaceType = DLMS_INTERFACE_TYPE_HDLC;
+    m_Authentication = DLMS_AUTHENTICATION_NONE;
     m_MaxReceivePDUSize = 0xFFFF;
+    m_Cipher = NULL;
+    m_SourceSystemTitle.Clear();
+    m_Index = 0;
+    m_Count = 0;
 }
 
 CGXByteBuffer& CGXDLMSSettings::GetCtoSChallenge()
@@ -57,7 +63,7 @@ CGXByteBuffer& CGXDLMSSettings::GetCtoSChallenge()
 }
 
 
-void CGXDLMSSettings::SetCtoSChallenge(CGXByteBuffer value)
+void CGXDLMSSettings::SetCtoSChallenge(CGXByteBuffer& value)
 {
     if (!m_CustomChallenges || m_CtoSChallenge.GetSize() == 0)
     {
@@ -78,12 +84,12 @@ void CGXDLMSSettings::SetStoCChallenge(CGXByteBuffer value)
     }
 }
 
-GXDLMS_AUTHENTICATION CGXDLMSSettings::GetAuthentication()
+DLMS_AUTHENTICATION CGXDLMSSettings::GetAuthentication()
 {
     return m_Authentication;
 }
 
-void CGXDLMSSettings::SetAuthentication(GXDLMS_AUTHENTICATION value)
+void CGXDLMSSettings::SetAuthentication(DLMS_AUTHENTICATION value)
 {
     m_Authentication = value;
 }
@@ -205,7 +211,7 @@ CGXDLMSLNSettings& CGXDLMSSettings::GetLnSettings()
     return m_LNSettings;
 }
 
-CGXDLMSSNSettings CGXDLMSSettings::GetSnSettings()
+CGXDLMSSNSettings& CGXDLMSSettings::GetSnSettings()
 {
     return m_SNSettings;
 }
@@ -240,12 +246,12 @@ CGXDLMSLimits& CGXDLMSSettings::GetLimits()
     return m_Limits;
 }
 
-GXDLMS_INTERFACETYPE CGXDLMSSettings::GetInterfaceType()
+DLMS_INTERFACE_TYPE CGXDLMSSettings::GetInterfaceType()
 {
     return m_InterfaceType;
 }
 
-void CGXDLMSSettings::SetInterfaceType(GXDLMS_INTERFACETYPE value)
+void CGXDLMSSettings::SetInterfaceType(DLMS_INTERFACE_TYPE value)
 {
     m_InterfaceType = value;
 }
@@ -304,22 +310,22 @@ void CGXDLMSSettings::SetUseLogicalNameReferencing(bool value)
     m_UseLogicalNameReferencing = value;
 }
 
-GXDLMS_PRIORITY CGXDLMSSettings::GetPriority()
+DLMS_PRIORITY CGXDLMSSettings::GetPriority()
 {
     return m_Priority;
 }
 
-void CGXDLMSSettings::SetPriority(GXDLMS_PRIORITY value)
+void CGXDLMSSettings::SetPriority(DLMS_PRIORITY value)
 {
     m_Priority = value;
 }
 
-GXDLMS_SERVICECLASS CGXDLMSSettings::GetServiceClass()
+DLMS_SERVICE_CLASS CGXDLMSSettings::GetServiceClass()
 {
     return m_ServiceClass;
 }
 
-void CGXDLMSSettings::SetServiceClass(GXDLMS_SERVICECLASS value)
+void CGXDLMSSettings::SetServiceClass(DLMS_SERVICE_CLASS value)
 {
     m_ServiceClass = value;
 }
@@ -334,6 +340,20 @@ void CGXDLMSSettings::SetInvokeID(int value)
     m_InvokeID = value;
 }
 
+unsigned long CGXDLMSSettings::GetLongInvokeID()
+{
+    return m_LongInvokeID;
+}
+int CGXDLMSSettings::SetLongInvokeID(unsigned long value)
+{
+    if (value > 0xFFFFFF)
+    {
+        //Invalid InvokeID.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    m_LongInvokeID = value;
+    return 0;
+}
 CGXDLMSObjectCollection& CGXDLMSSettings::GetObjects()
 {
     return m_Objects;
@@ -344,7 +364,7 @@ bool CGXDLMSSettings::IsCustomChallenges()
     return m_CustomChallenges;
 }
 
-void CGXDLMSSettings::SetCustomChallenges(bool value)
+void CGXDLMSSettings::SetUseCustomChallenge(bool value)
 {
     m_CustomChallenges = value;
 }
@@ -359,3 +379,86 @@ void CGXDLMSSettings::SetConnected(bool value)
     m_Connected = value;
 }
 
+CGXCipher* CGXDLMSSettings::GetCipher()
+{
+    return m_Cipher;
+}
+
+void CGXDLMSSettings::SetCipher(CGXCipher* value)
+{
+    m_Cipher = value;
+}
+
+/**
+     * @return Source system title.
+     */
+CGXByteBuffer& CGXDLMSSettings::GetSourceSystemTitle()
+{
+    return m_SourceSystemTitle;
+}
+
+/**
+ * @param value
+ *            Source system title.
+ */
+int  CGXDLMSSettings::SetSourceSystemTitle(CGXByteBuffer& value)
+{
+    if (value.GetSize() != 8)
+    {
+        //Invalid client system title.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    m_SourceSystemTitle = value;
+    return DLMS_ERROR_CODE_OK;
+}
+
+/**
+ * @return Key Encrypting Key, also known as Master key.
+ */
+CGXByteBuffer& CGXDLMSSettings::GetKek()
+{
+    return m_Kek;
+}
+
+/**
+ * @param value
+ *            Key Encrypting Key, also known as Master key.
+ */
+void CGXDLMSSettings::SetKek(CGXByteBuffer& value)
+{
+    m_Kek = value;
+}
+
+/**
+ * @return Long data count.
+ */
+unsigned short CGXDLMSSettings::GetCount()
+{
+    return m_Count;
+}
+
+/**
+ * @param count
+ *            Long data count.
+ */
+void CGXDLMSSettings::SetCount(unsigned short value)
+{
+    m_Count = value;
+}
+
+/**
+ * @return Long data index.
+ */
+unsigned short CGXDLMSSettings::GetIndex()
+{
+    return m_Index;
+}
+
+/**
+ * @param index
+ *            Long data index
+ */
+void CGXDLMSSettings::SetIndex(unsigned short value)
+{
+    m_Index = value;
+}

@@ -58,11 +58,11 @@ CGXDLMSDayProfileAction::CGXDLMSDayProfileAction(CGXDateTime startTime, std::str
 /**
  Defines the time when the script is to be executed.
 */
-CGXDateTime CGXDLMSDayProfileAction::GetStartTime()
+CGXDateTime& CGXDLMSDayProfileAction::GetStartTime()
 {
     return m_StartTime;
 }
-void CGXDLMSDayProfileAction::SetStartTime(CGXDateTime value)
+void CGXDLMSDayProfileAction::SetStartTime(CGXDateTime& value)
 {
     m_StartTime = value;
 }

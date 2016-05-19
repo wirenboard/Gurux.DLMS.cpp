@@ -36,11 +36,11 @@
 #define GXDLMSSCRIPTTABLE_H
 
 #include "GXDLMSObject.h"
-#include "GXDLMSScriptAction.h"
+#include "GXDLMSScript.h"
 
 class CGXDLMSScriptTable : public CGXDLMSObject
 {
-    std::vector<std::pair<int, CGXDLMSScriptAction> > m_Scripts;
+    std::vector<CGXDLMSScript> m_Scripts;
 
 public:
     //Constructor.
@@ -52,7 +52,7 @@ public:
     //LN Constructor.
     CGXDLMSScriptTable(std::string ln);
 
-    std::vector<std::pair<int, CGXDLMSScriptAction> >& GetScripts();
+    std::vector<CGXDLMSScript>& GetScripts();
 
     // Returns amount of attributes.
     int GetAttributeCount();
@@ -68,9 +68,9 @@ public:
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
     // Returns value of given attribute.
-    int GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value);
+    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 
     // Set value of given attribute.
-    int SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value);
+    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 };
 #endif //GXDLMSSCRIPTTABLE_H

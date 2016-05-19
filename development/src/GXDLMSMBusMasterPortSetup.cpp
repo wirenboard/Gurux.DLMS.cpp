@@ -36,32 +36,32 @@
 #include "../include/GXDLMSConverter.h"
 
 //Constructor.
-CGXDLMSMBusMasterPortSetup::CGXDLMSMBusMasterPortSetup() : CGXDLMSObject(OBJECT_TYPE_MBUS_MASTER_PORT_SETUP)
+CGXDLMSMBusMasterPortSetup::CGXDLMSMBusMasterPortSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_MASTER_PORT_SETUP)
 {
-    m_CommSpeed = BAUDRATE_2400;
+    m_CommSpeed = DLMS_BAUD_RATE_2400;
 }
 
 //SN Constructor.
-CGXDLMSMBusMasterPortSetup::CGXDLMSMBusMasterPortSetup(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_MBUS_MASTER_PORT_SETUP, sn)
+CGXDLMSMBusMasterPortSetup::CGXDLMSMBusMasterPortSetup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_MASTER_PORT_SETUP, sn)
 {
-    m_CommSpeed = BAUDRATE_2400;
+    m_CommSpeed = DLMS_BAUD_RATE_2400;
 }
 
 //LN Constructor.
-CGXDLMSMBusMasterPortSetup::CGXDLMSMBusMasterPortSetup(std::string ln) : CGXDLMSObject(OBJECT_TYPE_MBUS_MASTER_PORT_SETUP, ln)
+CGXDLMSMBusMasterPortSetup::CGXDLMSMBusMasterPortSetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_MASTER_PORT_SETUP, ln)
 {
-    m_CommSpeed = BAUDRATE_2400;
+    m_CommSpeed = DLMS_BAUD_RATE_2400;
 }
 
 /**
 The communication speed supported by the port.
 */
-BAUDRATE CGXDLMSMBusMasterPortSetup::GetCommSpeed()
+DLMS_BAUD_RATE CGXDLMSMBusMasterPortSetup::GetCommSpeed()
 {
     return m_CommSpeed;
 }
 
-void CGXDLMSMBusMasterPortSetup::SetCommSpeed(BAUDRATE value)
+void CGXDLMSMBusMasterPortSetup::SetCommSpeed(DLMS_BAUD_RATE value)
 {
     m_CommSpeed = value;
 }
@@ -106,45 +106,52 @@ int CGXDLMSMBusMasterPortSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 1)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 2)
     {
         type = DLMS_DATA_TYPE_ENUM;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Returns value of given attribute.
-int CGXDLMSMBusMasterPortSetup::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSMBusMasterPortSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
-        value = m_CommSpeed;
-        return ERROR_CODES_OK;
+        e.SetValue(m_CommSpeed);
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Set value of given attribute.
-int CGXDLMSMBusMasterPortSetup::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSMBusMasterPortSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        m_CommSpeed = (BAUDRATE) value.ToInteger();
+        m_CommSpeed = (DLMS_BAUD_RATE) e.GetValue().ToInteger();
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

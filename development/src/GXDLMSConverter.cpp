@@ -39,96 +39,96 @@ const char* CGXDLMSConverter::GetErrorMessage(int error)
 {
     switch(error)
     {
-    case ERROR_CODES_INVALID_PARAMETER:
+    case DLMS_ERROR_CODE_INVALID_PARAMETER:
         return "Invalid parameter.";
-    case ERROR_CODES_NOT_INITIALIZED:
+    case DLMS_ERROR_CODE_NOT_INITIALIZED:
         return "Server is not initialized.";
-    case ERROR_CODES_OUTOFMEMORY:
+    case DLMS_ERROR_CODE_OUTOFMEMORY:
         return "Not enough memory available.";
-    case ERROR_CODES_NOT_REPLY:
+    case DLMS_ERROR_CODE_NOT_REPLY:
         return "Packet is not a reply for a send packet.";
-    case ERROR_CODES_FRAME_REJECTED:
+    case DLMS_ERROR_CODE_REJECTED:
         return "Meter rejects send packet.";
-    case ERROR_CODES_INVALID_LOGICAL_NAME:
+    case DLMS_ERROR_CODE_INVALID_LOGICAL_NAME:
         return "Invalid Logical Name.";
-    case ERROR_CODES_INVALID_CLIENT_ADDRESS:
+    case DLMS_ERROR_CODE_INVALID_CLIENT_ADDRESS:
         return "Client HDLC Address is not set.";
-    case ERROR_CODES_INVALID_SERVER_ADDRESS:
+    case DLMS_ERROR_CODE_INVALID_SERVER_ADDRESS:
         return "Server HDLC Address is not set.";
-    case ERROR_CODES_INVALID_DATA_FORMAT:
+    case DLMS_ERROR_CODE_INVALID_DATA_FORMAT:
         return "Not a HDLC frame.";
-    case ERROR_CODES_INVALID_VERSION_NUMBER:
+    case DLMS_ERROR_CODE_INVALID_VERSION_NUMBER:
         return "Invalid DLMS version number.";
-    case ERROR_CODES_CLIENT_ADDRESS_NO_NOT_MATCH:
+    case DLMS_ERROR_CODE_CLIENT_ADDRESS_NO_NOT_MATCH:
         return "Client addresses do not match.";
-    case ERROR_CODES_SERVER_ADDRESS_NO_NOT_MATCH:
+    case DLMS_ERROR_CODE_SERVER_ADDRESS_NO_NOT_MATCH:
         return "Server addresses do not match.";
-    case ERROR_CODES_WRONG_CRC:
+    case DLMS_ERROR_CODE_WRONG_CRC:
         return "CRC do not match.";
-    case ERROR_CODES_INVALID_RESPONSE:
+    case DLMS_ERROR_CODE_INVALID_RESPONSE:
         return "Invalid response";
-    case ERROR_CODES_INVALID_TAG:
+    case DLMS_ERROR_CODE_INVALID_TAG:
         return "Invalid Tag.";
-    case ERROR_CODES_ENCODING_FAILED:
+    case DLMS_ERROR_CODE_ENCODING_FAILED:
         return "Encoding failed. Not enough data.";
-    case ERROR_CODES_REJECTED_PERMAMENT:
+    case DLMS_ERROR_CODE_REJECTED_PERMAMENT:
         return "Rejected permament.";
-    case ERROR_CODES_REJECTED_TRANSIENT:
+    case DLMS_ERROR_CODE_REJECTED_TRANSIENT:
         return "Rejected transient.";
-    case ERROR_CODES_NO_REASON_GIVEN:
+    case DLMS_ERROR_CODE_NO_REASON_GIVEN:
         return "No reason given.";
-    case ERROR_CODES_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED:
+    case DLMS_ERROR_CODE_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED:
         return "Application context name not supported.";
-    case ERROR_CODES_AUTHENTICATION_MECHANISM_NAME_NOT_RECOGNISED:
+    case DLMS_ERROR_CODE_AUTHENTICATION_MECHANISM_NAME_NOT_RECOGNISED:
         return "Authentication mechanism name not recognised.";
-    case ERROR_CODES_AUTHENTICATION_MECHANISM_NAME_REQUIRED:
+    case DLMS_ERROR_CODE_AUTHENTICATION_MECHANISM_NAME_REQUIRED:
         return "Authentication mechanism name required.";
-    case ERROR_CODES_AUTHENTICATION_FAILURE:
+    case DLMS_ERROR_CODE_AUTHENTICATION_FAILURE:
         return "Authentication failure.";
-    case ERROR_CODES_AUTHENTICATION_REQUIRED:
+    case DLMS_ERROR_CODE_AUTHENTICATION_REQUIRED:
         return "Authentication required.";
-    case ERROR_CODES_HARDWARE_FAULT:
+    case DLMS_ERROR_CODE_HARDWARE_FAULT:
         return "Access Error : Device reports a hardware fault.";
-    case ERROR_CODES_TEMPORARY_FAILURE:
+    case DLMS_ERROR_CODE_TEMPORARY_FAILURE:
         return "Access Error : Device reports a temporary failure.";
-    case ERROR_CODES_WRITE_DENIED:
+    case DLMS_ERROR_CODE_READ_WRITE_DENIED:
         return "Access Error : Device reports Read-Write denied.";
-    case ERROR_CODES_UNDEFINED_OBJ:
+    case DLMS_ERROR_CODE_UNDEFINED_OBJECT:
         return "Access Error : Device reports a undefined object.";
-    case ERROR_CODES_INCONSISTENT_OBJ:
+    case DLMS_ERROR_CODE_INCONSISTENT_OBJECT:
         return "Access Error : Device reports a inconsistent Class or Object.";
-    case ERROR_CODES_UNAVAILABLE_OBJ:
+    case DLMS_ERROR_CODE_UNAVAILABLE_OBJECT:
         return "Access Error : Device reports a unavailable object.";
-    case ERROR_CODES_UNMATCH_TYPE:
+    case DLMS_ERROR_CODE_UNMATCH_TYPE:
         return "Access Error : Device reports a unmatched type.";
-    case ERROR_CODES_VIOLATED:
+    case DLMS_ERROR_CODE_VIOLATED:
         return "Access Error : Device reports scope of access violated.";
-    case ERROR_CODES_BLOCK_UNAVAILABLE:
+    case DLMS_ERROR_CODE_BLOCK_UNAVAILABLE:
         return "Access Error : Data Block Unavailable.";
-    case ERROR_CODES_READ_ABORTED:
+    case DLMS_ERROR_CODE_READ_ABORTED:
         return "Access Error : Long Get Or Read Aborted.";
-    case ERROR_CODES_READ_IN_PROGRESS:
+    case DLMS_ERROR_CODE_READ_IN_PROGRESS:
         return "Access Error : No Long Get Or Read In Progress.";
-    case ERROR_CODES_WRITE_ABORTED:
+    case DLMS_ERROR_CODE_WRITE_ABORTED:
         return "Access Error : Long Set Or Write Aborted.";
-    case ERROR_CODES_WRITE_IN_PROGRESS:
+    case DLMS_ERROR_CODE_NO_LONG_GET_OR_READ_IN_PROGRESS:
         return "Access Error : No Long Set Or Write In Progress.";
-    case ERROR_CODES_BLOCK_NUMBER_INVALID:
+    case DLMS_ERROR_CODE_DATA_BLOCK_NUMBER_INVALID:
         return "Access Error : Data Block Number Invalid.";
-    case ERROR_CODES_OTHER_REASON:
+    case DLMS_ERROR_CODE_OTHER_REASON:
         return "Access Error : Other Reason.";
-    case ERROR_CODES_UNKNOWN:
+    case DLMS_ERROR_CODE_UNKNOWN:
         return "Unknown error.";
-    case ERROR_CODES_SEND_FAILED:
+    case DLMS_ERROR_CODE_SEND_FAILED:
         return "Data send failed.";
-    case ERROR_CODES_RECEIVE_FAILED:
+    case DLMS_ERROR_CODE_RECEIVE_FAILED:
         return "Data receive failed.";
-    case ERROR_CODES_NOT_IMPLEMENTED:
+    case DLMS_ERROR_CODE_NOT_IMPLEMENTED:
         return "Not implemeted.";
     }
     return "Unknown error.";
 }
-const char* CGXDLMSConverter::ToString(BAUDRATE value)
+const char* CGXDLMSConverter::ToString(DLMS_BAUD_RATE value)
 {
     switch(value)
     {
@@ -168,7 +168,7 @@ const char* CGXDLMSConverter::ToString(BAUDRATE value)
     return "Unknown baudrate";
 }
 
-const char* CGXDLMSConverter::ToString(GXDLMS_CLOCK_STATUS value)
+const char* CGXDLMSConverter::ToString(DLMS_CLOCK_STATUS value)
 {
     switch(value)
     {
@@ -205,7 +205,7 @@ const char* CGXDLMSConverter::ToString(GXDLMS_CLOCK_STATUS value)
     return "Unknown Clock status";
 }
 
-const char* CGXDLMSConverter::ToString(CLOCKBASE value)
+const char* CGXDLMSConverter::ToString(DLMS_CLOCK_BASE value)
 {
     switch(value)
     {
@@ -403,7 +403,7 @@ const char* CGXDLMSConverter::GetUnitAsString(int unit)
 }
 
 
-const char* CGXDLMSConverter::ToString(ADDRESS_STATE value)
+const char* CGXDLMSConverter::ToString(DLMS_ADDRESS_STATE value)
 {
     switch(value)
     {
@@ -420,7 +420,7 @@ const char* CGXDLMSConverter::ToString(ADDRESS_STATE value)
 }
 
 //Get Disconnect control control state as a std::string.
-const char* CGXDLMSConverter::ToString(CONTROLSTATE value)
+const char* CGXDLMSConverter::ToString(DLMS_CONTROL_STATE value)
 {
     switch(value)
     {
@@ -440,7 +440,7 @@ const char* CGXDLMSConverter::ToString(CONTROLSTATE value)
 }
 
 //Get Disconnect control control mode as a std::string.
-const char* CGXDLMSConverter::ToString(CONTROLMODE value)
+const char* CGXDLMSConverter::ToString(DLMS_CONTROL_MODE value)
 {
     switch(value)
     {
@@ -472,7 +472,7 @@ const char* CGXDLMSConverter::ToString(CONTROLMODE value)
 }
 
 //Get Security Setup security policy as a std::string.
-const char* CGXDLMSConverter::ToString(SECURITY_POLICY value)
+const char* CGXDLMSConverter::ToString(DLMS_SECURITY_POLICY value)
 {
     switch(value)
     {
@@ -495,11 +495,11 @@ const char* CGXDLMSConverter::ToString(SECURITY_POLICY value)
 }
 
 //Get Security Setup security suite as a std::string.
-const char* CGXDLMSConverter::ToString(SECURITY_SUITE value)
+const char* CGXDLMSConverter::ToString(DLMS_SECURITY_SUITE value)
 {
     switch(value)
     {
-    case 0://SECURITY_SUITE_AES_GCM_128
+    case 0://DLMS_SECURITY_SUITE_AES_GCM_128
         return "AES_GCM_128";
         break;
     default:
@@ -508,17 +508,17 @@ const char* CGXDLMSConverter::ToString(SECURITY_SUITE value)
     return "Unknown security suite";
 }
 
-const char* CGXDLMSConverter::ToString(GX_ASSOCIATION_STATUS value)
+const char* CGXDLMSConverter::ToString(DLMS_DLMS_ASSOCIATION_STATUS value)
 {
     switch(value)
     {
-    case GX_ASSOCIATION_STATUS_NON_ASSOCIATED:
+    case DLMS_DLMS_ASSOCIATION_STATUS_NON_ASSOCIATED:
         return "NonAssociated";
         break;
-    case GX_ASSOCIATION_STATUS_ASSOCIATION_PENDING:
+    case DLMS_DLMS_ASSOCIATION_STATUS_ASSOCIATION_PENDING:
         return "AssociationPending";
         break;
-    case GX_ASSOCIATION_STATUS_ASSOCIATED:
+    case DLMS_DLMS_ASSOCIATION_STATUS_ASSOCIATED:
         return "Associated";
         break;
     default:
@@ -527,17 +527,17 @@ const char* CGXDLMSConverter::ToString(GX_ASSOCIATION_STATUS value)
     return "Unknown association status";
 }
 
-const char* CGXDLMSConverter::ToString(OPTICAL_PROTOCOL_MODE value)
+const char* CGXDLMSConverter::ToString(DLMS_OPTICAL_PROTOCOL_MODE value)
 {
     switch(value)
     {
-    case OPTICAL_PROTOCOL_MODE_DEFAULT:
+    case DLMS_OPTICAL_PROTOCOL_MODE_DEFAULT:
         return "Default";
         break;
-    case OPTICAL_PROTOCOL_MODE_NET:
+    case DLMS_OPTICAL_PROTOCOL_MODE_NET:
         return "Net";
         break;
-    case OPTICAL_PROTOCOL_MODE_UNKNOWN:
+    case DLMS_OPTICAL_PROTOCOL_MODE_UNKNOWN:
         return "Unknown";
         break;
     default:
@@ -546,14 +546,14 @@ const char* CGXDLMSConverter::ToString(OPTICAL_PROTOCOL_MODE value)
     return "Unknown ptotocol mode";
 }
 
-const char* CGXDLMSConverter::ToString(LOCAL_PORT_RESPONSE_TIME value)
+const char* CGXDLMSConverter::ToString(DLMS_LOCAL_PORT_RESPONSE_TIME value)
 {
     switch(value)
     {
-    case LOCAL_PORT_RESPONSE_TIME_20_MS:
+    case DLMS_LOCAL_PORT_RESPONSE_TIME_20_MS:
         return "ms20";
         break;
-    case LOCAL_PORT_RESPONSE_TIME_200_MS:
+    case DLMS_LOCAL_PORT_RESPONSE_TIME_200_MS:
         return "ms200";
         break;
     default:

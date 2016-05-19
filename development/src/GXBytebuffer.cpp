@@ -56,7 +56,7 @@ CGXByteBuffer::CGXByteBuffer(const CGXByteBuffer& value)
     m_Size = 0;
     if (value.m_Size != 0)
     {
-        AddRange(value.m_Data, value.m_Size);
+        Set(value.m_Data, value.m_Size);
     }
 }
 
@@ -277,7 +277,7 @@ void CGXByteBuffer::SetInt64(long long item)
     CGXByteBuffer::SetUInt64((unsigned long long) item);
 }
 
-void CGXByteBuffer::AddRange(const void* pSource, int count)
+void CGXByteBuffer::Set(const void* pSource, int count)
 {
     if(m_Size + count > m_Capacity)
     {
@@ -296,13 +296,13 @@ void CGXByteBuffer::AddRange(const void* pSource, int count)
     m_Size += count;
 }
 
-void CGXByteBuffer::AddRange2(CGXByteBuffer* data, int index, int count)
+void CGXByteBuffer::Set(CGXByteBuffer* data, int index, int count)
 {
     if (count == -1)
     {
         count = data->m_Size - index;
     }
-    CGXByteBuffer::AddRange(data->m_Data + index, count);
+    CGXByteBuffer::Set(data->m_Data + index, count);
     data->m_Position += count;
 }
 
@@ -311,14 +311,14 @@ void CGXByteBuffer::AddString(const char* value)
     if (value != NULL)
     {
         int len = strlen(value);
-        CGXByteBuffer::AddRange(value, len);
+        CGXByteBuffer::Set(value, len);
     }
 }
 
 void CGXByteBuffer::AttachString(char* value)
 {
     int len = strlen(value);
-    CGXByteBuffer::AddRange(value, len);
+    CGXByteBuffer::Set(value, len);
     free(value);
 }
 
@@ -331,7 +331,7 @@ int CGXByteBuffer::GetUInt8(unsigned char* value)
 {
     if (m_Position >= m_Size)
     {
-        return ERROR_CODES_OUTOFMEMORY;
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
     *value = m_Data[m_Position];
     ++m_Position;
@@ -342,7 +342,7 @@ int CGXByteBuffer::GetUInt8(int index, unsigned char* value)
 {
     if (index >= m_Size)
     {
-        return ERROR_CODES_OUTOFMEMORY;
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
     *value = m_Data[index];
     return 0;
@@ -354,7 +354,7 @@ int CGXByteBuffer::GetUInt16(unsigned short* value)
 
     if (m_Position + 2 > m_Size)
     {
-        return ERROR_CODES_OUTOFMEMORY;
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
     *value = (((m_Data[m_Position] & 0xFF) << 8) | (m_Data[m_Position + 1] & 0xFF));
     m_Position += 2;
@@ -366,7 +366,7 @@ int CGXByteBuffer::GetUInt32(unsigned long* value)
 
     if (m_Position + 4 > m_Size)
     {
-        return ERROR_CODES_OUTOFMEMORY;
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
     *value = m_Data[m_Position] << 24|
              m_Data[m_Position + 1] << 16 |
@@ -380,7 +380,7 @@ int CGXByteBuffer::GetUInt32LE(unsigned long* value)
 {
     if (m_Position + 4 > m_Size)
     {
-        return ERROR_CODES_OUTOFMEMORY;
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
     *value = m_Data[m_Position + 3] << 24|
              m_Data[m_Position + 2] << 16 |
@@ -394,7 +394,7 @@ int CGXByteBuffer::GetUInt32LE(int index, unsigned long* value)
 {
     if (index + 4 > m_Size)
     {
-        return ERROR_CODES_OUTOFMEMORY;
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
     *value = m_Data[index + 3] << 24 |
              m_Data[index + 2] << 16 |
@@ -422,7 +422,7 @@ int CGXByteBuffer::GetInt16(short* value)
 {
     if (m_Position + 2 > m_Size)
     {
-        return ERROR_CODES_OUTOFMEMORY;
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
     *value = m_Data[m_Position] << 8 |
              m_Data[m_Position + 1];
@@ -441,7 +441,7 @@ int CGXByteBuffer::GetUInt32(int index, unsigned long* value)
 {
     if (index + 4 > m_Size)
     {
-        return ERROR_CODES_OUTOFMEMORY;
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
     *value = m_Data[index] << 24 |
              m_Data[index + 1] << 16 |
@@ -474,7 +474,7 @@ int CGXByteBuffer::GetUInt64(int index, unsigned long long* value)
 {
     if (index + 8 > m_Size)
     {
-        return ERROR_CODES_OUTOFMEMORY;
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
     *value = (unsigned long long)m_Data[index] << 56 |
              (unsigned long long) m_Data[index + 1] << 48 |
@@ -509,7 +509,7 @@ int CGXByteBuffer::GetFloat(float* value)
 {
     if (m_Position + 8 > m_Size)
     {
-        return ERROR_CODES_OUTOFMEMORY;
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
     *value = (float) ((unsigned long long)m_Data[m_Position] << 56 |
                       (unsigned long long)m_Data[m_Position + 1] << 48 |
@@ -527,7 +527,7 @@ int CGXByteBuffer::GetDouble(double* value)
 {
     if (m_Position + 16 > m_Size)
     {
-        return ERROR_CODES_OUTOFMEMORY;
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
     *value = (double)((unsigned long long)m_Data[m_Position] << 56 |
                       (unsigned long long)m_Data[m_Position + 1] << 48 |
@@ -545,7 +545,7 @@ int CGXByteBuffer::Get(unsigned char* value, int count)
 {
     if (value == NULL || count < 0 || m_Size - m_Position < count)
     {
-        return ERROR_CODES_OUTOFMEMORY;
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
     memcpy(value, m_Data + m_Position, count);
     m_Position += count;
@@ -561,7 +561,7 @@ int CGXByteBuffer::GetUInt16(int index, unsigned short* value)
 {
     if (index + 2 > m_Size)
     {
-        return ERROR_CODES_OUTOFMEMORY;
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
     *value = m_Data[index] << 8 |
              m_Data[index + 1];
@@ -613,22 +613,44 @@ void CGXByteBuffer::AddDoubleAsString(double value)
     }
 }
 
+/**
+    * Returns data as byte array.
+    *
+    * @return Byte buffer as a byte array.
+    */
+int CGXByteBuffer::SubArray(int index, int count, CGXByteBuffer& bb)
+{
+    bb.Clear();
+    bb.Set(this, index, count);
+    return 0;
+}
+
 int CGXByteBuffer::Move(int srcPos, int destPos, int count)
 {
     if (m_Size < destPos + count || srcPos < 0 || destPos < 0 || count < 0)
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    memcpy(m_Data + destPos, m_Data + srcPos, count);
-    if (srcPos < destPos)
+    if (count != 0)
     {
-        m_Size -= destPos - srcPos;
+        memcpy(m_Data + destPos, m_Data + srcPos, count);
+        m_Size = (destPos + count);
+        m_Position = destPos;
     }
     else
     {
-
+        m_Size = 0;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
+}
+
+void CGXByteBuffer::Trim()
+{
+    Move(m_Position, 0, m_Size - m_Position);
+    if (m_Position > m_Size)
+    {
+        m_Position = m_Size;
+    }
 }
 
 /**
@@ -670,7 +692,7 @@ CGXByteBuffer& CGXByteBuffer::operator=(CGXByteBuffer& value)
     m_Size = 0;
     if (value.GetSize() != 0)
     {
-        AddRange2(&value, 0, -1);
+        Set(&value, 0, -1);
     }
     return *this;
 }

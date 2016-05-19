@@ -37,34 +37,158 @@
 
 class CGXCipher
 {
+    DLMS_SECURITY m_Security;
+    /**
+    * System title.
+    */
+    CGXByteBuffer m_SystemTitle;
+
+    /**
+    *  Block cipher key.
+    */
+    CGXByteBuffer m_BlockCipherKey;
+    /**
+    *  Block Authentication key.
+    */
+    CGXByteBuffer m_AuthenticationKey;
+
+    /**
+     * Frame counter. AKA Invocation counter.
+     */
+    unsigned long m_FrameCounter;
+
 public:
     /**
-     * Encrypt PDU.
-     *
-     * command : Command.
-     * data : Data to encrypt.
-     * Returns : Encrypted data.
-     */
-    int Encrypt(DLMS_COMMAND command, CGXByteBuffer& data, CGXByteBuffer& reply)
+    * Constructor.
+    */
+    CGXCipher()
+    {
+    	m_FrameCounter = 0;
+        m_Security = DLMS_SECURITY_NONE;
+    }
+    /**
+      * Encrypt PDU.
+      *
+      * @param tag
+      *            Tag.
+      * @param systemTitle
+      *            System Title.
+      * @param data
+      *            Data to encrypt.
+      * @param reply
+      *            Encrypted data.
+      */
+    int Encrypt(unsigned char tag, CGXByteBuffer& systemTitle, CGXByteBuffer& data, CGXByteBuffer& reply)
     {
         //Encryption is not supported in C++ at the moment.
         return 0;
     }
 
     /**
-     * Decrypt data.
-     *
-     * data : Decrypted data.
-     */
-    int Decrypt(CGXByteBuffer& data)
+      * Decrypt data.
+      *
+      * @param systemTitle
+      *            System Title.
+      * @param data
+      *            Decrypted data.
+      * @param security
+      *            Used security level.
+      */
+    int Decrypt(CGXByteBuffer& title, CGXByteBuffer& data, DLMS_SECURITY& security)
     {
+    	security = DLMS_SECURITY_NONE;
         //Decryption is not supported in C++ at the moment.
         return 0;
     }
+
+    /**
+     * @return Is ciphering used.
+     */
     bool IsCiphered()
     {
         //Decryption is not supported in C++ at the moment.
         return false;
+    }
+    /**
+     * @return Used security.
+     */
+    DLMS_SECURITY GetSecurity()
+    {
+        return m_Security;
+    }
+
+    /**
+    * @param value
+    *            Used security.
+    */
+    void SetSecurity(DLMS_SECURITY value)
+    {
+        m_Security = value;
+    }
+
+    /**
+     * @return System title.
+     */
+    CGXByteBuffer& GetSystemTitle()
+    {
+        return m_SystemTitle;
+    }
+
+    /**
+    *  @param value System title.
+    */
+    void SetSystemTitle(CGXByteBuffer& value)
+    {
+        m_SystemTitle.Clear();
+        m_SystemTitle.Set(&value);
+    }
+
+    /**
+     * @return Block cipher key.
+     */
+    CGXByteBuffer& GetBlockCipherKey()
+    {
+        return m_BlockCipherKey;
+    }
+
+    /**
+    *  @param value Block cipher key.
+    */
+    void SetBlockCipherKey(CGXByteBuffer& value)
+    {
+        m_BlockCipherKey.Clear();
+        m_BlockCipherKey.Set(&value);
+    }
+
+    /**
+     * @return Authentication key.
+     */
+    CGXByteBuffer& GetAuthenticationKey()
+    {
+        return m_AuthenticationKey;
+    }
+
+    /**
+     * @param value
+     *            Authentication key.
+     */
+    void SetAuthenticationKey(CGXByteBuffer& value)
+    {
+        m_AuthenticationKey.Clear();
+        m_AuthenticationKey.Set(&value);
+    }
+
+    /**
+     * @return Frame counter. Invocation counter.
+     */
+    unsigned long GetFrameCounter()
+    {
+        return m_FrameCounter;
+    }
+
+    void Reset()
+    {
+
     }
 };
 #endif //GXCIPHER_H

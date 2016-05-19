@@ -304,7 +304,7 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     }
     status = ch;
     CGXDateTime dt;
-    dt.SetStatus((GXDLMS_CLOCK_STATUS) status);
+    dt.SetStatus((DLMS_CLOCK_STATUS) status);
     DATETIME_SKIPS skip = DATETIME_SKIPS_NONE;
     if (year < 1 || year == 0xFFFF)
     {
@@ -367,7 +367,7 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         time_t t = GetUtcTime(&tm);
         if (t == -1)
         {
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
 #if _MSC_VER > 1000
         localtime_s(&tm, &t);
@@ -376,7 +376,7 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 #endif
     }
     // If summer time and it is not set on our environment.
-    if (tm.tm_isdst == 0 && (status & GXDLMS_CLOCK_STATUS_DAYLIGHT_SAVE_ACTIVE) != 0)
+    if (tm.tm_isdst == 0 && (status & DLMS_CLOCK_STATUS_DAYLIGHT_SAVE_ACTIVE) != 0)
     {
         tm.tm_hour += 1;
         if (mktime(&tm) == -1)
@@ -693,7 +693,7 @@ int GXHelpers::GetObjectCount(CGXByteBuffer& data, unsigned long& count)
                 return ret;
             }
             count = cnt;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         else if (cnt == 0x82)
         {
@@ -703,7 +703,7 @@ int GXHelpers::GetObjectCount(CGXByteBuffer& data, unsigned long& count)
                 return ret;
             }
             count = tmp;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         else if (cnt == 0x84)
         {
@@ -713,15 +713,35 @@ int GXHelpers::GetObjectCount(CGXByteBuffer& data, unsigned long& count)
                 return ret;
             }
             count = tmp;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         else
         {
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
     }
     count = cnt;
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
+}
+
+unsigned char GXHelpers::GetObjectCountSizeInBytes(unsigned long count)
+{
+    if (count < 0x80)
+    {
+        return 1;
+    }
+    else if (count < 0x100)
+    {
+        return 2;
+    }
+    else if (count < 0x10000)
+    {
+        return 3;
+    }
+    else
+    {
+        return 5;
+    }
 }
 
 void GXHelpers::SetObjectCount(unsigned long count, CGXByteBuffer& buff)
@@ -1034,7 +1054,7 @@ static void ToBitString(CGXByteBuffer& sb, unsigned char value, int count)
             data[count - pos - 1] = '0';
         }
     }
-    sb.AddRange(data, count);
+    sb.Set(data, count);
 }
 
 /**
@@ -1185,7 +1205,7 @@ int GXHelpers::GetData(CGXByteBuffer& data, CGXDataInfo& info, CGXDLMSVariant& v
         break;
     case DLMS_DATA_TYPE_COMPACT_ARRAY:
         assert(0);
-        ret = ERROR_CODES_INVALID_PARAMETER;
+        ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
         break;
     case DLMS_DATA_TYPE_INT64:
         ret = GetInt64(data, info, value);
@@ -1213,7 +1233,7 @@ int GXHelpers::GetData(CGXByteBuffer& data, CGXDataInfo& info, CGXDLMSVariant& v
         break;
     default:
         assert(0);
-        ret = ERROR_CODES_INVALID_PARAMETER;
+        ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     return ret;
 }
@@ -1413,7 +1433,7 @@ static int SetDateTime(CGXByteBuffer& buff, CGXDLMSVariant& value)
     // Add clock_status
     if (dt.tm_isdst)
     {
-        buff.SetUInt8(value.dateTime.GetStatus() | GXDLMS_CLOCK_STATUS_DAYLIGHT_SAVE_ACTIVE);
+        buff.SetUInt8(value.dateTime.GetStatus() | DLMS_CLOCK_STATUS_DAYLIGHT_SAVE_ACTIVE);
     }
     else
     {
@@ -1449,7 +1469,7 @@ static int SetBcd(CGXByteBuffer& buff, CGXDLMSVariant& value)
     if (value.vt != DLMS_DATA_TYPE_STRING)
     {
         //BCD value must give as std::string.
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     std::string str = value.strVal;
     int len = str.length();
@@ -1531,7 +1551,7 @@ static int SetOctetString(CGXByteBuffer& buff, CGXDLMSVariant& value)
     else if (value.vt == DLMS_DATA_TYPE_OCTET_STRING)
     {
         GXHelpers::SetObjectCount(value.size, buff);
-        buff.AddRange(value.byteArr, value.size);
+        buff.Set(value.byteArr, value.size);
     }
     else if (value.vt == DLMS_DATA_TYPE_NONE)
     {
@@ -1540,7 +1560,7 @@ static int SetOctetString(CGXByteBuffer& buff, CGXDLMSVariant& value)
     else
     {
         // Invalid data type.
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     return 0;
 }
@@ -1578,7 +1598,7 @@ int GXHelpers::SetLogicalName(const char* name, unsigned char ln[6])
 #endif
     if (ret != 6)
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     ln[0] = (unsigned char) v1;
     ln[1] = (unsigned char) v2;
@@ -1586,7 +1606,7 @@ int GXHelpers::SetLogicalName(const char* name, unsigned char ln[6])
     ln[3] = (unsigned char) v4;
     ln[4] = (unsigned char) v5;
     ln[5] = (unsigned char) v6;
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 /**
@@ -1639,7 +1659,7 @@ static int SetBitString(CGXByteBuffer& buff, CGXDLMSVariant& value)
             }
             else
             {
-                return ERROR_CODES_INVALID_PARAMETER;
+                return DLMS_ERROR_CODE_INVALID_PARAMETER;
             }
             if (index == 8)
             {
@@ -1664,7 +1684,7 @@ static int SetBitString(CGXByteBuffer& buff, CGXDLMSVariant& value)
     else if (value.vt == DLMS_DATA_TYPE_OCTET_STRING)
     {
         GXHelpers::SetObjectCount(value.size, buff);
-        buff.AddRange(value.byteArr, value.size);
+        buff.Set(value.byteArr, value.size);
     }
     else if (value.vt == DLMS_DATA_TYPE_NONE)
     {
@@ -1673,9 +1693,9 @@ static int SetBitString(CGXByteBuffer& buff, CGXDLMSVariant& value)
     else
     {
         //BitString must give as std::string.
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant& value)
@@ -1694,7 +1714,7 @@ int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant&
              && value.vt == DLMS_DATA_TYPE_OCTET_STRING)
     {
         // If byte array is added do not add type.
-        buff.AddRange(value.byteArr, value.size);
+        buff.Set(value.byteArr, value.size);
         return 0;
     }
     else
@@ -1761,7 +1781,7 @@ int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant&
     else if (type == DLMS_DATA_TYPE_COMPACT_ARRAY)
     {
         assert(0);
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     else if (type == DLMS_DATA_TYPE_DATETIME)
     {
@@ -1778,7 +1798,7 @@ int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant&
     else
     {
         assert(0);
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     return 0;
 }

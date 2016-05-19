@@ -38,18 +38,18 @@
 #include <sstream>
 
 //Constructor.
-CGXDLMSActivityCalendar::CGXDLMSActivityCalendar() : CGXDLMSObject(OBJECT_TYPE_ACTIVITY_CALENDAR, "0.0.13.0.0.255")
+CGXDLMSActivityCalendar::CGXDLMSActivityCalendar() : CGXDLMSObject(DLMS_OBJECT_TYPE_ACTIVITY_CALENDAR, "0.0.13.0.0.255")
 {
 }
 
 //SN Constructor.
-CGXDLMSActivityCalendar::CGXDLMSActivityCalendar(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_ACTIVITY_CALENDAR, sn)
+CGXDLMSActivityCalendar::CGXDLMSActivityCalendar(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_ACTIVITY_CALENDAR, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSActivityCalendar::CGXDLMSActivityCalendar(std::string ln) : CGXDLMSObject(OBJECT_TYPE_ACTIVITY_CALENDAR, ln)
+CGXDLMSActivityCalendar::CGXDLMSActivityCalendar(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_ACTIVITY_CALENDAR, ln)
 {
 
 }
@@ -316,71 +316,78 @@ int CGXDLMSActivityCalendar::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 1)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 2)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 3)
     {
         type = DLMS_DATA_TYPE_ARRAY;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 4)
     {
         type = DLMS_DATA_TYPE_ARRAY;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 5)
     {
         type = DLMS_DATA_TYPE_ARRAY;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 6)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 7)
     {
         type = DLMS_DATA_TYPE_ARRAY;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
 
     }
     if (index == 8)
     {
         type = DLMS_DATA_TYPE_ARRAY;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 9)
     {
         type = DLMS_DATA_TYPE_ARRAY;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 10)
     {
         type = DLMS_DATA_TYPE_DATETIME;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Returns value of given attribute.
-int CGXDLMSActivityCalendar::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
     CGXByteBuffer data;
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
-        value.Add(&m_CalendarNameActive[0], m_CalendarNameActive.size());
-        return ERROR_CODES_OK;
+        e.GetValue().Add(&m_CalendarNameActive[0], m_CalendarNameActive.size());
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 3)
+    if (e.GetIndex() == 3)
     {
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int cnt = m_SeasonProfileActive.size();
@@ -399,10 +406,10 @@ int CGXDLMSActivityCalendar::GetValue(int index, int selector, CGXDLMSVariant& p
             tmp.Add((*it).GetWeekName());
             GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
         }
-        value = data;
-        return ERROR_CODES_OK;
+        e.SetValue(data);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 4)
+    if (e.GetIndex() == 4)
     {
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int cnt = m_WeekProfileTableActive.size();
@@ -430,10 +437,10 @@ int CGXDLMSActivityCalendar::GetValue(int index, int selector, CGXDLMSVariant& p
             tmp = it->GetSunday();
             GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, tmp);
         }
-        value = data;
-        return ERROR_CODES_OK;
+        e.SetValue(data);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 5)
+    if (e.GetIndex() == 5)
     {
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int cnt = m_DayProfileTableActive.size();
@@ -460,16 +467,16 @@ int CGXDLMSActivityCalendar::GetValue(int index, int selector, CGXDLMSVariant& p
                 GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, selector);
             }
         }
-        value = data;
-        return ERROR_CODES_OK;
+        e.SetValue(data);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 6)
+    if (e.GetIndex() == 6)
     {
-        value.Add(m_CalendarNamePassive);
-        return ERROR_CODES_OK;
+        e.GetValue().Add(m_CalendarNamePassive);
+        return DLMS_ERROR_CODE_OK;
     }
     //
-    if (index == 7)
+    if (e.GetIndex() == 7)
     {
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int cnt = m_SeasonProfilePassive.size();
@@ -487,11 +494,11 @@ int CGXDLMSActivityCalendar::GetValue(int index, int selector, CGXDLMSVariant& p
             tmp = it->GetWeekName();
             GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
         }
-        value = data;
-        return ERROR_CODES_OK;
+        e.SetValue(data);
+        return DLMS_ERROR_CODE_OK;
 
     }
-    if (index == 8)
+    if (e.GetIndex() == 8)
     {
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int cnt = m_WeekProfileTablePassive.size();
@@ -519,10 +526,10 @@ int CGXDLMSActivityCalendar::GetValue(int index, int selector, CGXDLMSVariant& p
             tmp = it->GetSunday();
             GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, tmp);
         }
-        value = data;
-        return ERROR_CODES_OK;
+        e.SetValue(data);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 9)
+    if (e.GetIndex() == 9)
     {
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int cnt = m_DayProfileTablePassive.size();
@@ -549,34 +556,34 @@ int CGXDLMSActivityCalendar::GetValue(int index, int selector, CGXDLMSVariant& p
                 GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, selector);
             }
         }
-        value = data;
-        return ERROR_CODES_OK;
+        e.SetValue(data);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 10)
+    if (e.GetIndex() == 10)
     {
-        value = GetTime();
-        return ERROR_CODES_OK;
+        e.SetValue(GetTime());
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Set value of given attribute.
-int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
         CGXDLMSVariant tmp;
-        CGXDLMSClient::ChangeType(value, DLMS_DATA_TYPE_STRING, tmp);
+        CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_STRING, tmp);
         SetCalendarNameActive(tmp.strVal);
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
         m_SeasonProfileActive.clear();
-        for(std::vector<CGXDLMSVariant>::iterator item = value.Arr.begin(); item != value.Arr.end(); ++item)
+        for(std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
         {
             CGXDLMSSeasonProfile it;
             CGXDLMSVariant tmp;
@@ -589,10 +596,10 @@ int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings* settings, int index, CGXD
             m_SeasonProfileActive.push_back(it);
         }
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
         m_WeekProfileTableActive.clear();
-        for(std::vector<CGXDLMSVariant>::iterator item = value.Arr.begin(); item != value.Arr.end(); ++item)
+        for(std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
         {
             CGXDLMSVariant tmp;
             CGXDLMSWeekProfile it;
@@ -608,10 +615,10 @@ int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings* settings, int index, CGXD
             m_WeekProfileTableActive.push_back(it);
         }
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
         m_DayProfileTableActive.clear();
-        for(std::vector<CGXDLMSVariant>::iterator item = value.Arr.begin(); item != value.Arr.end(); ++item)
+        for(std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
         {
             CGXDLMSDayProfile it;
             it.SetDayId(item->Arr[0].ToInteger());
@@ -629,15 +636,15 @@ int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings* settings, int index, CGXD
             m_DayProfileTableActive.push_back(it);
         }
     }
-    else if (index == 6)
+    else if (e.GetIndex() == 6)
     {
         CGXDLMSVariant tmp;
-        CGXDLMSClient::ChangeType(value, DLMS_DATA_TYPE_STRING, tmp);
+        CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_STRING, tmp);
         SetCalendarNamePassive(tmp.strVal);
     }
-    else if (index == 7)
+    else if (e.GetIndex() == 7)
     {
-        for(std::vector<CGXDLMSVariant>::iterator item = value.Arr.begin(); item != value.Arr.end(); ++item)
+        for(std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
         {
             CGXDLMSSeasonProfile it;
             CGXDLMSVariant tmp;
@@ -650,9 +657,9 @@ int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings* settings, int index, CGXD
             m_SeasonProfilePassive.push_back(it);
         }
     }
-    else if (index == 8)
+    else if (e.GetIndex() == 8)
     {
-        for(std::vector<CGXDLMSVariant>::iterator item = value.Arr.begin(); item != value.Arr.end(); ++item)
+        for(std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
         {
             CGXDLMSWeekProfile it;
             CGXDLMSVariant tmp;
@@ -668,9 +675,9 @@ int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings* settings, int index, CGXD
             m_WeekProfileTablePassive.push_back(it);
         }
     }
-    else if (index == 9)
+    else if (e.GetIndex() == 9)
     {
-        for(std::vector<CGXDLMSVariant>::iterator item = value.Arr.begin(); item != value.Arr.end(); ++item)
+        for(std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
         {
             CGXDLMSDayProfile it;
             it.SetDayId((*item).Arr[0].iVal);
@@ -688,15 +695,15 @@ int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings* settings, int index, CGXD
             m_DayProfileTablePassive.push_back(it);
         }
     }
-    else if (index == 10)
+    else if (e.GetIndex() == 10)
     {
         CGXDLMSVariant tmp;
-        CGXDLMSClient::ChangeType(value, DLMS_DATA_TYPE_DATETIME, tmp);
+        CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_DATETIME, tmp);
         SetTime(tmp.dateTime);
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

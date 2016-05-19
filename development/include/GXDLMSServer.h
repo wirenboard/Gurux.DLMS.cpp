@@ -1,0 +1,376 @@
+//
+// --------------------------------------------------------------------------
+//  Gurux Ltd
+//
+//
+//
+// Filename:        $HeadURL$
+//
+// Version:         $Revision$,
+//                  $Date$
+//                  $Author$
+//
+// Copyright (c) Gurux Ltd
+//
+//---------------------------------------------------------------------------
+//
+//  DESCRIPTION
+//
+// This file is a part of Gurux Device Framework.
+//
+// Gurux Device Framework is Open Source software; you can redistribute it
+// and/or modify it under the terms of the GNU General License
+// as published by the Free Software Foundation; version 2 of the License.
+// Gurux Device Framework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General License for more details.
+//
+// More information of Gurux products: http://www.gurux.org
+//
+// This code is licensed under the GNU General License v2.
+// Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
+//---------------------------------------------------------------------------
+
+#ifndef GXDLMSSERVER_H
+#define GXDLMSSERVER_H
+
+#include <vector>
+#include "GXDLMSLongTransaction.h"
+#include "GXReplyData.h"
+#include "GXDLMSSettings.h"
+#include "GXSNInfo.h"
+
+class CGXDLMSServer
+{
+private:
+    CGXReplyData m_Info;
+    /**
+     * Received data.
+     */
+    CGXByteBuffer m_ReceivedData;
+
+    /**
+     * Reply data.
+     */
+    CGXByteBuffer m_ReplyData;
+
+    /**
+     * Long get or read transaction information.
+     */
+    CGXDLMSLongTransaction* m_Transaction;
+
+    /**
+     * Is server initialized.
+     */
+    bool m_Initialized;
+
+protected:
+    /**
+     * Server m_Settings.
+     */
+    CGXDLMSSettings m_Settings;
+
+    /**
+     * @param value
+     *            Cipher interface that is used to cipher PDU.
+     */
+    void SetCipher(CGXCipher* value);
+
+    /**
+    * @return Get settings.
+    */
+    CGXDLMSSettings& GetSettings();
+
+    /**
+        * Check is data sent to this server.
+        *
+        * @param serverAddress
+        *            Server address.
+        * @param clientAddress
+        *            Client address.
+        * @return True, if data is sent to this server.
+        */
+    virtual bool IsTarget(
+        unsigned long int serverAddress,
+        unsigned long clientAddress) = 0;
+
+    /**
+     * Check whether the authentication and password are correct.
+     *
+     * @param authentication
+     *            Authentication level.
+     * @param password
+     *            Password.
+     * @return Source diagnostic.
+     */
+    virtual DLMS_SOURCE_DIAGNOSTIC ValidateAuthentication(
+        DLMS_AUTHENTICATION authentication,
+        CGXByteBuffer& password) = 0;
+
+    /**
+     * Find object.
+     *
+     * @param objectType
+     *            Object type.
+     * @param sn
+     *            Short Name. In Logical name referencing this is not used.
+     * @param ln
+     *            Logical Name. In Short Name referencing this is not used.
+     * @return Found object or NULL if object is not found.
+     */
+    virtual CGXDLMSObject* FindObject(
+        DLMS_OBJECT_TYPE objectType,
+        int sn,
+        std::string& ln) = 0;
+
+    /**
+     * Read selected item(s).
+     *
+     * @param args
+     *            Handled read requests.
+     */
+    virtual void Read(
+        std::vector<CGXDLMSValueEventArgs*>& args) = 0;
+
+    /**
+     * Write selected item(s).
+     *
+     * @param args
+     *            Handled write requests.
+     */
+    virtual void Write(
+        std::vector<CGXDLMSValueEventArgs*>& args) = 0;
+
+    /**
+     * Accepted connection is made for the server. All initialization is done
+     * here.
+     */
+    virtual void Connected() = 0;
+
+    /**
+     * Server has close the connection. All clean up is made here.
+     */
+    virtual void Disconnected() = 0;
+
+    /**
+     * Action is occurred.
+     *
+     * @param args
+     *            Handled action requests.
+     */
+    virtual void Action(
+        std::vector<CGXDLMSValueEventArgs*>& args) = 0;
+public:
+    /**
+     * @return Client to Server challenge.
+     */
+    CGXByteBuffer& GetCtoSChallenge();
+
+    /**
+     * @return Server to Client challenge.
+     */
+    CGXByteBuffer& GetStoCChallenge();
+
+    /**
+     * @return Interface type.
+     */
+    DLMS_INTERFACE_TYPE GetInterfaceType();
+
+    /**
+     * Server to Client custom challenge. This is for debugging purposes. Reset
+     * custom challenge settings StoCChallenge to NULL.
+     *
+     * @param value
+     *            Server to Client challenge.
+     */
+    void SetStoCChallenge(
+        CGXByteBuffer& value);
+
+    /**
+     * Set starting packet index. Default is One based, but some meters use Zero
+     * based value. Usually this is not used.
+     *
+     * @param value
+     *            Zero based starting index.
+     */
+    void SetStartingPacketIndex(int value);
+
+    /**
+     * @return Invoke ID.
+     */
+    int GetInvokeID();
+
+    /**
+     * Constructor.
+     *
+     * @param logicalNameReferencing
+     *            Is logical name referencing used.
+     * @param type
+     *            Interface type.
+     */
+    CGXDLMSServer(
+        bool logicalNameReferencing,
+        DLMS_INTERFACE_TYPE type);
+
+    /**
+    * Destructor.
+    */
+    ~CGXDLMSServer();
+
+    /**
+     * @return List of objects that meter supports.
+     */
+    CGXDLMSObjectCollection& GetItems();
+
+    /**
+     * @return Information from the connection size that server can handle.
+     */
+    CGXDLMSLimits GetLimits();
+
+    /**
+     * Retrieves the maximum size of received PDU. PDU size tells maximum size
+     * of PDU packet. Value can be from 0 to 0xFFFF. By default the value is
+     * 0xFFFF.
+     *
+     * @return Maximum size of received PDU.
+     */
+    unsigned short GetMaxReceivePDUSize();
+
+    /**
+     * @param value
+     *            Maximum size of received PDU.
+     */
+    void SetMaxReceivePDUSize(
+        unsigned short value);
+
+    /**
+     * Determines, whether Logical, or Short name, referencing is used.
+     * Referencing depends on the device to communicate with. Normally, a device
+     * supports only either Logical or Short name referencing. The referencing
+     * is defined by the device manufacturer. If the referencing is wrong, the
+     * SNMR message will fail.
+     *
+     * @see #getMaxReceivePDUSize
+     * @return Is logical name referencing used.
+     */
+    bool GetUseLogicalNameReferencing();
+
+    /**
+     * @param value
+     *            Is Logical Name referencing used.
+     */
+    void SetUseLogicalNameReferencing(
+        bool value);
+
+    /**
+     * Gets Logical Name settings.
+     *
+     * @return Logical Name m_Settings.
+     */
+    CGXDLMSLNSettings& GetLNSettings();
+
+    /**
+     * Gets Short Name m_Settings.
+     *
+     * @return Short Name m_Settings.
+     */
+    CGXDLMSSNSettings& GetSNSettings();
+
+    /**
+     * Initialize server. This must call after server objects are set.
+     */
+    int Initialize();
+
+    /**
+     * Reset after connection is closed.
+     */
+    void Reset();
+
+    /**
+     * Handles client request.
+     *
+     * @param data
+     *            Received data from the client.
+     * @return Response to the request. Response is NULL if request packet is
+     *         not complete.
+     */
+    int HandleRequest(
+        CGXByteBuffer& data,
+        CGXByteBuffer& reply);
+
+    /**
+     * Handles client request.
+     *
+     * @param data
+     *            Received data from the client.
+     * @return Response to the request. Response is NULL if request packet is
+     *         not complete.
+     */
+    int HandleRequest(
+        unsigned char* data,
+        unsigned short size,
+        CGXByteBuffer& reply);
+
+    /**
+    * Handle received command.
+    */
+    int HandleCommand(
+        DLMS_COMMAND cmd,
+        CGXByteBuffer& data,
+        CGXByteBuffer& reply);
+
+    /**
+    * Parse AARQ request that client send and returns AARE request.
+    *
+    * @return Reply to the client.
+    */
+    int HandleAarqRequest(CGXByteBuffer& data);
+
+    /**
+     * Handle Set request.
+     *
+     * @return Reply to the client.
+     */
+    int HandleSetRequest(
+        CGXByteBuffer& data);
+
+    /**
+    * Handle Get request.
+    *
+    * @return Reply to the client.
+    */
+    int HandleGetRequest(
+        CGXByteBuffer& data);
+
+    /**
+    * Handle read request.
+    */
+    int HandleReadRequest(CGXByteBuffer& data);
+
+    /**
+    * Handle write request.
+    *
+    * @param reply
+    *            Received data from the client.
+    * @return Reply.
+    */
+    int HandleWriteRequest(CGXByteBuffer& data);
+
+    /**
+    * Handle action request.
+    *
+    * @param reply
+    *            Received data from the client.
+    * @return Reply.
+    */
+    int HandleMethodRequest(CGXByteBuffer& data);
+
+    /**
+    * Find Short Name object.
+    *
+    * @param sn
+    */
+    int FindSNObject(int sn, CGXSNInfo& i);
+};
+#endif //GXDLMSSERVER_H

@@ -48,7 +48,7 @@ void CGXDLMSAutoAnswer::Init()
 /**
  Constructor.
 */
-CGXDLMSAutoAnswer::CGXDLMSAutoAnswer() : CGXDLMSObject(OBJECT_TYPE_AUTO_ANSWER, "0.0.2.2.0.255")
+CGXDLMSAutoAnswer::CGXDLMSAutoAnswer() : CGXDLMSObject(DLMS_OBJECT_TYPE_AUTO_ANSWER, "0.0.2.2.0.255")
 {
     Init();
 }
@@ -58,7 +58,7 @@ CGXDLMSAutoAnswer::CGXDLMSAutoAnswer() : CGXDLMSObject(OBJECT_TYPE_AUTO_ANSWER, 
 
  @param ln Logical Name of the object.
 */
-CGXDLMSAutoAnswer::CGXDLMSAutoAnswer(std::string ln) : CGXDLMSObject(OBJECT_TYPE_AUTO_ANSWER, ln)
+CGXDLMSAutoAnswer::CGXDLMSAutoAnswer(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_AUTO_ANSWER, ln)
 {
     Init();
 }
@@ -69,7 +69,7 @@ CGXDLMSAutoAnswer::CGXDLMSAutoAnswer(std::string ln) : CGXDLMSObject(OBJECT_TYPE
  @param ln Logical Name of the object.
  @param sn Short Name of the object.
 */
-CGXDLMSAutoAnswer::CGXDLMSAutoAnswer(int sn) : CGXDLMSObject(OBJECT_TYPE_AUTO_ANSWER, sn)
+CGXDLMSAutoAnswer::CGXDLMSAutoAnswer(int sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_AUTO_ANSWER, sn)
 {
     Init();
 }
@@ -217,49 +217,56 @@ int CGXDLMSAutoAnswer::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 1)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 2)
     {
         type = DLMS_DATA_TYPE_ENUM;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 3)
     {
         type = DLMS_DATA_TYPE_ARRAY;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 4)
     {
         type = DLMS_DATA_TYPE_ENUM;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 5)
     {
         type = DLMS_DATA_TYPE_UINT8;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 6)
     {
         type = DLMS_DATA_TYPE_ARRAY;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Returns value of given attribute.
-int CGXDLMSAutoAnswer::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSAutoAnswer::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
-        value = GetMode();
-        return ERROR_CODES_OK;
+        e.SetValue(GetMode());
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 3)
+    if (e.GetIndex() == 3)
     {
         int ret;
         int cnt = m_ListeningWindow.size();
@@ -281,20 +288,20 @@ int CGXDLMSAutoAnswer::GetValue(int index, int selector, CGXDLMSVariant& paramet
                 return ret;
             }
         }
-        value = data;
-        return ERROR_CODES_OK;
+        e.SetValue(data);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 4)
+    if (e.GetIndex() == 4)
     {
-        value = GetStatus();
-        return ERROR_CODES_OK;
+        e.SetValue(GetStatus());
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 5)
+    if (e.GetIndex() == 5)
     {
-        value = GetNumberOfCalls();
-        return ERROR_CODES_OK;
+        e.SetValue(GetNumberOfCalls());
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 6)
+    if (e.GetIndex() == 6)
     {
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
@@ -302,62 +309,62 @@ int CGXDLMSAutoAnswer::GetValue(int index, int selector, CGXDLMSVariant& paramet
         CGXDLMSVariant in = m_NumberOfRingsInListeningWindow;
         CGXDLMSVariant out = m_NumberOfRingsOutListeningWindow;
         int ret;
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, in)) != ERROR_CODES_OK ||
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, out)) != ERROR_CODES_OK)
+        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, in)) != DLMS_ERROR_CODE_OK ||
+                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, out)) != DLMS_ERROR_CODE_OK)
         {
             return ret;
         }
-        value = data;
-        return ERROR_CODES_OK;
+        e.SetValue(data);
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 /*
  * Set value of given attribute.
  */
-int CGXDLMSAutoAnswer::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSAutoAnswer::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
-        SetMode((AUTO_CONNECT_MODE) value.lVal);
-        return ERROR_CODES_OK;
+        SetMode((AUTO_CONNECT_MODE) e.GetValue().lVal);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 3)
+    if (e.GetIndex() == 3)
     {
         m_ListeningWindow.clear();
-        for (std::vector<CGXDLMSVariant>::iterator item = value.Arr.begin(); item != value.Arr.end(); ++item)
+        for (std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
         {
             CGXDLMSVariant start, end;
             CGXDLMSClient::ChangeType((*item).Arr[0], DLMS_DATA_TYPE_DATETIME, start);
             CGXDLMSClient::ChangeType((*item).Arr[1], DLMS_DATA_TYPE_DATETIME, end);
             m_ListeningWindow.push_back(std::pair< CGXDateTime, CGXDateTime>(start.dateTime, end.dateTime));
         }
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 4)
+    if (e.GetIndex() == 4)
     {
-        SetStatus((AUTO_ANSWER_STATUS) value.lVal);
-        return ERROR_CODES_OK;
+        SetStatus((AUTO_ANSWER_STATUS) e.GetValue().lVal);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 5)
+    if (e.GetIndex() == 5)
     {
-        SetNumberOfCalls(value.lVal);
-        return ERROR_CODES_OK;
+        SetNumberOfCalls(e.GetValue().lVal);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 6)
+    if (e.GetIndex() == 6)
     {
         m_NumberOfRingsInListeningWindow = m_NumberOfRingsOutListeningWindow = 0;
-        if (value.vt != DLMS_DATA_TYPE_NONE)
+        if (e.GetValue().vt != DLMS_DATA_TYPE_NONE)
         {
-            m_NumberOfRingsInListeningWindow = value.Arr[0].ToInteger();
-            m_NumberOfRingsOutListeningWindow = value.Arr[1].ToInteger();
+            m_NumberOfRingsInListeningWindow = e.GetValue().Arr[0].ToInteger();
+            m_NumberOfRingsOutListeningWindow = e.GetValue().Arr[1].ToInteger();
         }
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }

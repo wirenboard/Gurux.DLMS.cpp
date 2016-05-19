@@ -40,7 +40,7 @@
 class GXAuthentication
 {
     CGXDLMSVariant m_ClientID;
-    GXDLMS_AUTHENTICATION m_Type;
+    DLMS_AUTHENTICATION m_Type;
     std::string m_Password;
 public:
     //Constructor.
@@ -49,7 +49,7 @@ public:
     }
 
     //Constructor.
-    GXAuthentication(GXDLMS_AUTHENTICATION type, std::string password, CGXDLMSVariant clientID)
+    GXAuthentication(DLMS_AUTHENTICATION type, std::string password, CGXDLMSVariant clientID)
     {
         m_Type = type;
         m_ClientID = clientID;
@@ -59,7 +59,7 @@ public:
     /// <summary>
     /// Authentication type
     /// </summary>
-    GXDLMS_AUTHENTICATION GetType()
+    DLMS_AUTHENTICATION GetType()
     {
         return m_Type;
     }
@@ -67,7 +67,7 @@ public:
     /// <summary>
     /// Authentication type
     /// </summary>
-    void SetType(GXDLMS_AUTHENTICATION value)
+    void SetType(DLMS_AUTHENTICATION value)
     {
         m_Type = value;
     }

@@ -38,18 +38,18 @@
 #include "../include/GXDLMSConverter.h"
 
 //Constructor.
-CGXDLMSDisconnectControl::CGXDLMSDisconnectControl() : CGXDLMSObject(OBJECT_TYPE_DISCONNECT_CONTROL)
+CGXDLMSDisconnectControl::CGXDLMSDisconnectControl() : CGXDLMSObject(DLMS_OBJECT_TYPE_DISCONNECT_CONTROL)
 {
 }
 
 //SN Constructor.
-CGXDLMSDisconnectControl::CGXDLMSDisconnectControl(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_DISCONNECT_CONTROL, sn)
+CGXDLMSDisconnectControl::CGXDLMSDisconnectControl(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_DISCONNECT_CONTROL, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSDisconnectControl::CGXDLMSDisconnectControl(std::string ln) : CGXDLMSObject(OBJECT_TYPE_DISCONNECT_CONTROL, ln)
+CGXDLMSDisconnectControl::CGXDLMSDisconnectControl(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_DISCONNECT_CONTROL, ln)
 {
 
 }
@@ -69,11 +69,11 @@ void CGXDLMSDisconnectControl::SetOutputState(bool value)
 /**
  Control state of COSEM Disconnect Control object.
 */
-CONTROLSTATE CGXDLMSDisconnectControl::GetControlState()
+DLMS_CONTROL_STATE CGXDLMSDisconnectControl::GetControlState()
 {
     return m_ControlState;
 }
-void CGXDLMSDisconnectControl::SetControlState(CONTROLSTATE value)
+void CGXDLMSDisconnectControl::SetControlState(DLMS_CONTROL_STATE value)
 {
     m_ControlState = value;
 }
@@ -81,11 +81,11 @@ void CGXDLMSDisconnectControl::SetControlState(CONTROLSTATE value)
 /**
 Control mode of COSEM Disconnect Control object.
 */
-CONTROLMODE CGXDLMSDisconnectControl::GetControlMode()
+DLMS_CONTROL_MODE CGXDLMSDisconnectControl::GetControlMode()
 {
     return m_ControlMode;
 }
-void CGXDLMSDisconnectControl::SetControlMode(CONTROLMODE value)
+void CGXDLMSDisconnectControl::SetControlMode(DLMS_CONTROL_MODE value)
 {
     m_ControlMode = value;
 }
@@ -157,58 +157,65 @@ int CGXDLMSDisconnectControl::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Returns value of given attribute.
-int CGXDLMSDisconnectControl::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSDisconnectControl::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
-        value = m_OutputState;
-        return ERROR_CODES_OK;
+        e.SetValue(m_OutputState);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 3)
+    if (e.GetIndex() == 3)
     {
-        value = m_ControlState;
-        return ERROR_CODES_OK;
+        e.SetValue(m_ControlState);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 4)
+    if (e.GetIndex() == 4)
     {
-        value = m_ControlMode;
-        return ERROR_CODES_OK;
+        e.SetValue(m_ControlMode);
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Set value of given attribute.
-int CGXDLMSDisconnectControl::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSDisconnectControl::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        m_OutputState = value.boolVal;
+        m_OutputState = e.GetValue().boolVal;
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        m_ControlState = (CONTROLSTATE) value.ToInteger();
+        m_ControlState = (DLMS_CONTROL_STATE) e.GetValue().ToInteger();
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
-        m_ControlMode = (CONTROLMODE) value.ToInteger();
+        m_ControlMode = (DLMS_CONTROL_MODE) e.GetValue().ToInteger();
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

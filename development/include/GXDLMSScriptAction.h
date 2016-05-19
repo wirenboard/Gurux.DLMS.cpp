@@ -53,7 +53,7 @@ enum SCRIPT_ACTION_TYPE
 class CGXDLMSScriptAction
 {
     SCRIPT_ACTION_TYPE m_Type;
-    OBJECT_TYPE m_ObjectType;
+    DLMS_OBJECT_TYPE m_ObjectType;
     std::string m_LogicalName;
     int m_Index;
     CGXDLMSVariant m_Parameter;
@@ -67,8 +67,8 @@ public:
     /**
      Executed object type.
     */
-    OBJECT_TYPE GetObjectType();
-    void SetObjectType(OBJECT_TYPE value);
+    DLMS_OBJECT_TYPE GetObjectType();
+    void SetObjectType(DLMS_OBJECT_TYPE value);
 
     /**
      Logical name of executed object.

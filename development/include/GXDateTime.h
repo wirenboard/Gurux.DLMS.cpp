@@ -71,7 +71,7 @@ class CGXDateTime
     struct tm m_Value;
     bool m_DaylightSavingsBegin;
     bool m_DaylightSavingsEnd;
-    GXDLMS_CLOCK_STATUS m_Status;
+    DLMS_CLOCK_STATUS m_Status;
     void Init(int year, int month, int day, int hour, int minute, int second, int millisecond, int devitation);
 public:
     // Constructor.
@@ -112,8 +112,8 @@ public:
     void SetDeviation(int value);
 
     // Status of the clock.
-    GXDLMS_CLOCK_STATUS GetStatus();
-    void SetStatus(GXDLMS_CLOCK_STATUS value);
+    DLMS_CLOCK_STATUS GetStatus();
+    void SetStatus(DLMS_CLOCK_STATUS value);
     unsigned char DaysInMonth(int year, short month);
 
     //Get date time value as meter time.

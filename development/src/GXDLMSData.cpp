@@ -35,30 +35,30 @@
 #include "../include/GXDLMSData.h"
 
 //Constructor.
-CGXDLMSData::CGXDLMSData() : CGXDLMSObject(OBJECT_TYPE_DATA)
+CGXDLMSData::CGXDLMSData() : CGXDLMSObject(DLMS_OBJECT_TYPE_DATA)
 {
 }
 
 //SN Constructor.
-CGXDLMSData::CGXDLMSData(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_DATA, sn)
+CGXDLMSData::CGXDLMSData(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_DATA, sn)
 {
 
 }
 
 //SN Constructor.
-CGXDLMSData::CGXDLMSData(unsigned short sn, CGXDLMSVariant value) : CGXDLMSObject(OBJECT_TYPE_DATA, sn)
+CGXDLMSData::CGXDLMSData(unsigned short sn, CGXDLMSVariant value) : CGXDLMSObject(DLMS_OBJECT_TYPE_DATA, sn)
 {
     m_Value = value;
 }
 
 //LN Constructor.
-CGXDLMSData::CGXDLMSData(std::string ln) : CGXDLMSObject(OBJECT_TYPE_DATA, ln)
+CGXDLMSData::CGXDLMSData(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_DATA, ln)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSData::CGXDLMSData(std::string ln, CGXDLMSVariant value) : CGXDLMSObject(OBJECT_TYPE_DATA, ln)
+CGXDLMSData::CGXDLMSData(std::string ln, CGXDLMSVariant value) : CGXDLMSObject(DLMS_OBJECT_TYPE_DATA, ln)
 {
     m_Value = value;
 }
@@ -115,44 +115,51 @@ int CGXDLMSData::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 1)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 2)
     {
         return CGXDLMSObject::GetDataType(index, type);
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Returns value of given attribute.
-int CGXDLMSData::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSData::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
-        value = m_Value;
-        return ERROR_CODES_OK;
+        e.SetValue(m_Value);
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Set value of given attribute.
-int CGXDLMSData::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSData::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        SetValue(value);
+        SetValue(e.GetValue());
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

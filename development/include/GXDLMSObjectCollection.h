@@ -43,17 +43,17 @@ class CGXDLMSObjectCollection : public std::vector<CGXDLMSObject*>
 public:
     ~CGXDLMSObjectCollection();
 
-    CGXDLMSObject* FindByLN(OBJECT_TYPE type, std::string ln);
+    CGXDLMSObject* FindByLN(DLMS_OBJECT_TYPE type, std::string& ln);
 
-    CGXDLMSObject* FindByLN(OBJECT_TYPE type, CGXByteBuffer ln);
+    CGXDLMSObject* FindByLN(DLMS_OBJECT_TYPE type, CGXByteBuffer& ln);
 
     CGXDLMSObject* FindBySN(unsigned short sn);
 
-    void GetObjects(OBJECT_TYPE type, CGXDLMSObjectCollection& items);
+    void GetObjects(DLMS_OBJECT_TYPE type, CGXDLMSObjectCollection& items);
 
     void push_back(CGXDLMSObject* item);
 
-    void clear();
+    void Clear();
 
     std::string ToString();
 };

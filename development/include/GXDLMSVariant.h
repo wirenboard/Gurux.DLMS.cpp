@@ -132,7 +132,7 @@ public:
     CGXDLMSVariant& operator=(unsigned int value);
     CGXDLMSVariant& operator=(unsigned long value);
     CGXDLMSVariant& operator=(struct tm value);
-    CGXDLMSVariant& operator=(CGXDateTime value);
+    CGXDLMSVariant& operator=(CGXDateTime& value);
     void Add(const unsigned char*, int count);
     void Add(const char*, int count);
     void Add(std::string value);

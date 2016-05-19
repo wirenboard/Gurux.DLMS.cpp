@@ -60,7 +60,7 @@ class CGXStandardObisCodeCollection : public std::vector<CGXStandardObisCode>
     std::string GetDescription(std::string& str);
 
 public:
-    bool Find(std::string ln, OBJECT_TYPE objectType, CGXStandardObisCode& item);
+    bool Find(std::string ln, DLMS_OBJECT_TYPE objectType, CGXStandardObisCode& item);
 
     static bool EqualsMask(std::string obisMask, std::string ln);
 

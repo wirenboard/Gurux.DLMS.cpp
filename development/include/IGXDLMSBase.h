@@ -35,6 +35,7 @@
 #define IGXDLMSBASE_H
 
 #include "GXDLMSVariant.h"
+#include "GXDLMSValueEventArgs.h"
 
 class CGXDLMSSettings;
 
@@ -48,13 +49,13 @@ public:
     virtual int GetMethodCount() = 0;
 
     // Returns value of given attribute.
-    virtual int GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value) = 0;
+    virtual int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e) = 0;
 
     // Set value of given attribute.
-    virtual int SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value) = 0;
+    virtual int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e) = 0;
 
     // Invokes method.
-    virtual int Invoke(int index, CGXDLMSVariant& parameters) = 0;
+    virtual int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e) = 0;
 
 //	virtual DLMS_DATA_TYPE GetUIDataType(int index) = 0;
 };

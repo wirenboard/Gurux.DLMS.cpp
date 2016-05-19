@@ -49,7 +49,7 @@ int CGXSerialNumberCounter::FormatString(std::string& expression, std::string& v
 {
     if (expression.length() == 0)
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     value = "";
     char ch;
@@ -58,7 +58,7 @@ int CGXSerialNumberCounter::FormatString(std::string& expression, std::string& v
         ch = toLower(expression[pos]);
         if (ch == '(' || ch == ')')
         {
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         // Is white space.
         if (ch == ' ')
@@ -143,7 +143,7 @@ int CGXSerialNumberCounter::Count(unsigned long sn, const char* formula)
 
     if ((ret = GetValues(str, values)) != 0)
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     if (values.size() % 2 == 0)
     {

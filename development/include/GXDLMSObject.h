@@ -55,7 +55,7 @@ class CGXDLMSObject : public IGXDLMSBase
     CGXAttributeCollection m_MethodAttributes;
     void Initialize(short sn, unsigned short class_id, unsigned char version, CGXByteBuffer* pLogicalName);
     std::string m_Description;
-    OBJECT_TYPE m_ObjectType;
+    DLMS_OBJECT_TYPE m_ObjectType;
     char m_AttributeIndex;
     unsigned short m_DataIndex;
     unsigned short m_Version;
@@ -82,13 +82,13 @@ public:
     }
 
     CGXDLMSObject(void);
-    CGXDLMSObject(OBJECT_TYPE type);
+    CGXDLMSObject(DLMS_OBJECT_TYPE type);
 
     //SN Constructor.
-    CGXDLMSObject(OBJECT_TYPE type, unsigned short sn);
+    CGXDLMSObject(DLMS_OBJECT_TYPE type, unsigned short sn);
 
     //LN Constructor.
-    CGXDLMSObject(OBJECT_TYPE type, std::string ln);
+    CGXDLMSObject(DLMS_OBJECT_TYPE type, std::string ln);
     CGXDLMSObject(short sn, unsigned short class_id, unsigned char version, CGXByteBuffer& ln);
 
     virtual ~CGXDLMSObject(void);
@@ -99,7 +99,7 @@ public:
     int SetName(CGXDLMSVariant value);
 
     //Get Object's Interface class type.
-    OBJECT_TYPE GetObjectType();
+    DLMS_OBJECT_TYPE GetObjectType();
 
     //Get Object's Short Name.
     unsigned short GetShortName();
@@ -121,10 +121,10 @@ public:
     virtual int GetUIDataType(int index, DLMS_DATA_TYPE& type);
     void SetUIDataType(int index, DLMS_DATA_TYPE type);
 
-    ACCESSMODE GetAccess(int index);
-    void SetAccess(int index, ACCESSMODE access);
-    METHOD_ACCESSMODE GetMethodAccess(int index);
-    void SetMethodAccess(int index, METHOD_ACCESSMODE access);
+    DLMS_ACCESS_MODE GetAccess(int index);
+    void SetAccess(int index, DLMS_ACCESS_MODE access);
+    DLMS_METHOD_ACCESS_MODE GetMethodAccess(int index);
+    void SetMethodAccess(int index, DLMS_METHOD_ACCESS_MODE access);
 
 
     //Get description of the object.
@@ -159,28 +159,31 @@ public:
     }
 
     // Returns value of given attribute.
-    virtual int GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+    virtual int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+        return DLMS_ERROR_CODE_OK;
     }
 
     // Set value of given attribute.
-    virtual int SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+    virtual int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+        return DLMS_ERROR_CODE_OK;
     }
 
     // Set value of given attribute.
-    virtual int Invoke(int index, CGXDLMSVariant& parameters)
+    virtual int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+        return DLMS_ERROR_CODE_OK;
     }
 };
 
 class CGXDLMSCustomObject : public CGXDLMSObject
 {
 public:
-    CGXDLMSCustomObject(OBJECT_TYPE type) : CGXDLMSObject(type)
+    CGXDLMSCustomObject(DLMS_OBJECT_TYPE type) : CGXDLMSObject(type)
     {
     }
 };

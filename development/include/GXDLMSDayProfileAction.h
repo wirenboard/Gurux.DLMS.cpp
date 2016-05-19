@@ -57,8 +57,8 @@ public:
     /**
      Defines the time when the script is to be executed.
     */
-    CGXDateTime GetStartTime();
-    void SetStartTime(CGXDateTime value);
+    CGXDateTime& GetStartTime();
+    void SetStartTime(CGXDateTime& value);
 
     /**
      Defines the logical name of the "Script table" object;

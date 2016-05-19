@@ -42,7 +42,7 @@ class CGXDLMSIecHdlcSetup : public CGXDLMSObject
     int m_InactivityTimeout;
     int m_DeviceAddress;
     int m_MaximumInfoLengthTransmit;
-    BAUDRATE m_CommunicationSpeed;
+    DLMS_BAUD_RATE m_CommunicationSpeed;
     int m_WindowSizeTransmit;
     int m_WindowSizeReceive;
     int m_InterCharachterTimeout;
@@ -58,9 +58,9 @@ public:
     //LN Constructor.
     CGXDLMSIecHdlcSetup(std::string ln);
 
-    BAUDRATE GetCommunicationSpeed();
+    DLMS_BAUD_RATE GetCommunicationSpeed();
 
-    void SetCommunicationSpeed(BAUDRATE value);
+    void SetCommunicationSpeed(DLMS_BAUD_RATE value);
 
     int GetWindowSizeTransmit();
     void SetWindowSizeTransmit(int value);
@@ -95,9 +95,9 @@ public:
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
     // Returns value of given attribute.
-    int GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value);
+    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 
     // Set value of given attribute.
-    int SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value);
+    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 };
 #endif //GXDLMSIECHDLCSETUP_H

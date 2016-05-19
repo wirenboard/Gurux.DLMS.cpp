@@ -39,16 +39,16 @@
 
 void CGXDLMSClock::Init()
 {
-    m_Deviation = m_ClockBase = CLOCKBASE_NONE;
+    m_Deviation = m_ClockBase = DLMS_CLOCK_BASE_NONE;
     m_Enabled = false;
     m_TimeZone = 0;
-    m_Status = GXDLMS_CLOCK_STATUS_OK;
+    m_Status = DLMS_CLOCK_STATUS_OK;
 }
 
 /**
  Constructor.
 */
-CGXDLMSClock::CGXDLMSClock() : CGXDLMSObject(OBJECT_TYPE_CLOCK, "0.0.1.0.0.255")
+CGXDLMSClock::CGXDLMSClock() : CGXDLMSObject(DLMS_OBJECT_TYPE_CLOCK, "0.0.1.0.0.255")
 {
     Init();
 }
@@ -57,7 +57,7 @@ CGXDLMSClock::CGXDLMSClock() : CGXDLMSObject(OBJECT_TYPE_CLOCK, "0.0.1.0.0.255")
 Constructor.
 @param ln Logical Name of the object.
 */
-CGXDLMSClock::CGXDLMSClock(std::string ln) : CGXDLMSObject(OBJECT_TYPE_CLOCK, ln)
+CGXDLMSClock::CGXDLMSClock(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_CLOCK, ln)
 {
     Init();
 }
@@ -67,7 +67,7 @@ CGXDLMSClock::CGXDLMSClock(std::string ln) : CGXDLMSObject(OBJECT_TYPE_CLOCK, ln
  @param ln Logical Name of the object.
  @param sn Short Name of the object.
 */
-CGXDLMSClock::CGXDLMSClock(std::string ln, int sn) : CGXDLMSObject(OBJECT_TYPE_CLOCK, ln)
+CGXDLMSClock::CGXDLMSClock(std::string ln, int sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_CLOCK, ln)
 {
     Init();
     SetShortName(sn);
@@ -76,7 +76,7 @@ CGXDLMSClock::CGXDLMSClock(std::string ln, int sn) : CGXDLMSObject(OBJECT_TYPE_C
 /**
  Time of COSEM Clock object.
 */
-CGXDateTime CGXDLMSClock::GetTime()
+CGXDateTime& CGXDLMSClock::GetTime()
 {
     return m_Time;
 }
@@ -100,16 +100,16 @@ void CGXDLMSClock::SetTimeZone(short value)
 /**
  Status of COSEM Clock object.
 */
-GXDLMS_CLOCK_STATUS CGXDLMSClock::GetStatus()
+DLMS_CLOCK_STATUS CGXDLMSClock::GetStatus()
 {
     return m_Status;
 }
-void CGXDLMSClock::SetStatus(GXDLMS_CLOCK_STATUS value)
+void CGXDLMSClock::SetStatus(DLMS_CLOCK_STATUS value)
 {
     m_Status = value;
 }
 
-CGXDateTime CGXDLMSClock::GetBegin()
+CGXDateTime& CGXDLMSClock::GetBegin()
 {
     return m_Begin;
 }
@@ -119,7 +119,7 @@ void CGXDLMSClock::SetBegin(CGXDateTime& value)
     m_Begin = value;
 }
 
-CGXDateTime CGXDLMSClock::GetEnd()
+CGXDateTime& CGXDLMSClock::GetEnd()
 {
     return m_End;
 }
@@ -149,11 +149,11 @@ void CGXDLMSClock::SetEnabled(bool value)
 /**
  Clock base of COSEM Clock object.
 */
-CLOCKBASE CGXDLMSClock::GetClockBase()
+DLMS_CLOCK_BASE CGXDLMSClock::GetClockBase()
 {
     return m_ClockBase;
 }
-void CGXDLMSClock::SetClockBase(CLOCKBASE value)
+void CGXDLMSClock::SetClockBase(DLMS_CLOCK_BASE value)
 {
     m_ClockBase = value;
 }
@@ -173,12 +173,13 @@ int CGXDLMSClock::GetMethodCount()
 void CGXDLMSClock::GetValues(std::vector<std::string>& values)
 {
     values.clear();
-    std::string ln;
-    GetLogicalName(ln);
-    values.push_back(ln);
+    std::string tmp;
+    GetLogicalName(tmp);
+    values.push_back(tmp);
     values.push_back(m_Time.ToString());
     values.push_back(CGXDLMSVariant(m_TimeZone).ToString());
-    values.push_back(CGXDLMSConverter::ToString(m_Status));
+    tmp.append(CGXDLMSConverter::ToString(m_Status));
+    values.push_back(tmp);
     values.push_back(m_Begin.ToString());
     values.push_back(m_End.ToString());
     values.push_back(CGXDLMSVariant(m_Deviation).ToString());
@@ -245,7 +246,7 @@ int CGXDLMSClock::GetUIDataType(int index, DLMS_DATA_TYPE& type)
     {
         return CGXDLMSObject::GetUIDataType(index, type);
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 int CGXDLMSClock::GetDataType(int index, DLMS_DATA_TYPE& type)
@@ -288,134 +289,141 @@ int CGXDLMSClock::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 /*
  * Returns value of given attribute.
  */
-int CGXDLMSClock::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSClock::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
-        value = GetTime();
+        e.SetValue(GetTime());
         return 0;
     }
-    if (index == 3)
+    if (e.GetIndex() == 3)
     {
-        value = GetTimeZone();
+        e.SetValue(GetTimeZone());
         return 0;
     }
-    if (index == 4)
+    if (e.GetIndex() == 4)
     {
-        value = (unsigned char) GetStatus();
+        e.SetValue((unsigned char) GetStatus());
         return 0;
     }
-    if (index == 5)
+    if (e.GetIndex() == 5)
     {
-        value = GetBegin();
+        e.SetValue(GetBegin());
         return 0;
     }
-    if (index == 6)
+    if (e.GetIndex() == 6)
     {
-        value = GetEnd();
+        e.SetValue(GetEnd());
         return 0;
     }
-    if (index == 7)
+    if (e.GetIndex() == 7)
     {
-        value = GetDeviation();
+        e.SetValue(GetDeviation());
         return 0;
     }
-    if (index == 8)
+    if (e.GetIndex() == 8)
     {
-        value = GetEnabled();
+        e.SetValue(GetEnabled());
         return 0;
     }
-    if (index == 9)
+    if (e.GetIndex() == 9)
     {
-        value = GetClockBase();
+        e.SetValue(GetClockBase());
         return 0;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 /*
  * Set value of given attribute.
  */
-int CGXDLMSClock::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSClock::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        if (value.vt == DLMS_DATA_TYPE_OCTET_STRING)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_OCTET_STRING)
         {
             CGXDLMSVariant tmp;
-            CGXDLMSClient::ChangeType(value, DLMS_DATA_TYPE_DATETIME, tmp);
+            CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_DATETIME, tmp);
             SetTime(tmp.dateTime);
         }
         else
         {
-            SetTime(value.dateTime);
+            SetTime(e.GetValue().dateTime);
         }
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        SetTimeZone(value.ToInteger());
+        SetTimeZone(e.GetValue().ToInteger());
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
-        SetStatus((GXDLMS_CLOCK_STATUS) value.ToInteger());
+        SetStatus((DLMS_CLOCK_STATUS) e.GetValue().ToInteger());
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
-        if (value.vt == DLMS_DATA_TYPE_OCTET_STRING)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_OCTET_STRING)
         {
             CGXDLMSVariant tmp;
-            CGXDLMSClient::ChangeType(value, DLMS_DATA_TYPE_DATETIME, tmp);
+            CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_DATETIME, tmp);
             SetBegin(tmp.dateTime);
         }
         else
         {
-            SetBegin(value.dateTime);
+            SetBegin(e.GetValue().dateTime);
         }
     }
-    else if (index == 6)
+    else if (e.GetIndex() == 6)
     {
-        if (value.vt == DLMS_DATA_TYPE_OCTET_STRING)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_OCTET_STRING)
         {
             CGXDLMSVariant tmp;
-            CGXDLMSClient::ChangeType(value, DLMS_DATA_TYPE_DATETIME, tmp);
+            CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_DATETIME, tmp);
             SetEnd(tmp.dateTime);
         }
         else
         {
-            SetEnd(value.dateTime);
+            SetEnd(e.GetValue().dateTime);
         }
     }
-    else if (index == 7)
+    else if (e.GetIndex() == 7)
     {
-        SetDeviation(value.ToInteger());
+        SetDeviation(e.GetValue().ToInteger());
     }
-    else if (index == 8)
+    else if (e.GetIndex() == 8)
     {
-        SetEnabled(value.boolVal);
+        SetEnabled(e.GetValue().boolVal);
     }
-    else if (index == 9)
+    else if (e.GetIndex() == 9)
     {
-        SetClockBase((CLOCKBASE)value.ToInteger());
+        SetClockBase((DLMS_CLOCK_BASE)e.GetValue().ToInteger());
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

@@ -39,7 +39,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 {
     if (item->vt == type)
     {
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     CGXDLMSVariant tmp(item);
     if (type == DLMS_DATA_TYPE_STRING)
@@ -59,7 +59,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             str += "}";
             item->strVal = str;
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (tmp.vt == DLMS_DATA_TYPE_BOOLEAN)
         {
@@ -72,7 +72,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
                 item->strVal = "True";
             }
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         char buff[250];
         if (tmp.vt == DLMS_DATA_TYPE_INT32)
@@ -84,7 +84,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #endif
             item->strVal = buff;
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (tmp.vt == DLMS_DATA_TYPE_UINT32)
         {
@@ -95,7 +95,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #endif
             item->strVal = buff;
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (tmp.vt == DLMS_DATA_TYPE_INT8)
         {
@@ -106,7 +106,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #endif
             item->strVal = buff;
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (tmp.vt == DLMS_DATA_TYPE_INT16)
         {
@@ -117,7 +117,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #endif
             item->strVal = buff;
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (tmp.vt == DLMS_DATA_TYPE_UINT8)
         {
@@ -128,7 +128,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #endif
             item->strVal = buff;
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (tmp.vt == DLMS_DATA_TYPE_UINT16)
         {
@@ -139,7 +139,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #endif
             item->strVal = buff;
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (tmp.vt == DLMS_DATA_TYPE_INT64)
         {
@@ -147,7 +147,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #if _MSC_VER > 1000
             sprintf_s(buff, 250, "%lld", tmp.llVal);
 #else
-        	sprintf(buff, "%I64d", tmp.llVal);
+            sprintf(buff, "%I64d", tmp.llVal);
 #endif
 
 #else
@@ -155,7 +155,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #endif
             item->strVal = buff;
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (tmp.vt == DLMS_DATA_TYPE_UINT64)
         {
@@ -163,14 +163,14 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #if _MSC_VER > 1000
             sprintf_s(buff, 250, "%llu", tmp.ullVal);
 #else
-        	sprintf(buff, "%I64u", tmp.llVal);
+            sprintf(buff, "%I64u", tmp.llVal);
 #endif
 #else
             sprintf(buff, "%llu", tmp.ullVal);
 #endif
-        	item->strVal = buff;
+            item->strVal = buff;
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (tmp.vt == DLMS_DATA_TYPE_ENUM)
         {
@@ -181,7 +181,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #endif
             item->strVal = buff;
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (tmp.vt == DLMS_DATA_TYPE_FLOAT32)
         {
@@ -192,7 +192,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #endif
             item->strVal = buff;
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (tmp.vt == DLMS_DATA_TYPE_FLOAT64)
         {
@@ -203,18 +203,18 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #endif
             item->strVal = buff;
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (tmp.vt == DLMS_DATA_TYPE_BIT_STRING)
         {
             //TODO:
-            return ERROR_CODES_NOT_IMPLEMENTED;
+            return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
         }
         if (tmp.vt == DLMS_DATA_TYPE_DATETIME)
         {
             item->strVal = tmp.dateTime.ToString();
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (tmp.vt == DLMS_DATA_TYPE_OCTET_STRING)
         {
@@ -235,9 +235,9 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
                 item->strVal.append(buff);
             }
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
-        return ERROR_CODES_NOT_IMPLEMENTED;
+        return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
     }
     if (item->vt == DLMS_DATA_TYPE_STRING)
     {
@@ -246,7 +246,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
         {
             item->boolVal = tmp.strVal.compare("False") == 0 ?  0: 1;
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (type == DLMS_DATA_TYPE_INT32)
         {
@@ -256,7 +256,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             sscanf(tmp.strVal.c_str(), "%ld", &item->lVal);
 #endif
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (type == DLMS_DATA_TYPE_UINT32)
         {
@@ -266,7 +266,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             sscanf(tmp.strVal.c_str(), "%lu", &item->ulVal);
 #endif
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (type == DLMS_DATA_TYPE_INT8)
         {
@@ -276,7 +276,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             sscanf(tmp.strVal.c_str(), "%c", &item->cVal);
 #endif
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (type == DLMS_DATA_TYPE_INT16)
         {
@@ -286,7 +286,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             sscanf(tmp.strVal.c_str(), "%hd", &item->iVal);
 #endif
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (type == DLMS_DATA_TYPE_UINT8)
         {
@@ -298,7 +298,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             item->bVal = value & 0xFF;
 #endif
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (type == DLMS_DATA_TYPE_UINT16)
         {
@@ -310,7 +310,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             item->uiVal = value & 0xFFFF;
 #endif
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (type == DLMS_DATA_TYPE_INT64)
         {
@@ -324,7 +324,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             sscanf(tmp.strVal.c_str(), "%lld", &item->llVal);
 #endif
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (type == DLMS_DATA_TYPE_UINT64)
         {
@@ -342,7 +342,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #else
 #endif
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (type == DLMS_DATA_TYPE_ENUM)
         {
@@ -354,7 +354,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             item->bVal = value & 0xFF;
 #endif
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (type == DLMS_DATA_TYPE_FLOAT32)
         {
@@ -364,7 +364,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             sscanf(tmp.strVal.c_str(), "%f", &item->fltVal);
 #endif
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (type == DLMS_DATA_TYPE_FLOAT64)
         {
@@ -374,7 +374,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             sscanf(tmp.strVal.c_str(), "%lf", &item->dblVal);
 #endif
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
         if (type == DLMS_DATA_TYPE_OCTET_STRING)
         {
@@ -412,9 +412,9 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
                 item->Add(tmp2.GetData(), item->size);
             }
             item->vt = type;
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
-        return ERROR_CODES_NOT_IMPLEMENTED;
+        return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
     }
     int fromSize = tmp.GetSize();
     int toSize = GetSize(type);
@@ -427,7 +427,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
         {
             if (pValue[pos] != 0)
             {
-                return ERROR_CODES_INVALID_PARAMETER;
+                return DLMS_ERROR_CODE_INVALID_PARAMETER;
             }
         }
     }
@@ -442,7 +442,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
         memcpy(&item->bVal, &tmp.bVal, fromSize);
     }
     item->vt = type;
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 void CGXDLMSVariant::Clear()
@@ -464,6 +464,7 @@ void CGXDLMSVariant::Clear()
 
 CGXDLMSVariant::CGXDLMSVariant()
 {
+    size = 0;
     byteArr = NULL;
     Clear();
 }
@@ -842,7 +843,7 @@ CGXDLMSVariant& CGXDLMSVariant::operator=(struct tm value)
     return *this;
 }
 
-CGXDLMSVariant& CGXDLMSVariant::operator=(CGXDateTime value)
+CGXDLMSVariant& CGXDLMSVariant::operator=(CGXDateTime& value)
 {
     Clear();
     vt = DLMS_DATA_TYPE_DATETIME;
@@ -913,17 +914,17 @@ int CGXDLMSVariant::ChangeType(DLMS_DATA_TYPE newType)
 {
     if (newType == vt)
     {
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
 
     if (newType == DLMS_DATA_TYPE_NONE)
     {
         Clear();
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (vt == DLMS_DATA_TYPE_ARRAY && newType == DLMS_DATA_TYPE_OCTET_STRING)
     {
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (vt == DLMS_DATA_TYPE_STRING)
     {
@@ -954,45 +955,45 @@ int CGXDLMSVariant::ChangeType(DLMS_DATA_TYPE newType)
     switch(vt)
     {
     case DLMS_DATA_TYPE_BOOLEAN:
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     case DLMS_DATA_TYPE_BIT_STRING:
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     case DLMS_DATA_TYPE_INT32:
         switch(newType)
         {
         case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
-            return ERROR_CODES_NOT_IMPLEMENTED;
+            return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_UINT32:
         switch(newType)
         {
         case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
-            return ERROR_CODES_NOT_IMPLEMENTED;
+            return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_OCTET_STRING:
         switch(newType)
         {
         case DLMS_DATA_TYPE_DATETIME:
-            return ERROR_CODES_NOT_IMPLEMENTED;
+            return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
             break;
         case DLMS_DATA_TYPE_DATE:
-            return ERROR_CODES_NOT_IMPLEMENTED;
+            return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
             break;
         case DLMS_DATA_TYPE_TIME:
-            return ERROR_CODES_NOT_IMPLEMENTED;
+            return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
@@ -1023,97 +1024,97 @@ int CGXDLMSVariant::ChangeType(DLMS_DATA_TYPE newType)
         case DLMS_DATA_TYPE_FLOAT64:
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_INT8:
         switch(newType)
         {
         case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
-            return ERROR_CODES_NOT_IMPLEMENTED;
+            return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_INT16:
         switch(newType)
         {
         case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
-            return ERROR_CODES_NOT_IMPLEMENTED;
+            return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_UINT8:
         switch(newType)
         {
         case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
-            return ERROR_CODES_NOT_IMPLEMENTED;
+            return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_UINT16:
         switch(newType)
         {
         case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
-            return ERROR_CODES_NOT_IMPLEMENTED;
+            return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_INT64:
         switch(newType)
         {
         case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
-            return ERROR_CODES_NOT_IMPLEMENTED;
+            return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_UINT64:
         switch(newType)
         {
         case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
-            return ERROR_CODES_NOT_IMPLEMENTED;
+            return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_ENUM:
         switch(newType)
         {
         case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
-            return ERROR_CODES_NOT_IMPLEMENTED;
+            return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_FLOAT32:
         switch(newType)
         {
         case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
-            return ERROR_CODES_NOT_IMPLEMENTED;
+            return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_FLOAT64:
         switch(newType)
         {
         case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
-            return ERROR_CODES_NOT_IMPLEMENTED;
+            return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_DATETIME:
@@ -1128,7 +1129,7 @@ int CGXDLMSVariant::ChangeType(DLMS_DATA_TYPE newType)
         case DLMS_DATA_TYPE_TIME:
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_DATE:
@@ -1145,7 +1146,7 @@ int CGXDLMSVariant::ChangeType(DLMS_DATA_TYPE newType)
         case DLMS_DATA_TYPE_TIME:
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_TIME:
@@ -1162,16 +1163,16 @@ int CGXDLMSVariant::ChangeType(DLMS_DATA_TYPE newType)
         case DLMS_DATA_TYPE_TIME:
             break;
         default:
-            return ERROR_CODES_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         break;
     case DLMS_DATA_TYPE_ARRAY:
     case DLMS_DATA_TYPE_STRUCTURE:
     case DLMS_DATA_TYPE_COMPACT_ARRAY:
     default:
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 //Get size in bytes.
@@ -1418,7 +1419,7 @@ int CGXDLMSVariant::GetBytes(CGXByteBuffer& value)
 {
     if (vt == DLMS_DATA_TYPE_OCTET_STRING)
     {
-        value.AddRange(byteArr, size);
+        value.Set(byteArr, size);
     }
     else if (vt == DLMS_DATA_TYPE_UINT8)
     {
@@ -1436,6 +1437,22 @@ int CGXDLMSVariant::GetBytes(CGXByteBuffer& value)
     {
         value.SetUInt64(ullVal);
     }
+    else if (vt == DLMS_DATA_TYPE_INT8)
+    {
+        value.SetInt8(bVal);
+    }
+    else if (vt == DLMS_DATA_TYPE_INT16)
+    {
+        value.SetInt16(iVal);
+    }
+    else if (vt == DLMS_DATA_TYPE_INT32)
+    {
+        value.SetInt32(lVal);
+    }
+    else if (vt == DLMS_DATA_TYPE_INT64)
+    {
+        value.SetInt64(llVal);
+    }
     else if (vt == DLMS_DATA_TYPE_STRING)
     {
         value.AddString(strVal.c_str());
@@ -1443,7 +1460,7 @@ int CGXDLMSVariant::GetBytes(CGXByteBuffer& value)
     else
     {
         //Invalid object type.
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     return 0;
 }

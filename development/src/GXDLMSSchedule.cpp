@@ -37,18 +37,18 @@
 #include "../include/GXDLMSSchedule.h"
 
 //Constructor.
-CGXDLMSSchedule::CGXDLMSSchedule() : CGXDLMSObject(OBJECT_TYPE_SCHEDULE)
+CGXDLMSSchedule::CGXDLMSSchedule() : CGXDLMSObject(DLMS_OBJECT_TYPE_SCHEDULE)
 {
 }
 
 //SN Constructor.
-CGXDLMSSchedule::CGXDLMSSchedule(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_SCHEDULE, sn)
+CGXDLMSSchedule::CGXDLMSSchedule(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_SCHEDULE, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSSchedule::CGXDLMSSchedule(std::string ln) : CGXDLMSObject(OBJECT_TYPE_SCHEDULE, ln)
+CGXDLMSSchedule::CGXDLMSSchedule(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_SCHEDULE, ln)
 {
 
 }
@@ -105,39 +105,46 @@ int CGXDLMSSchedule::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 1)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 2)
     {
         type = DLMS_DATA_TYPE_ARRAY;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Returns value of given attribute.
-int CGXDLMSSchedule::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
     //TODO:
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Set value of given attribute.
-int CGXDLMSSchedule::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSSchedule::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
         m_Entries.clear();
         CGXDLMSVariant tmp;
-        for (std::vector<CGXDLMSVariant >::iterator it = value.Arr.begin(); it != value.Arr.end(); ++it)
+        for (std::vector<CGXDLMSVariant >::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
         {
             CGXDLMSScheduleEntry item;
             item.SetIndex((*it).Arr[0].ToInteger());
@@ -159,7 +166,7 @@ int CGXDLMSSchedule::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVaria
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

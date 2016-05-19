@@ -38,18 +38,18 @@
 #include <sstream>
 
 //Constructor.
-CGXDLMSSpecialDaysTable::CGXDLMSSpecialDaysTable() : CGXDLMSObject(OBJECT_TYPE_SPECIAL_DAYS_TABLE)
+CGXDLMSSpecialDaysTable::CGXDLMSSpecialDaysTable() : CGXDLMSObject(DLMS_OBJECT_TYPE_SPECIAL_DAYS_TABLE)
 {
 }
 
 //SN Constructor.
-CGXDLMSSpecialDaysTable::CGXDLMSSpecialDaysTable(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_SPECIAL_DAYS_TABLE, sn)
+CGXDLMSSpecialDaysTable::CGXDLMSSpecialDaysTable(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_SPECIAL_DAYS_TABLE, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSSpecialDaysTable::CGXDLMSSpecialDaysTable(std::string ln) : CGXDLMSObject(OBJECT_TYPE_SPECIAL_DAYS_TABLE, ln)
+CGXDLMSSpecialDaysTable::CGXDLMSSpecialDaysTable(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_SPECIAL_DAYS_TABLE, ln)
 {
 
 }
@@ -118,25 +118,32 @@ int CGXDLMSSpecialDaysTable::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 1)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     //Entries
     if (index == 2)
     {
         type = DLMS_DATA_TYPE_ARRAY;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Returns value of given attribute.
-int CGXDLMSSpecialDaysTable::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSSpecialDaysTable::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
@@ -151,32 +158,39 @@ int CGXDLMSSpecialDaysTable::GetValue(int index, int selector, CGXDLMSVariant& p
             index = it->GetIndex();
             date = it->GetDate();
             id = it->GetDayId();
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, index)) != ERROR_CODES_OK ||
-                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_DATETIME, date)) != ERROR_CODES_OK ||
-                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, id)) != ERROR_CODES_OK)
+            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, index)) != DLMS_ERROR_CODE_OK ||
+                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_DATETIME, date)) != DLMS_ERROR_CODE_OK ||
+                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, id)) != DLMS_ERROR_CODE_OK)
             {
                 return ret;
             }
         }
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Set value of given attribute.
-int CGXDLMSSpecialDaysTable::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSSpecialDaysTable::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
         m_Entries.clear();
-        if (value.vt == DLMS_DATA_TYPE_ARRAY)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
             CGXDLMSVariant tmp;
-            for (std::vector<CGXDLMSVariant>::iterator item = value.Arr.begin(); item != value.Arr.end(); ++item)
+            for (std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
             {
                 CGXDLMSSpecialDay it;
                 it.SetIndex((*item).Arr[0].ToInteger());
@@ -189,7 +203,7 @@ int CGXDLMSSpecialDaysTable::SetValue(CGXDLMSSettings* settings, int index, CGXD
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

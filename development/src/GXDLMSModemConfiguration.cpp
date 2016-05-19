@@ -40,7 +40,7 @@
 
 void CGXDLMSModemConfiguration::Init()
 {
-    m_CommunicationSpeed = BAUDRATE_9600;
+    m_CommunicationSpeed = DLMS_BAUD_RATE_9600;
     m_ModemProfile.push_back("OK");
     m_ModemProfile.push_back("CONNECT");
     m_ModemProfile.push_back("RING");
@@ -61,7 +61,7 @@ void CGXDLMSModemConfiguration::Init()
 }
 
 // Constructor.
-CGXDLMSModemConfiguration::CGXDLMSModemConfiguration() : CGXDLMSObject(OBJECT_TYPE_MODEM_CONFIGURATION, "0.0.2.0.0.255")
+CGXDLMSModemConfiguration::CGXDLMSModemConfiguration() : CGXDLMSObject(DLMS_OBJECT_TYPE_MODEM_CONFIGURATION, "0.0.2.0.0.255")
 {
     Init();
 }
@@ -70,7 +70,7 @@ CGXDLMSModemConfiguration::CGXDLMSModemConfiguration() : CGXDLMSObject(OBJECT_TY
  Constructor.
  @param ln Logical Name of the object.
 */
-CGXDLMSModemConfiguration::CGXDLMSModemConfiguration(std::string ln) : CGXDLMSObject(OBJECT_TYPE_MODEM_CONFIGURATION, ln)
+CGXDLMSModemConfiguration::CGXDLMSModemConfiguration(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_MODEM_CONFIGURATION, ln)
 {
     Init();
 }
@@ -80,16 +80,16 @@ CGXDLMSModemConfiguration::CGXDLMSModemConfiguration(std::string ln) : CGXDLMSOb
  @param ln Logical Name of the object.
  @param sn Short Name of the object.
 */
-CGXDLMSModemConfiguration::CGXDLMSModemConfiguration(int sn) : CGXDLMSObject(OBJECT_TYPE_MODEM_CONFIGURATION, sn)
+CGXDLMSModemConfiguration::CGXDLMSModemConfiguration(int sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_MODEM_CONFIGURATION, sn)
 {
     Init();
 }
 
-BAUDRATE CGXDLMSModemConfiguration::GetCommunicationSpeed()
+DLMS_BAUD_RATE CGXDLMSModemConfiguration::GetCommunicationSpeed()
 {
     return m_CommunicationSpeed;
 }
-void CGXDLMSModemConfiguration::SetCommunicationSpeed(BAUDRATE value)
+void CGXDLMSModemConfiguration::SetCommunicationSpeed(DLMS_BAUD_RATE value)
 {
     m_CommunicationSpeed = value;
 }
@@ -210,24 +210,31 @@ int CGXDLMSModemConfiguration::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Returns value of given attribute.
-int CGXDLMSModemConfiguration::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSModemConfiguration::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
-        value = m_CommunicationSpeed;
-        return ERROR_CODES_OK;
+        e.SetValue(m_CommunicationSpeed);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 3)
+    if (e.GetIndex() == 3)
     {
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
@@ -251,10 +258,10 @@ int CGXDLMSModemConfiguration::GetValue(int index, int selector, CGXDLMSVariant&
                 return ret;
             }
         }
-        value = data;
-        return ERROR_CODES_OK;
+        e.SetValue(data);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 4)
+    if (e.GetIndex() == 4)
     {
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
@@ -266,44 +273,44 @@ int CGXDLMSModemConfiguration::GetValue(int index, int selector, CGXDLMSVariant&
         for (std::vector< std::string >::iterator it = m_ModemProfile.begin();
                 it != m_ModemProfile.end(); ++it)
         {
-        	tmp = *it;
+            tmp = *it;
             if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
             {
                 return ret;
             }
         }
-        value = data;
-        return ERROR_CODES_OK;
+        e.SetValue(data);
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Set value of given attribute.
-int CGXDLMSModemConfiguration::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSModemConfiguration::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        m_CommunicationSpeed = (BAUDRATE) value.bVal;
-        return ERROR_CODES_OK;
+        m_CommunicationSpeed = (DLMS_BAUD_RATE) e.GetValue().bVal;
+        return DLMS_ERROR_CODE_OK;
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
         m_InitialisationStrings.clear();
         int ret;
-        for (std::vector<CGXDLMSVariant>::iterator it = value.Arr.begin(); it != value.Arr.end(); ++it)
+        for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
         {
             CGXDLMSModemInitialisation item;
             CGXDLMSVariant tmp;
-            if((ret = CGXDLMSClient::ChangeType(it->Arr[0], DLMS_DATA_TYPE_STRING, tmp)) != ERROR_CODES_OK)
+            if((ret = CGXDLMSClient::ChangeType(it->Arr[0], DLMS_DATA_TYPE_STRING, tmp)) != DLMS_ERROR_CODE_OK)
             {
                 return ret;
             }
             item.SetRequest(tmp.ToString());
-            if((ret = CGXDLMSClient::ChangeType(it->Arr[1], DLMS_DATA_TYPE_STRING, tmp)) != ERROR_CODES_OK)
+            if((ret = CGXDLMSClient::ChangeType(it->Arr[1], DLMS_DATA_TYPE_STRING, tmp)) != DLMS_ERROR_CODE_OK)
             {
                 return ret;
             }
@@ -314,22 +321,22 @@ int CGXDLMSModemConfiguration::SetValue(CGXDLMSSettings* settings, int index, CG
             }
             m_InitialisationStrings.push_back(item);
         }
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
         m_ModemProfile.clear();
         int ret;
-        for (std::vector<CGXDLMSVariant>::iterator it = value.Arr.begin(); it != value.Arr.end(); ++it)
+        for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
         {
             CGXDLMSVariant tmp;
-            if((ret = CGXDLMSClient::ChangeType(*it, DLMS_DATA_TYPE_STRING, tmp)) != ERROR_CODES_OK)
+            if((ret = CGXDLMSClient::ChangeType(*it, DLMS_DATA_TYPE_STRING, tmp)) != DLMS_ERROR_CODE_OK)
             {
                 return ret;
             }
             m_ModemProfile.push_back(tmp.ToString());
         }
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }

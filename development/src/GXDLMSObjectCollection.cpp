@@ -37,16 +37,16 @@
 
 CGXDLMSObjectCollection::~CGXDLMSObjectCollection()
 {
-    clear();
+    Clear();
 }
 
-CGXDLMSObject* CGXDLMSObjectCollection::FindByLN(OBJECT_TYPE type, std::string ln)
+CGXDLMSObject* CGXDLMSObjectCollection::FindByLN(DLMS_OBJECT_TYPE type, std::string& ln)
 {
     const char* pLn = ln.c_str();
     std::string ln2;
     for (CGXDLMSObjectCollection::iterator it = this->begin(); it != end(); ++it)
     {
-        if ((type == OBJECT_TYPE_ALL || (*it)->GetObjectType() == type))
+        if ((type == DLMS_OBJECT_TYPE_ALL || (*it)->GetObjectType() == type))
         {
             (*it)->GetLogicalName(ln2);
             if (strcmp(ln2.c_str(), pLn) == 0)
@@ -58,7 +58,7 @@ CGXDLMSObject* CGXDLMSObjectCollection::FindByLN(OBJECT_TYPE type, std::string l
     return NULL;
 }
 
-CGXDLMSObject* CGXDLMSObjectCollection::FindByLN(OBJECT_TYPE type, CGXByteBuffer ln)
+CGXDLMSObject* CGXDLMSObjectCollection::FindByLN(DLMS_OBJECT_TYPE type, CGXByteBuffer& ln)
 {
     if (ln.GetSize() != 6)
     {
@@ -68,7 +68,7 @@ CGXDLMSObject* CGXDLMSObjectCollection::FindByLN(OBJECT_TYPE type, CGXByteBuffer
     std::string ln2;
     for (CGXDLMSObjectCollection::iterator it = this->begin(); it != end(); ++it)
     {
-        if (type == OBJECT_TYPE_ALL || (*it)->GetObjectType() == type)
+        if (type == DLMS_OBJECT_TYPE_ALL || (*it)->GetObjectType() == type)
         {
             (*it)->GetLogicalName(ln2);
             if (ln.Compare((unsigned char*) ln2.c_str(), 6) == 0)
@@ -92,7 +92,7 @@ CGXDLMSObject* CGXDLMSObjectCollection::FindBySN(unsigned short sn)
     return NULL;
 }
 
-void CGXDLMSObjectCollection::GetObjects(OBJECT_TYPE type, CGXDLMSObjectCollection& items)
+void CGXDLMSObjectCollection::GetObjects(DLMS_OBJECT_TYPE type, CGXDLMSObjectCollection& items)
 {
     for (CGXDLMSObjectCollection::iterator it = begin(); it != end(); ++it)
     {
@@ -112,7 +112,7 @@ void CGXDLMSObjectCollection::push_back(CGXDLMSObject* item)
     std::vector<CGXDLMSObject*>::push_back(item);
 }
 
-void CGXDLMSObjectCollection::clear()
+void CGXDLMSObjectCollection::Clear()
 {
     for (CGXDLMSObjectCollection::iterator it = begin(); it != end(); ++it)
     {

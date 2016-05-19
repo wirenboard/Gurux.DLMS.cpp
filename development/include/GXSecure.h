@@ -48,7 +48,7 @@ public:
     *            Used authentication.
     * @return Generated challenge.
     */
-    static int GenerateChallenge(GXDLMS_AUTHENTICATION authentication, CGXByteBuffer& challenge);
+    static int GenerateChallenge(DLMS_AUTHENTICATION authentication, CGXByteBuffer& challenge);
 };
 
 #endif //GXSECURE_H

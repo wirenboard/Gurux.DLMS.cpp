@@ -41,6 +41,7 @@
 #include "GXDLMSSNSettings.h"
 #include "GXDLMSLimits.h"
 #include "GXDLMSObjectCollection.h"
+#include "GXCipher.h"
 
 // Server sender frame sequence starting number.
 const unsigned char SERVER_START_SENDER_FRAME_SEQUENCE = 0x1E;
@@ -74,14 +75,18 @@ class CGXDLMSSettings
     // Server to Client challenge.
     CGXByteBuffer m_StoCChallenge;
 
+    CGXByteBuffer m_SourceSystemTitle;
+
     // Invoke ID.
-    int m_InvokeID;
+    unsigned char m_InvokeID;
+    //Long Invoke ID.
+    int m_LongInvokeID;
 
     // Priority.
-    GXDLMS_PRIORITY m_Priority;
+    DLMS_PRIORITY m_Priority;
 
     // Service class.
-    GXDLMS_SERVICECLASS m_ServiceClass;
+    DLMS_SERVICE_CLASS m_ServiceClass;
 
     // Client address.
     int m_ClientAddress;
@@ -93,13 +98,28 @@ class CGXDLMSSettings
     bool m_UseLogicalNameReferencing;
 
     // Interface type.
-    GXDLMS_INTERFACETYPE m_InterfaceType;
+    DLMS_INTERFACE_TYPE m_InterfaceType;
 
     // User authentication.
-    GXDLMS_AUTHENTICATION m_Authentication;
+    DLMS_AUTHENTICATION m_Authentication;
 
     // User password.
     CGXByteBuffer m_Password;
+
+    /**
+     * Key Encrypting Key, also known as Master key.
+     */
+    CGXByteBuffer m_Kek;
+
+    /**
+     * Long data count.
+     */
+    unsigned short m_Count;
+
+    /**
+     * Long data index.
+     */
+    unsigned short m_Index;
 
     // DLMS version number.
     unsigned char m_DlmsVersionNumber;
@@ -131,6 +151,11 @@ class CGXDLMSSettings
     // List of server or client objects.
     CGXDLMSObjectCollection m_Objects;
 
+    /**
+     * Cipher interface that is used to cipher PDU.
+     */
+    CGXCipher* m_Cipher;
+
 public:
 // Constructor.
     CGXDLMSSettings(bool isServer);
@@ -139,7 +164,7 @@ public:
     CGXByteBuffer& GetCtoSChallenge();
 
 // Client to Server challenge.
-    void SetCtoSChallenge(CGXByteBuffer value);
+    void SetCtoSChallenge(CGXByteBuffer& value);
 
 // Get server to Client challenge.
     CGXByteBuffer& GetStoCChallenge();
@@ -148,10 +173,10 @@ public:
     void SetStoCChallenge(CGXByteBuffer value);
 
 // Gets used authentication.
-    GXDLMS_AUTHENTICATION GetAuthentication();
+    DLMS_AUTHENTICATION GetAuthentication();
 
 //Sets Used authentication.
-    void SetAuthentication(GXDLMS_AUTHENTICATION value);
+    void SetAuthentication(DLMS_AUTHENTICATION value);
 
 //Gets password.
     CGXByteBuffer& GetPassword();
@@ -183,7 +208,7 @@ public:
     CGXDLMSLNSettings& GetLnSettings();
 
 // Short name Settings.
-    CGXDLMSSNSettings GetSnSettings();
+    CGXDLMSSNSettings& GetSnSettings();
 
 // Gets current block index.
     unsigned long GetBlockIndex();
@@ -204,10 +229,10 @@ public:
     CGXDLMSLimits& GetLimits();
 
 // Used interface.
-    GXDLMS_INTERFACETYPE GetInterfaceType();
+    DLMS_INTERFACE_TYPE GetInterfaceType();
 
 // Used interface.
-    void SetInterfaceType(GXDLMS_INTERFACETYPE value);
+    void SetInterfaceType(DLMS_INTERFACE_TYPE value);
 
 // Gets client address.
     int GetClientAddress();
@@ -240,22 +265,33 @@ public:
     void SetUseLogicalNameReferencing(bool value);
 
 // Used priority.
-    GXDLMS_PRIORITY GetPriority();
+    DLMS_PRIORITY GetPriority();
 
 // Used priority.
-    void SetPriority(GXDLMS_PRIORITY value);
+    void SetPriority(DLMS_PRIORITY value);
 
 // Used service class.
-    GXDLMS_SERVICECLASS GetServiceClass();
+    DLMS_SERVICE_CLASS GetServiceClass();
 
 // Used service class.
-    void SetServiceClass(GXDLMS_SERVICECLASS value);
+    void SetServiceClass(DLMS_SERVICE_CLASS value);
 
 // Invoke ID.
     int GetInvokeID();
 
 // Invoke ID.
     void SetInvokeID(int value);
+
+    /**
+       * @return Invoke ID.
+       */
+    unsigned long GetLongInvokeID();
+
+    /**
+     * @param value
+     *            Invoke ID.
+     */
+    int SetLongInvokeID(unsigned long value);
 
 // Collection of the objects.
     CGXDLMSObjectCollection& GetObjects();
@@ -264,13 +300,67 @@ public:
     bool IsCustomChallenges();
 
 // Set is custom challenges used.
-    void SetCustomChallenges(bool value);
+    void SetUseCustomChallenge(bool value);
 
 //Get is connection made for the server.
     bool IsConnected();
 
-//Set is connection made for the server.
+    //Set is connection made for the server.
     void SetConnected(bool value);
+
+    /**
+    * Cipher interface that is used to cipher PDU.
+    */
+    CGXCipher* GetCipher();
+
+    /**
+    * Cipher interface that is used to cipher PDU.
+    */
+    void SetCipher(CGXCipher* value);
+
+    /**
+     * @return Source system title.
+     */
+    CGXByteBuffer& GetSourceSystemTitle();
+
+    /**
+     * @param value
+     *            Source system title.
+     */
+    int SetSourceSystemTitle(CGXByteBuffer& value);
+
+    /**
+     * @return Key Encrypting Key, also known as Master key.
+     */
+    CGXByteBuffer& GetKek();
+
+    /**
+     * @param value
+     *            Key Encrypting Key, also known as Master key.
+     */
+    void SetKek(CGXByteBuffer& value);
+
+    /**
+     * @return Long data count.
+     */
+    unsigned short GetCount();
+
+    /**
+     * @param count
+     *            Long data count.
+     */
+    void SetCount(unsigned short value);
+
+    /**
+     * @return Long data index.
+     */
+    unsigned short GetIndex();
+
+    /**
+     * @param index
+     *            Long data index
+     */
+    void SetIndex(unsigned short value);
 };
 
 #endif //GXDLMSSETTINGS_H

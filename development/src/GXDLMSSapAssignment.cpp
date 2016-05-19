@@ -40,7 +40,7 @@
 /**
  Constructor.
 */
-CGXDLMSSapAssignment::CGXDLMSSapAssignment() : CGXDLMSObject(OBJECT_TYPE_SAP_ASSIGNMENT, "0.0.41.0.0.255")
+CGXDLMSSapAssignment::CGXDLMSSapAssignment() : CGXDLMSObject(DLMS_OBJECT_TYPE_SAP_ASSIGNMENT, "0.0.41.0.0.255")
 {
 }
 
@@ -49,7 +49,7 @@ CGXDLMSSapAssignment::CGXDLMSSapAssignment() : CGXDLMSObject(OBJECT_TYPE_SAP_ASS
 
  @param ln Logical Name of the object.
 */
-CGXDLMSSapAssignment::CGXDLMSSapAssignment(std::string ln) : CGXDLMSObject(OBJECT_TYPE_SAP_ASSIGNMENT, ln)
+CGXDLMSSapAssignment::CGXDLMSSapAssignment(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_SAP_ASSIGNMENT, ln)
 {
 }
 
@@ -57,7 +57,7 @@ CGXDLMSSapAssignment::CGXDLMSSapAssignment(std::string ln) : CGXDLMSObject(OBJEC
  Constructor.
  @param sn Short Name of the object.
 */
-CGXDLMSSapAssignment::CGXDLMSSapAssignment(int sn) : CGXDLMSObject(OBJECT_TYPE_SAP_ASSIGNMENT, sn)
+CGXDLMSSapAssignment::CGXDLMSSapAssignment(int sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_SAP_ASSIGNMENT, sn)
 {
 
 }
@@ -127,25 +127,32 @@ int CGXDLMSSapAssignment::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 1)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 2)
     {
         type = DLMS_DATA_TYPE_ARRAY;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 
 // Returns value of given attribute.
-int CGXDLMSSapAssignment::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSSapAssignment::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
         int cnt = m_SapAssignmentList.size();
         CGXByteBuffer data;
@@ -155,7 +162,7 @@ int CGXDLMSSapAssignment::GetValue(int index, int selector, CGXDLMSVariant& para
         int ret;
         if (cnt != 0)
         {
-        	CGXDLMSVariant f, s;
+            CGXDLMSVariant f, s;
             for (std::map<int, std::string >::iterator it = m_SapAssignmentList.begin();
                     it != m_SapAssignmentList.end(); ++it)
             {
@@ -170,26 +177,26 @@ int CGXDLMSSapAssignment::GetValue(int index, int selector, CGXDLMSVariant& para
                 }
             }
         }
-        value = data;
-        return ERROR_CODES_OK;
+        e.SetValue(data);
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 /*
  * Set value of given attribute.
  */
-int CGXDLMSSapAssignment::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSSapAssignment::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
         m_SapAssignmentList.clear();
-        for (std::vector<CGXDLMSVariant>::iterator item = value.Arr.begin();
-                item != value.Arr.end(); ++item)
+        for (std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin();
+                item != e.GetValue().Arr.end(); ++item)
         {
             std::string str;
             if ((*item).Arr[1].vt == DLMS_DATA_TYPE_OCTET_STRING)
@@ -204,7 +211,7 @@ int CGXDLMSSapAssignment::SetValue(CGXDLMSSettings* settings, int index, CGXDLMS
             }
             m_SapAssignmentList[(*item).Arr[0].ToInteger()] = str;
         }
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }

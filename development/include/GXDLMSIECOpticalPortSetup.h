@@ -42,10 +42,10 @@ class CGXDLMSIECOpticalPortSetup : public CGXDLMSObject
     std::string m_Password1;
     std::string m_Password2;
     std::string m_Password5;
-    OPTICAL_PROTOCOL_MODE m_DefaultMode;
-    BAUDRATE m_DefaultBaudrate;
-    BAUDRATE m_ProposedBaudrate;
-    LOCAL_PORT_RESPONSE_TIME m_ResponseTime;
+    DLMS_OPTICAL_PROTOCOL_MODE m_DefaultMode;
+    DLMS_BAUD_RATE m_DefaultBaudrate;
+    DLMS_BAUD_RATE m_ProposedBaudrate;
+    DLMS_LOCAL_PORT_RESPONSE_TIME m_ResponseTime;
     std::string m_DeviceAddress;
 
     void Init();
@@ -58,17 +58,17 @@ public:
     //LN Constructor.
     CGXDLMSIECOpticalPortSetup(std::string ln);
 
-    OPTICAL_PROTOCOL_MODE GetDefaultMode();
-    void SetDefaultMode(OPTICAL_PROTOCOL_MODE value);
+    DLMS_OPTICAL_PROTOCOL_MODE GetDefaultMode();
+    void SetDefaultMode(DLMS_OPTICAL_PROTOCOL_MODE value);
 
-    BAUDRATE GetDefaultBaudrate();
-    void SetDefaultBaudrate(BAUDRATE value);
+    DLMS_BAUD_RATE GetDefaultBaudrate();
+    void SetDefaultBaudrate(DLMS_BAUD_RATE value);
 
-    BAUDRATE GetProposedBaudrate();
-    void SetProposedBaudrate(BAUDRATE value);
+    DLMS_BAUD_RATE GetProposedBaudrate();
+    void SetProposedBaudrate(DLMS_BAUD_RATE value);
 
-    LOCAL_PORT_RESPONSE_TIME GetResponseTime();
-    void SetResponseTime(LOCAL_PORT_RESPONSE_TIME value);
+    DLMS_LOCAL_PORT_RESPONSE_TIME GetResponseTime();
+    void SetResponseTime(DLMS_LOCAL_PORT_RESPONSE_TIME value);
 
     std::string GetDeviceAddress();
     void SetDeviceAddress(std::string value);
@@ -96,9 +96,9 @@ public:
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
     // Returns value of given attribute.
-    int GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value);
+    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 
     // Set value of given attribute.
-    int SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value);
+    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 };
 #endif //GXDLMSIECOPTICALPORTSETUP_H

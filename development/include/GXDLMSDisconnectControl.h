@@ -40,8 +40,8 @@
 class CGXDLMSDisconnectControl : public CGXDLMSObject
 {
     bool m_OutputState;
-    CONTROLSTATE m_ControlState;
-    CONTROLMODE m_ControlMode;
+    DLMS_CONTROL_STATE m_ControlState;
+    DLMS_CONTROL_MODE m_ControlMode;
 
 public:
     //Constructor.
@@ -62,14 +62,14 @@ public:
     /**
      Control state of COSEM Disconnect Control object.
     */
-    CONTROLSTATE GetControlState();
-    void SetControlState(CONTROLSTATE value);
+    DLMS_CONTROL_STATE GetControlState();
+    void SetControlState(DLMS_CONTROL_STATE value);
 
     /**
     Control mode of COSEM Disconnect Control object.
     */
-    CONTROLMODE GetControlMode();
-    void SetControlMode(CONTROLMODE value);
+    DLMS_CONTROL_MODE GetControlMode();
+    void SetControlMode(DLMS_CONTROL_MODE value);
 
     // Returns amount of attributes.
     int GetAttributeCount();
@@ -85,9 +85,9 @@ public:
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
     // Returns value of given attribute.
-    int GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value);
+    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 
     // Set value of given attribute.
-    int SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value);
+    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 };
 #endif //GXDLMSDISCONNECTCONTROL_H

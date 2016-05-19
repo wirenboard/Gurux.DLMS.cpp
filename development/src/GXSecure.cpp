@@ -35,7 +35,7 @@
 #include "../include/GXSecure.h"
 #include <stdlib.h> //rand
 
-int CGXSecure::GenerateChallenge(GXDLMS_AUTHENTICATION authentication, CGXByteBuffer& challenge)
+int CGXSecure::GenerateChallenge(DLMS_AUTHENTICATION authentication, CGXByteBuffer& challenge)
 {
     challenge.Clear();
     // Random challenge is 8 to 64 bytes.

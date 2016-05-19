@@ -39,7 +39,7 @@ int CGXStandardObisCodeCollection::GetUInt8(std::string ln, unsigned char* bytes
     if (tmp.size() != 6)
     {
         //Invalid OBIS Code.
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     int value;
 #if _MSC_VER > 1000
@@ -78,7 +78,7 @@ int CGXStandardObisCodeCollection::GetUInt8(std::string ln, unsigned char* bytes
     sscanf(tmp[5].c_str(), "%d", &value);
 #endif
     bytes[5] = value;
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 bool CGXStandardObisCodeCollection::EqualsInterface(CGXStandardObisCode item, int ic)
@@ -399,10 +399,10 @@ std::string CGXStandardObisCodeCollection::GetDescription(std::string& str)
 }
 
 
-bool CGXStandardObisCodeCollection::Find(std::string ln, OBJECT_TYPE objectType, CGXStandardObisCode& item)
+bool CGXStandardObisCodeCollection::Find(std::string ln, DLMS_OBJECT_TYPE objectType, CGXStandardObisCode& item)
 {
     unsigned char bytes[6];
-    if (GetUInt8(ln, bytes) != ERROR_CODES_OK)
+    if (GetUInt8(ln, bytes) != DLMS_ERROR_CODE_OK)
     {
         return NULL;
     }
@@ -412,7 +412,7 @@ bool CGXStandardObisCodeCollection::Find(std::string ln, OBJECT_TYPE objectType,
 bool CGXStandardObisCodeCollection::EqualsMask(std::string obisMask, std::string ln)
 {
     unsigned char bytes[6];
-    if (GetUInt8(ln, bytes) != ERROR_CODES_OK)
+    if (GetUInt8(ln, bytes) != DLMS_ERROR_CODE_OK)
     {
         return NULL;
     }

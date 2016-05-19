@@ -68,7 +68,7 @@ void CGXDLMSSeasonProfile::SetName(std::string value)
 /**
  Season Profile start time.
 */
-CGXDateTime CGXDLMSSeasonProfile::GetStart()
+CGXDateTime& CGXDLMSSeasonProfile::GetStart()
 {
     return m_Start;
 }

@@ -35,11 +35,11 @@
 #include "../include/GXDLMSPushObject.h"
 #include <sstream>
 
-OBJECT_TYPE CGXDLMSPushObject::GetType()
+DLMS_OBJECT_TYPE CGXDLMSPushObject::GetType()
 {
     return m_Type;
 }
-void CGXDLMSPushObject::SetType(OBJECT_TYPE value)
+void CGXDLMSPushObject::SetType(DLMS_OBJECT_TYPE value)
 {
     m_Type = value;
 }

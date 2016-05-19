@@ -46,7 +46,7 @@ void CGXDLMSActionSchedule::Init()
 /**
  Constructor.
 */
-CGXDLMSActionSchedule::CGXDLMSActionSchedule() : CGXDLMSObject(OBJECT_TYPE_ACTION_SCHEDULE)
+CGXDLMSActionSchedule::CGXDLMSActionSchedule() : CGXDLMSObject(DLMS_OBJECT_TYPE_ACTION_SCHEDULE)
 {
     Init();
 }
@@ -56,7 +56,7 @@ CGXDLMSActionSchedule::CGXDLMSActionSchedule() : CGXDLMSObject(OBJECT_TYPE_ACTIO
 
  @param ln Logical Name of the object.
 */
-CGXDLMSActionSchedule::CGXDLMSActionSchedule(std::string ln) : CGXDLMSObject(OBJECT_TYPE_ACTION_SCHEDULE, ln)
+CGXDLMSActionSchedule::CGXDLMSActionSchedule(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_ACTION_SCHEDULE, ln)
 {
     Init();
 }
@@ -67,7 +67,7 @@ CGXDLMSActionSchedule::CGXDLMSActionSchedule(std::string ln) : CGXDLMSObject(OBJ
  @param ln Logical Name of the object.
  @param sn Short Name of the object.
 */
-CGXDLMSActionSchedule::CGXDLMSActionSchedule(int sn) : CGXDLMSObject(OBJECT_TYPE_ACTION_SCHEDULE, sn)
+CGXDLMSActionSchedule::CGXDLMSActionSchedule(int sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_ACTION_SCHEDULE, sn)
 {
     Init();
 }
@@ -174,36 +174,43 @@ int CGXDLMSActionSchedule::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 1)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 2)
     {
         type = DLMS_DATA_TYPE_ARRAY;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 3)
     {
         type = DLMS_DATA_TYPE_ENUM;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 4)
     {
         type = DLMS_DATA_TYPE_ARRAY;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 
 }
 
 // Returns value of given attribute.
-int CGXDLMSActionSchedule::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSActionSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
     CGXByteBuffer data;
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
         int ret;
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
@@ -215,15 +222,15 @@ int CGXDLMSActionSchedule::GetValue(int index, int selector, CGXDLMSVariant& par
         {
             return ret;
         }
-        value = data;
-        return ERROR_CODES_OK;
+        e.SetValue(data);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 3)
+    if (e.GetIndex() == 3)
     {
-        value = GetType();
-        return ERROR_CODES_OK;
+        e.SetValue(GetType());
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 4)
+    if (e.GetIndex() == 4)
     {
         int ret;
         CGXByteBuffer bb;
@@ -241,35 +248,35 @@ int CGXDLMSActionSchedule::GetValue(int index, int selector, CGXDLMSVariant& par
                 return ret;
             }
         }
-        value = bb;
-        return ERROR_CODES_OK;
+        e.SetValue(bb);
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Set value of given attribute.
-int CGXDLMSActionSchedule::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSActionSchedule::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        SetExecutedScriptLogicalName(value.Arr[0].ToString());
-        SetExecutedScriptSelector(value.Arr[1].ToInteger());
-        return ERROR_CODES_OK;
+        SetExecutedScriptLogicalName(e.GetValue().Arr[0].ToString());
+        SetExecutedScriptSelector(e.GetValue().Arr[1].ToInteger());
+        return DLMS_ERROR_CODE_OK;
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        SetType((SINGLE_ACTION_SCHEDULE_TYPE) value.ToInteger());
-        return ERROR_CODES_OK;
+        SetType((SINGLE_ACTION_SCHEDULE_TYPE) e.GetValue().ToInteger());
+        return DLMS_ERROR_CODE_OK;
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
         m_ExecutionTime.clear();
-        for (std::vector<CGXDLMSVariant>::iterator it = value.Arr.begin();
-                it != value.Arr.end(); ++it)
+        for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin();
+                it != e.GetValue().Arr.end(); ++it)
         {
             CGXDLMSVariant time, date;
             CGXDLMSClient::ChangeType((*it).Arr[0], DLMS_DATA_TYPE_TIME, time);
@@ -283,7 +290,7 @@ int CGXDLMSActionSchedule::SetValue(CGXDLMSSettings* settings, int index, CGXDLM
             date.dateTime.SetSkip((DATETIME_SKIPS) (time.dateTime.GetSkip() | date.dateTime.GetSkip()));
             m_ExecutionTime.push_back(date.dateTime);
         }
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }

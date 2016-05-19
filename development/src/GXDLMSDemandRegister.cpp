@@ -49,7 +49,7 @@ bool CGXDLMSDemandRegister::IsRead(int index)
 /**
  Constructor.
 */
-CGXDLMSDemandRegister::CGXDLMSDemandRegister() : CGXDLMSObject(OBJECT_TYPE_DEMAND_REGISTER)
+CGXDLMSDemandRegister::CGXDLMSDemandRegister() : CGXDLMSObject(DLMS_OBJECT_TYPE_DEMAND_REGISTER)
 {
     m_Period = m_NumberOfPeriods = m_Unit = m_Scaler = 0;
 }
@@ -59,7 +59,7 @@ CGXDLMSDemandRegister::CGXDLMSDemandRegister() : CGXDLMSObject(OBJECT_TYPE_DEMAN
 
  @param ln Logical Name of the object.
 */
-CGXDLMSDemandRegister::CGXDLMSDemandRegister(std::string ln) : CGXDLMSObject(OBJECT_TYPE_DEMAND_REGISTER, ln)
+CGXDLMSDemandRegister::CGXDLMSDemandRegister(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_DEMAND_REGISTER, ln)
 {
     m_Period = m_NumberOfPeriods = m_Unit = m_Scaler = 0;
 }
@@ -70,7 +70,7 @@ CGXDLMSDemandRegister::CGXDLMSDemandRegister(std::string ln) : CGXDLMSObject(OBJ
  @param ln Logical Name of the object.
  @param sn Short Name of the object.
 */
-CGXDLMSDemandRegister::CGXDLMSDemandRegister(int sn) : CGXDLMSObject(OBJECT_TYPE_DEMAND_REGISTER, sn)
+CGXDLMSDemandRegister::CGXDLMSDemandRegister(int sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_DEMAND_REGISTER, sn)
 {
     m_Period = m_NumberOfPeriods = m_Unit = m_Scaler = 0;
 }
@@ -180,7 +180,7 @@ void CGXDLMSDemandRegister::SetNumberOfPeriods(int value)
 }
 
 /*
- * Reset value.
+ * Reset e.GetValue().
  */
 void CGXDLMSDemandRegister::Reset()
 {
@@ -285,14 +285,15 @@ int CGXDLMSDemandRegister::GetMethodCount()
     return 2;
 }
 
-int CGXDLMSDemandRegister::Invoke(int index, CGXDLMSVariant& value)
+int CGXDLMSDemandRegister::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
         Reset();
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+    return DLMS_ERROR_CODE_OK;
 }
 
 int CGXDLMSDemandRegister::GetDataType(int index, DLMS_DATA_TYPE& type)
@@ -300,163 +301,170 @@ int CGXDLMSDemandRegister::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 1)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 2)
     {
         type = DLMS_DATA_TYPE_NONE;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 3)
     {
         type = DLMS_DATA_TYPE_NONE;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 4)
     {
         type = DLMS_DATA_TYPE_STRUCTURE;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 5)
     {
         type = DLMS_DATA_TYPE_NONE;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 6)
     {
         type = DLMS_DATA_TYPE_DATETIME;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 7)
     {
         type = DLMS_DATA_TYPE_DATETIME;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 8)
     {
         type = DLMS_DATA_TYPE_UINT32;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 9)
     {
         type = DLMS_DATA_TYPE_UINT16;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
-int CGXDLMSDemandRegister::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSDemandRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
-        value = m_CurrentAvarageValue;
-        return ERROR_CODES_OK;
+        e.SetValue(m_CurrentAvarageValue);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 3)
+    if (e.GetIndex() == 3)
     {
-        value = m_LastAvarageValue;
-        return ERROR_CODES_OK;
+        e.SetValue(m_LastAvarageValue);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 4)
+    if (e.GetIndex() == 4)
     {
-        value.Clear();
-        value.vt = DLMS_DATA_TYPE_STRUCTURE;
-        value.Arr.push_back(m_Scaler);
-        value.Arr.push_back(m_Unit);
-        return ERROR_CODES_OK;
+        e.GetValue().Clear();
+        e.GetValue().vt = DLMS_DATA_TYPE_STRUCTURE;
+        e.GetValue().Arr.push_back(m_Scaler);
+        e.GetValue().Arr.push_back(m_Unit);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 5)
+    if (e.GetIndex() == 5)
     {
-        value = m_Status;
-        return ERROR_CODES_OK;
+        e.SetValue(m_Status);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 6)
+    if (e.GetIndex() == 6)
     {
-        value = m_CaptureTime;
-        return ERROR_CODES_OK;
+        e.SetValue(m_CaptureTime);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 7)
+    if (e.GetIndex() == 7)
     {
-        value = m_StartTimeCurrent;
-        return ERROR_CODES_OK;
+        e.SetValue(m_StartTimeCurrent);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 8)
+    if (e.GetIndex() == 8)
     {
-        value = m_Period;
-        return ERROR_CODES_OK;
+        e.SetValue(m_Period);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 9)
+    if (e.GetIndex() == 9)
     {
-        value = m_NumberOfPeriods;
-        return ERROR_CODES_OK;
+        e.SetValue(m_NumberOfPeriods);
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
-int CGXDLMSDemandRegister::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSDemandRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
         if (m_Scaler != 0)
         {
-            SetCurrentAvarageValue(CGXDLMSVariant(value.ToDouble() * m_Scaler));
+            SetCurrentAvarageValue(CGXDLMSVariant(e.GetValue().ToDouble() * m_Scaler));
         }
         else
         {
-            SetCurrentAvarageValue(value);
+            SetCurrentAvarageValue(e.GetValue());
         }
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
         if (m_Scaler != 0)
         {
-            SetLastAvarageValue(CGXDLMSVariant(value.ToDouble() * GetScaler()));
+            SetLastAvarageValue(CGXDLMSVariant(e.GetValue().ToDouble() * GetScaler()));
         }
         else
         {
-            SetLastAvarageValue(value);
+            SetLastAvarageValue(e.GetValue());
         }
     }
-    else if (index == 4 && value.vt == DLMS_DATA_TYPE_STRUCTURE)
+    else if (e.GetIndex() == 4 && e.GetValue().vt == DLMS_DATA_TYPE_STRUCTURE)
     {
-        m_Scaler = value.Arr[0].bVal;
-        m_Unit = value.Arr[1].bVal;
+        m_Scaler = e.GetValue().Arr[0].bVal;
+        m_Unit = e.GetValue().Arr[1].bVal;
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
-        SetStatus(value.lVal);
+        SetStatus(e.GetValue().lVal);
     }
-    else if (index == 6)
+    else if (e.GetIndex() == 6)
     {
         CGXDLMSVariant tmp;
-        CGXDLMSClient::ChangeType(value, DLMS_DATA_TYPE_DATETIME, tmp);
+        CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_DATETIME, tmp);
         SetCaptureTime(tmp.dateTime);
     }
-    else if (index == 7)
+    else if (e.GetIndex() == 7)
     {
         CGXDLMSVariant tmp;
-        CGXDLMSClient::ChangeType(value, DLMS_DATA_TYPE_DATETIME, tmp);
+        CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_DATETIME, tmp);
         SetStartTimeCurrent(tmp.dateTime);
     }
-    else if (index == 8)
+    else if (e.GetIndex() == 8)
     {
-        SetPeriod(value.ulVal);
+        SetPeriod(e.GetValue().ulVal);
     }
-    else if (index == 9)
+    else if (e.GetIndex() == 9)
     {
-        SetNumberOfPeriods(value.lVal);
+        SetNumberOfPeriods(e.GetValue().ToInteger());
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

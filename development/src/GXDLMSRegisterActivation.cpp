@@ -38,18 +38,18 @@
 #include <sstream>
 
 //Constructor.
-CGXDLMSRegisterActivation::CGXDLMSRegisterActivation() : CGXDLMSObject(OBJECT_TYPE_REGISTER_ACTIVATION)
+CGXDLMSRegisterActivation::CGXDLMSRegisterActivation() : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER_ACTIVATION)
 {
 }
 
 //SN Constructor.
-CGXDLMSRegisterActivation::CGXDLMSRegisterActivation(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_REGISTER_ACTIVATION, sn)
+CGXDLMSRegisterActivation::CGXDLMSRegisterActivation(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER_ACTIVATION, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSRegisterActivation::CGXDLMSRegisterActivation(std::string ln) : CGXDLMSObject(OBJECT_TYPE_REGISTER_ACTIVATION, ln)
+CGXDLMSRegisterActivation::CGXDLMSRegisterActivation(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER_ACTIVATION, ln)
 {
 
 }
@@ -160,7 +160,7 @@ int CGXDLMSRegisterActivation::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 1)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 2)
     {
@@ -173,22 +173,29 @@ int CGXDLMSRegisterActivation::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 4)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Returns value of given attribute.
-int CGXDLMSRegisterActivation::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSRegisterActivation::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
     CGXByteBuffer data;
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
-    	int ret;
+        int ret;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         GXHelpers::SetObjectCount(m_RegisterAssignment.size(), data);
         CGXDLMSVariant id, ln;
@@ -199,44 +206,44 @@ int CGXDLMSRegisterActivation::GetValue(int index, int selector, CGXDLMSVariant&
             id = it->GetClassId();
             ln = it->GetLogicalName();
             if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, id)) != 0 ||
-            	(ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0)
-			{
-				return ret;
-			}
+                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0)
+            {
+                return ret;
+            }
         }
-        value = data;
-        return ERROR_CODES_OK;
+        e.SetValue(data);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 3)
+    if (e.GetIndex() == 3)
     {
-        //TODO: value = m_MaskList;
-        return ERROR_CODES_OK;
+        //TODO: e.SetValue(m_MaskList);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 4)
+    if (e.GetIndex() == 4)
     {
-        value.Add(m_ActiveMask.GetData(), m_ActiveMask.GetSize());
-        value.vt = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        e.GetValue().Add(m_ActiveMask.GetData(), m_ActiveMask.GetSize());
+        e.GetValue().vt = DLMS_DATA_TYPE_OCTET_STRING;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Set value of given attribute.
-int CGXDLMSRegisterActivation::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSRegisterActivation::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
         m_RegisterAssignment.clear();
-        if (value.vt == DLMS_DATA_TYPE_ARRAY)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
-            for(std::vector<CGXDLMSVariant>::iterator it = value.Arr.begin(); it != value.Arr.end(); ++it)
+            for(std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 CGXDLMSObjectDefinition item;
-                item.SetClassId((OBJECT_TYPE) it->Arr[0].ToInteger());
+                item.SetClassId((DLMS_OBJECT_TYPE) it->Arr[0].ToInteger());
                 std::string ln;
                 GXHelpers::GetLogicalName(it->Arr[1].byteArr, ln);
                 item.SetLogicalName(ln);
@@ -244,27 +251,27 @@ int CGXDLMSRegisterActivation::SetValue(CGXDLMSSettings* settings, int index, CG
             }
         }
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
         m_MaskList.clear();
-        if (value.vt == DLMS_DATA_TYPE_ARRAY)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
-            for(std::vector<CGXDLMSVariant>::iterator it = value.Arr.begin(); it != value.Arr.end(); ++it)
+            for(std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 CGXByteBuffer key, arr;
-                key.AddRange(it->Arr[0].byteArr, it->Arr[0].size);
-                arr.AddRange(it->Arr[1].byteArr, it->Arr[1].size);
+                key.Set(it->Arr[0].byteArr, it->Arr[0].size);
+                arr.Set(it->Arr[1].byteArr, it->Arr[1].size);
                 m_MaskList.push_back(std::pair<CGXByteBuffer, CGXByteBuffer>(key, arr));
             }
         }
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
-        m_ActiveMask.AddRange(&value.byteArr, value.size);
+        m_ActiveMask.Set(&e.GetValue().byteArr, e.GetValue().size);
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

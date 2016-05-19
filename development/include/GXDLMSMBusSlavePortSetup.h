@@ -39,9 +39,9 @@
 
 class CGXDLMSMBusSlavePortSetup : public CGXDLMSObject
 {
-    BAUDRATE m_DefaultBaud;
-    BAUDRATE m_AvailableBaud;
-    ADDRESS_STATE m_AddressState;
+    DLMS_BAUD_RATE m_DefaultBaud;
+    DLMS_BAUD_RATE m_AvailableBaud;
+    DLMS_ADDRESS_STATE m_AddressState;
     int m_BusAddress;
 
 public:
@@ -57,24 +57,24 @@ public:
     /**
      Defines the baud rate for the opening sequence.
     */
-    BAUDRATE GetDefaultBaud();
+    DLMS_BAUD_RATE GetDefaultBaud();
 
-    void SetDefaultBaud(BAUDRATE value);
+    void SetDefaultBaud(DLMS_BAUD_RATE value);
 
     /**
      Defines the baud rate for the opening sequence.
     */
-    BAUDRATE GetAvailableBaud();
+    DLMS_BAUD_RATE GetAvailableBaud();
 
-    void SetAvailableBaud(BAUDRATE value);
+    void SetAvailableBaud(DLMS_BAUD_RATE value);
 
     /**
      Defines whether or not the device has been assigned an address
      * since last power up of the device.
     */
-    ADDRESS_STATE GetAddressState();
+    DLMS_ADDRESS_STATE GetAddressState();
 
-    void SetAddressState(ADDRESS_STATE value);
+    void SetAddressState(DLMS_ADDRESS_STATE value);
 
     /**
      Defines the baud rate for the opening sequence.
@@ -97,9 +97,9 @@ public:
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
     // Returns value of given attribute.
-    int GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value);
+    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 
     // Set value of given attribute.
-    int SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value);
+    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 };
 #endif //GXDLMSMBUSSLAVEPORTSETUP_H

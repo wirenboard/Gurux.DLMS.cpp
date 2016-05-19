@@ -37,7 +37,7 @@
 #include <sstream>
 
 //Constructor.
-CGXDLMSIp4Setup::CGXDLMSIp4Setup() : CGXDLMSObject(OBJECT_TYPE_IP4_SETUP)
+CGXDLMSIp4Setup::CGXDLMSIp4Setup() : CGXDLMSObject(DLMS_OBJECT_TYPE_IP4_SETUP)
 {
     m_IPAddress = 0;
     m_SubnetMask = 0;
@@ -48,7 +48,7 @@ CGXDLMSIp4Setup::CGXDLMSIp4Setup() : CGXDLMSObject(OBJECT_TYPE_IP4_SETUP)
 }
 
 //SN Constructor.
-CGXDLMSIp4Setup::CGXDLMSIp4Setup(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_IP4_SETUP, sn)
+CGXDLMSIp4Setup::CGXDLMSIp4Setup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_IP4_SETUP, sn)
 {
     m_IPAddress = 0;
     m_SubnetMask = 0;
@@ -59,7 +59,7 @@ CGXDLMSIp4Setup::CGXDLMSIp4Setup(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_
 }
 
 //LN Constructor.
-CGXDLMSIp4Setup::CGXDLMSIp4Setup(std::string ln) : CGXDLMSObject(OBJECT_TYPE_IP4_SETUP, ln)
+CGXDLMSIp4Setup::CGXDLMSIp4Setup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_IP4_SETUP, ln)
 {
     m_IPAddress = 0;
     m_SubnetMask = 0;
@@ -309,28 +309,35 @@ int CGXDLMSIp4Setup::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Returns value of given attribute.
-int CGXDLMSIp4Setup::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        value = m_DataLinkLayerReference;
+        e.SetValue(m_DataLinkLayerReference);
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        value = m_IPAddress;
-        return ERROR_CODES_OK;
+        e.SetValue(m_IPAddress);
+        return DLMS_ERROR_CODE_OK;
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
@@ -345,9 +352,9 @@ int CGXDLMSIp4Setup::GetValue(int index, int selector, CGXDLMSVariant& parameter
                 return ret;
             }
         }
-        value = data;
+        e.SetValue(data);
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
         CGXByteBuffer bb;
         bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
@@ -368,110 +375,110 @@ int CGXDLMSIp4Setup::GetValue(int index, int selector, CGXDLMSVariant& parameter
                 return ret;
             }
         }
-        value = bb;
+        e.SetValue(bb);
     }
-    else if (index == 6)
+    else if (e.GetIndex() == 6)
     {
-        value = m_SubnetMask;
+        e.SetValue(m_SubnetMask);
     }
-    else if (index == 7)
+    else if (e.GetIndex() == 7)
     {
-        value = m_GatewayIPAddress;
+        e.SetValue(m_GatewayIPAddress);
     }
-    else if (index == 8)
+    else if (e.GetIndex() == 8)
     {
-        value = m_UseDHCP;
+        e.SetValue(m_UseDHCP);
     }
-    else if (index == 9)
+    else if (e.GetIndex() == 9)
     {
-        value = m_PrimaryDNSAddress;
+        e.SetValue(m_PrimaryDNSAddress);
     }
-    else if (index == 10)
+    else if (e.GetIndex() == 10)
     {
-        value = m_SecondaryDNSAddress;
+        e.SetValue(m_SecondaryDNSAddress);
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Set value of given attribute.
-int CGXDLMSIp4Setup::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSIp4Setup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        if (value.vt == DLMS_DATA_TYPE_STRING)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_STRING)
         {
-            m_DataLinkLayerReference = value.ToString();
+            m_DataLinkLayerReference = e.GetValue().ToString();
         }
         else
         {
             CGXDLMSVariant tmp;
-            CGXDLMSClient::ChangeType(value, DLMS_DATA_TYPE_OCTET_STRING, tmp);
+            CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_OCTET_STRING, tmp);
             m_DataLinkLayerReference = tmp.ToString();
         }
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        m_IPAddress = value.ToInteger();
+        m_IPAddress = e.GetValue().ToInteger();
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
         m_MulticastIPAddress.clear();
-        if (value.vt == DLMS_DATA_TYPE_ARRAY)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
-            for(std::vector<CGXDLMSVariant>::iterator it = value.Arr.begin(); it != value.Arr.end(); ++it)
+            for(std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 m_MulticastIPAddress.push_back((*it).ToInteger());
             }
         }
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
         m_IPOptions.clear();
-        if (value.vt == DLMS_DATA_TYPE_ARRAY)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
-            for(std::vector<CGXDLMSVariant>::iterator it = value.Arr.begin(); it != value.Arr.end(); ++it)
+            for(std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 CGXDLMSIp4SetupIpOption item;
                 item.SetType((IP_OPTION_TYPE) it->Arr[0].ToInteger());
                 item.SetLength(it->Arr[1].ToInteger());
                 CGXByteBuffer tmp;
-                tmp.AddRange(it->Arr[0].byteArr, it->Arr[0].size);
+                tmp.Set(it->Arr[0].byteArr, it->Arr[0].size);
                 item.SetData(tmp);
                 m_IPOptions.push_back(item);
             }
         }
     }
-    else if (index == 6)
+    else if (e.GetIndex() == 6)
     {
-        m_SubnetMask = value.ToInteger();
+        m_SubnetMask = e.GetValue().ToInteger();
     }
-    else if (index == 7)
+    else if (e.GetIndex() == 7)
     {
-        m_GatewayIPAddress = value.ToInteger();
+        m_GatewayIPAddress = e.GetValue().ToInteger();
     }
-    else if (index == 8)
+    else if (e.GetIndex() == 8)
     {
-        m_UseDHCP = value.boolVal;
+        m_UseDHCP = e.GetValue().boolVal;
     }
-    else if (index == 9)
+    else if (e.GetIndex() == 9)
     {
-        m_PrimaryDNSAddress = value.ToInteger();
+        m_PrimaryDNSAddress = e.GetValue().ToInteger();
     }
-    else if (index == 10)
+    else if (e.GetIndex() == 10)
     {
-        m_SecondaryDNSAddress = value.ToInteger();
+        m_SecondaryDNSAddress = e.GetValue().ToInteger();
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

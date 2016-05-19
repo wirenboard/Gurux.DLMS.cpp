@@ -45,10 +45,10 @@ protected:
     unsigned char m_Unit;
 
     //SN Constructor.
-    CGXDLMSRegister(OBJECT_TYPE type, unsigned short sn);
+    CGXDLMSRegister(DLMS_OBJECT_TYPE type, unsigned short sn);
 
     //LN Constructor.
-    CGXDLMSRegister(OBJECT_TYPE type, std::string ln);
+    CGXDLMSRegister(DLMS_OBJECT_TYPE type, std::string ln);
 
     bool IsRead(int index);
 
@@ -99,7 +99,7 @@ public:
     // Returns amount of methods.
     int GetMethodCount();
 
-    int Invoke(int index, CGXDLMSVariant& value);
+    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
@@ -108,8 +108,8 @@ public:
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
-    int GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value);
+    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 
-    int SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value);
+    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 };
 #endif //GXDLMSREGISTER_H

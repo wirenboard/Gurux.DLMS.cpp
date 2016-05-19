@@ -43,13 +43,13 @@ void CGXDLMSRegister::Init()
 }
 
 //SN Constructor.
-CGXDLMSRegister::CGXDLMSRegister(OBJECT_TYPE type, unsigned short sn) : CGXDLMSObject(type, sn)
+CGXDLMSRegister::CGXDLMSRegister(DLMS_OBJECT_TYPE type, unsigned short sn) : CGXDLMSObject(type, sn)
 {
     Init();
 }
 
 //LN Constructor.
-CGXDLMSRegister::CGXDLMSRegister(OBJECT_TYPE type, std::string ln) : CGXDLMSObject(type, ln)
+CGXDLMSRegister::CGXDLMSRegister(DLMS_OBJECT_TYPE type, std::string ln) : CGXDLMSObject(type, ln)
 {
     Init();
 }
@@ -64,32 +64,32 @@ bool CGXDLMSRegister::IsRead(int index)
 }
 
 //Constructor.
-CGXDLMSRegister::CGXDLMSRegister(void) : CGXDLMSObject(OBJECT_TYPE_REGISTER)
+CGXDLMSRegister::CGXDLMSRegister(void) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER)
 {
     Init();
 }
 
 //SN Constructor.
-CGXDLMSRegister::CGXDLMSRegister(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_REGISTER, sn)
+CGXDLMSRegister::CGXDLMSRegister(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER, sn)
 {
     Init();
 }
 
 //SN Constructor.
-CGXDLMSRegister::CGXDLMSRegister(unsigned short sn, double scaler, int unit, CGXDLMSVariant value) : CGXDLMSObject(OBJECT_TYPE_REGISTER, sn)
+CGXDLMSRegister::CGXDLMSRegister(unsigned short sn, double scaler, int unit, CGXDLMSVariant value) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER, sn)
 {
     m_Value = value;
     Init();
 }
 
 //LN Constructor.
-CGXDLMSRegister::CGXDLMSRegister(std::string ln) : CGXDLMSObject(OBJECT_TYPE_REGISTER, ln)
+CGXDLMSRegister::CGXDLMSRegister(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER, ln)
 {
     Init();
 }
 
 //LN Constructor.
-CGXDLMSRegister::CGXDLMSRegister(std::string ln, double scaler, int unit, CGXDLMSVariant value) : CGXDLMSObject(OBJECT_TYPE_REGISTER, ln)
+CGXDLMSRegister::CGXDLMSRegister(std::string ln, double scaler, int unit, CGXDLMSVariant value) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER, ln)
 {
     m_Value = value;
     Init();
@@ -153,14 +153,15 @@ int CGXDLMSRegister::GetMethodCount()
     return 1;
 }
 
-int CGXDLMSRegister::Invoke(int index, CGXDLMSVariant& value)
+int CGXDLMSRegister::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
         Reset();
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+    return DLMS_ERROR_CODE_OK;
 }
 
 void CGXDLMSRegister::GetValues(std::vector<std::string>& values)
@@ -210,7 +211,7 @@ int CGXDLMSRegister::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 1)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 2)
     {
@@ -219,61 +220,68 @@ int CGXDLMSRegister::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 3)
     {
         type = DLMS_DATA_TYPE_STRUCTURE;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
-int CGXDLMSRegister::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
-        value = m_Value;
-        return ERROR_CODES_OK;
+        e.SetValue(m_Value);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 3)
+    if (e.GetIndex() == 3)
     {
-        value.Clear();
-        value.vt = DLMS_DATA_TYPE_STRUCTURE;
-        value.Arr.push_back(m_Scaler);
-        value.Arr.push_back(m_Unit);
-        return ERROR_CODES_OK;
+        e.GetValue().Clear();
+        e.GetValue().vt = DLMS_DATA_TYPE_STRUCTURE;
+        e.GetValue().Arr.push_back(m_Scaler);
+        e.GetValue().Arr.push_back(m_Unit);
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
-int CGXDLMSRegister::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
         if (m_Scaler != 0)
         {
             double val = GetScaler();
-            val *= value.ToDouble();
+            val *= e.GetValue().ToDouble();
             CGXDLMSVariant tmp(val);
             SetValue(tmp);
         }
         else
         {
-            SetValue(value);
+            SetValue(e.GetValue());
         }
     }
-    else if (index == 3 && value.vt == DLMS_DATA_TYPE_STRUCTURE)
+    else if (e.GetIndex() == 3 && e.GetValue().vt == DLMS_DATA_TYPE_STRUCTURE)
     {
-        m_Scaler = value.Arr[0].ToInteger();
-        m_Unit = value.Arr[1].ToInteger();
+        m_Scaler = e.GetValue().Arr[0].ToInteger();
+        m_Unit = e.GetValue().Arr[1].ToInteger();
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

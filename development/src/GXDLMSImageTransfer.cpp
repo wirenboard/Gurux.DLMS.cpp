@@ -37,30 +37,30 @@
 #include <sstream>
 
 //Constructor.
-CGXDLMSImageTransfer::CGXDLMSImageTransfer() : CGXDLMSObject(OBJECT_TYPE_IMAGE_TRANSFER)
+CGXDLMSImageTransfer::CGXDLMSImageTransfer() : CGXDLMSObject(DLMS_OBJECT_TYPE_IMAGE_TRANSFER)
 {
-	m_ImageBlockSize = 0;
-	m_ImageFirstNotTransferredBlockNumber = 0;
-	m_ImageTransferEnabled = false;
-	m_ImageTransferStatus = IMAGE_TRANSFER_STATUSNOT_INITIATED;
+    m_ImageBlockSize = 0;
+    m_ImageFirstNotTransferredBlockNumber = 0;
+    m_ImageTransferEnabled = false;
+    m_ImageTransferStatus = IMAGE_TRANSFER_STATUSNOT_INITIATED;
 }
 
 //SN Constructor.
-CGXDLMSImageTransfer::CGXDLMSImageTransfer(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_IMAGE_TRANSFER, sn)
+CGXDLMSImageTransfer::CGXDLMSImageTransfer(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_IMAGE_TRANSFER, sn)
 {
-	m_ImageBlockSize = 0;
-	m_ImageFirstNotTransferredBlockNumber = 0;
-	m_ImageTransferEnabled = false;
-	m_ImageTransferStatus = IMAGE_TRANSFER_STATUSNOT_INITIATED;
+    m_ImageBlockSize = 0;
+    m_ImageFirstNotTransferredBlockNumber = 0;
+    m_ImageTransferEnabled = false;
+    m_ImageTransferStatus = IMAGE_TRANSFER_STATUSNOT_INITIATED;
 }
 
 //LN Constructor.
-CGXDLMSImageTransfer::CGXDLMSImageTransfer(std::string ln) : CGXDLMSObject(OBJECT_TYPE_IMAGE_TRANSFER, ln)
+CGXDLMSImageTransfer::CGXDLMSImageTransfer(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_IMAGE_TRANSFER, ln)
 {
-	m_ImageBlockSize = 0;
-	m_ImageFirstNotTransferredBlockNumber = 0;
-	m_ImageTransferEnabled = false;
-	m_ImageTransferStatus = IMAGE_TRANSFER_STATUSNOT_INITIATED;
+    m_ImageBlockSize = 0;
+    m_ImageFirstNotTransferredBlockNumber = 0;
+    m_ImageTransferEnabled = false;
+    m_ImageTransferStatus = IMAGE_TRANSFER_STATUSNOT_INITIATED;
 }
 /**
  Holds the ImageBlockSize, expressed in octets,
@@ -217,75 +217,82 @@ int CGXDLMSImageTransfer::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 1)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 2)
     {
         type = DLMS_DATA_TYPE_UINT32;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 3)
     {
         type = DLMS_DATA_TYPE_BIT_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 4)
     {
         type = DLMS_DATA_TYPE_UINT32;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 5)
     {
         type = DLMS_DATA_TYPE_BOOLEAN;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 6)
     {
         type = DLMS_DATA_TYPE_ENUM;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (index == 7)
     {
         type = DLMS_DATA_TYPE_ARRAY;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Returns value of given attribute.
-int CGXDLMSImageTransfer::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSImageTransfer::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
-        value = GetImageBlockSize();
-        return ERROR_CODES_OK;
+        e.SetValue(GetImageBlockSize());
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 3)
+    if (e.GetIndex() == 3)
     {
-        value = m_ImageTransferredBlocksStatus;
-        return ERROR_CODES_OK;
+        e.SetValue(m_ImageTransferredBlocksStatus);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 4)
+    if (e.GetIndex() == 4)
     {
-        value = m_ImageFirstNotTransferredBlockNumber;
-        return ERROR_CODES_OK;
+        e.SetValue(m_ImageFirstNotTransferredBlockNumber);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 5)
+    if (e.GetIndex() == 5)
     {
-        value = m_ImageTransferEnabled;
-        return ERROR_CODES_OK;
+        e.SetValue(m_ImageTransferEnabled);
+        return DLMS_ERROR_CODE_OK;
 
     }
-    if (index == 6)
+    if (e.GetIndex() == 6)
     {
-        value = m_ImageTransferStatus;
-        return ERROR_CODES_OK;
+        e.SetValue(m_ImageTransferStatus);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 7)
+    if (e.GetIndex() == 7)
     {
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
@@ -300,51 +307,51 @@ int CGXDLMSImageTransfer::GetValue(int index, int selector, CGXDLMSVariant& para
             id = it->GetIdentification();
             signature = (*it).GetSignature();
             if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT32, size)) != 0 ||
-				(ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, id)) != 0 ||
-				(ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, signature)) != 0)
+                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, id)) != 0 ||
+                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, signature)) != 0)
             {
                 return ret;
             }
         }
-        value = data;
+        e.SetValue(data);
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Set value of given attribute.
-int CGXDLMSImageTransfer::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSImageTransfer::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        m_ImageBlockSize = value.ToInteger();
+        m_ImageBlockSize = e.GetValue().ToInteger();
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        m_ImageTransferredBlocksStatus = value.ToString();
+        m_ImageTransferredBlocksStatus = e.GetValue().ToString();
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
-        m_ImageFirstNotTransferredBlockNumber = value.ToInteger();
+        m_ImageFirstNotTransferredBlockNumber = e.GetValue().ToInteger();
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
-        m_ImageTransferEnabled = value.boolVal;
+        m_ImageTransferEnabled = e.GetValue().boolVal;
     }
-    else if (index == 6)
+    else if (e.GetIndex() == 6)
     {
-        m_ImageTransferStatus = (IMAGE_TRANSFER_STATUS) value.ToInteger();
+        m_ImageTransferStatus = (IMAGE_TRANSFER_STATUS) e.GetValue().ToInteger();
     }
-    else if (index == 7)
+    else if (e.GetIndex() == 7)
     {
         m_ImageActivateInfo.clear();
-        if (value.vt == DLMS_DATA_TYPE_ARRAY)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
             CGXDLMSVariant tmp;
-            for (std::vector<CGXDLMSVariant>::iterator it = value.Arr.begin(); it != value.Arr.end(); ++it)
+            for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 CGXDLMSImageActivateInfo item;
                 item.SetSize((*it).Arr[0].ToInteger());
@@ -358,7 +365,7 @@ int CGXDLMSImageTransfer::SetValue(CGXDLMSSettings* settings, int index, CGXDLMS
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

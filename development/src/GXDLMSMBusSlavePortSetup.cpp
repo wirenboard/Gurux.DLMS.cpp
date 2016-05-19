@@ -36,18 +36,18 @@
 #include "../include/GXDLMSConverter.h"
 
 //Constructor.
-CGXDLMSMBusSlavePortSetup::CGXDLMSMBusSlavePortSetup() : CGXDLMSObject(OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP)
+CGXDLMSMBusSlavePortSetup::CGXDLMSMBusSlavePortSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP)
 {
 }
 
 //SN Constructor.
-CGXDLMSMBusSlavePortSetup::CGXDLMSMBusSlavePortSetup(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP, sn)
+CGXDLMSMBusSlavePortSetup::CGXDLMSMBusSlavePortSetup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSMBusSlavePortSetup::CGXDLMSMBusSlavePortSetup(std::string ln) : CGXDLMSObject(OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP, ln)
+CGXDLMSMBusSlavePortSetup::CGXDLMSMBusSlavePortSetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP, ln)
 {
 
 }
@@ -55,22 +55,22 @@ CGXDLMSMBusSlavePortSetup::CGXDLMSMBusSlavePortSetup(std::string ln) : CGXDLMSOb
 /**
 Defines the baud rate for the opening sequence.
 */
-BAUDRATE CGXDLMSMBusSlavePortSetup::GetDefaultBaud()
+DLMS_BAUD_RATE CGXDLMSMBusSlavePortSetup::GetDefaultBaud()
 {
     return m_DefaultBaud;
 }
-void CGXDLMSMBusSlavePortSetup::SetDefaultBaud(BAUDRATE value)
+void CGXDLMSMBusSlavePortSetup::SetDefaultBaud(DLMS_BAUD_RATE value)
 {
     m_DefaultBaud = value;
 }
 /**
  Defines the baud rate for the opening sequence.
 */
-BAUDRATE CGXDLMSMBusSlavePortSetup::GetAvailableBaud()
+DLMS_BAUD_RATE CGXDLMSMBusSlavePortSetup::GetAvailableBaud()
 {
     return m_AvailableBaud;
 }
-void CGXDLMSMBusSlavePortSetup::SetAvailableBaud(BAUDRATE value)
+void CGXDLMSMBusSlavePortSetup::SetAvailableBaud(DLMS_BAUD_RATE value)
 {
     m_AvailableBaud = value;
 }
@@ -79,11 +79,11 @@ void CGXDLMSMBusSlavePortSetup::SetAvailableBaud(BAUDRATE value)
  Defines whether or not the device has been assigned an address
  * since last power up of the device.
 */
-ADDRESS_STATE CGXDLMSMBusSlavePortSetup::GetAddressState()
+DLMS_ADDRESS_STATE CGXDLMSMBusSlavePortSetup::GetAddressState()
 {
     return m_AddressState;
 }
-void CGXDLMSMBusSlavePortSetup::SetAddressState(ADDRESS_STATE value)
+void CGXDLMSMBusSlavePortSetup::SetAddressState(DLMS_ADDRESS_STATE value)
 {
     m_AddressState = value;
 }
@@ -159,7 +159,7 @@ int CGXDLMSMBusSlavePortSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 1)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     else if (index == 2)
     {
@@ -179,67 +179,73 @@ int CGXDLMSMBusSlavePortSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Returns value of given attribute.
-int CGXDLMSMBusSlavePortSetup::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSMBusSlavePortSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        value = m_DefaultBaud;
+        e.SetValue(m_DefaultBaud);
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        value = m_AvailableBaud;
+        e.SetValue(m_AvailableBaud);
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
-        value = m_AddressState;
+        e.SetValue(m_AddressState);
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
-        value = m_BusAddress;
+        e.SetValue(m_BusAddress);
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Set value of given attribute.
-int CGXDLMSMBusSlavePortSetup::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSMBusSlavePortSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        m_DefaultBaud = (BAUDRATE) value.ToInteger();
+        m_DefaultBaud = (DLMS_BAUD_RATE) e.GetValue().ToInteger();
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        m_AvailableBaud = (BAUDRATE) value.ToInteger();
+        m_AvailableBaud = (DLMS_BAUD_RATE) e.GetValue().ToInteger();
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
-        m_AddressState = (ADDRESS_STATE) value.ToInteger();
+        m_AddressState = (DLMS_ADDRESS_STATE) e.GetValue().ToInteger();
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
-        m_BusAddress = value.ToInteger();
+        m_BusAddress = e.GetValue().ToInteger();
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

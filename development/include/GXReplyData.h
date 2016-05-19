@@ -36,6 +36,8 @@
 #define GXREPLYDATA_H
 
 #include "GXDLMSConverter.h"
+#include "GXBytebuffer.h"
+#include "GXDLMSVariant.h"
 
 class CGXReplyData
 {
@@ -43,7 +45,7 @@ private:
     /**
      * Is more data available.
      */
-    GXDLMS_DATA_REQUEST_TYPES m_MoreData;
+    DLMS_DATA_REQUEST_TYPES m_MoreData;
     /**
      * Received command.
      */
@@ -86,17 +88,22 @@ private:
      */
     bool m_Peek;
 
-    /**
-     * Client address.
-     */
-    int m_ClientAddress;
-
-    /**
-     * Server address.
-     */
-    int m_ServerAddress;
-
     DLMS_DATA_TYPE m_DataType;
+
+    /**
+     * Cipher index is position where data is decrypted.
+     */
+    unsigned short m_CipherIndex;
+
+    /**
+    * Is received message General Block Transfer message.
+    */
+    bool m_Gbt;
+
+    /**
+     * Data notification date time.
+     */
+    struct tm* m_Time;
 
 public:
     /**
@@ -114,199 +121,94 @@ public:
      *            Received error ID.
      */
     CGXReplyData(
-        GXDLMS_DATA_REQUEST_TYPES more,
+        DLMS_DATA_REQUEST_TYPES more,
         DLMS_COMMAND cmd,
         CGXByteBuffer& buff,
         bool complete,
-        unsigned char error)
-    {
-        Clear();
-        m_DataType = DLMS_DATA_TYPE_NONE;
-        m_MoreData = more;
-        m_Command = cmd;
-        m_Data = buff;
-        m_Complete = complete;
-        m_Error = error;
-    }
+        unsigned char error);
 
     /**
      * Constructor.
      */
-    CGXReplyData()
-    {
-        Clear();
-    }
+    CGXReplyData();
 
-    DLMS_DATA_TYPE GetValueType()
-    {
-        return m_DataType;
-    }
+    DLMS_DATA_TYPE GetValueType();
 
-    void SetValueType(DLMS_DATA_TYPE value)
-    {
-        m_DataType = value;
-    }
+    void SetValueType(DLMS_DATA_TYPE value);
 
-    CGXDLMSVariant& GetValue()
-    {
-        return m_DataValue;
-    }
 
-    void SetValue(CGXDLMSVariant& value)
-    {
-        m_DataValue = value;
-    }
+    CGXDLMSVariant& GetValue();
 
-    int GetReadPosition()
-    {
-        return m_ReadPosition;
-    }
 
-    void SetReadPosition(int value)
-    {
-        m_ReadPosition = value;
-    }
+    void SetValue(CGXDLMSVariant& value);
 
-    int GetBlockLength()
-    {
-        return m_BlockLength;
-    }
+    int GetReadPosition();
 
-    void SetBlockLength(int value)
-    {
-        m_BlockLength = value;
-    }
+    void SetReadPosition(int value);
 
-    int GetClientAddress()
-    {
-        return m_ClientAddress;
-    }
+    int GetBlockLength();
 
-    void SetClientAddress(int value)
-    {
-        m_ClientAddress = value;
-    }
+    void SetBlockLength(int value);
 
-    int GetServerAddress()
-    {
-        return m_ServerAddress;
-    }
+    void SetCommand(DLMS_COMMAND value);
 
-    void SetServerAddress(int value)
-    {
-        m_ServerAddress = value;
-    }
+    void SetData(CGXByteBuffer& value);
 
-    void SetCommand(DLMS_COMMAND value)
-    {
-        m_Command = value;
-    }
+    void SetComplete(bool value);
 
-    void SetData(CGXByteBuffer& value)
-    {
-        m_Data = value;
-    }
+    void SetError(short value);
 
-    void SetComplete(bool value)
-    {
-        m_Complete = value;
-    }
-
-    void SetError(short value)
-    {
-        m_Error = value;
-    }
-
-    void SetTotalCount(int value)
-    {
-        m_TotalCount = value;
-    }
+    void SetTotalCount(int value);
 
     /**
      * Reset data values to default.
      */
-    void Clear()
-    {
-        m_MoreData = GXDLMS_DATA_REQUEST_TYPES_NONE;
-        m_Command = DLMS_COMMAND_NONE;
-        m_Data.Clear();
-        m_Complete = false;
-        m_Peek = false;
-        m_Error = 0;
-        m_TotalCount = 0;
-        m_DataValue.Clear();
-        m_ReadPosition = 0;
-        m_BlockLength = 0;
-        m_DataType = DLMS_DATA_TYPE_NONE;
-    }
+    void Clear();
 
     /**
      * @return Is more data available.
      */
-    bool IsMoreData()
-    {
-        return m_MoreData != GXDLMS_DATA_REQUEST_TYPES_NONE && m_Error == 0;
-    }
+    bool IsMoreData();
 
     /**
      * Is more data available.
      *
      * @return Return None if more data is not available or Frame or Block type.
      */
-    GXDLMS_DATA_REQUEST_TYPES GetMoreData()
-    {
-        return m_MoreData;
-    }
+    DLMS_DATA_REQUEST_TYPES GetMoreData();
 
-    void SetMoreData(GXDLMS_DATA_REQUEST_TYPES value)
-    {
-        m_MoreData = value;
-    }
+    void SetMoreData(DLMS_DATA_REQUEST_TYPES value);
+
 
     /**
      * Get received command.
      *
      * @return Received command.
      */
-    DLMS_COMMAND GetCommand()
-    {
-        return m_Command;
-    }
+    DLMS_COMMAND GetCommand();
 
     /**
      * Get received data.
      *
      * @return Received data.
      */
-    CGXByteBuffer& GetData()
-    {
-        return m_Data;
-    }
+    CGXByteBuffer& GetData();
 
     /**
      * Is frame complete.
      *
      * @return Returns true if frame is complete or false if bytes is missing.
      */
-    bool IsComplete()
-    {
-        return m_Complete;
-    }
+    bool IsComplete();
 
     /**
      * Get Received error. Value is zero if no error has occurred.
      *
      * @return Received error.
      */
-    short GetError()
-    {
-        return m_Error;
-    }
+    short GetError();
 
-    std::string GetErrorMessage()
-    {
-        return CGXDLMSConverter::GetErrorMessage(m_Error);
-    }
+    std::string GetErrorMessage();
 
     /**
      * Get total count of element in the array. If this method is used peek must
@@ -316,10 +218,7 @@ public:
      * @see peek
      * @see GetCount
      */
-    int GetTotalCount()
-    {
-        return m_TotalCount;
-    }
+    int GetTotalCount();
 
     /**
      * Get count of read elements. If this method is used peek must be Set true.
@@ -328,14 +227,7 @@ public:
      * @see peek
      * @see GetTotalCount
      */
-    int GetCount()
-    {
-        if (m_DataValue.vt == DLMS_DATA_TYPE_ARRAY)
-        {
-            return m_DataValue.Arr.size();
-        }
-        return 0;
-    }
+    int GetCount();
 
     /**
      * Get is value try to peek.
@@ -344,10 +236,7 @@ public:
      * @see GetCount
      * @see GetTotalCount
      */
-    bool GetPeek()
-    {
-        return m_Peek;
-    }
+    bool GetPeek();
 
     /**
      * Set is value try to peek.
@@ -355,10 +244,41 @@ public:
      * @param value
      *            Is value try to peek.
      */
-    void SetPeek(bool value)
-    {
-        m_Peek = value;
-    }
+    void SetPeek(bool value);
+
+    /**
+     * @return Cipher index is position where data is decrypted.
+     */
+    unsigned short GetCipherIndex();
+
+    /**
+     * @param cipherIndex
+     *            Cipher index is position where data is decrypted.
+     */
+    void SetCipherIndex(unsigned short value);
+
+    /**
+     * @return Is received message General Block Transfer message.
+     */
+    bool GetGbt();
+
+    /**
+     * @param Is
+     *            received message General Block Transfer message.
+     */
+    void SetGbt(bool value);
+
+    /**
+     * @return Data notification date time.
+     */
+    struct tm* GetTime();
+
+
+    /**
+     * @param time
+     *            Data notification date time.
+     */
+    void SetTime(struct tm* value);
 };
 
 #endif //GXREPLYDATA_H

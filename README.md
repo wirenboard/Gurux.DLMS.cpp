@@ -77,7 +77,7 @@ int GXClient::Open(const char* pPortName, bool IEC)
 					OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 	if (m_hComPort == INVALID_HANDLE_VALUE)
 	{
-		return ERROR_CODES_INVALID_PARAMETER;
+		return DLMS_DLMS_ERROR_CODE_INVALID_PARAMETER;
 	}	
 	COMMCONFIG conf = {0};	
 	DWORD dwSize = sizeof(conf);
@@ -127,7 +127,7 @@ int GXClient::Open(const char* pPortName, bool IEC)
 			//If error occurs...
 			if (err != ERROR_IO_PENDING)
 			{				
-				return ERROR_CODES_SEND_FAILED;
+				return DLMS_DLMS_ERROR_CODE_SEND_FAILED;
 			}
 			//Wait until data is actually sent
 			::WaitForSingleObject(m_osWrite.hEvent, INFINITE);			
@@ -149,7 +149,7 @@ int GXClient::Open(const char* pPortName, bool IEC)
 					DWORD nErr = GetLastError();
 					if (nErr != ERROR_IO_PENDING)     
 					{
-						return ERROR_CODES_SEND_FAILED;
+						return DLMS_DLMS_ERROR_CODE_SEND_FAILED;
 					}			
 					//Wait until data is actually read
 					::WaitForSingleObject(m_osReader.hEvent, INFINITE);
@@ -169,7 +169,7 @@ int GXClient::Open(const char* pPortName, bool IEC)
 		}
 		if (m_Receivebuff[0] != '/')
 		{
-			return ERROR_CODES_SEND_FAILED;
+			return DLMS_DLMS_ERROR_CODE_SEND_FAILED;
 		}
 		char baudrate = m_Receivebuff[4];
 		if (baudrate == ' ')
@@ -201,7 +201,7 @@ int GXClient::Open(const char* pPortName, bool IEC)
                 bitrate = 19200;
                 break;
             default:
-                return ERROR_CODES_INVALID_PARAMETER;
+                return DLMS_DLMS_ERROR_CODE_INVALID_PARAMETER;
         }   
 		//Send ACK
 		buff[0] = 0x06;
@@ -227,7 +227,7 @@ int GXClient::Open(const char* pPortName, bool IEC)
 			//If error occurs...
 			if (err != ERROR_IO_PENDING)
 			{				
-				return ERROR_CODES_SEND_FAILED;
+				return DLMS_DLMS_ERROR_CODE_SEND_FAILED;
 			}
 			//Wait until data is actually sent
 			::WaitForSingleObject(m_osWrite.hEvent, INFINITE);			
@@ -253,7 +253,7 @@ int GXClient::Open(const char* pPortName, bool IEC)
 				DWORD nErr = GetLastError();
 				if (nErr != ERROR_IO_PENDING)     
 				{
-					return ERROR_CODES_SEND_FAILED;
+					return DLMS_DLMS_ERROR_CODE_SEND_FAILED;
 				}			
 				//Wait until data is actually read
 				::WaitForSingleObject(m_osReader.hEvent, INFINITE);
@@ -274,7 +274,7 @@ int GXClient::Open(const char* pPortName, bool IEC)
 		//Some meters need this sleep. Do not remove.
 		Sleep(300);
 	}
-	return ERROR_CODES_OK;
+	return DLMS_DLMS_ERROR_CODE_OK;
 }
 
 ```
@@ -302,7 +302,7 @@ if ((ret = m_Parser->AARQRequest(data)) != 0 ||
         (ret = ReadDataBlock(data, reply)) != 0 ||
         (ret = m_Parser->ParseAAREResponse(reply.GetData())) != 0)
 {
-    if (ret == ERROR_CODES_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED)
+    if (ret == DLMS_DLMS_ERROR_CODE_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED)
     {
         TRACE1("Use Logical Name referencing is wrong. Change it!\r\n");
         return ret;
@@ -356,7 +356,7 @@ int GXClient::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
     string tmp;
     if (data.GetSize() == 0)
     {
-        return ERROR_CODES_OK;
+        return DLMS_DLMS_ERROR_CODE_OK;
     }
     int len = data.GetSize();
     if (m_hComPort != INVALID_HANDLE_VALUE)
@@ -370,7 +370,7 @@ int GXClient::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             //If error occurs...
             if (err != ERROR_IO_PENDING)
             {
-                return ERROR_CODES_SEND_FAILED;
+                return DLMS_DLMS_ERROR_CODE_SEND_FAILED;
             }
             //Wait until data is actually sent
             ::WaitForSingleObject(m_osWrite.hEvent, INFINITE);
@@ -379,23 +379,23 @@ int GXClient::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         ret = write(settings->con.comPort, data->data, data->size);
         if (ret != data->size)
         {
-            return ERROR_CODES_SEND_FAILED;
+            return DLMS_DLMS_ERROR_CODE_SEND_FAILED;
         }
 #endif
     }
     else if (send(m_socket, (const char*) data.GetData(), len, 0) == -1)
     {
         //If error has occured
-        return ERROR_CODES_SEND_FAILED;
+        return DLMS_DLMS_ERROR_CODE_SEND_FAILED;
     }
     // Loop until whole DLMS packet is received.
-    while ((ret = m_Parser->GetData(bb, reply)) == ERROR_CODES_FALSE)
+    while ((ret = m_Parser->GetData(bb, reply)) == DLMS_DLMS_ERROR_CODE_FALSE)
     {
         if (m_hComPort != INVALID_HANDLE_VALUE)
         {
             if(Read(0x7E, bb) != 0)
             {
-                return ERROR_CODES_SEND_FAILED;
+                return DLMS_DLMS_ERROR_CODE_SEND_FAILED;
             }
         }
         else
@@ -403,9 +403,9 @@ int GXClient::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             len = RECEIVE_BUFFER_SIZE;
             if ((ret = recv(m_socket, (char*) m_Receivebuff, len, 0)) == -1)
             {
-                return ERROR_CODES_RECEIVE_FAILED;
+                return DLMS_DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
-            bb.AddRange(m_Receivebuff, ret);
+            bb.Set(m_Receivebuff, ret);
         }
     }
     return ret;

@@ -120,6 +120,15 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     static int GetObjectCount(CGXByteBuffer& data, unsigned long& count);
 
+    /**
+        * Return how many bytes object count takes.
+        *
+        * @param count
+        *            Value
+        * @return Value size in bytes.
+        */
+    static unsigned char GetObjectCountSizeInBytes(unsigned long count);
+
 /////////////////////////////////////////////////////////////////////////////
 // Set item count.
 /////////////////////////////////////////////////////////////////////////////

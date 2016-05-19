@@ -37,18 +37,18 @@
 #include <sstream>
 
 //Constructor.
-CGXDLMSMBusClient::CGXDLMSMBusClient() : CGXDLMSObject(OBJECT_TYPE_MBUS_CLIENT)
+CGXDLMSMBusClient::CGXDLMSMBusClient() : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_CLIENT)
 {
 }
 
 //SN Constructor.
-CGXDLMSMBusClient::CGXDLMSMBusClient(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_MBUS_CLIENT, sn)
+CGXDLMSMBusClient::CGXDLMSMBusClient(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_CLIENT, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSMBusClient::CGXDLMSMBusClient(std::string ln) : CGXDLMSObject(OBJECT_TYPE_MBUS_CLIENT, ln)
+CGXDLMSMBusClient::CGXDLMSMBusClient(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_CLIENT, ln)
 {
 
 }
@@ -324,132 +324,138 @@ int CGXDLMSMBusClient::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Returns value of given attribute.
-int CGXDLMSMBusClient::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSMBusClient::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        value = m_MBusPortReference;
+        e.SetValue(m_MBusPortReference);
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        //value = m_CaptureDefinition;//TODO;
+        //e.SetValue(m_CaptureDefinition);//TODO;
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
-        value = m_CapturePeriod;
+        e.SetValue(m_CapturePeriod);
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
-        value = m_PrimaryAddress;
+        e.SetValue(m_PrimaryAddress);
     }
-    else if (index == 6)
+    else if (e.GetIndex() == 6)
     {
-        value = m_IdentificationNumber;
+        e.SetValue(m_IdentificationNumber);
     }
-    else if (index == 7)
+    else if (e.GetIndex() == 7)
     {
-        value = m_ManufacturerID;
+        e.SetValue(m_ManufacturerID);
     }
-    else if (index == 8)
+    else if (e.GetIndex() == 8)
     {
-        value = m_DataHeaderVersion;
+        e.SetValue(m_DataHeaderVersion);
     }
-    else if (index == 9)
+    else if (e.GetIndex() == 9)
     {
-        value = m_DeviceType;
+        e.SetValue(m_DeviceType);
     }
-    else if (index == 10)
+    else if (e.GetIndex() == 10)
     {
-        value = m_AccessNumber;
+        e.SetValue(m_AccessNumber);
     }
-    else if (index == 11)
+    else if (e.GetIndex() == 11)
     {
-        value = m_Status;
+        e.SetValue(m_Status);
     }
-    else if (index == 12)
+    else if (e.GetIndex() == 12)
     {
-        value = m_Alarm;
+        e.SetValue(m_Alarm);
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Set value of given attribute.
-int CGXDLMSMBusClient::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSMBusClient::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
         CGXDLMSVariant tmp;
-        CGXDLMSClient::ChangeType(value, DLMS_DATA_TYPE_OCTET_STRING, tmp);
+        CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_OCTET_STRING, tmp);
         m_MBusPortReference = tmp.ToString();
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
         m_CaptureDefinition.clear();
         CGXDLMSVariant tmp1, tmp2;
-        for(std::vector<CGXDLMSVariant>::iterator it = value.Arr.begin(); it != value.Arr.end(); ++it)
+        for(std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
         {
             CGXDLMSClient::ChangeType((*it).Arr[0], DLMS_DATA_TYPE_OCTET_STRING, tmp1);
             CGXDLMSClient::ChangeType((*it).Arr[1], DLMS_DATA_TYPE_OCTET_STRING, tmp2);
             m_CaptureDefinition.push_back(std::pair<std::string, std::string>(tmp1.ToString(), tmp2.ToString()));
         }
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
-        m_CapturePeriod = value.ToInteger();
+        m_CapturePeriod = e.GetValue().ToInteger();
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
-        m_PrimaryAddress = value.ToInteger();
+        m_PrimaryAddress = e.GetValue().ToInteger();
     }
-    else if (index == 6)
+    else if (e.GetIndex() == 6)
     {
-        m_IdentificationNumber = value.ToInteger();
+        m_IdentificationNumber = e.GetValue().ToInteger();
     }
-    else if (index == 7)
+    else if (e.GetIndex() == 7)
     {
-        m_ManufacturerID = value.ToInteger();
+        m_ManufacturerID = e.GetValue().ToInteger();
     }
-    else if (index == 8)
+    else if (e.GetIndex() == 8)
     {
-        m_DataHeaderVersion = value.ToInteger();
+        m_DataHeaderVersion = e.GetValue().ToInteger();
     }
-    else if (index == 9)
+    else if (e.GetIndex() == 9)
     {
-        m_DeviceType = value.ToInteger();
+        m_DeviceType = e.GetValue().ToInteger();
     }
-    else if (index == 10)
+    else if (e.GetIndex() == 10)
     {
-        m_AccessNumber = value.ToInteger();
+        m_AccessNumber = e.GetValue().ToInteger();
     }
-    else if (index == 11)
+    else if (e.GetIndex() == 11)
     {
-        m_Status = value.ToInteger();
+        m_Status = e.GetValue().ToInteger();
     }
-    else if (index == 12)
+    else if (e.GetIndex() == 12)
     {
-        m_Alarm = value.ToInteger();
+        m_Alarm = e.GetValue().ToInteger();
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

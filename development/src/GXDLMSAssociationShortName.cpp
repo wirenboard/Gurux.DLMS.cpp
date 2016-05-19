@@ -68,7 +68,7 @@ int CGXDLMSAssociationShortName::GetAccessRights(CGXDLMSObject* pObj, CGXByteBuf
         GXHelpers::SetData(data, DLMS_DATA_TYPE_INT8, index);
         GXHelpers::SetData(data, DLMS_DATA_TYPE_ENUM, access);
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 void CGXDLMSAssociationShortName::UpdateAccessRights(CGXDLMSVariant& buff)
@@ -84,21 +84,21 @@ void CGXDLMSAssociationShortName::UpdateAccessRights(CGXDLMSVariant& buff)
             {
                 int id = attributeAccess->Arr[0].ToInteger();
                 int tmp = attributeAccess->Arr[1].ToInteger();
-                pObj->SetAccess(id, (ACCESSMODE) tmp);
+                pObj->SetAccess(id, (DLMS_ACCESS_MODE) tmp);
             }
             for(std::vector<CGXDLMSVariant>::iterator methodAccess = access->Arr[2].Arr.begin();
                     methodAccess != access->Arr[2].Arr.end(); ++methodAccess)
             {
                 int id = methodAccess->Arr[0].ToInteger();
                 int tmp = methodAccess->Arr[1].ToInteger();
-                pObj->SetMethodAccess(id, (METHOD_ACCESSMODE) tmp);
+                pObj->SetMethodAccess(id, (DLMS_METHOD_ACCESS_MODE) tmp);
             }
         }
     }
 }
 
 //Constructor.
-CGXDLMSAssociationShortName::CGXDLMSAssociationShortName() : CGXDLMSObject(OBJECT_TYPE_ASSOCIATION_SHORT_NAME)
+CGXDLMSAssociationShortName::CGXDLMSAssociationShortName() : CGXDLMSObject(DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME)
 {
     GXHelpers::SetLogicalName("0.0.40.0.0.255", m_LN);
     m_SN = 0xFA00;
@@ -196,9 +196,9 @@ int CGXDLMSAssociationShortName::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Returns SN Association View.
@@ -224,23 +224,29 @@ int CGXDLMSAssociationShortName::GetObjects(CGXByteBuffer& data)
             return ret;
         }
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
-int CGXDLMSAssociationShortName::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSAssociationShortName::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
         CGXByteBuffer Packets;
         int ret = GetObjects(Packets);
-        value = Packets;
+        e.SetValue(Packets);
         return ret;
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
         int ret;
         bool lnExists = m_ObjectList.FindBySN(GetShortName()) != NULL;
@@ -267,44 +273,40 @@ int CGXDLMSAssociationShortName::GetValue(int index, int selector, CGXDLMSVarian
                 return ret;
             }
         }
-        value = data;
+        e.SetValue(data);
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
         CGXByteBuffer data;
         CGXDLMSVariant tmp = m_SecuritySetupReference;
         GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
-        value = data;
+        e.SetValue(data);
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
-int CGXDLMSAssociationShortName::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSAssociationShortName::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
         m_ObjectList.clear();
-        if (value.vt == DLMS_DATA_TYPE_ARRAY)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
-            for(std::vector<CGXDLMSVariant>::iterator item = value.Arr.begin(); item != value.Arr.end(); ++item)
+            for(std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
             {
                 int sn = item->Arr[0].ToInteger();
-                CGXDLMSObject* pObj = NULL;
-                if (settings != NULL)
-                {
-                    pObj = settings->GetObjects().FindBySN(sn);
-                }
+                CGXDLMSObject* pObj = settings.GetObjects().FindBySN(sn);
                 if (pObj == NULL)
                 {
-                    OBJECT_TYPE type = (OBJECT_TYPE) item->Arr[1].ToInteger();
+                    DLMS_OBJECT_TYPE type = (DLMS_OBJECT_TYPE) item->Arr[1].ToInteger();
                     int version = item->Arr[2].ToInteger();
                     std::string ln;
                     GXHelpers::GetLogicalName((*item).Arr[3].byteArr, ln);
@@ -316,34 +318,34 @@ int CGXDLMSAssociationShortName::SetValue(CGXDLMSSettings* settings, int index, 
             }
         }
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        if (value.vt == DLMS_DATA_TYPE_NONE)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_NONE)
         {
             for(std::vector<CGXDLMSObject*>::iterator it = m_ObjectList.begin(); it != m_ObjectList.end(); ++it)
             {
                 for(int pos = 1; pos != (*it)->GetAttributeCount(); ++pos)
                 {
-                    (*it)->SetAccess(pos, ACCESSMODE_NONE);
+                    (*it)->SetAccess(pos, DLMS_ACCESS_MODE_NONE);
                 }
             }
         }
         else
         {
-            UpdateAccessRights(value);
+            UpdateAccessRights(e.GetValue());
         }
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
-        if (value.vt == DLMS_DATA_TYPE_STRING)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_STRING)
         {
-            m_SecuritySetupReference = value.ToString();
+            m_SecuritySetupReference = e.GetValue().ToString();
         }
         else
         {
             int ret;
             CGXDLMSVariant tmp;
-            if ((ret = CGXDLMSClient::ChangeType(value, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+            if ((ret = CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
             {
                 return ret;
             }
@@ -352,7 +354,7 @@ int CGXDLMSAssociationShortName::SetValue(CGXDLMSSettings* settings, int index, 
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

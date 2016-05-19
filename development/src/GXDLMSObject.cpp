@@ -36,13 +36,13 @@
 #include "../include/GXHelpers.h"
 
 //SN Constructor.
-CGXDLMSObject::CGXDLMSObject(OBJECT_TYPE type, unsigned short sn)
+CGXDLMSObject::CGXDLMSObject(DLMS_OBJECT_TYPE type, unsigned short sn)
 {
     Initialize(sn, type, 0, NULL);
 }
 
 //LN Constructor.
-CGXDLMSObject::CGXDLMSObject(OBJECT_TYPE type, std::string ln)
+CGXDLMSObject::CGXDLMSObject(DLMS_OBJECT_TYPE type, std::string ln)
 {
     Initialize(0, type, 0, NULL);
     GXHelpers::SetLogicalName(ln.c_str(), m_LN);
@@ -50,7 +50,7 @@ CGXDLMSObject::CGXDLMSObject(OBJECT_TYPE type, std::string ln)
 
 CGXDLMSObject::CGXDLMSObject()
 {
-    Initialize(0, OBJECT_TYPE_NONE, 0, NULL);
+    Initialize(0, DLMS_OBJECT_TYPE_NONE, 0, NULL);
 }
 
 CGXDLMSObject::CGXDLMSObject(short sn, unsigned short class_id, unsigned char version, CGXByteBuffer& ln)
@@ -58,7 +58,7 @@ CGXDLMSObject::CGXDLMSObject(short sn, unsigned short class_id, unsigned char ve
     Initialize(sn, class_id, version, &ln);
 }
 
-CGXDLMSObject::CGXDLMSObject(OBJECT_TYPE type)
+CGXDLMSObject::CGXDLMSObject(DLMS_OBJECT_TYPE type)
 {
     Initialize(0, type, 0, NULL);
 }
@@ -67,17 +67,17 @@ int CGXDLMSObject::GetLogicalName(CGXDLMSObject * target, CGXDLMSVariant& value)
 {
     value.Add(target->m_LN, 6);
     value.vt = DLMS_DATA_TYPE_OCTET_STRING;
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 int CGXDLMSObject::SetLogicalName(CGXDLMSObject * target, CGXDLMSVariant& value)
 {
     if (value.vt != DLMS_DATA_TYPE_OCTET_STRING || value.GetSize() != 6)
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     memcpy(target->m_LN, value.byteArr, 6);
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 void CGXDLMSObject::Initialize(short sn, unsigned short class_id, unsigned char version, CGXByteBuffer* ln)
@@ -86,7 +86,7 @@ void CGXDLMSObject::Initialize(short sn, unsigned short class_id, unsigned char 
     m_AttributeIndex = 0;
     m_DataIndex = 0;
     m_SN = sn;
-    m_ObjectType = (OBJECT_TYPE)class_id;
+    m_ObjectType = (DLMS_OBJECT_TYPE)class_id;
     m_Version = version;
     if (ln == NULL)
     {
@@ -131,17 +131,17 @@ int CGXDLMSObject::SetName(CGXDLMSVariant value)
     if (value.vt == DLMS_DATA_TYPE_UINT16)
     {
         m_SN = value.uiVal;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     if (value.vt == DLMS_DATA_TYPE_STRING)
     {
         GXHelpers::SetLogicalName(value.strVal.c_str(), m_LN);
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
-OBJECT_TYPE CGXDLMSObject::GetObjectType()
+DLMS_OBJECT_TYPE CGXDLMSObject::GetObjectType()
 {
     return m_ObjectType;
 }
@@ -150,18 +150,18 @@ int CGXDLMSObject::GetDataType(int index, DLMS_DATA_TYPE& type)
 {
     if (index < 1)
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     for(std::vector<CGXDLMSAttribute>::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
     {
         if ((*it).GetIndex() == index)
         {
             type = (*it).GetDataType();
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
     }
     type = DLMS_DATA_TYPE_NONE;
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 int CGXDLMSObject::SetDataType(int index, DLMS_DATA_TYPE type)
@@ -171,16 +171,16 @@ int CGXDLMSObject::SetDataType(int index, DLMS_DATA_TYPE type)
         if ((*it).GetIndex() == index)
         {
             (*it).SetDataType(type);
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
     }
     CGXDLMSAttribute att(index);
     att.SetDataType(type);
     m_Attributes.push_back(att);
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
-ACCESSMODE CGXDLMSObject::GetAccess(int index)
+DLMS_ACCESS_MODE CGXDLMSObject::GetAccess(int index)
 {
     for(CGXAttributeCollection::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
     {
@@ -192,13 +192,13 @@ ACCESSMODE CGXDLMSObject::GetAccess(int index)
     //LN is read only.
     if (index == 1)
     {
-        return ACCESSMODE_READ;
+        return DLMS_ACCESS_MODE_READ;
     }
-    return ACCESSMODE_READWRITE;
+    return DLMS_ACCESS_MODE_READ_WRITE;
 }
 
 // Set attribute access.
-void CGXDLMSObject::SetAccess(int index, ACCESSMODE access)
+void CGXDLMSObject::SetAccess(int index, DLMS_ACCESS_MODE access)
 {
     for(CGXAttributeCollection::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
     {
@@ -213,7 +213,7 @@ void CGXDLMSObject::SetAccess(int index, ACCESSMODE access)
     m_Attributes.push_back(att);
 }
 
-METHOD_ACCESSMODE CGXDLMSObject::GetMethodAccess(int index)
+DLMS_METHOD_ACCESS_MODE CGXDLMSObject::GetMethodAccess(int index)
 {
     for(CGXAttributeCollection::iterator it = m_MethodAttributes.begin(); it != m_MethodAttributes.end(); ++it)
     {
@@ -222,10 +222,10 @@ METHOD_ACCESSMODE CGXDLMSObject::GetMethodAccess(int index)
             return (*it).GetMethodAccess();
         }
     }
-    return METHOD_ACCESSMODE_NONE;
+    return DLMS_METHOD_ACCESS_MODE_NONE;
 }
 
-void CGXDLMSObject::SetMethodAccess(int index, METHOD_ACCESSMODE access)
+void CGXDLMSObject::SetMethodAccess(int index, DLMS_METHOD_ACCESS_MODE access)
 {
     for(CGXAttributeCollection::iterator it = m_MethodAttributes.begin(); it != m_MethodAttributes.end(); ++it)
     {
@@ -247,11 +247,11 @@ int CGXDLMSObject::GetUIDataType(int index, DLMS_DATA_TYPE& type)
         if ((*it).GetIndex() == index)
         {
             type = (*it).GetUIDataType();
-            return ERROR_CODES_OK;
+            return DLMS_ERROR_CODE_OK;
         }
     }
     type = DLMS_DATA_TYPE_NONE;
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 void CGXDLMSObject::SetUIDataType(int index, DLMS_DATA_TYPE type)
@@ -351,5 +351,5 @@ bool CGXDLMSObject::IsRead(int index)
 
 bool CGXDLMSObject::CanRead(int index)
 {
-    return GetAccess(index) != ACCESSMODE_NONE;
+    return GetAccess(index) != DLMS_ACCESS_MODE_NONE;
 }

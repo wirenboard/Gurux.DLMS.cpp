@@ -42,7 +42,6 @@
 class CGXDLMSClient
 {
 private:
-    CGXCipher* m_Cipher;
     bool m_IsAuthenticationRequired;
     CGXDLMSSettings m_Settings;
     static void UpdateOBISCodes(CGXDLMSObjectCollection& objects);
@@ -70,10 +69,10 @@ public:
         int ClientAddress = 16,
         int ServerAddress = 1,
         //Authentication type.
-        GXDLMS_AUTHENTICATION authentication = GXDLMS_AUTHENTICATION_NONE,
+        DLMS_AUTHENTICATION authentication = DLMS_AUTHENTICATION_NONE,
         //Password if authentication is used.
         const char* password = NULL,
-        GXDLMS_INTERFACETYPE intefaceType = GXDLMS_INTERFACETYPE_HDLC);
+        DLMS_INTERFACE_TYPE intefaceType = DLMS_INTERFACE_TYPE_HDLC);
 
     /////////////////////////////////////////////////////////////////////////////
     //Destructor.
@@ -82,7 +81,7 @@ public:
 
     bool GetUseLogicalNameReferencing();
 
-    GXDLMS_INTERFACETYPE GetInterfaceType();
+    DLMS_INTERFACE_TYPE GetInterfaceType();
 
     CGXDLMSLimits& GetLimits();
 
@@ -129,7 +128,7 @@ public:
     // Returns: 0 if succeed. Otherwise error number.
     /////////////////////////////////////////////////////////////////////////////
     int ReceiverReady(
-        GXDLMS_DATA_REQUEST_TYPES Type,
+        DLMS_DATA_REQUEST_TYPES Type,
         CGXByteBuffer& Data);
 
     /////////////////////////////////////////////////////////////////////////////
@@ -209,7 +208,7 @@ public:
         CGXReplyData& data);
 
     static std::string ObjectTypeToString(
-        OBJECT_TYPE type);
+        DLMS_OBJECT_TYPE type);
 
     /**
     * Reads the Association view from the device. This method is used to get
@@ -232,7 +231,7 @@ public:
     */
     int Read(
         CGXDLMSVariant name,
-        OBJECT_TYPE objectType,
+        DLMS_OBJECT_TYPE objectType,
         int attributeOrdinal,
         std::vector<CGXByteBuffer>& reply);
 
@@ -248,7 +247,7 @@ public:
     */
     int Read(
         CGXDLMSVariant name,
-        OBJECT_TYPE objectType,
+        DLMS_OBJECT_TYPE objectType,
         int attributeOrdinal,
         CGXByteBuffer* data,
         std::vector<CGXByteBuffer>& reply);
@@ -271,7 +270,7 @@ public:
     */
     int Write(
         CGXDLMSVariant name,
-        OBJECT_TYPE objectType,
+        DLMS_OBJECT_TYPE objectType,
         int index,
         CGXDLMSVariant& data,
         std::vector<CGXByteBuffer>& reply);
@@ -331,7 +330,7 @@ public:
     */
     int Method(
         CGXDLMSVariant name,
-        OBJECT_TYPE objectType,
+        DLMS_OBJECT_TYPE objectType,
         int methodIndex,
         CGXDLMSVariant& data,
         std::vector<CGXByteBuffer>& reply);

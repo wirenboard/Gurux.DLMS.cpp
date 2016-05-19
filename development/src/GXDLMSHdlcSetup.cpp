@@ -36,34 +36,34 @@
 #include "../include/GXDLMSConverter.h"
 
 //Constructor.
-CGXDLMSIecHdlcSetup::CGXDLMSIecHdlcSetup() : CGXDLMSObject(OBJECT_TYPE_IEC_HDLC_SETUP)
+CGXDLMSIecHdlcSetup::CGXDLMSIecHdlcSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_IEC_HDLC_SETUP)
 {
-    m_CommunicationSpeed = BAUDRATE_9600;
+    m_CommunicationSpeed = DLMS_BAUD_RATE_9600;
     m_WindowSizeTransmit = m_WindowSizeReceive = 1;
     m_MaximumInfoLengthTransmit = m_MaximumInfoLengthReceive = 128;
 }
 
 //SN Constructor.
-CGXDLMSIecHdlcSetup::CGXDLMSIecHdlcSetup(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_IEC_HDLC_SETUP, sn)
+CGXDLMSIecHdlcSetup::CGXDLMSIecHdlcSetup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_IEC_HDLC_SETUP, sn)
 {
-    m_CommunicationSpeed = BAUDRATE_9600;
+    m_CommunicationSpeed = DLMS_BAUD_RATE_9600;
     m_WindowSizeTransmit = m_WindowSizeReceive = 1;
     m_MaximumInfoLengthTransmit = m_MaximumInfoLengthReceive = 128;
 }
 
 //LN Constructor.
-CGXDLMSIecHdlcSetup::CGXDLMSIecHdlcSetup(std::string ln) : CGXDLMSObject(OBJECT_TYPE_IEC_HDLC_SETUP, ln)
+CGXDLMSIecHdlcSetup::CGXDLMSIecHdlcSetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_IEC_HDLC_SETUP, ln)
 {
-    m_CommunicationSpeed = BAUDRATE_9600;
+    m_CommunicationSpeed = DLMS_BAUD_RATE_9600;
     m_WindowSizeTransmit = m_WindowSizeReceive = 1;
     m_MaximumInfoLengthTransmit = m_MaximumInfoLengthReceive = 128;
 }
 
-BAUDRATE CGXDLMSIecHdlcSetup::GetCommunicationSpeed()
+DLMS_BAUD_RATE CGXDLMSIecHdlcSetup::GetCommunicationSpeed()
 {
     return m_CommunicationSpeed;
 }
-void CGXDLMSIecHdlcSetup::SetCommunicationSpeed(BAUDRATE value)
+void CGXDLMSIecHdlcSetup::SetCommunicationSpeed(DLMS_BAUD_RATE value)
 {
     m_CommunicationSpeed = value;
 }
@@ -248,99 +248,106 @@ int CGXDLMSIecHdlcSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Returns value of given attribute.
-int CGXDLMSIecHdlcSetup::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSIecHdlcSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        value = m_CommunicationSpeed;
+        e.SetValue(m_CommunicationSpeed);
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        value = m_WindowSizeTransmit;
+        e.SetValue(m_WindowSizeTransmit);
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
-        value = m_WindowSizeReceive;
+        e.SetValue(m_WindowSizeReceive);
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
-        value = m_MaximumInfoLengthTransmit;
+        e.SetValue(m_MaximumInfoLengthTransmit);
     }
-    else if (index == 6)
+    else if (e.GetIndex() == 6)
     {
-        value = m_MaximumInfoLengthReceive;
+        e.SetValue(m_MaximumInfoLengthReceive);
     }
-    else if (index == 7)
+    else if (e.GetIndex() == 7)
     {
-        value = m_InterCharachterTimeout;
+        e.SetValue(m_InterCharachterTimeout);
     }
-    else if (index == 8)
+    else if (e.GetIndex() == 8)
     {
-        value = m_InactivityTimeout;
+        e.SetValue(m_InactivityTimeout);
     }
-    else if (index == 9)
+    else if (e.GetIndex() == 9)
     {
-        value = m_DeviceAddress;
+        e.SetValue(m_DeviceAddress);
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Set value of given attribute.
-int CGXDLMSIecHdlcSetup::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSIecHdlcSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        m_CommunicationSpeed = (BAUDRATE) value.ToInteger();
+        m_CommunicationSpeed = (DLMS_BAUD_RATE) e.GetValue().ToInteger();
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        m_WindowSizeTransmit = value.ToInteger();
+        m_WindowSizeTransmit = e.GetValue().ToInteger();
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
-        m_WindowSizeReceive = value.ToInteger();
+        m_WindowSizeReceive = e.GetValue().ToInteger();
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
-        m_MaximumInfoLengthTransmit = value.ToInteger();
+        m_MaximumInfoLengthTransmit = e.GetValue().ToInteger();
     }
-    else if (index == 6)
+    else if (e.GetIndex() == 6)
     {
-        m_MaximumInfoLengthReceive = value.ToInteger();
+        m_MaximumInfoLengthReceive = e.GetValue().ToInteger();
     }
-    else if (index == 7)
+    else if (e.GetIndex() == 7)
     {
-        m_InterCharachterTimeout = value.ToInteger();
+        m_InterCharachterTimeout = e.GetValue().ToInteger();
     }
-    else if (index == 8)
+    else if (e.GetIndex() == 8)
     {
-        m_InactivityTimeout = value.ToInteger();
+        m_InactivityTimeout = e.GetValue().ToInteger();
     }
-    else if (index == 9)
+    else if (e.GetIndex() == 9)
     {
-        m_DeviceAddress = value.ToInteger();
+        m_DeviceAddress = e.GetValue().ToInteger();
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

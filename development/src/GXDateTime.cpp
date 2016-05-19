@@ -47,7 +47,7 @@ CGXDateTime::CGXDateTime()
     m_Skip = DATETIME_SKIPS_NONE;
     memset(&m_Value, 0xFF, sizeof(m_Value));
     m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
-    m_Status = GXDLMS_CLOCK_STATUS_OK;
+    m_Status = DLMS_CLOCK_STATUS_OK;
 }
 
 // Constructor.
@@ -57,7 +57,7 @@ CGXDateTime::CGXDateTime(struct tm value)
     m_Value = value;
     m_Skip = DATETIME_SKIPS_NONE;
     m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
-    m_Status = GXDLMS_CLOCK_STATUS_OK;
+    m_Status = DLMS_CLOCK_STATUS_OK;
 }
 
 CGXDateTime::CGXDateTime(int year, int month, int day, int hour, int minute, int second, int millisecond)
@@ -76,7 +76,7 @@ void CGXDateTime::Init(int year, int month, int day, int hour, int minute, int s
 {
     memset(&m_Value, 0, sizeof(m_Value));
     m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
-    m_Status = GXDLMS_CLOCK_STATUS_OK;
+    m_Status = DLMS_CLOCK_STATUS_OK;
     int skip = DATETIME_SKIPS_NONE;
     if (year < 1 || year == 0xFFFF)
     {
@@ -392,7 +392,7 @@ std::string CGXDateTime::ToString()
             {
                 ret = strftime(buff, 50, "%X", &m_Value);
                 ba.SetUInt8(' ');
-                ba.AddRange(buff, ret);
+                ba.Set(buff, ret);
                 return 0;
             }
             }
@@ -467,12 +467,12 @@ CGXDateTime CGXDateTime::Now()
 }
 
 // Status of the clock.
-GXDLMS_CLOCK_STATUS CGXDateTime::GetStatus()
+DLMS_CLOCK_STATUS CGXDateTime::GetStatus()
 {
     return m_Status;
 }
 
-void CGXDateTime::SetStatus(GXDLMS_CLOCK_STATUS value)
+void CGXDateTime::SetStatus(DLMS_CLOCK_STATUS value)
 {
     m_Status = value;
 }

@@ -34,93 +34,98 @@
 #ifndef ERRORCODES_H
 #define ERRORCODES_H
 
-enum ERROR_CODE
+typedef enum
 {
-    ERROR_CODES_FALSE = -1,
-    ERROR_CODES_OK = 0,
-    ERROR_CODES_INVALID_PARAMETER = 1,
-    //Server is not initialized.
-    ERROR_CODES_NOT_INITIALIZED,
-    //Not enough memory available.
-    ERROR_CODES_OUTOFMEMORY,
-    //Packet is not a reply for a send packet.
-    ERROR_CODES_NOT_REPLY,
     //Meter rejects send packet.
-    ERROR_CODES_FRAME_REJECTED,
-    //Invalid Logical Name
-    ERROR_CODES_INVALID_LOGICAL_NAME,
-    //Client HDLC Address is not set.
-    ERROR_CODES_INVALID_CLIENT_ADDRESS,
-    //Server HDLC Address is not set.
-    ERROR_CODES_INVALID_SERVER_ADDRESS,
-    //Not a HDLC frame.
-    ERROR_CODES_INVALID_DATA_FORMAT,
-    //Invalid DLMS version number.
-    ERROR_CODES_INVALID_VERSION_NUMBER,
-    //Client addresses do not match
-    ERROR_CODES_CLIENT_ADDRESS_NO_NOT_MATCH,
-    //Server addresses do not match
-    ERROR_CODES_SERVER_ADDRESS_NO_NOT_MATCH,
-    //CRC do not match.
-    ERROR_CODES_WRONG_CRC,
-    //Invalid response
-    ERROR_CODES_INVALID_RESPONSE,
-    //Invalid Tag.
-    ERROR_CODES_INVALID_TAG,
-    //Encoding failed. Not enough data.
-    ERROR_CODES_ENCODING_FAILED,
-    ERROR_CODES_REJECTED_PERMAMENT,
-    ERROR_CODES_REJECTED_TRANSIENT,
-    ERROR_CODES_NO_REASON_GIVEN,
-    ERROR_CODES_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED,
-    ERROR_CODES_AUTHENTICATION_MECHANISM_NAME_NOT_RECOGNISED,
-    ERROR_CODES_AUTHENTICATION_MECHANISM_NAME_REQUIRED,
-    ERROR_CODES_AUTHENTICATION_FAILURE,
-    ERROR_CODES_AUTHENTICATION_REQUIRED,
+    DLMS_ERROR_CODE_REJECTED = -2,
+    DLMS_ERROR_CODE_FALSE = -1,
+    //////////////////////////////////////////
+    //DLMS Standard error codes start here.
+    DLMS_ERROR_CODE_OK = 0,
     //Access Error : Device reports a hardware fault
-    ERROR_CODES_HARDWARE_FAULT,
+    DLMS_ERROR_CODE_HARDWARE_FAULT = 1,
     //Access Error : Device reports a temporary failure
-    ERROR_CODES_TEMPORARY_FAILURE,
+    DLMS_ERROR_CODE_TEMPORARY_FAILURE = 2,
     // Access Error : Device reports Read-Write denied
-    ERROR_CODES_WRITE_DENIED,
+    DLMS_ERROR_CODE_READ_WRITE_DENIED = 3,
     // Access Error : Device reports a undefined object
-    ERROR_CODES_UNDEFINED_OBJ,
+    DLMS_ERROR_CODE_UNDEFINED_OBJECT = 4,
     // Access Error : Device reports a inconsistent Class or Object
-    ERROR_CODES_INCONSISTENT_OBJ,
+    DLMS_ERROR_CODE_INCONSISTENT_OBJECT = 9,
     // Access Error : Device reports a unavailable object
-    ERROR_CODES_UNAVAILABLE_OBJ,
+    DLMS_ERROR_CODE_UNAVAILABLE_OBJECT = 11,
     // Access Error : Device reports a unmatched type
-    ERROR_CODES_UNMATCH_TYPE,
+    DLMS_ERROR_CODE_UNMATCH_TYPE = 12,
     // Access Error : Device reports scope of access violated
-    ERROR_CODES_VIOLATED,
+    DLMS_ERROR_CODE_VIOLATED = 13,
     // Access Error : Data Block Unavailable.
-    ERROR_CODES_BLOCK_UNAVAILABLE,
+    DLMS_ERROR_CODE_BLOCK_UNAVAILABLE = 14,
     // Access Error : Long Get Or Read Aborted.
-    ERROR_CODES_READ_ABORTED,
+    DLMS_ERROR_CODE_READ_ABORTED = 15,
     // Access Error : No Long Get Or Read In Progress.
-    ERROR_CODES_READ_IN_PROGRESS,
+    DLMS_ERROR_CODE_READ_IN_PROGRESS = 16,
     // Access Error : Long Set Or Write Aborted.
-    ERROR_CODES_WRITE_ABORTED,
+    DLMS_ERROR_CODE_WRITE_ABORTED = 17,
     // Access Error : No Long Set Or Write In Progress.
-    ERROR_CODES_WRITE_IN_PROGRESS,
+    DLMS_ERROR_CODE_NO_LONG_GET_OR_READ_IN_PROGRESS = 18,
     // Access Error : Data Block Number Invalid.
-    ERROR_CODES_BLOCK_NUMBER_INVALID,
+    DLMS_ERROR_CODE_DATA_BLOCK_NUMBER_INVALID = 19,
     // Access Error : Other Reason.
-    ERROR_CODES_OTHER_REASON,
-    //Unknown error.
-    ERROR_CODES_UNKNOWN,
-    //Data send failed.
-    ERROR_CODES_SEND_FAILED,
-    //Data receive failed.
-    ERROR_CODES_RECEIVE_FAILED,
-    ERROR_CODES_NOT_IMPLEMENTED,
-    //Secure connection is not supported.
-    ERROR_CODES_SECURITY_NOT_IMPLEMENTED,
-    //Invalid DLMS command.
-    ERROR_CODES_INVALID_COMMAND,
-    //Invalid Block number.
-    ERROR_CODES_INVALID_BLOCK_NUMBER,
+    DLMS_ERROR_CODE_OTHER_REASON = 250,
+    //DLMS Standard error codes end here.
+    //////////////////////////////////////////
 
-};
+    //Unknown error.
+    DLMS_ERROR_CODE_UNKNOWN,
+    //Data send failed.
+    DLMS_ERROR_CODE_SEND_FAILED,
+    //Data receive failed.
+    DLMS_ERROR_CODE_RECEIVE_FAILED,
+    DLMS_ERROR_CODE_NOT_IMPLEMENTED,
+    //Secure connection is not supported.
+    DLMS_ERROR_CODE_DLMS_SECURITY_NOT_IMPLEMENTED,
+    //Invalid DLMS command.
+    DLMS_ERROR_CODE_INVALID_COMMAND,
+    //Invalid Block number.
+    DLMS_ERROR_CODE_INVALID_BLOCK_NUMBER,
+    //Invalid parameter.
+    DLMS_ERROR_CODE_INVALID_PARAMETER,
+    //Server is not initialized.
+    DLMS_ERROR_CODE_NOT_INITIALIZED,
+    //Not enough memory available.
+    DLMS_ERROR_CODE_OUTOFMEMORY,
+    //Packet is not a reply for a send packet.
+    DLMS_ERROR_CODE_NOT_REPLY,
+    //Invalid Logical Name
+    DLMS_ERROR_CODE_INVALID_LOGICAL_NAME,
+    //Client HDLC Address is not set.
+    DLMS_ERROR_CODE_INVALID_CLIENT_ADDRESS,
+    //Server HDLC Address is not set.
+    DLMS_ERROR_CODE_INVALID_SERVER_ADDRESS,
+    //Not a HDLC frame.
+    DLMS_ERROR_CODE_INVALID_DATA_FORMAT,
+    //Invalid DLMS version number.
+    DLMS_ERROR_CODE_INVALID_VERSION_NUMBER,
+    //Client addresses do not match
+    DLMS_ERROR_CODE_CLIENT_ADDRESS_NO_NOT_MATCH,
+    //Server addresses do not match
+    DLMS_ERROR_CODE_SERVER_ADDRESS_NO_NOT_MATCH,
+    //CRC do not match.
+    DLMS_ERROR_CODE_WRONG_CRC,
+    //Invalid response
+    DLMS_ERROR_CODE_INVALID_RESPONSE,
+    //Invalid Tag.
+    DLMS_ERROR_CODE_INVALID_TAG,
+    //Encoding failed. Not enough data.
+    DLMS_ERROR_CODE_ENCODING_FAILED,
+    DLMS_ERROR_CODE_REJECTED_PERMAMENT,
+    DLMS_ERROR_CODE_REJECTED_TRANSIENT,
+    DLMS_ERROR_CODE_NO_REASON_GIVEN,
+    DLMS_ERROR_CODE_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED,
+    DLMS_ERROR_CODE_AUTHENTICATION_MECHANISM_NAME_NOT_RECOGNISED,
+    DLMS_ERROR_CODE_AUTHENTICATION_MECHANISM_NAME_REQUIRED,
+    DLMS_ERROR_CODE_AUTHENTICATION_FAILURE,
+    DLMS_ERROR_CODE_AUTHENTICATION_REQUIRED
+}DLMS_ERROR_CODE;
 
 #endif //ERRORCODES_H

@@ -32,15 +32,15 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSSECURITYSETUP_H
-#define GXDLMSSECURITYSETUP_H
+#ifndef GXDLMSDLMS_SECURITYSETUP_H
+#define GXDLMSDLMS_SECURITYSETUP_H
 
 #include "GXDLMSObject.h"
 
 class CGXDLMSSecuritySetup : public CGXDLMSObject
 {
-    SECURITY_POLICY m_SecurityPolicy;
-    SECURITY_SUITE m_SecuritySuite;
+    DLMS_SECURITY_POLICY m_SecurityPolicy;
+    DLMS_SECURITY_SUITE m_SecuritySuite;
     CGXByteBuffer m_ServerSystemTitle;
     CGXByteBuffer m_ClientSystemTitle;
 public:
@@ -54,13 +54,13 @@ public:
     //LN Constructor.
     CGXDLMSSecuritySetup(std::string ln);
 
-    SECURITY_POLICY GetSecurityPolicy();
+    DLMS_SECURITY_POLICY GetSecurityPolicy();
 
-    void SetSecurityPolicy(SECURITY_POLICY value);
+    void SetSecurityPolicy(DLMS_SECURITY_POLICY value);
 
-    SECURITY_SUITE GetSecuritySuite();
+    DLMS_SECURITY_SUITE GetSecuritySuite();
 
-    void SetSecuritySuite(SECURITY_SUITE value);
+    void SetSecuritySuite(DLMS_SECURITY_SUITE value);
 
     CGXByteBuffer GetClientSystemTitle();
 
@@ -84,9 +84,9 @@ public:
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
     // Returns value of given attribute.
-    int GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value);
+    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 
     // Set value of given attribute.
-    int SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value);
+    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
 };
-#endif //GXDLMSSECURITYSETUP_H
+#endif //GXDLMSDLMS_SECURITYSETUP_H

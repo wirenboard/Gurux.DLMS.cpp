@@ -37,19 +37,19 @@
 #include <sstream>
 
 //Constructor.
-CGXDLMSPushSetup::CGXDLMSPushSetup() : CGXDLMSObject(OBJECT_TYPE_PUSH_SETUP)
+CGXDLMSPushSetup::CGXDLMSPushSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_PUSH_SETUP)
 {
     m_RandomisationStartInterval = m_NumberOfRetries = m_RepetitionDelay = 0;
 }
 
 //SN Constructor.
-CGXDLMSPushSetup::CGXDLMSPushSetup(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_PUSH_SETUP, sn)
+CGXDLMSPushSetup::CGXDLMSPushSetup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_PUSH_SETUP, sn)
 {
     m_RandomisationStartInterval = m_NumberOfRetries = m_RepetitionDelay = 0;
 }
 
 //LN Constructor.
-CGXDLMSPushSetup::CGXDLMSPushSetup(std::string ln) : CGXDLMSObject(OBJECT_TYPE_PUSH_SETUP, ln)
+CGXDLMSPushSetup::CGXDLMSPushSetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_PUSH_SETUP, ln)
 {
     m_RandomisationStartInterval = m_NumberOfRetries = m_RepetitionDelay = 0;
 }
@@ -166,7 +166,7 @@ int CGXDLMSPushSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
     if (index == 1)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
-        return ERROR_CODES_OK;
+        return DLMS_ERROR_CODE_OK;
     }
     else if (index == 2)
     {
@@ -194,67 +194,74 @@ int CGXDLMSPushSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Returns value of given attribute.
-int CGXDLMSPushSetup::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 2)
+    if (e.GetIndex() == 2)
     {
-        //TODO: value = m_PushObjectList;
-        return ERROR_CODES_OK;
+        //TODO: e.SetValue(m_PushObjectList;
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 3)
+    if (e.GetIndex() == 3)
     {
-        //TODO: value = m_SendDestinationAndMethod;
-        return ERROR_CODES_OK;
+        //TODO: e.SetValue(m_SendDestinationAndMethod;
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 4)
+    if (e.GetIndex() == 4)
     {
-        //TODO: value = m_CommunicationWindow;
-        return ERROR_CODES_OK;
+        //TODO: e.SetValue(m_CommunicationWindow;
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 5)
+    if (e.GetIndex() == 5)
     {
-        value = m_RandomisationStartInterval;
-        return ERROR_CODES_OK;
+        e.SetValue(m_RandomisationStartInterval);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 6)
+    if (e.GetIndex() == 6)
     {
-        value = m_NumberOfRetries;
-        return ERROR_CODES_OK;
+        e.SetValue(m_NumberOfRetries);
+        return DLMS_ERROR_CODE_OK;
     }
-    if (index == 7)
+    if (e.GetIndex() == 7)
     {
-        value = m_RepetitionDelay;
-        return ERROR_CODES_OK;
+        e.SetValue(m_RepetitionDelay);
+        return DLMS_ERROR_CODE_OK;
     }
-    return ERROR_CODES_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
 // Set value of given attribute.
-int CGXDLMSPushSetup::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSPushSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
         m_PushObjectList.clear();
-        if (value.vt == DLMS_DATA_TYPE_ARRAY)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
-            for(std::vector<CGXDLMSVariant>::iterator it = value.Arr.begin(); it != value.Arr.end(); ++it)
+            for(std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 CGXDLMSPushObject obj;
-                obj.SetType((OBJECT_TYPE) it->Arr[0].ToInteger());
+                obj.SetType((DLMS_OBJECT_TYPE) it->Arr[0].ToInteger());
                 CGXDLMSVariant tmp;
                 CGXDLMSClient::ChangeType(it->Arr[1], DLMS_DATA_TYPE_BIT_STRING, tmp);
                 obj.SetLogicalName(tmp.ToString());
@@ -264,24 +271,24 @@ int CGXDLMSPushSetup::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVari
             }
         }
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        if (value.vt == DLMS_DATA_TYPE_ARRAY)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
-            m_SendDestinationAndMethod.SetService((GXDLMS_SERVICE_TYPE) value.Arr[0].ToInteger());
+            m_SendDestinationAndMethod.SetService((DLMS_SERVICE_TYPE) e.GetValue().Arr[0].ToInteger());
             std::string str;
-            str.append(reinterpret_cast< char const* >(value.Arr[1].byteArr), value.Arr[1].size);
+            str.append(reinterpret_cast< char const* >(e.GetValue().Arr[1].byteArr), e.GetValue().Arr[1].size);
             m_SendDestinationAndMethod.SetDestination(str);
-            m_SendDestinationAndMethod.SetMessage((GXDLMS_MESSAGE_TYPE) value.Arr[2].ToInteger());
+            m_SendDestinationAndMethod.SetMessage((DLMS_MESSAGE_TYPE) e.GetValue().Arr[2].ToInteger());
         }
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
         m_CommunicationWindow.clear();
-        if (value.vt == DLMS_DATA_TYPE_ARRAY)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
             int ret;
-            for(std::vector<CGXDLMSVariant>::iterator it = value.Arr.begin(); it != value.Arr.end(); ++it)
+            for(std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 CGXDLMSVariant tmp;
                 if ((ret = CGXDLMSClient::ChangeType(it->Arr[0], DLMS_DATA_TYPE_DATETIME, tmp)) != 0)
@@ -298,21 +305,21 @@ int CGXDLMSPushSetup::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVari
             }
         }
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
-        m_RandomisationStartInterval = value.ToInteger();
+        m_RandomisationStartInterval = e.GetValue().ToInteger();
     }
-    else if (index == 6)
+    else if (e.GetIndex() == 6)
     {
-        m_NumberOfRetries = value.ToInteger();
+        m_NumberOfRetries = e.GetValue().ToInteger();
     }
-    else if (index == 7)
+    else if (e.GetIndex() == 7)
     {
-        m_RepetitionDelay = value.ToInteger();
+        m_RepetitionDelay = e.GetValue().ToInteger();
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

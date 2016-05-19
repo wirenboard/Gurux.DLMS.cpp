@@ -38,7 +38,7 @@
 
 CGXAuthenticationMechanismName::CGXAuthenticationMechanismName()
 {
-    m_MechanismId = GXDLMS_AUTHENTICATION_NONE;
+    m_MechanismId = DLMS_AUTHENTICATION_NONE;
     m_JointIsoCtt = m_Country = m_CountryName = 0;
     m_IdentifiedOrganization = m_DlmsUA = m_AuthenticationMechanismName = 0;
 }
@@ -95,11 +95,11 @@ void CGXAuthenticationMechanismName::SetAuthenticationMechanismName(int value)
     m_AuthenticationMechanismName = value;
 }
 
-GXDLMS_AUTHENTICATION CGXAuthenticationMechanismName::GetMechanismId()
+DLMS_AUTHENTICATION CGXAuthenticationMechanismName::GetMechanismId()
 {
     return m_MechanismId;
 }
-void CGXAuthenticationMechanismName::SetMechanismId(GXDLMS_AUTHENTICATION value)
+void CGXAuthenticationMechanismName::SetMechanismId(DLMS_AUTHENTICATION value)
 {
     m_MechanismId = value;
 }

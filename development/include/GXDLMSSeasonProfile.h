@@ -63,7 +63,7 @@ public:
     /**
      Season Profile start time.
     */
-    CGXDateTime GetStart();
+    CGXDateTime& GetStart();
     void SetStart(CGXDateTime value);
 
     /**

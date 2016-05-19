@@ -38,38 +38,38 @@
 #include "../include/GXDLMSConverter.h"
 
 //Constructor.
-CGXDLMSSecuritySetup::CGXDLMSSecuritySetup() : CGXDLMSObject(OBJECT_TYPE_SECURITY_SETUP)
+CGXDLMSSecuritySetup::CGXDLMSSecuritySetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP)
 {
 }
 
 //SN Constructor.
-CGXDLMSSecuritySetup::CGXDLMSSecuritySetup(unsigned short sn) : CGXDLMSObject(OBJECT_TYPE_SECURITY_SETUP, sn)
+CGXDLMSSecuritySetup::CGXDLMSSecuritySetup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSSecuritySetup::CGXDLMSSecuritySetup(std::string ln) : CGXDLMSObject(OBJECT_TYPE_SECURITY_SETUP, ln)
+CGXDLMSSecuritySetup::CGXDLMSSecuritySetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP, ln)
 {
 
 }
 
-SECURITY_POLICY CGXDLMSSecuritySetup::GetSecurityPolicy()
+DLMS_SECURITY_POLICY CGXDLMSSecuritySetup::GetSecurityPolicy()
 {
     return m_SecurityPolicy;
 }
 
-void CGXDLMSSecuritySetup::SetSecurityPolicy(SECURITY_POLICY value)
+void CGXDLMSSecuritySetup::SetSecurityPolicy(DLMS_SECURITY_POLICY value)
 {
     m_SecurityPolicy = value;
 }
 
-SECURITY_SUITE CGXDLMSSecuritySetup::GetSecuritySuite()
+DLMS_SECURITY_SUITE CGXDLMSSecuritySetup::GetSecuritySuite()
 {
     return m_SecuritySuite;
 }
 
-void CGXDLMSSecuritySetup::SetSecuritySuite(SECURITY_SUITE value)
+void CGXDLMSSecuritySetup::SetSecuritySuite(DLMS_SECURITY_SUITE value)
 {
     m_SecuritySuite = value;
 }
@@ -174,67 +174,74 @@ int CGXDLMSSecuritySetup::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Returns value of given attribute.
-int CGXDLMSSecuritySetup::GetValue(int index, int selector, CGXDLMSVariant& parameters, CGXDLMSVariant& value)
+int CGXDLMSSecuritySetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return GetLogicalName(this, value);
+        int ret;
+        CGXDLMSVariant tmp;
+        if ((ret = GetLogicalName(this, tmp)) != 0)
+        {
+            return ret;
+        }
+        e.SetValue(tmp);
+        return DLMS_ERROR_CODE_OK;
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        value = m_SecurityPolicy;
+        e.SetValue(m_SecurityPolicy);
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        value = m_SecuritySuite;
+        e.SetValue(m_SecuritySuite);
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
-        value.Add(m_ClientSystemTitle.GetData(), m_ClientSystemTitle.GetSize());
+        e.GetValue().Add(m_ClientSystemTitle.GetData(), m_ClientSystemTitle.GetSize());
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
-        value.Add(m_ServerSystemTitle.GetData(), m_ServerSystemTitle.GetSize());
+        e.GetValue().Add(m_ServerSystemTitle.GetData(), m_ServerSystemTitle.GetSize());
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Set value of given attribute.
-int CGXDLMSSecuritySetup::SetValue(CGXDLMSSettings* settings, int index, CGXDLMSVariant& value)
+int CGXDLMSSecuritySetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 {
-    if (index == 1)
+    if (e.GetIndex() == 1)
     {
-        return SetLogicalName(this, value);
+        return SetLogicalName(this, e.GetValue());
     }
-    else if (index == 2)
+    else if (e.GetIndex() == 2)
     {
-        m_SecurityPolicy = (SECURITY_POLICY) value.ToInteger();
+        m_SecurityPolicy = (DLMS_SECURITY_POLICY) e.GetValue().ToInteger();
     }
-    else if (index == 3)
+    else if (e.GetIndex() == 3)
     {
-        m_SecuritySuite = (SECURITY_SUITE) value.ToInteger();
+        m_SecuritySuite = (DLMS_SECURITY_SUITE) e.GetValue().ToInteger();
     }
-    else if (index == 4)
+    else if (e.GetIndex() == 4)
     {
-        m_ClientSystemTitle.AddRange(value.byteArr, value.size);
+        m_ClientSystemTitle.Set(e.GetValue().byteArr, e.GetValue().size);
     }
-    else if (index == 5)
+    else if (e.GetIndex() == 5)
     {
-        m_ServerSystemTitle.AddRange(value.byteArr, value.size);
+        m_ServerSystemTitle.Set(e.GetValue().byteArr, e.GetValue().size);
     }
     else
     {
-        return ERROR_CODES_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return ERROR_CODES_OK;
+    return DLMS_ERROR_CODE_OK;
 }

@@ -106,9 +106,9 @@ public:
 
     void SetDouble(double value);
 
-    void AddRange(const void* pSource, int count);
+    void Set(const void* pSource, int count);
 
-    void AddRange2(CGXByteBuffer* data, int index, int count);
+    void Set(CGXByteBuffer* data, int index = 0, int count = -1);
 
     void AddString(const char* value);
 
@@ -145,6 +145,13 @@ public:
     void ToArray(unsigned char*& value, int& count);
 
     /**
+     * Remove handled bytes. This can be used in debugging to remove handled
+     * bytes.
+     */
+    void Trim();
+
+
+    /**
      * Compares, whether two given arrays are similar starting from current
      * position.
      *
@@ -170,6 +177,13 @@ public:
 
     //Add double value to byte array as a std::string.
     void AddDoubleAsString(double value);
+
+    /**
+        * Returns data as byte array.
+        *
+        * @param bb Byte buffer as a byte array.
+        */
+    int SubArray(int index, int count, CGXByteBuffer& bb);
 
     //Move data insize byte array.
     int Move(int srcPos, int destPos, int count);
