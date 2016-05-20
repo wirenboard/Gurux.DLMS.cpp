@@ -40,11 +40,12 @@
 #include <time.h>
 #include <process.h>//Add support for threads
 #else //Linux includes.
-#define closesocket close
+#include <stdio.h>
 #include <pthread.h>
 #include <termios.h>
 #include <sys/types.h>
 #include <sys/socket.h> //Add support for sockets
+#include <unistd.h> //Add support for sockets
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -74,7 +75,6 @@
 
 using namespace std;
 
-
 void ListenerThread(void* pVoid)
 {
     CGXByteBuffer reply;
@@ -84,10 +84,10 @@ void ListenerThread(void* pVoid)
     char tmp[10];
     CGXByteBuffer bb;
     bb.Capacity(2048);
-#if defined(_WIN32) || defined(_WIN64)//Windows includes
+#if defined(_WIN32) || defined(_WIN64)//If Windows
     int len;
     int AddrLen = sizeof(add);
-#else
+#else //If Linux
     socklen_t len;
     socklen_t AddrLen = sizeof(add);
 #endif
@@ -95,17 +95,22 @@ void ListenerThread(void* pVoid)
     memset(&client,0,sizeof(client));
     //Get buffer data
     basic_string<char> senderInfo;
-    while(server->GetSocket() != INVALID_SOCKET)
+    while(server->IsConnected())
     {
         len = sizeof(client);
         senderInfo.clear();
-        SOCKET socket = accept(server->GetSocket(),(struct sockaddr*)&client, &len);
-        if (socket != INVALID_SOCKET)
+        int socket = accept(server->GetSocket(),(struct sockaddr*)&client, &len);
+        if (server->IsConnected())
         {
             if ((ret = getpeername(socket, (sockaddr*) &add, &AddrLen)) == -1)
             {
+#if defined(_WIN32) || defined(_WIN64)//If Windows
                 closesocket(socket);
                 socket = INVALID_SOCKET;
+#else //If Linux
+                close(socket);
+                socket = -1;
+#endif
                 continue;
                 //Notify error.
             }
@@ -117,7 +122,7 @@ void ListenerThread(void* pVoid)
             sprintf(tmp, "%d", add.sin_port);
 #endif
             senderInfo.append(tmp);
-            while(socket != INVALID_SOCKET)
+            if (server->IsConnected())
             {
                 //If client is left wait for next client.
                 if ((ret = recv(socket, (char*)
@@ -126,23 +131,38 @@ void ListenerThread(void* pVoid)
                 {
                     //Notify error.
                     server->Reset();
+#if defined(_WIN32) || defined(_WIN64)//If Windows
                     closesocket(socket);
                     socket = INVALID_SOCKET;
+#else //If Linux
+                    close(socket);
+                    socket = -1;
+#endif
                     break;
                 }
                 //If client is closed the connection.
                 if (ret == 0)
                 {
                     server->Reset();
+#if defined(_WIN32) || defined(_WIN64)//If Windows
                     closesocket(socket);
                     socket = INVALID_SOCKET;
+#else //If Linux
+                    close(socket);
+                    socket = -1;
+#endif
                     break;
                 }
                 bb.SetSize(bb.GetSize() + ret);
                 if (server->HandleRequest(bb, reply) != 0)
                 {
+#if defined(_WIN32) || defined(_WIN64)//If Windows
                     closesocket(socket);
                     socket = INVALID_SOCKET;
+#else //If Linux
+                    close(socket);
+                    socket = -1;
+#endif
                 }
                 bb.SetSize(0);
                 if (reply.GetSize() != 0)
@@ -151,8 +171,13 @@ void ListenerThread(void* pVoid)
                     {
                         //If error has occured
                         server->Reset();
+#if defined(_WIN32) || defined(_WIN64)//If Windows
                         closesocket(socket);
                         socket = INVALID_SOCKET;
+#else //If Linux
+                        close(socket);
+                        socket = -1;
+#endif
                     }
                     reply.Clear();
                 }
@@ -162,13 +187,25 @@ void ListenerThread(void* pVoid)
     }
 }
 
+#if defined(_WIN32) || defined(_WIN64)//If Windows
+#else //If Linux
 void * UnixListenerThread(void * pVoid)
 {
     ListenerThread(pVoid);
     return NULL;
 }
+#endif
 
-SOCKET CGXDLMSBase::GetSocket()
+bool CGXDLMSBase::IsConnected()
+{
+#if defined(_WIN32) || defined(_WIN64)//If Windows
+    return m_ServerSocket != INVALID_SOCKET;
+#else //If Linux
+    return m_ServerSocket != -1;
+#endif
+}
+
+int CGXDLMSBase::GetSocket()
 {
     return m_ServerSocket;
 }
@@ -181,7 +218,7 @@ int CGXDLMSBase::StartServer(int port)
         return ret;
     }
     m_ServerSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (m_ServerSocket == INVALID_SOCKET) //If failed.
+    if (!IsConnected())
     {
         //socket creation.
         return -1;
@@ -214,15 +251,16 @@ int CGXDLMSBase::StartServer(int port)
     m_ReceiverThread = (HANDLE) _beginthread(ListenerThread, 0, (LPVOID) this);
 #else
     pthread_t iThreadId;
-    ret = pthread_create(&iThreadId, NULL, UnixListenerThread, (void *) this);
+    ret = pthread_create(&m_ReceiverThread, NULL, UnixListenerThread, (void *) this);
 #endif
-    return 0;
+    return ret;
 }
 
 int CGXDLMSBase::StopServer()
 {
-    if (m_ServerSocket != INVALID_SOCKET)
+    if (IsConnected())
     {
+#if defined(_WIN32) || defined(_WIN64)//Windows includes
         closesocket(m_ServerSocket);
         m_ServerSocket = INVALID_SOCKET;
         if (m_ReceiverThread != INVALID_HANDLE_VALUE)
@@ -230,6 +268,13 @@ int CGXDLMSBase::StopServer()
             int ret = ::WaitForSingleObject(m_ReceiverThread, 5000);
             m_ReceiverThread = INVALID_HANDLE_VALUE;
         }
+#else
+        close(m_ServerSocket);
+        m_ServerSocket = -1;
+        void *res;
+        pthread_join(m_ReceiverThread, (void **)&res);
+        free(res);
+#endif
     }
     return 0;
 }
@@ -492,7 +537,7 @@ void CGXDLMSBase::Read(std::vector<CGXDLMSValueEventArgs*>& args)
         //Update date and time of clock object.
         if (type == DLMS_OBJECT_TYPE_CLOCK && index == 2)
         {
-        	CGXDateTime tm = CGXDateTime::Now();
+            CGXDateTime tm = CGXDateTime::Now();
             ((CGXDLMSClock*)pObj)->SetTime(tm);
             continue;
         }

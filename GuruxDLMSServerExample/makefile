@@ -11,7 +11,7 @@ LINKER   = g++ -o
 # linking flags here
 LFLAGS   = -L../development/lib
 
-# change these to set the proper directories where each files shoould be
+# change these to set the proper directories where each files should be
 
 SRCDIR   = src
 OBJDIR   = obj
@@ -24,7 +24,7 @@ OBJECTS  := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 rm       = rm -f
 
 $(BINDIR)/$(TARGET): $(OBJECTS)
-	@$(LINKER) $@ $(LFLAGS) $(OBJECTS) -lgurux_dlms_cpp
+	@$(LINKER) $@ $(LFLAGS) $(OBJECTS) -lgurux_dlms_cpp -lpthread
 	@echo "Linking complete!"
 
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp

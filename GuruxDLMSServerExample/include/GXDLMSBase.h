@@ -43,10 +43,15 @@
 class CGXDLMSBase : public CGXDLMSServer
 {
 private:
+#if defined(_WIN32) || defined(_WIN64)//If Windows 
     SOCKET m_ServerSocket;
-public:
     HANDLE m_ReceiverThread;
-    SOCKET GetSocket();
+#else //If Linux.
+    int m_ServerSocket;
+    pthread_t m_ReceiverThread;
+#endif
+
+public:
 
     /////////////////////////////////////////////////////////////////////////
     //Constructor.
@@ -54,9 +59,15 @@ public:
     CGXDLMSBase(
         bool UseLogicalNameReferencing = true,
         DLMS_INTERFACE_TYPE IntefaceType = DLMS_INTERFACE_TYPE_HDLC) :
-        CGXDLMSServer(UseLogicalNameReferencing, IntefaceType), m_ServerSocket(INVALID_SOCKET)
+        CGXDLMSServer(UseLogicalNameReferencing, IntefaceType)
     {
+#if defined(_WIN32) || defined(_WIN64)//If Windows 
         m_ReceiverThread = INVALID_HANDLE_VALUE;
+        m_ServerSocket = INVALID_SOCKET;
+#else //If Linux.
+        m_ServerSocket = -1;
+        m_ReceiverThread = -1;
+#endif
     }
 
 
@@ -67,6 +78,10 @@ public:
     {
         StopServer();
     }
+
+    bool IsConnected();
+
+    int GetSocket();
 
     int StartServer(int port);
 

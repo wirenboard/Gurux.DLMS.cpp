@@ -97,7 +97,7 @@ int Test()
 #if defined(_WIN32) || defined(_WIN64)//Windows
     while ((_getche()) != 27);
 #else
-    while (getchar() != 27);
+    while (getchar() != '\033');
 #endif
     return 0;
 }
