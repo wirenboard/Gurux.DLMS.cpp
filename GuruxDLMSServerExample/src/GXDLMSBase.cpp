@@ -122,7 +122,7 @@ void ListenerThread(void* pVoid)
             sprintf(tmp, "%d", add.sin_port);
 #endif
             senderInfo.append(tmp);
-            if (server->IsConnected())
+            while (server->IsConnected())
             {
                 //If client is left wait for next client.
                 if ((ret = recv(socket, (char*)
@@ -328,25 +328,24 @@ int CGXDLMSBase::Init(int port)
     GetItems().push_back(pClock);
     //Add Tcp/Udp setup. Default Logical Name is 0.0.25.0.0.255.
     GetItems().push_back(new CGXDLMSTcpUdpSetup());
-    /*
+
     ///////////////////////////////////////////////////////////////////////
-    //Add Load profile.
-    CGXProfileGenericObject* pPG = new CGXProfileGenericObject("1.0.99.1.0.255");
+    //Add profile generic (historical data) object.
+    CGXDLMSProfileGeneric* profileGeneric = new CGXDLMSProfileGeneric("1.0.99.1.0.255");
     //Set capture period to 60 second.
-    pPG->SetCapturePeriod(60);
+    profileGeneric->SetCapturePeriod(60);
     //Maximum row count.
-    pPG->SetProfileEntries(100);
-    pPG->SetSortMethod(GX_SORT_METHOD_FIFO);
-    pPG->SetSortObject(pClock);
+    profileGeneric->SetProfileEntries(100);
+    profileGeneric->SetSortMethod(GX_SORT_METHOD_FIFO);
+    profileGeneric->SetSortObject(pClock);
     //Add colums.
     //Set saved attribute index.
-    //pClock->SetSelectedAttributeIndex(2);
-    pPG->GetCaptureObjects().push_back(pClock);
+    CGXDLMSCaptureObject * capture = new CGXDLMSCaptureObject(2, 0);
+    profileGeneric->GetCaptureObjects().push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*>(pClock, capture));
     //Set saved attribute index.
-    //pPG->SetSelectedAttributeIndex(2);
-    pPG->GetCaptureObjects().push_back(pRegister);
-    GetItems().push_back(pPG);
-    */
+    capture = new CGXDLMSCaptureObject(2, 0);
+    profileGeneric->GetCaptureObjects().push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*>(pRegister, capture));
+    GetItems().push_back(profileGeneric);
 
     ///////////////////////////////////////////////////////////////////////
     //Add Auto connect object.
@@ -486,11 +485,12 @@ int CGXDLMSBase::Init(int port)
     {
         return ret;
     }
-    /*
+
     //Add rows after Initialize.
-    Object[][] rows = new Object[][]{new Object[]{java.util.Calendar.getInstance().getTime(), 10}};
-    pg.setBuffer(rows);
-    */
+    std::vector<CGXDLMSVariant> row;
+    row.push_back(CGXDateTime::Now());
+    row.push_back(10);
+    profileGeneric->GetBuffer().push_back(row);
     return DLMS_ERROR_CODE_OK;
 }
 

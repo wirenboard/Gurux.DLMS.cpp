@@ -88,7 +88,7 @@ int CGXDLMSProfileGeneric::GetColumns(CGXByteBuffer& data)
     return DLMS_ERROR_CODE_OK;
 }
 
-int CGXDLMSProfileGeneric::GetData(std::vector< std::vector<CGXDLMSVariant> > table, CGXByteBuffer& data)
+int CGXDLMSProfileGeneric::GetData(std::vector< std::vector<CGXDLMSVariant> >& table, CGXByteBuffer& data)
 {
     data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
     GXHelpers::SetObjectCount(table.size(), data);
@@ -114,9 +114,8 @@ int CGXDLMSProfileGeneric::GetData(std::vector< std::vector<CGXDLMSVariant> > ta
             DLMS_DATA_TYPE tp = types[++pos];
             if (tp == DLMS_DATA_TYPE_NONE)
             {
-                //TODO:
-                //tp = GXCommon.GetValueType(value);
-                //types[pos] = tp;
+                tp = value->vt;
+                types[pos] = tp;
             }
             if ((ret = GXHelpers::SetData(data, tp, *value)) != 0)
             {
@@ -154,7 +153,6 @@ int CGXDLMSProfileGeneric::AddCaptureObject(CGXDLMSObject* pObj, int attributeIn
 
 int CGXDLMSProfileGeneric::GetProfileGenericData(int selector, CGXDLMSVariant& parameters, CGXByteBuffer& reply)
 {
-    CGXDLMSVariant from, to;
     //If all data is read.
     if (selector == 0 || parameters.vt == DLMS_DATA_TYPE_NONE)
     {
@@ -166,9 +164,9 @@ int CGXDLMSProfileGeneric::GetProfileGenericData(int selector, CGXDLMSVariant& p
     {
         if (selector == 1) //Read by range
         {
-            struct tm tmp = from.dateTime.GetValue();
+            struct tm tmp = parameters.Arr[0].dateTime.GetValue();
             time_t start = mktime(&tmp);
-            tmp = to.dateTime.GetValue();
+            tmp = parameters.Arr[1].dateTime.GetValue();
             time_t end = mktime(&tmp);
             for (std::vector< std::vector<CGXDLMSVariant> >::iterator row = table.begin(); row != table.end(); ++row)
             {
@@ -182,8 +180,8 @@ int CGXDLMSProfileGeneric::GetProfileGenericData(int selector, CGXDLMSVariant& p
         }
         else if (selector == 2) //Read by entry.
         {
-            int start = from.ToInteger();
-            int count = to.ToInteger();
+            int start = parameters.Arr[0].ToInteger();
+            int count = parameters.Arr[1].ToInteger();
             for (int pos = 0; pos < count; ++pos)
             {
                 if ((unsigned int) (pos + start) == table.size())

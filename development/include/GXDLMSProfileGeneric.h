@@ -87,7 +87,7 @@ private:
     void Init();
 
     int GetColumns(CGXByteBuffer& data);
-    int GetData(std::vector< std::vector<CGXDLMSVariant> > table, CGXByteBuffer& data);
+    int GetData(std::vector< std::vector<CGXDLMSVariant> >& table, CGXByteBuffer& data);
 
     /*
     * Add new capture object (column) to the profile generic.
