@@ -635,7 +635,10 @@ int CGXByteBuffer::Move(int srcPos, int destPos, int count)
     {
         memcpy(m_Data + destPos, m_Data + srcPos, count);
         m_Size = (destPos + count);
-        m_Position = destPos;
+        if (m_Position > m_Size)
+        {
+            m_Position = m_Size;
+        }
     }
     else
     {
@@ -647,10 +650,7 @@ int CGXByteBuffer::Move(int srcPos, int destPos, int count)
 void CGXByteBuffer::Trim()
 {
     Move(m_Position, 0, m_Size - m_Position);
-    if (m_Position > m_Size)
-    {
-        m_Position = m_Size;
-    }
+    m_Position = 0;
 }
 
 /**

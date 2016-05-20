@@ -220,6 +220,7 @@ int CGXDLMS::GetWrapperFrame(
     else
     {
         data.Move(data.GetPosition(), 0, data.GetSize() - data.GetPosition());
+        data.SetPosition(0);
     }
     return DLMS_ERROR_CODE_OK;
 }
@@ -335,6 +336,7 @@ int CGXDLMS::GetHdlcFrame(
         else
         {
             data->Move(data->GetPosition(), 0, data->GetSize() - data->GetPosition());
+            data->SetPosition(0);
         }
     }
     return DLMS_ERROR_CODE_OK;
@@ -418,11 +420,11 @@ long GetLongInvokeIDPriority(CGXDLMSSettings& settings)
     long value = 0;
     if (settings.GetPriority() == DLMS_PRIORITY_HIGH)
     {
-        value = 0x800000;
+        value = 0x80000000;
     }
     if (settings.GetServiceClass() == DLMS_SERVICE_CLASS_CONFIRMED)
     {
-        value |= 0x400000;
+        value |= 0x40000000;
     }
     value |= (settings.GetLongInvokeID() & 0xFFFFFF);
     settings.SetLongInvokeID(settings.GetLongInvokeID() + 1);
@@ -531,8 +533,13 @@ int CGXDLMS::GetLNPdu(CGXDLMSSettings& settings,
         }
         else
         {
+            int pos = bb.GetPosition();
             CGXDLMSVariant tmp = *date;
             if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+            {
+                return ret;
+            }
+            if ((ret = bb.Move(pos + 1, pos, bb.GetSize() - pos - 1)) != 0)
             {
                 return ret;
             }

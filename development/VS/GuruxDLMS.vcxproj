@@ -122,6 +122,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\GXAPDU.cpp" />
     <ClCompile Include="..\src\GXApplicationContextName.cpp" />
     <ClCompile Include="..\src\GXAuthenticationMechanismName.cpp" />
     <ClCompile Include="..\src\gxbytebuffer.cpp" />

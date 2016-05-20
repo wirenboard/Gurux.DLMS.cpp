@@ -488,7 +488,8 @@ int CGXDLMSBase::Init(int port)
 
     //Add rows after Initialize.
     std::vector<CGXDLMSVariant> row;
-    row.push_back(CGXDateTime::Now());
+    CGXDateTime tmp = CGXDateTime::Now();
+    row.push_back(tmp);
     row.push_back(10);
     profileGeneric->GetBuffer().push_back(row);
     return DLMS_ERROR_CODE_OK;
