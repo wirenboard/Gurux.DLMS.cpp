@@ -833,8 +833,7 @@ int CGXCommunication::Read(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVa
     std::vector<CGXByteBuffer> data;
     CGXReplyData reply;
     //Get meter's send and receive buffers size.
-    CGXDLMSVariant name = pObject->GetName();
-    if ((ret = m_Parser->Read(name, pObject->GetObjectType(), attributeIndex, data)) != 0 ||
+    if ((ret = m_Parser->Read(pObject, attributeIndex, data)) != 0 ||
             (ret = ReadDataBlock(data, reply)) != 0 ||
             (ret = m_Parser->UpdateValue(*pObject, attributeIndex, reply.GetValue())) != 0)
     {

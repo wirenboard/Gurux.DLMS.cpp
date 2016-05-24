@@ -863,7 +863,8 @@ int CGXDLMSClient::GetObjectsRequest(std::vector<CGXByteBuffer>& reply)
 
 int CGXDLMSClient::Read(CGXDLMSObject* pObject, int attributeOrdinal, std::vector<CGXByteBuffer>& reply)
 {
-    return Read(pObject->GetName(), pObject->GetObjectType(), attributeOrdinal, NULL, reply);
+    CGXDLMSVariant name = pObject->GetName();
+    return Read(name, pObject->GetObjectType(), attributeOrdinal, NULL, reply);
 }
 
 int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int attributeOrdinal, std::vector<CGXByteBuffer>& reply)
@@ -937,7 +938,8 @@ int CGXDLMSClient::Write(CGXDLMSObject* pObject,
                          CGXDLMSVariant& data,
                          std::vector<CGXByteBuffer>& reply)
 {
-    return Write(pObject->GetName(), pObject->GetObjectType(), index, data, reply);
+    CGXDLMSVariant name = pObject->GetName();
+    return Write(name, pObject->GetObjectType(), index, data, reply);
 }
 
 int CGXDLMSClient::Write(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType,
@@ -999,7 +1001,8 @@ int CGXDLMSClient::Write(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType,
 int CGXDLMSClient::Method(CGXDLMSObject* item, int index,
                           CGXDLMSVariant& data, std::vector<CGXByteBuffer>& reply)
 {
-    return Method(item->GetName(), item->GetObjectType(), index, data, reply);
+    CGXDLMSVariant name = item->GetName();
+    return Method(name, item->GetObjectType(), index, data, reply);
 }
 
 /**
@@ -1128,7 +1131,8 @@ int CGXDLMSClient::ReadRowsByEntry(CGXDLMSProfileGeneric* pg,
     }
     tmp = 0;
     GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT16, tmp);
-    return Read(pg->GetName(), DLMS_OBJECT_TYPE_PROFILE_GENERIC, 2, &buff, reply);
+    CGXDLMSVariant name = pg->GetName();
+    return Read(name, DLMS_OBJECT_TYPE_PROFILE_GENERIC, 2, &buff, reply);
 }
 
 int CGXDLMSClient::ReadRowsByRange(CGXDLMSProfileGeneric* pg,
@@ -1137,6 +1141,7 @@ int CGXDLMSClient::ReadRowsByRange(CGXDLMSProfileGeneric* pg,
                                    std::vector<CGXByteBuffer>& reply)
 {
     int ret;
+    CGXDLMSVariant name = pg->GetName();
     m_Settings.ResetBlockIndex();
     CGXDLMSObject* sort = pg->GetSortObject();
     if (sort == NULL && pg->GetCaptureObjects().size() != 0)
@@ -1146,7 +1151,7 @@ int CGXDLMSClient::ReadRowsByRange(CGXDLMSProfileGeneric* pg,
     // If sort object is not found or it is not clock object read all.
     if (sort == NULL || sort->GetObjectType() != DLMS_OBJECT_TYPE_CLOCK)
     {
-        return Read(pg->GetName(), pg->GetObjectType(), 2, reply);
+        return Read(name, pg->GetObjectType(), 2, reply);
     }
     CGXByteBuffer buff(51);
     // Add AccessSelector value.
@@ -1194,7 +1199,7 @@ int CGXDLMSClient::ReadRowsByRange(CGXDLMSProfileGeneric* pg,
     buff.SetUInt8(0x01);
     // Add item count
     buff.SetUInt8(0x00);
-    return Read(pg->GetName(), DLMS_OBJECT_TYPE_PROFILE_GENERIC, 2, &buff, reply);
+    return Read(name, DLMS_OBJECT_TYPE_PROFILE_GENERIC, 2, &buff, reply);
 }
 
 int CGXDLMSClient::GetServerAddress(unsigned long serialNumber,

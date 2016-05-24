@@ -51,6 +51,9 @@ public:
 
     void GetObjects(DLMS_OBJECT_TYPE type, CGXDLMSObjectCollection& items);
 
+    void push_back(
+        CGXDLMSObject* item);
+
     void Free();
 
     std::string ToString();

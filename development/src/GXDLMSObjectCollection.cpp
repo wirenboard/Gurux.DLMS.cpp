@@ -102,6 +102,11 @@ void CGXDLMSObjectCollection::GetObjects(DLMS_OBJECT_TYPE type, CGXDLMSObjectCol
     }
 }
 
+void CGXDLMSObjectCollection::push_back(CGXDLMSObject* item)
+{
+    std::vector<CGXDLMSObject*>::push_back(item);
+}
+
 void CGXDLMSObjectCollection::Free()
 {
     for (CGXDLMSObjectCollection::iterator it = begin(); it != end(); ++it)
