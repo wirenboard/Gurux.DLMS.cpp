@@ -60,6 +60,24 @@ private:
         CGXByteBuffer& buff,
         CGXDLMSObjectCollection& objects,
         bool onlyKnownObjects);
+
+    /**
+    * Generates a read message.
+    *
+    * name : Short or Logical Name.
+    * objectType : COSEM object type.
+    * attributeOrdinal : Attribute index of the object.
+    * data : Read data parameter.
+    * reply : Generated read message(s).
+    * Returns error status.
+    */
+    int Read(
+        CGXDLMSVariant& name,
+        DLMS_OBJECT_TYPE objectType,
+        int attributeOrdinal,
+        CGXByteBuffer* data,
+        std::vector<CGXByteBuffer>& reply);
+
 public:
     /////////////////////////////////////////////////////////////////////////////
     //Constructor
@@ -230,7 +248,7 @@ public:
     * Returns error status.
     */
     int Read(
-        CGXDLMSVariant name,
+        CGXDLMSVariant& name,
         DLMS_OBJECT_TYPE objectType,
         int attributeOrdinal,
         std::vector<CGXByteBuffer>& reply);
@@ -238,20 +256,18 @@ public:
     /**
     * Generates a read message.
     *
-    * name : Short or Logical Name.
-    * objectType : COSEM object type.
-    * attributeOrdinal : Attribute index of the object.
-    * data : Read data parameter.
-    * reply : Generated read message(s).
+    * @param pObject
+    *            COSEM object to write.
+    * @param attributeOrdinal
+    *            Attribute index of the object.
+    * @param reply
+    *            Generated read message(s).
     * Returns error status.
     */
     int Read(
-        CGXDLMSVariant name,
-        DLMS_OBJECT_TYPE objectType,
+        CGXDLMSObject* pObject,
         int attributeOrdinal,
-        CGXByteBuffer* data,
         std::vector<CGXByteBuffer>& reply);
-
 
     /**
     * Generates a write message.
@@ -269,7 +285,7 @@ public:
     * Returns error status.
     */
     int Write(
-        CGXDLMSVariant name,
+        CGXDLMSVariant& name,
         DLMS_OBJECT_TYPE objectType,
         int index,
         CGXDLMSVariant& data,

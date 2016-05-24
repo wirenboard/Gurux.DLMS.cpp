@@ -82,7 +82,6 @@ int CGXDLMSObject::SetLogicalName(CGXDLMSObject * target, CGXDLMSVariant& value)
 
 void CGXDLMSObject::Initialize(short sn, unsigned short class_id, unsigned char version, CGXByteBuffer* ln)
 {
-    m_Parent = NULL;
     m_AttributeIndex = 0;
     m_DataIndex = 0;
     m_SN = sn;
@@ -126,7 +125,7 @@ CGXDLMSVariant CGXDLMSObject::GetName()
     return ln;
 }
 
-int CGXDLMSObject::SetName(CGXDLMSVariant value)
+int CGXDLMSObject::SetName(CGXDLMSVariant& value)
 {
     if (value.vt == DLMS_DATA_TYPE_UINT16)
     {

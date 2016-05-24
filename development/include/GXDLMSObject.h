@@ -61,7 +61,6 @@ class CGXDLMSObject : public IGXDLMSBase
     unsigned short m_Version;
 protected:
     std::map<int, time_t> m_ReadTimes;
-    CGXDLMSObjectCollection* m_Parent;
     unsigned short m_SN;
     unsigned char m_LN[6];
 
@@ -96,7 +95,7 @@ public:
     //Get Object's Logical or Short Name as a std::string.
     CGXDLMSVariant GetName();
 
-    int SetName(CGXDLMSVariant value);
+    int SetName(CGXDLMSVariant& value);
 
     //Get Object's Interface class type.
     DLMS_OBJECT_TYPE GetObjectType();

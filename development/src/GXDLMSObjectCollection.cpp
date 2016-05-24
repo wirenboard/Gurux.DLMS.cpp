@@ -37,7 +37,6 @@
 
 CGXDLMSObjectCollection::~CGXDLMSObjectCollection()
 {
-    Clear();
 }
 
 CGXDLMSObject* CGXDLMSObjectCollection::FindByLN(DLMS_OBJECT_TYPE type, std::string& ln)
@@ -103,23 +102,11 @@ void CGXDLMSObjectCollection::GetObjects(DLMS_OBJECT_TYPE type, CGXDLMSObjectCol
     }
 }
 
-void CGXDLMSObjectCollection::push_back(CGXDLMSObject* item)
-{
-    if (item->m_Parent == NULL)
-    {
-        item->m_Parent = this;
-    }
-    std::vector<CGXDLMSObject*>::push_back(item);
-}
-
-void CGXDLMSObjectCollection::Clear()
+void CGXDLMSObjectCollection::Free()
 {
     for (CGXDLMSObjectCollection::iterator it = begin(); it != end(); ++it)
     {
-        if ((*it)->m_Parent == this)
-        {
-            delete (*it);
-        }
+        delete (*it);
     }
     std::vector<CGXDLMSObject*>::clear();
 }

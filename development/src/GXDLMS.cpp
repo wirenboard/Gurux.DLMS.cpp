@@ -1184,14 +1184,16 @@ int HandleDataNotification(CGXReplyData& reply)
     // Get Date time.
     CGXDataInfo info;
     reply.SetTime(NULL);
-    CGXDLMSVariant tmp;
-    if ((ret = GXHelpers::GetData(reply.GetData(), info, tmp)) != 0)
+    unsigned char len;
+    if ((ret = reply.GetData().GetUInt8(&len)) != 0)
     {
         return ret;
     }
-    if (tmp.vt != DLMS_DATA_TYPE_NONE)
+    if (len != 0)
     {
+        CGXByteBuffer tmp;
         CGXDLMSVariant t;
+        tmp.Set(&reply.GetData(), reply.GetData().GetPosition(), len);
         if ((ret = CGXDLMSClient::ChangeType(tmp, DLMS_DATA_TYPE_DATETIME, t)) != 0)
         {
             return ret;

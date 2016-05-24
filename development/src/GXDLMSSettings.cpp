@@ -57,6 +57,12 @@ CGXDLMSSettings::CGXDLMSSettings(bool isServer)
     m_Count = 0;
 }
 
+//Destructor.
+CGXDLMSSettings::~CGXDLMSSettings()
+{
+    m_Objects.Free();
+}
+
 CGXByteBuffer& CGXDLMSSettings::GetCtoSChallenge()
 {
     return m_CtoSChallenge;

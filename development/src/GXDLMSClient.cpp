@@ -379,6 +379,7 @@ int CGXDLMSClient::ParseObjects(CGXByteBuffer& data, CGXDLMSObjectCollection& ob
             return ret;
         }
     }
+    m_Settings.GetObjects().Free();
     m_Settings.GetObjects().insert(m_Settings.GetObjects().end(), objects.begin(), objects.end());
     return 0;
 }
@@ -860,12 +861,17 @@ int CGXDLMSClient::GetObjectsRequest(std::vector<CGXByteBuffer>& reply)
     return Read(name, DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME, 2, reply);
 }
 
-int CGXDLMSClient::Read(CGXDLMSVariant name, DLMS_OBJECT_TYPE objectType, int attributeOrdinal, std::vector<CGXByteBuffer>& reply)
+int CGXDLMSClient::Read(CGXDLMSObject* pObject, int attributeOrdinal, std::vector<CGXByteBuffer>& reply)
+{
+    return Read(pObject->GetName(), pObject->GetObjectType(), attributeOrdinal, NULL, reply);
+}
+
+int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int attributeOrdinal, std::vector<CGXByteBuffer>& reply)
 {
     return Read(name, objectType, attributeOrdinal, NULL, reply);
 }
 
-int CGXDLMSClient::Read(CGXDLMSVariant name, DLMS_OBJECT_TYPE objectType, int attributeOrdinal, CGXByteBuffer* data,
+int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int attributeOrdinal, CGXByteBuffer* data,
                         std::vector<CGXByteBuffer>& reply)
 {
     if ((attributeOrdinal < 1))
@@ -934,7 +940,7 @@ int CGXDLMSClient::Write(CGXDLMSObject* pObject,
     return Write(pObject->GetName(), pObject->GetObjectType(), index, data, reply);
 }
 
-int CGXDLMSClient::Write(CGXDLMSVariant name, DLMS_OBJECT_TYPE objectType,
+int CGXDLMSClient::Write(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType,
                          int index, CGXDLMSVariant& data, std::vector<CGXByteBuffer>& reply)
 {
     if (index < 1)

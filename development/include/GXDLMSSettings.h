@@ -160,6 +160,9 @@ public:
 // Constructor.
     CGXDLMSSettings(bool isServer);
 
+    //Destructor.
+    ~CGXDLMSSettings();
+
 // Client to Server challenge.
     CGXByteBuffer& GetCtoSChallenge();
 

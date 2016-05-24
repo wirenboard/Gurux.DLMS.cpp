@@ -587,6 +587,8 @@ int CGXDLMSServer::HandleGetRequest(
     // GetRequest normal
     if (type == 1)
     {
+        m_Settings.SetCount(0);
+        m_Settings.SetIndex (0);
         m_Settings.ResetBlockIndex();
         // CI
         unsigned short tmp;
@@ -1273,13 +1275,13 @@ int CGXDLMSServer::HandleCommand(
     }
     if (ret != 0)
     {
-    	return ret;
+        return ret;
     }
     if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER)
     {
         return CGXDLMS::GetWrapperFrame(m_Settings, m_ReplyData, reply);
     }
-	return CGXDLMS::GetHdlcFrame(m_Settings, frame, &m_ReplyData, reply);
+    return CGXDLMS::GetHdlcFrame(m_Settings, frame, &m_ReplyData, reply);
 }
 
 /**

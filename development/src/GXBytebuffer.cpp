@@ -640,16 +640,19 @@ int CGXByteBuffer::Move(int srcPos, int destPos, int count)
             m_Position = m_Size;
         }
     }
-    else
-    {
-        m_Size = 0;
-    }
     return DLMS_ERROR_CODE_OK;
 }
 
 void CGXByteBuffer::Trim()
 {
-    Move(m_Position, 0, m_Size - m_Position);
+    if (m_Size == m_Position)
+    {
+        m_Size = 0;
+    }
+    else
+    {
+        Move(m_Position, 0, m_Size - m_Position);
+    }
     m_Position = 0;
 }
 
