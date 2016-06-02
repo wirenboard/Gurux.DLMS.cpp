@@ -256,7 +256,7 @@ int CGXDLMSIECOpticalPortSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
 }
 
 // Returns value of given attribute.
-int CGXDLMSIECOpticalPortSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSIECOpticalPortSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -313,7 +313,7 @@ int CGXDLMSIECOpticalPortSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValue
 }
 
 // Set value of given attribute.
-int CGXDLMSIECOpticalPortSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSIECOpticalPortSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

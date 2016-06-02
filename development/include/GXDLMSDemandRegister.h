@@ -140,13 +140,13 @@ public:
     // Returns amount of methods.
     int GetMethodCount();
 
-    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
+    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
-    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
+    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 
-    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
+    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
 
 #endif //GXDLMSDEMANDREGISTER_H

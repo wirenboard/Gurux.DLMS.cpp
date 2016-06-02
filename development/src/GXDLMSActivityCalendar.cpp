@@ -368,7 +368,7 @@ int CGXDLMSActivityCalendar::GetDataType(int index, DLMS_DATA_TYPE& type)
 }
 
 // Returns value of given attribute.
-int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     CGXByteBuffer data;
     if (e.GetIndex() == 1)
@@ -568,7 +568,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
 }
 
 // Set value of given attribute.
-int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

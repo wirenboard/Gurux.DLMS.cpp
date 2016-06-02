@@ -80,10 +80,10 @@ public:
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
     // Returns value of given attribute.
-    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
+    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 
     // Set value of given attribute.
-    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
+    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
 
 #endif //GXDLMSGPRSSETUP_H

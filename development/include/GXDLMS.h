@@ -83,7 +83,7 @@ private:
     //
     /////////////////////////////////////////////////////////////////////////////
     static int CheckWrapperAddress(CGXDLMSSettings& settings,
-                                   CGXByteBuffer& buff, CGXReplyData& data);
+                                   CGXByteBuffer& buff);
 
     /////////////////////////////////////////////////////////////////////////////
     // Get value from data.

@@ -200,7 +200,7 @@ int CGXDLMSPushSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
 }
 
 // Returns value of given attribute.
-int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -247,7 +247,7 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs&
 }
 
 // Set value of given attribute.
-int CGXDLMSPushSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSPushSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

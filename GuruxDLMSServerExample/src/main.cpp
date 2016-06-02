@@ -93,12 +93,8 @@ int Test()
         return ret;
     }
     printf("Logical Name DLMS Server with IEC 62056-47 in port 4063.\r\n");
-    printf("Press ESC to close application.\r\n");
-#if defined(_WIN32) || defined(_WIN64)//Windows
-    while ((_getche()) != 27);
-#else
-    while (getchar() != '\033');
-#endif
+    printf("Press Enter to close application.\r\n");
+    getchar();
     return 0;
 }
 

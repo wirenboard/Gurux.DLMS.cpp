@@ -35,10 +35,10 @@
 #ifndef GXDLMSVALUEEVENT_COLLECTION_H
 #define GXDLMSVALUEEVENT_COLLECTION_H
 
-#include "GXDLMSValueEventArgs.h"
+#include "GXDLMSValueEventArg.h"
 
 
-class CGXDLMSValueEventCollection : public std::vector<CGXDLMSValueEventArgs*>
+class CGXDLMSValueEventCollection : public std::vector<CGXDLMSValueEventArg*>
 {
 public:
     /**
@@ -46,7 +46,7 @@ public:
     */
     ~CGXDLMSValueEventCollection()
     {
-        for(std::vector<CGXDLMSValueEventArgs*>::iterator it = begin(); it != end(); ++it)
+        for(std::vector<CGXDLMSValueEventArg*>::iterator it = begin(); it != end(); ++it)
         {
             delete *it;
         }

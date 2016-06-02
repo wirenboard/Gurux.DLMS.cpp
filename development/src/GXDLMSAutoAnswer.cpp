@@ -248,7 +248,7 @@ int CGXDLMSAutoAnswer::GetDataType(int index, DLMS_DATA_TYPE& type)
 }
 
 // Returns value of given attribute.
-int CGXDLMSAutoAnswer::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSAutoAnswer::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -323,7 +323,7 @@ int CGXDLMSAutoAnswer::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs
 /*
  * Set value of given attribute.
  */
-int CGXDLMSAutoAnswer::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSAutoAnswer::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

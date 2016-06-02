@@ -86,8 +86,8 @@ public:
     // Returns SN Association View.
     int GetObjects(CGXByteBuffer& data);
 
-    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
+    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 
-    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
+    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
 #endif //GXDLMSASSOCIATIONSHORTNAME_H

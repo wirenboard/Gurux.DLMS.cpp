@@ -54,10 +54,7 @@ CGXDLMSServer::CGXDLMSServer(bool logicalNameReferencing,
 
 CGXDLMSServer::~CGXDLMSServer()
 {
-    for(CGXDLMSObjectCollection::iterator it = m_Settings.GetObjects().begin(); it != m_Settings.GetObjects().end(); ++it)
-    {
 
-    }
 }
 
 CGXDLMSObjectCollection& CGXDLMSServer::GetItems()
@@ -543,7 +540,7 @@ int CGXDLMSServer::HandleSetRequest(CGXByteBuffer& data)
                         }
                     }
                 }
-                CGXDLMSValueEventArgs* e = new CGXDLMSValueEventArgs(obj, index);
+                CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(obj, index);
                 e->SetValue(value);
                 CGXDLMSValueEventCollection arr;
                 arr.push_back(e);
@@ -638,7 +635,7 @@ int CGXDLMSServer::HandleGetRequest(
                 }
             }
 
-            CGXDLMSValueEventArgs* e = new CGXDLMSValueEventArgs(obj, index, selector, parameters);
+            CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(obj, index, selector, parameters);
             arr.push_back(e);
             Read(arr);
             if (!e->GetHandled())
@@ -722,7 +719,7 @@ int CGXDLMSServer::HandleGetRequest(
                     }
                     else
                     {
-                        for (std::vector<CGXDLMSValueEventArgs*>::iterator arg = m_Transaction->GetTargets().begin();
+                        for (std::vector<CGXDLMSValueEventArg*>::iterator arg = m_Transaction->GetTargets().begin();
                                 arg != m_Transaction->GetTargets().end(); ++arg)
                         {
                             if ((*arg)->GetHandled())
@@ -799,7 +796,7 @@ int CGXDLMSServer::HandleGetRequest(
             if (obj == NULL)
             {
                 // "Access Error : Device reports a undefined object."
-                CGXDLMSValueEventArgs* e = new CGXDLMSValueEventArgs(obj, index);
+                CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(obj, index);
                 e->SetError(DLMS_ERROR_CODE_UNDEFINED_OBJECT);
                 list.push_back(e);
             }
@@ -824,14 +821,14 @@ int CGXDLMSServer::HandleGetRequest(
                         return ret;
                     }
                 }
-                CGXDLMSValueEventArgs* arg = new CGXDLMSValueEventArgs(obj, index, selector, parameters);
+                CGXDLMSValueEventArg* arg = new CGXDLMSValueEventArg(obj, index, selector, parameters);
                 list.push_back(arg);
             }
         }
         Read(list);
         CGXDLMSVariant value;
         pos = 0;
-        for (std::vector<CGXDLMSValueEventArgs*>::iterator it = list.begin(); it != list.end(); ++it)
+        for (std::vector<CGXDLMSValueEventArg*>::iterator it = list.begin(); it != list.end(); ++it)
         {
             if ((*it)->GetHandled())
             {
@@ -931,7 +928,7 @@ int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
     {
         bb.Set(&m_ReplyData);
         m_ReplyData.Clear();
-        for (std::vector<CGXDLMSValueEventArgs*>::iterator it = m_Transaction->GetTargets().begin();
+        for (std::vector<CGXDLMSValueEventArg*>::iterator it = m_Transaction->GetTargets().begin();
                 it != m_Transaction->GetTargets().end(); ++it)
         {
             list.push_back(*it);
@@ -946,8 +943,8 @@ int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
         }
         GXHelpers::SetObjectCount(cnt, bb);
         CGXSNInfo info;
-        std::vector<CGXDLMSValueEventArgs*> reads;
-        std::vector<CGXDLMSValueEventArgs*> actions;
+        std::vector<CGXDLMSValueEventArg*> reads;
+        std::vector<CGXDLMSValueEventArg*> actions;
         for (pos = 0; pos != cnt; ++pos)
         {
             if ((ret = data.GetUInt8(&type)) != 0)
@@ -965,7 +962,7 @@ int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
                 {
                     return ret;
                 }
-                CGXDLMSValueEventArgs* e = new CGXDLMSValueEventArgs(info.GetItem(), info.GetIndex());
+                CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(info.GetItem(), info.GetIndex());
                 e->SetAction(info.IsAction());
                 list.push_back(e);
                 if (e->IsAction())
@@ -1000,7 +997,7 @@ int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
                 {
                     return ret;
                 }
-                CGXDLMSValueEventArgs* e = new CGXDLMSValueEventArgs(info.GetItem(), info.GetIndex(), selector, parameters);
+                CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(info.GetItem(), info.GetIndex(), selector, parameters);
                 e->SetAction(info.IsAction());
                 list.push_back(e);
                 if (e->IsAction())
@@ -1022,7 +1019,7 @@ int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
             Action(actions);
         }
     }
-    for (std::vector<CGXDLMSValueEventArgs*>::iterator e1 = list.begin(); e1 != list.end(); ++e1)
+    for (std::vector<CGXDLMSValueEventArg*>::iterator e1 = list.begin(); e1 != list.end(); ++e1)
     {
         if ((*e1)->GetHandled())
         {
@@ -1079,7 +1076,7 @@ int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
         if (m_Transaction == NULL && m_Settings.GetCount() != m_Settings.GetIndex())
         {
             CGXDLMSValueEventCollection reads;
-            for (std::vector<CGXDLMSValueEventArgs*>::iterator it = list.begin(); it != list.end(); ++it)
+            for (std::vector<CGXDLMSValueEventArg*>::iterator it = list.begin(); it != list.end(); ++it)
             {
                 reads.push_back(*it);
             }
@@ -1192,7 +1189,7 @@ int CGXDLMSServer::HandleWriteRequest(CGXByteBuffer& data)
             }
             else
             {
-                CGXDLMSValueEventArgs* e = new CGXDLMSValueEventArgs(target.GetItem(), target.GetIndex());
+                CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(target.GetItem(), target.GetIndex());
                 e->SetValue(value);
                 CGXDLMSValueEventCollection arr;
                 arr.push_back(e);
@@ -1349,7 +1346,7 @@ int CGXDLMSServer::HandleMethodRequest(CGXByteBuffer& data)
     }
     else
     {
-        CGXDLMSValueEventArgs* e = new CGXDLMSValueEventArgs(obj, id, 0, parameters);
+        CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(obj, id, 0, parameters);
         CGXDLMSValueEventCollection arr;
         arr.push_back(e);
         Action(arr);

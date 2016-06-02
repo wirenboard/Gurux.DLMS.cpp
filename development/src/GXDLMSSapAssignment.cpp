@@ -139,7 +139,7 @@ int CGXDLMSSapAssignment::GetDataType(int index, DLMS_DATA_TYPE& type)
 
 
 // Returns value of given attribute.
-int CGXDLMSSapAssignment::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSSapAssignment::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -186,7 +186,7 @@ int CGXDLMSSapAssignment::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
 /*
  * Set value of given attribute.
  */
-int CGXDLMSSapAssignment::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSSapAssignment::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

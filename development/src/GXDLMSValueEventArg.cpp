@@ -32,71 +32,71 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#include "../include/GXDLMSValueEventArgs.h"
+#include "../include/GXDLMSValueEventArg.h"
 
 
-CGXDLMSObject* CGXDLMSValueEventArgs::GetTarget()
+CGXDLMSObject* CGXDLMSValueEventArg::GetTarget()
 {
     return m_Target;
 }
 
-void CGXDLMSValueEventArgs::SetTarget(CGXDLMSObject* value)
+void CGXDLMSValueEventArg::SetTarget(CGXDLMSObject* value)
 {
     m_Target = value;
 }
 
-int CGXDLMSValueEventArgs::GetIndex()
+int CGXDLMSValueEventArg::GetIndex()
 {
     return m_Index;
 }
 
-void CGXDLMSValueEventArgs::SetIndex(int value)
+void CGXDLMSValueEventArg::SetIndex(int value)
 {
     m_Index = value;
 }
 
-CGXDLMSVariant& CGXDLMSValueEventArgs::GetValue()
+CGXDLMSVariant& CGXDLMSValueEventArg::GetValue()
 {
     return m_Value;
 }
 
-void CGXDLMSValueEventArgs::SetValue(CGXDLMSVariant value)
+void CGXDLMSValueEventArg::SetValue(CGXDLMSVariant value)
 {
     m_Value = value;
 }
 
-DLMS_DATA_TYPE CGXDLMSValueEventArgs::GetDataType()
+DLMS_DATA_TYPE CGXDLMSValueEventArg::GetDataType()
 {
     return m_DataType;
 }
 
-void CGXDLMSValueEventArgs::SetDataType(DLMS_DATA_TYPE value)
+void CGXDLMSValueEventArg::SetDataType(DLMS_DATA_TYPE value)
 {
     m_DataType = value;
 }
 
-bool CGXDLMSValueEventArgs::GetHandled()
+bool CGXDLMSValueEventArg::GetHandled()
 {
     return m_Handled;
 }
 
-void CGXDLMSValueEventArgs::SetHandled(bool value)
+void CGXDLMSValueEventArg::SetHandled(bool value)
 {
     m_Handled = value;
 }
 
-int CGXDLMSValueEventArgs::GetSelector()
+int CGXDLMSValueEventArg::GetSelector()
 {
     return m_Selector;
 }
 
-CGXDLMSVariant& CGXDLMSValueEventArgs::GetParameters()
+CGXDLMSVariant& CGXDLMSValueEventArg::GetParameters()
 {
     return m_Parameters;
 }
 
 
-CGXDLMSValueEventArgs::CGXDLMSValueEventArgs(
+CGXDLMSValueEventArg::CGXDLMSValueEventArg(
     CGXDLMSObject* target,
     int index)
 {
@@ -108,7 +108,7 @@ CGXDLMSValueEventArgs::CGXDLMSValueEventArgs(
     m_Error = DLMS_ERROR_CODE_OK;
 }
 
-CGXDLMSValueEventArgs::CGXDLMSValueEventArgs(
+CGXDLMSValueEventArg::CGXDLMSValueEventArg(
     CGXDLMSObject* target,
     int index,
     int selector,
@@ -123,22 +123,22 @@ CGXDLMSValueEventArgs::CGXDLMSValueEventArgs(
     m_Error = DLMS_ERROR_CODE_OK;
 }
 
-DLMS_ERROR_CODE CGXDLMSValueEventArgs::GetError()
+DLMS_ERROR_CODE CGXDLMSValueEventArg::GetError()
 {
     return m_Error;
 }
 
-void CGXDLMSValueEventArgs::SetError(DLMS_ERROR_CODE value)
+void CGXDLMSValueEventArg::SetError(DLMS_ERROR_CODE value)
 {
     m_Error = value;
 }
 
-bool CGXDLMSValueEventArgs::IsAction()
+bool CGXDLMSValueEventArg::IsAction()
 {
     return m_Action;
 }
 
-void CGXDLMSValueEventArgs::SetAction(bool value)
+void CGXDLMSValueEventArg::SetAction(bool value)
 {
     m_Action = value;
 }

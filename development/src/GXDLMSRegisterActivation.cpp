@@ -179,7 +179,7 @@ int CGXDLMSRegisterActivation::GetDataType(int index, DLMS_DATA_TYPE& type)
 }
 
 // Returns value of given attribute.
-int CGXDLMSRegisterActivation::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSRegisterActivation::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     CGXByteBuffer data;
     if (e.GetIndex() == 1)
@@ -229,7 +229,7 @@ int CGXDLMSRegisterActivation::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
 }
 
 // Set value of given attribute.
-int CGXDLMSRegisterActivation::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSRegisterActivation::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

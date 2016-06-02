@@ -38,7 +38,7 @@
 #include <vector>
 #include "enums.h"
 #include "GXBytebuffer.h"
-#include "GXDLMSValueEventArgs.h"
+#include "GXDLMSValueEventArg.h"
 #include "GXDLMSValueEventCollection.h"
 
 class CGXDLMSLongTransaction
@@ -87,7 +87,7 @@ public:
     /**
      * @return Targets.
      */
-    std::vector<CGXDLMSValueEventArgs*>& GetTargets()
+    std::vector<CGXDLMSValueEventArg*>& GetTargets()
     {
         return m_Targets;
     }

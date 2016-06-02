@@ -129,7 +129,7 @@ int CGXDLMSScriptTable::GetDataType(int index, DLMS_DATA_TYPE& type)
 }
 
 // Returns value of given attribute.
-int CGXDLMSScriptTable::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSScriptTable::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -190,7 +190,7 @@ int CGXDLMSScriptTable::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
 }
 
 // Set value of given attribute.
-int CGXDLMSScriptTable::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSScriptTable::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

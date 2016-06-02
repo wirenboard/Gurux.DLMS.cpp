@@ -82,9 +82,9 @@ public:
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
-    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
+    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 
-    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
+    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 
     int GetUIDataType(int index, DLMS_DATA_TYPE& type);
 };

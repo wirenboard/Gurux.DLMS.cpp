@@ -95,13 +95,13 @@ public:
         std::string& ln);
 
     void Read(
-        std::vector<CGXDLMSValueEventArgs*>& args);
+        std::vector<CGXDLMSValueEventArg*>& args);
 
     void Write(
-        std::vector<CGXDLMSValueEventArgs*>& args);
+        std::vector<CGXDLMSValueEventArg*>& args);
 
     void Action(
-        std::vector<CGXDLMSValueEventArgs*>& args);
+        std::vector<CGXDLMSValueEventArg*>& args);
 
     bool IsTarget(
         unsigned long int serverAddress,

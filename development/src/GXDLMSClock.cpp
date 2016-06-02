@@ -297,7 +297,7 @@ int CGXDLMSClock::GetDataType(int index, DLMS_DATA_TYPE& type)
 /*
  * Returns value of given attribute.
  */
-int CGXDLMSClock::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSClock::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -356,7 +356,7 @@ int CGXDLMSClock::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
 /*
  * Set value of given attribute.
  */
-int CGXDLMSClock::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSClock::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

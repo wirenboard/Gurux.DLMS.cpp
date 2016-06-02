@@ -374,7 +374,7 @@ int CGXDLMSLimiter::GetDataType(int index, DLMS_DATA_TYPE& type)
 }
 
 // Returns value of given attribute.
-int CGXDLMSLimiter::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSLimiter::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -498,7 +498,7 @@ int CGXDLMSLimiter::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e
 }
 
 // Set value of given attribute.
-int CGXDLMSLimiter::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSLimiter::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

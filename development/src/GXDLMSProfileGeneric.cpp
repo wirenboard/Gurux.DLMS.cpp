@@ -501,7 +501,7 @@ int CGXDLMSProfileGeneric::GetDataType(int index, DLMS_DATA_TYPE& type)
 /*
 * Returns value of given attribute.
 */
-int CGXDLMSProfileGeneric::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSProfileGeneric::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -559,7 +559,7 @@ int CGXDLMSProfileGeneric::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
 /*
  * Set value of given attribute.
  */
-int CGXDLMSProfileGeneric::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSProfileGeneric::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     int ret;
     if (e.GetIndex() == 1)

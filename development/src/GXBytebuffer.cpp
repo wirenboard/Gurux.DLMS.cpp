@@ -633,7 +633,8 @@ int CGXByteBuffer::Move(int srcPos, int destPos, int count)
     }
     if (count != 0)
     {
-        memcpy(m_Data + destPos, m_Data + srcPos, count);
+        //Do not use memcpy here!
+        memmove(m_Data + destPos, m_Data + srcPos, count);
         m_Size = (destPos + count);
         if (m_Position > m_Size)
         {

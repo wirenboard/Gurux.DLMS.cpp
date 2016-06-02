@@ -250,7 +250,6 @@ int CGXDLMSBase::StartServer(int port)
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
     m_ReceiverThread = (HANDLE) _beginthread(ListenerThread, 0, (LPVOID) this);
 #else
-    pthread_t iThreadId;
     ret = pthread_create(&m_ReceiverThread, NULL, UnixListenerThread, (void *) this);
 #endif
     return ret;
@@ -506,13 +505,13 @@ CGXDLMSObject* CGXDLMSBase::FindObject(
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-void CGXDLMSBase::Read(std::vector<CGXDLMSValueEventArgs*>& args)
+void CGXDLMSBase::Read(std::vector<CGXDLMSValueEventArg*>& args)
 {
     CGXDLMSVariant value;
     CGXDLMSObject* pObj;
     int ret, index;
     DLMS_OBJECT_TYPE type;
-    for(std::vector<CGXDLMSValueEventArgs*>::iterator it = args.begin(); it != args.end(); ++it)
+    for(std::vector<CGXDLMSValueEventArg*>::iterator it = args.begin(); it != args.end(); ++it)
     {
         //Let framework handle Logical Name read.
         if ((*it)->GetIndex() == 1)
@@ -557,7 +556,7 @@ void CGXDLMSBase::Read(std::vector<CGXDLMSValueEventArgs*>& args)
         else
         {
             CGXDLMSVariant null;
-            CGXDLMSValueEventArgs e(pObj, index);
+            CGXDLMSValueEventArg e(pObj, index);
             ret = ((IGXDLMSBase*) pObj)->GetValue(m_Settings, e);
             if (ret != DLMS_ERROR_CODE_OK)
             {
@@ -588,14 +587,14 @@ void CGXDLMSBase::Read(std::vector<CGXDLMSValueEventArgs*>& args)
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-void CGXDLMSBase::Write(std::vector<CGXDLMSValueEventArgs*>& args)
+void CGXDLMSBase::Write(std::vector<CGXDLMSValueEventArg*>& args)
 {
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-void CGXDLMSBase::Action(std::vector<CGXDLMSValueEventArgs*>& args)
+void CGXDLMSBase::Action(std::vector<CGXDLMSValueEventArg*>& args)
 {
 }
 

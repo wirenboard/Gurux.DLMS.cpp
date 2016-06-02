@@ -216,7 +216,7 @@ int CGXDLMSModemConfiguration::GetDataType(int index, DLMS_DATA_TYPE& type)
 }
 
 // Returns value of given attribute.
-int CGXDLMSModemConfiguration::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSModemConfiguration::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -286,7 +286,7 @@ int CGXDLMSModemConfiguration::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
 }
 
 // Set value of given attribute.
-int CGXDLMSModemConfiguration::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSModemConfiguration::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

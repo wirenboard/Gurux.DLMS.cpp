@@ -194,7 +194,7 @@
     <ClCompile Include="..\src\GXDLMSSpecialDay.cpp" />
     <ClCompile Include="..\src\GXDLMSSpecialDaysTable.cpp" />
     <ClCompile Include="..\src\GXDLMSTcpUdpSetup.cpp" />
-    <ClCompile Include="..\src\GXDLMSValueEventArgs.cpp" />
+    <ClCompile Include="..\src\GXDLMSValueEventArg.cpp" />
     <ClCompile Include="..\src\GXDLMSVariant.cpp" />
     <ClCompile Include="..\src\GXDLMSWeekProfile.cpp" />
     <ClCompile Include="..\src\GXHelpers.cpp" />
@@ -286,6 +286,7 @@
     <ClInclude Include="..\include\GXDLMSSpecialDay.h" />
     <ClInclude Include="..\include\GXDLMSSpecialDaysTable.h" />
     <ClInclude Include="..\include\GXDLMSTcpUdpSetup.h" />
+    <ClInclude Include="..\include\GXDLMSValueEventArg.h" />
     <ClInclude Include="..\include\GXDLMSValueEventCollection.h" />
     <ClInclude Include="..\include\GXDLMSVariant.h" />
     <ClInclude Include="..\include\GXDLMSWeekProfile.h" />
@@ -297,7 +298,6 @@
     <ClInclude Include="..\include\GXSNInfo.h" />
     <ClInclude Include="..\include\GXStandardObisCode.h" />
     <ClInclude Include="..\include\GXStandardObisCodeCollection.h" />
-    <ClInclude Include="..\include\GXDLMSValueEventArgs.h" />
     <ClInclude Include="..\include\IGXDLMSBase.h" />
     <ClInclude Include="..\include\OBiscodes.h" />
   </ItemGroup>

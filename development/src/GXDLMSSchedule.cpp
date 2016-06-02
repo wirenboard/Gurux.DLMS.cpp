@@ -116,7 +116,7 @@ int CGXDLMSSchedule::GetDataType(int index, DLMS_DATA_TYPE& type)
 }
 
 // Returns value of given attribute.
-int CGXDLMSSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -134,7 +134,7 @@ int CGXDLMSSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& 
 }
 
 // Set value of given attribute.
-int CGXDLMSSchedule::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSSchedule::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

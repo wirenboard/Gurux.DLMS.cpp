@@ -234,7 +234,7 @@ int CGXDLMSAutoConnect::GetDataType(int index, DLMS_DATA_TYPE& type)
 }
 
 // Returns value of given attribute.
-int CGXDLMSAutoConnect::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSAutoConnect::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -313,7 +313,7 @@ int CGXDLMSAutoConnect::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
 }
 
 // Set value of given attribute.
-int CGXDLMSAutoConnect::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSAutoConnect::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

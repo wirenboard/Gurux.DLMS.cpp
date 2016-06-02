@@ -1769,7 +1769,7 @@ int CGXDLMS::GetTcpData(
     }
 
     // Check TCP/IP addresses.
-    CheckWrapperAddress(settings, buff, data);
+    CheckWrapperAddress(settings, buff);
     // Get length.
     if ((ret = buff.GetUInt16(&value)) != 0)
     {
@@ -1896,8 +1896,9 @@ void CGXDLMS::GetLLCBytes(bool server, CGXByteBuffer& data)
     }
 }
 
-int CGXDLMS::CheckWrapperAddress(CGXDLMSSettings& settings,
-                                 CGXByteBuffer& buff, CGXReplyData& data)
+int CGXDLMS::CheckWrapperAddress(
+    CGXDLMSSettings& settings,
+    CGXByteBuffer& buff)
 {
     int ret;
     unsigned short value;

@@ -338,7 +338,7 @@ int CGXDLMSAssociationLogicalName::GetDataType(int index, DLMS_DATA_TYPE& type)
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
-int CGXDLMSAssociationLogicalName::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSAssociationLogicalName::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     int ret;
     if (e.GetIndex() == 1)
@@ -465,7 +465,7 @@ int CGXDLMSAssociationLogicalName::GetValue(CGXDLMSSettings& settings, CGXDLMSVa
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
-int CGXDLMSAssociationLogicalName::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSAssociationLogicalName::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

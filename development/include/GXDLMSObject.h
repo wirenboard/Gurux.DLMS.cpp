@@ -158,21 +158,21 @@ public:
     }
 
     // Returns value of given attribute.
-    virtual int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+    virtual int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
     {
         e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
         return DLMS_ERROR_CODE_OK;
     }
 
     // Set value of given attribute.
-    virtual int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+    virtual int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
     {
         e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
         return DLMS_ERROR_CODE_OK;
     }
 
     // Set value of given attribute.
-    virtual int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+    virtual int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
     {
         e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
         return DLMS_ERROR_CODE_OK;

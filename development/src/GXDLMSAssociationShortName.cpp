@@ -227,7 +227,7 @@ int CGXDLMSAssociationShortName::GetObjects(CGXByteBuffer& data)
     return DLMS_ERROR_CODE_OK;
 }
 
-int CGXDLMSAssociationShortName::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSAssociationShortName::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -289,7 +289,7 @@ int CGXDLMSAssociationShortName::GetValue(CGXDLMSSettings& settings, CGXDLMSValu
     return DLMS_ERROR_CODE_OK;
 }
 
-int CGXDLMSAssociationShortName::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSAssociationShortName::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

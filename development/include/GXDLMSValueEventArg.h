@@ -41,7 +41,7 @@
 
 class CGXDLMSObject;
 
-class CGXDLMSValueEventArgs
+class CGXDLMSValueEventArg
 {
 private:
     /**
@@ -148,7 +148,7 @@ public:
     * @param index
     *            Event index.
     */
-    CGXDLMSValueEventArgs(
+    CGXDLMSValueEventArg(
         CGXDLMSObject* target,
         int index);
 
@@ -164,7 +164,7 @@ public:
     * @param parameters
     *            Optional parameters.
     */
-    CGXDLMSValueEventArgs(
+    CGXDLMSValueEventArg(
         CGXDLMSObject* target,
         int index,
         int selector,

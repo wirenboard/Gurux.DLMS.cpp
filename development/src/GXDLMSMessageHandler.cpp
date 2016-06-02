@@ -190,7 +190,7 @@ int CGXDLMSMessageHandler::GetDataType(int index, DLMS_DATA_TYPE& type)
 }
 
 // Returns value of given attribute.
-int CGXDLMSMessageHandler::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSMessageHandler::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -222,7 +222,7 @@ int CGXDLMSMessageHandler::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
 }
 
 // Set value of given attribute.
-int CGXDLMSMessageHandler::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSMessageHandler::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

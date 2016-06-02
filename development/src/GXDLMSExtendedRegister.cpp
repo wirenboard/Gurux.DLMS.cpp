@@ -150,7 +150,7 @@ int CGXDLMSExtendedRegister::GetDataType(int index, DLMS_DATA_TYPE& type)
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
-int CGXDLMSExtendedRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSExtendedRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -179,7 +179,7 @@ int CGXDLMSExtendedRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 
-int CGXDLMSExtendedRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSExtendedRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() < 4)
     {

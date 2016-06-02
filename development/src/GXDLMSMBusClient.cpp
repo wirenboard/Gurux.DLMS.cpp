@@ -330,7 +330,7 @@ int CGXDLMSMBusClient::GetDataType(int index, DLMS_DATA_TYPE& type)
 }
 
 // Returns value of given attribute.
-int CGXDLMSMBusClient::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSMBusClient::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -394,7 +394,7 @@ int CGXDLMSMBusClient::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs
 }
 
 // Set value of given attribute.
-int CGXDLMSMBusClient::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSMBusClient::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

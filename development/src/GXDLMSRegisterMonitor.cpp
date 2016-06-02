@@ -199,7 +199,7 @@ int CGXDLMSRegisterMonitor::GetDataType(int index, DLMS_DATA_TYPE& type)
 /*
  * Returns value of given attribute.
  */
-int CGXDLMSRegisterMonitor::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSRegisterMonitor::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     CGXByteBuffer data;
     CGXDLMSVariant ln;
@@ -288,7 +288,7 @@ int CGXDLMSRegisterMonitor::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEven
 /*
  * Set value of given attribute.
  */
-int CGXDLMSRegisterMonitor::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSRegisterMonitor::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

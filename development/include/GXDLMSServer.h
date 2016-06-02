@@ -131,7 +131,7 @@ protected:
      *            Handled read requests.
      */
     virtual void Read(
-        std::vector<CGXDLMSValueEventArgs*>& args) = 0;
+        std::vector<CGXDLMSValueEventArg*>& args) = 0;
 
     /**
      * Write selected item(s).
@@ -140,7 +140,7 @@ protected:
      *            Handled write requests.
      */
     virtual void Write(
-        std::vector<CGXDLMSValueEventArgs*>& args) = 0;
+        std::vector<CGXDLMSValueEventArg*>& args) = 0;
 
     /**
      * Accepted connection is made for the server. All initialization is done
@@ -160,7 +160,7 @@ protected:
      *            Handled action requests.
      */
     virtual void Action(
-        std::vector<CGXDLMSValueEventArgs*>& args) = 0;
+        std::vector<CGXDLMSValueEventArg*>& args) = 0;
 public:
     /**
      * @return Client to Server challenge.

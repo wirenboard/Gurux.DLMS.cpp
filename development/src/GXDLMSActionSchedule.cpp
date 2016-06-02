@@ -196,7 +196,7 @@ int CGXDLMSActionSchedule::GetDataType(int index, DLMS_DATA_TYPE& type)
 }
 
 // Returns value of given attribute.
-int CGXDLMSActionSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSActionSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     CGXByteBuffer data;
     if (e.GetIndex() == 1)
@@ -255,7 +255,7 @@ int CGXDLMSActionSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
 }
 
 // Set value of given attribute.
-int CGXDLMSActionSchedule::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e)
+int CGXDLMSActionSchedule::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

@@ -99,7 +99,7 @@ public:
     // Returns amount of methods.
     int GetMethodCount();
 
-    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
+    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
@@ -108,8 +108,8 @@ public:
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
-    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
+    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 
-    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArgs& e);
+    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
 #endif //GXDLMSREGISTER_H
