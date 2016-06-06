@@ -82,7 +82,7 @@ typedef enum
     DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_MECHANISM_NAME_REQUIRED = 12,
     DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_FAILURE =13,
     DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_REQUIRED =14,
-}DLMS_SOURCE_DIAGNOSTIC;
+} DLMS_SOURCE_DIAGNOSTIC;
 
 /**
  *
@@ -244,7 +244,7 @@ typedef enum
     /// Radio controlled.
     /// </summary>
     DLMS_CLOCK_BASE_RADIO
-}DLMS_CLOCK_BASE;
+} DLMS_CLOCK_BASE;
 
 typedef enum
 {
@@ -260,7 +260,7 @@ typedef enum
      * The output_state is set to false and the consumer is disconnected.
      */
     DLMS_CONTROL_STATE_READY_FOR_RECONNECTION
-}DLMS_CONTROL_STATE;
+} DLMS_CONTROL_STATE;
 
 
 // Defines whether or not the device has been assigned an address
@@ -271,7 +271,7 @@ typedef enum
     DLMS_ADDRESS_STATE_NONE,
     // Assigned an address either by manual setting, or by automated method.
     DLMS_ADDRESS_STATE_ASSIGNED
-}DLMS_ADDRESS_STATE;
+} DLMS_ADDRESS_STATE;
 
 typedef enum
 {
@@ -294,7 +294,7 @@ typedef enum
      * Authentication and Encryption security are used.
      */
     DLMS_SECURITY_AUTHENTICATION_ENCRYPTION = 0x30,
-}DLMS_SECURITY;
+} DLMS_SECURITY;
 
 /**
 * HDLC frame types.
@@ -315,7 +315,7 @@ typedef enum
      * UA.
      */
     HDLC_FRAME_TYPE_U_FRAME = 0x3
-}HDLC_FRAME_TYPE;
+} HDLC_FRAME_TYPE;
 
 /**
 *BER encoding enumeration values.
@@ -434,7 +434,7 @@ typedef enum
     * Constructed.
     */
     BER_TYPE_CONSTRUCTED = 0x20
-}BER_TYPE;
+} BER_TYPE;
 
 /**
  * APDU types.
@@ -517,7 +517,7 @@ typedef enum
      * Association-information OPTIONAL
      */
     PDU_TYPE_USER_INFORMATION = 30
-}PDU_TYPE;
+} PDU_TYPE;
 
 /**
  * HDLC control frame types.
@@ -540,27 +540,46 @@ typedef enum
      * Frame is selective rejected. Not all meters support this.
      */
     HDLC_CONTROL_FRAME_SELECTIVE_REJECT = 3
-}HDLC_CONTROL_FRAME;
+} HDLC_CONTROL_FRAME;
 
 
 // Security policy Enforces authentication and/or encryption algorithm provided with security_suite.
 typedef enum
 {
-    //No security is used.
-    DLMS_SECURITY_POLICY_NOTHING,
     /**
-     All messages to be authenticated.
-    */
-    DLMS_SECURITY_POLICY_AUTHENTICATED,
+     * Security is not used.
+     */
+    DLMS_SECURITY_POLICY_NOTHING = 0,
     /**
-     All messages to be encrypted.
-    */
-    DLMS_SECURITY_POLICY_ENCRYPTED,
+     * Request is authenticated.
+     */
+    DLMS_SECURITY_POLICY_AUTHENTICATED_REQUEST = 0x4,
+
     /**
-     All messages to be authenticated and encrypted.
-    */
-    DLMS_SECURITY_POLICY_AUTHENTICATED_ENCRYPTED
-}DLMS_SECURITY_POLICY;
+     * Request is encrypted.
+     */
+    DLMS_SECURITY_POLICY_ENCRYPTED_REQUEST = 0x8,
+
+    /**
+     * Request is digitally signed.
+     */
+    DLMS_SECURITY_POLICY_DIGITALLY_SIGNED_REQUEST = 0x10,
+
+    /**
+     * Response is authenticated.
+     */
+    DLMS_SECURITY_POLICY_AUTHENTICATED_RESPONSE = 0x20,
+
+    /**
+     * Response is encrypted.
+     */
+    DLMS_SECURITY_POLICY_ENCRYPTED_RESPONSE = 0x40,
+
+    /**
+     * Response is digitally signed.
+     */
+    DLMS_SECURITY_POLICY_DIGITALLY_SIGNED_RESPONSE = 0x80
+} DLMS_SECURITY_POLICY;
 
 
 //Security suite Specifies authentication, encryption and key wrapping algorithm.
@@ -570,7 +589,7 @@ typedef enum
      AES-GCM-128 for authenticated encryption and AES-128 for key wrapping.
     */
     DLMS_SECURITY_SUITE_AES_GCM_128
-}DLMS_SECURITY_SUITE;
+} DLMS_SECURITY_SUITE;
 
 
 typedef enum
@@ -580,14 +599,14 @@ typedef enum
     DLMS_SERVICE_TYPE_FTP = 2,
     DLMS_SERVICE_TYPE_SMTP = 3,
     DLMS_SERVICE_TYPE_SMS = 4
-}DLMS_SERVICE_TYPE;
+} DLMS_SERVICE_TYPE;
 
 typedef enum
 {
     DLMS_MESSAGE_TYPE_COSEM_APDU = 0,
     DLMS_MESSAGE_TYPE_COSEM_APDU_XML = 1,
     DLMS_MESSAGE_TYPE_MANUFACTURER_SPESIFIC = 128
-}DLMS_MESSAGE_TYPE;
+} DLMS_MESSAGE_TYPE;
 
 typedef enum
 {
@@ -602,7 +621,7 @@ typedef enum
     DLMS_CLOCK_STATUS_DAYLIGHT_SAVE_ACTIVE = 0x80,
     //Skip clock status on write.
     DLMS_CLOCK_STATUS_SKIP = 0xFF
-}DLMS_CLOCK_STATUS;
+} DLMS_CLOCK_STATUS;
 
 /**
  * Authentication enumerates the authentication levels.
@@ -640,7 +659,7 @@ typedef enum
      * High authentication is used. Password is hashed with GMAC.
      */
     DLMS_AUTHENTICATION_HIGH_GMAC
-}DLMS_AUTHENTICATION;
+} DLMS_AUTHENTICATION;
 
 /**
  * Used priority.
@@ -652,13 +671,13 @@ typedef enum
 
     // High priority.
     DLMS_PRIORITY_HIGH = 1
-}DLMS_PRIORITY;
+} DLMS_PRIORITY;
 
 typedef enum
 {
     DLMS_SERVICE_CLASS_UN_CONFIRMED = 0,
     DLMS_SERVICE_CLASS_CONFIRMED = 1
-}DLMS_SERVICE_CLASS;
+} DLMS_SERVICE_CLASS;
 
 //Interface type that is used.
 typedef enum
@@ -667,14 +686,14 @@ typedef enum
     DLMS_INTERFACE_TYPE_HDLC = 0,
     // IEC 62056-47 COSEM transport layers for IPv4 networks
     DLMS_INTERFACE_TYPE_WRAPPER = 0x1
-}DLMS_INTERFACE_TYPE;
+} DLMS_INTERFACE_TYPE;
 
 typedef enum
 {
     DLMS_DATA_REQUEST_TYPES_NONE = 0x0,
     DLMS_DATA_REQUEST_TYPES_FRAME = 0x1,
     DLMS_DATA_REQUEST_TYPES_BLOCK = 0x2
-}DLMS_DATA_REQUEST_TYPES;
+} DLMS_DATA_REQUEST_TYPES;
 
 typedef enum
 {
@@ -739,7 +758,7 @@ typedef enum
      */
     DLMS_OBJECT_TYPE_ZIG_BEE_SAS_APS_FRAGMENTATION = 103,
     DLMS_OBJECT_TYPE_ZIG_BEE_NETWORK_CONTROL = 104
-}DLMS_OBJECT_TYPE;
+} DLMS_OBJECT_TYPE;
 
 typedef enum
 {
@@ -782,7 +801,7 @@ typedef enum
     DLMS_COMMAND_GLO_SET_RESPONSE = 0xCD,
     DLMS_COMMAND_GLO_METHOD_REQUEST = 0xCB,
     DLMS_COMMAND_GLO_METHOD_RESPONSE = 0xCF
-}DLMS_COMMAND;
+} DLMS_COMMAND;
 
 typedef enum
 {
@@ -790,7 +809,7 @@ typedef enum
     HDLC_INFO_MAX_INFO_RX = 0x6,
     HDLC_INFO_WINDOW_SIZE_TX = 0x7,
     HDLC_INFO_WINDOW_SIZE_RX = 0x8
-}HDLC_INFO;
+} HDLC_INFO;
 
 typedef enum
 {
@@ -818,7 +837,7 @@ typedef enum
     DLMS_DATA_TYPE_ARRAY = 1,
     DLMS_DATA_TYPE_STRUCTURE = 2,
     DLMS_DATA_TYPE_COMPACT_ARRAY = 19
-}DLMS_DATA_TYPE;
+} DLMS_DATA_TYPE;
 
 typedef enum
 {
@@ -841,7 +860,7 @@ typedef enum
     DLMS_ACCESS_MODE_AUTHENTICATED_READ = 4,
     DLMS_ACCESS_MODE_AUTHENTICATED_WRITE = 5,
     DLMS_ACCESS_MODE_AUTHENTICATED_READ_WRITE = 6
-}DLMS_ACCESS_MODE;
+} DLMS_ACCESS_MODE;
 
 typedef enum
 {
@@ -857,13 +876,13 @@ typedef enum
     /// Authenticated Access.
     /// </summary>
     DLMS_METHOD_ACCESS_MODE_AUTHENTICATED_ACCESS = 2
-}DLMS_METHOD_ACCESS_MODE;
+} DLMS_METHOD_ACCESS_MODE;
 
 typedef enum
 {
     DLMS_ASSOCIATION_STATUS_NON_ASSOCIATED = 0,
     DLMS_ASSOCIATION_STATUS_ASSOCIATION_PENDING = 1,
     DLMS_ASSOCIATION_STATUS_ASSOCIATED = 2
-}DLMS_ASSOCIATION_STATUS;
+} DLMS_ASSOCIATION_STATUS;
 
 #endif //ENUMS_H

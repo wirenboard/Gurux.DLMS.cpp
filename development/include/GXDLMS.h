@@ -139,6 +139,16 @@ public:
         CGXByteBuffer& bb);
 
     /**
+    * Handle General block transfer message.
+    *
+    * @param settings
+    *            DLMS settings.
+    * @param data
+    *            received data.
+    */
+    static int HandleGbt(CGXDLMSSettings& settings, CGXReplyData& data);
+
+    /**
      * Split DLMS PDU to wrapper frames.
      *
      * @param settings
