@@ -1139,16 +1139,17 @@ int CGXDLMS::HandleMethodResponse(
     {
         return ret;
     }
-    if ((ret = data.GetData().GetUInt8(&ch)) != 0)
-    {
-        return ret;
-    }
-    if (ch != 0)
-    {
-        data.SetError(ch);
-    }
+    //Action-Response-Normal
     if (type == 1)
     {
+        if ((ret = data.GetData().GetUInt8(&ch)) != 0)
+        {
+            return ret;
+        }
+        if (ch != 0)
+        {
+            data.SetError(ch);
+        }
         // Response normal. Get data if exists.
         if (data.GetData().GetPosition() < data.GetData().GetSize())
         {
@@ -1156,29 +1157,51 @@ int CGXDLMS::HandleMethodResponse(
             {
                 return ret;
             }
-            if (ch != 0)
+            if (ch == 0)
             {
-                if (ch != 1)
-                {
-                    //Invalid tag.
-                    return DLMS_ERROR_CODE_INVALID_TAG;
-                }
-                CGXDataInfo info;
-                CGXDLMSVariant value;
-                int pos = data.GetData().GetPosition();
-                if ((ret = GXHelpers::GetData(data.GetData(), info, value)) != 0)
+                GetDataFromBlock(data.GetData(), 0);
+            }
+            else if (ch == 1)
+            {
+                //Get Data-Access-Result
+                if ((ret = data.GetData().GetUInt8(&ch)) != 0)
                 {
                     return ret;
                 }
-                data.SetValue(value);
-                data.GetData().SetPosition(pos);
+                if (ch != 0)
+                {
+                    if ((ret = data.GetData().GetUInt8(&ch)) != 0)
+                    {
+                        return ret;
+                    }
+                    data.SetError(ch);
+                }
                 GetDataFromBlock(data.GetData(), 0);
+            }
+            else
+            {
+                //Invalid tag.
+                return DLMS_ERROR_CODE_INVALID_TAG;
             }
         }
     }
+    else if  (type == 2)
+    {
+        //Action-Response-With-Pblock
+        return DLMS_ERROR_CODE_INVALID_COMMAND;
+    }
+    else if  (type == 3)
+    {
+        // Action-Response-With-List.
+        return DLMS_ERROR_CODE_INVALID_COMMAND;
+    }
+    else if  (type == 4)
+    {
+        //Action-Response-Next-Pblock
+        return DLMS_ERROR_CODE_INVALID_COMMAND;
+    }
     else
     {
-        //Invalid DLMS_COMMAND_
         return DLMS_ERROR_CODE_INVALID_COMMAND;
     }
     return DLMS_ERROR_CODE_OK;

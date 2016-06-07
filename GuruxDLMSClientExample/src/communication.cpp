@@ -41,10 +41,10 @@ CGXCommunication::CGXCommunication(CGXDLMSClient* pParser, int wt, bool trace) :
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
     ZeroMemory(&m_osReader, sizeof(OVERLAPPED));
     ZeroMemory(&m_osWrite, sizeof(OVERLAPPED));
-    m_hComPort = INVALID_HANDLE_VALUE;
     m_osReader.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     m_osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 #endif
+    m_hComPort = INVALID_HANDLE_VALUE;
 }
 
 CGXCommunication::~CGXCommunication(void)
@@ -58,21 +58,24 @@ int CGXCommunication::Close()
     int ret;
     std::vector<CGXByteBuffer> data;
     CGXReplyData reply;
-    if ((ret = m_Parser->DisconnectRequest(data)) != 0 ||
-            (ret = ReadDataBlock(data, reply)) != 0)
+    if (m_hComPort != INVALID_HANDLE_VALUE || m_socket != -1)
     {
-        //Show error but continue close.
+        if ((ret = m_Parser->DisconnectRequest(data)) != 0 ||
+                (ret = ReadDataBlock(data, reply)) != 0)
+        {
+            //Show error but continue close.
+        }
     }
     if (m_hComPort != INVALID_HANDLE_VALUE)
     {
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
         CloseHandle(m_hComPort);
-        m_hComPort = INVALID_HANDLE_VALUE;
         CloseHandle(m_osReader.hEvent);
         CloseHandle(m_osWrite.hEvent);
 #else
         close(m_hComPort);
 #endif
+        m_hComPort = INVALID_HANDLE_VALUE;
     }
     if (m_socket != -1)
     {
@@ -83,7 +86,7 @@ int CGXCommunication::Close()
 #endif
         m_socket = -1;
     }
-    return ret;
+    return 0;
 }
 
 //Make TCP/IP connection to the meter.
@@ -110,7 +113,7 @@ int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
             int err = WSAGetLastError();
 #else
-            int err = h_errno;
+            int err = errno;
 #endif
             Close();
             return err;
@@ -664,7 +667,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
     int len = data.GetSize();
     if (m_hComPort != INVALID_HANDLE_VALUE)
     {
-#if defined(_WIN32) || defined(_WIN64)//Windows includes
+#if defined(_WIN32) || defined(_WIN64)//If Windows
         DWORD sendSize = 0;
         BOOL bRes = ::WriteFile(m_hComPort, data.GetData(), len, &sendSize, &m_osWrite);
         if (!bRes)
@@ -678,17 +681,23 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             //Wait until data is actually sent
             ::WaitForSingleObject(m_osWrite.hEvent, INFINITE);
         }
-#else
+#else //If Linux
         ret = write(m_hComPort, data.GetData(), len);
         if (ret != len)
         {
+            printf("send failed %d\n", errno);
             return DLMS_ERROR_CODE_SEND_FAILED;
         }
 #endif
     }
-    else if (send(m_socket, (const char*) data.GetData(), len, 0) == -1)
+    else if ((ret = send(m_socket, (const char*) data.GetData(), len, 0)) == -1)
     {
         //If error has occured
+#if defined(_WIN32) || defined(_WIN64)//If Windows
+        printf("send failed %d\n", WSAGetLastError());
+#else
+        printf("send failed %d\n", errno);
+#endif
         return DLMS_ERROR_CODE_SEND_FAILED;
     }
     // Loop until whole DLMS packet is received.
@@ -706,6 +715,11 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             len = RECEIVE_BUFFER_SIZE;
             if ((ret = recv(m_socket, (char*) m_Receivebuff, len, 0)) == -1)
             {
+#if defined(_WIN32) || defined(_WIN64)//If Windows
+                printf("recv failed %d\n", WSAGetLastError());
+#else
+                printf("recv failed %d\n", errno);
+#endif
                 return DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
             bb.Set(m_Receivebuff, ret);

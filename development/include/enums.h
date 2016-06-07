@@ -553,32 +553,32 @@ typedef enum
     /**
      * Request is authenticated.
      */
-    DLMS_SECURITY_POLICY_AUTHENTICATED_REQUEST = 0x4,
+    DLMS_SECURITY_POLICY_AUTHENTICATED_REQUEST = 0x20,
 
     /**
      * Request is encrypted.
      */
-    DLMS_SECURITY_POLICY_ENCRYPTED_REQUEST = 0x8,
+    DLMS_SECURITY_POLICY_ENCRYPTED_REQUEST = 0x10,
 
     /**
      * Request is digitally signed.
      */
-    DLMS_SECURITY_POLICY_DIGITALLY_SIGNED_REQUEST = 0x10,
+    DLMS_SECURITY_POLICY_DIGITALLY_SIGNED_REQUEST = 0x8,
 
     /**
      * Response is authenticated.
      */
-    DLMS_SECURITY_POLICY_AUTHENTICATED_RESPONSE = 0x20,
+    DLMS_SECURITY_POLICY_AUTHENTICATED_RESPONSE = 0x4,
 
     /**
      * Response is encrypted.
      */
-    DLMS_SECURITY_POLICY_ENCRYPTED_RESPONSE = 0x40,
+    DLMS_SECURITY_POLICY_ENCRYPTED_RESPONSE = 0x2,
 
     /**
      * Response is digitally signed.
      */
-    DLMS_SECURITY_POLICY_DIGITALLY_SIGNED_RESPONSE = 0x80
+    DLMS_SECURITY_POLICY_DIGITALLY_SIGNED_RESPONSE = 0x1
 } DLMS_SECURITY_POLICY;
 
 
