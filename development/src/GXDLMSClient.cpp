@@ -74,6 +74,26 @@ DLMS_INTERFACE_TYPE CGXDLMSClient::GetInterfaceType()
     return m_Settings.GetInterfaceType();
 }
 
+DLMS_PRIORITY CGXDLMSClient::GetPriority()
+{
+    return m_Settings.GetPriority();
+}
+
+void CGXDLMSClient::SetPriority(DLMS_PRIORITY value)
+{
+    m_Settings.SetPriority(value);
+}
+
+DLMS_SERVICE_CLASS CGXDLMSClient::GetServiceClass()
+{
+    return m_Settings.GetServiceClass();
+}
+
+void CGXDLMSClient::SetServiceClass(DLMS_SERVICE_CLASS value)
+{
+    m_Settings.SetServiceClass(value);
+}
+
 CGXDLMSLimits& CGXDLMSClient::GetLimits()
 {
     return m_Settings.GetLimits();
@@ -931,6 +951,130 @@ int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int a
         }
     }
     return CGXDLMS::GetMessages(m_Settings, cmd, 1, bb, NULL, reply);
+}
+
+/**
+* Read list of COSEM objects.
+*
+* @param list
+*            DLMS objects to read.
+* @return Read request as byte array.
+*/
+int CGXDLMSClient::ReadList(
+    std::vector<std::pair<CGXDLMSObject*, unsigned char>>& list,
+    std::vector<CGXByteBuffer>& reply)
+{
+    if (list.size() == 0)
+    {
+        //Invalid parameter
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    int ret;
+    m_Settings.ResetBlockIndex();
+    DLMS_COMMAND cmd;
+    CGXByteBuffer bb;
+    if (GetUseLogicalNameReferencing())
+    {
+        cmd = DLMS_COMMAND_GET_REQUEST;
+        //Request service primitive shall always fit in a single APDU.
+        unsigned short pos = 0, count = (m_Settings.GetMaxReceivePDUSize() - 12) / 10;
+        if (list.size() < count)
+        {
+            count = list.size();
+        }
+        //All meters can handle 10 items.
+        if (count > 10)
+        {
+            count = 10;
+        }
+        // Add length.
+        GXHelpers::SetObjectCount(count, bb);
+        for(std::vector<std::pair<CGXDLMSObject*, unsigned char>>::iterator it = list.begin(); it != list.end(); ++it)
+        {
+            // CI.
+            bb.SetUInt16(it->first->GetObjectType());
+            bb.Set(it->first->m_LN, 6);
+            // Attribute ID.
+            bb.SetUInt8(it->second);
+            // Attribute selector is not used.
+            bb.SetUInt8(0);
+            ++pos;
+            if (pos % count == 0 && list.size() != pos)
+            {
+                if ((ret = CGXDLMS::GetMessages(m_Settings, cmd, 3, bb, NULL, reply)) != 0)
+                {
+                    return ret;
+                }
+                bb.Clear();
+                if (list.size() - pos < count)
+                {
+                    GXHelpers::SetObjectCount(list.size() - pos, bb);
+                }
+                else
+                {
+                    GXHelpers::SetObjectCount(count, bb);
+                }
+            }
+        }
+    }
+    else
+    {
+        int sn;
+        cmd = DLMS_COMMAND_READ_REQUEST;
+        // Add length.
+        GXHelpers::SetObjectCount(list.size(), bb);
+        for(std::vector<std::pair<CGXDLMSObject*, unsigned char>>::iterator it = list.begin(); it != list.end(); ++it)
+        {
+            // Add variable type.
+            bb.SetUInt8(2);
+            sn = it->first->GetShortName();
+            sn += (it->second - 1) * 8;
+            bb.SetUInt16(sn);
+        }
+    }
+    return CGXDLMS::GetMessages(m_Settings, cmd, 3, bb, NULL, reply);
+}
+
+/**
+     * Update list of values.
+     *
+     * @param list
+     *            read objects.
+     * @param data
+     *            Received reply from the meter.
+     */
+int CGXDLMSClient::UpdateValues(
+    std::vector<std::pair<CGXDLMSObject*, unsigned char>>& list,
+    CGXByteBuffer& data)
+{
+    int ret;
+    CGXDLMSVariant value;
+    CGXDataInfo info;
+    unsigned char ch;
+    for(std::vector<std::pair<CGXDLMSObject*, unsigned char>>::iterator it = list.begin(); it != list.end(); ++it)
+    {
+        ret = data.GetUInt8(&ch);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        if (ch == 0)
+        {
+            if ((ret = GXHelpers::GetData(data, info, value)) != 0)
+            {
+                return ret;
+            }
+            CGXDLMSValueEventArg e(it->first, it->second);
+            e.SetValue(value);
+            it->first->SetValue(m_Settings, e);
+            info.Clear();
+        }
+        else
+        {
+            return ch;
+        }
+    }
+    return 0;
 }
 
 int CGXDLMSClient::Write(CGXDLMSObject* pObject,

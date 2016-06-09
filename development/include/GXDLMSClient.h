@@ -101,6 +101,28 @@ public:
 
     DLMS_INTERFACE_TYPE GetInterfaceType();
 
+    /**
+     * @return Used Priority.
+     */
+    DLMS_PRIORITY GetPriority();
+
+    /**
+     * @param value
+     *            Used Priority.
+     */
+    void SetPriority(DLMS_PRIORITY value);
+
+    /**
+     * @return Used service class.
+     */
+    DLMS_SERVICE_CLASS GetServiceClass();
+
+    /**
+     * @param value
+     *            Used service class.
+     */
+    void SetServiceClass(DLMS_SERVICE_CLASS value);
+
     CGXDLMSLimits& GetLimits();
 
     /////////////////////////////////////////////////////////////////////////////
@@ -268,6 +290,29 @@ public:
         CGXDLMSObject* pObject,
         int attributeOrdinal,
         std::vector<CGXByteBuffer>& reply);
+
+    /**
+    * Read list of COSEM objects.
+    *
+    * @param list
+    *            DLMS objects to read.
+    * @return Read request as byte array.
+    */
+    int ReadList(
+        std::vector<std::pair<CGXDLMSObject*, unsigned char>>& list,
+        std::vector<CGXByteBuffer>& reply);
+
+    /**
+         * Update list of values.
+         *
+         * @param list
+         *            read objects.
+         * @param data
+         *            Received reply from the meter.
+         */
+    int UpdateValues(
+        std::vector<std::pair<CGXDLMSObject*, unsigned char>>& list,
+        CGXByteBuffer& data);
 
     /**
     * Generates a write message.

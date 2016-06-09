@@ -58,10 +58,6 @@ private:
      * Is frame complete.
      */
     bool m_Complete;
-    /**
-     * Received error.
-     */
-    short m_Error;
 
     /**
      * Read value.
@@ -156,8 +152,6 @@ public:
 
     void SetComplete(bool value);
 
-    void SetError(short value);
-
     void SetTotalCount(int value);
 
     /**
@@ -200,15 +194,6 @@ public:
      * @return Returns true if frame is complete or false if bytes is missing.
      */
     bool IsComplete();
-
-    /**
-     * Get Received error. Value is zero if no error has occurred.
-     *
-     * @return Received error.
-     */
-    short GetError();
-
-    std::string GetErrorMessage();
 
     /**
      * Get total count of element in the array. If this method is used peek must

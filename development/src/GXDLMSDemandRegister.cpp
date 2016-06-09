@@ -39,7 +39,7 @@
 
 bool CGXDLMSDemandRegister::IsRead(int index)
 {
-    if (index == 3)
+    if (index == 4)
     {
         return m_Unit != 0;
     }

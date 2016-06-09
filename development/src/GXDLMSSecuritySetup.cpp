@@ -137,16 +137,23 @@ void CGXDLMSSecuritySetup::GetAttributeIndexToRead(std::vector<int>& attributes)
     {
         attributes.push_back(3);
     }
-
-    //ClientSystemTitle
-    if (CanRead(4))
+    if (GetVersion() > 0)
     {
-        attributes.push_back(4);
-    }
-    //ServerSystemTitle
-    if (CanRead(5))
-    {
-        attributes.push_back(5);
+        //ClientSystemTitle
+        if (CanRead(4))
+        {
+            attributes.push_back(4);
+        }
+        //ServerSystemTitle
+        if (CanRead(5))
+        {
+            attributes.push_back(5);
+        }
+        //Certificates
+        if (CanRead(6))
+        {
+            attributes.push_back(6);
+        }
     }
 }
 

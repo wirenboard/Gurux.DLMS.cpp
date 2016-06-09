@@ -47,7 +47,6 @@ CGXReplyData::CGXReplyData(
     m_Command = cmd;
     m_Data = buff;
     m_Complete = complete;
-    m_Error = error;
     m_Time = NULL;
 }
 
@@ -111,11 +110,6 @@ void CGXReplyData::SetComplete(bool value)
     m_Complete = value;
 }
 
-void CGXReplyData::SetError(short value)
-{
-    m_Error = value;
-}
-
 void CGXReplyData::SetTotalCount(int value)
 {
     m_TotalCount = value;
@@ -129,7 +123,6 @@ void CGXReplyData::Clear()
     m_Data.Clear();
     m_Complete = false;
     m_Peek = false;
-    m_Error = 0;
     m_TotalCount = 0;
     m_DataValue.Clear();
     m_ReadPosition = 0;
@@ -140,7 +133,7 @@ void CGXReplyData::Clear()
 
 bool CGXReplyData::IsMoreData()
 {
-    return m_MoreData != DLMS_DATA_REQUEST_TYPES_NONE && m_Error == 0;
+    return m_MoreData != DLMS_DATA_REQUEST_TYPES_NONE;
 }
 
 DLMS_DATA_REQUEST_TYPES CGXReplyData::GetMoreData()
@@ -166,16 +159,6 @@ CGXByteBuffer& CGXReplyData::GetData()
 bool CGXReplyData::IsComplete()
 {
     return m_Complete;
-}
-
-short CGXReplyData::GetError()
-{
-    return m_Error;
-}
-
-std::string CGXReplyData::GetErrorMessage()
-{
-    return CGXDLMSConverter::GetErrorMessage(m_Error);
 }
 
 int CGXReplyData::GetTotalCount()

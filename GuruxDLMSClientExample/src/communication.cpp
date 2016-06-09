@@ -110,7 +110,7 @@ int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
         hostent *Hostent = gethostbyname(pAddress);
         if (Hostent == NULL)
         {
-#if defined(_WIN32) || defined(_WIN64)//Windows includes
+#if defined(_WIN32) || defined(_WIN64)//If Windows
             int err = WSAGetLastError();
 #else
             int err = errno;
@@ -737,6 +737,36 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
     return ret;
 }
 
+int CGXCommunication::ReadDataBlock(CGXByteBuffer& data, CGXReplyData& reply)
+{
+    //If ther is no data to send.
+    if (data.GetSize() == 0)
+    {
+        return DLMS_ERROR_CODE_OK;
+    }
+    int ret;
+    CGXByteBuffer bb;
+    //Send data.
+    if ((ret = ReadDLMSPacket(data, reply)) != DLMS_ERROR_CODE_OK)
+    {
+        return ret;
+    }
+    while (reply.IsMoreData())
+    {
+        bb.Clear();
+        if ((ret = m_Parser->ReceiverReady(reply.GetMoreData(), bb)) != 0)
+        {
+            return ret;
+        }
+        if ((ret = ReadDLMSPacket(bb, reply)) != DLMS_ERROR_CODE_OK)
+        {
+            return ret;
+        }
+    }
+    return DLMS_ERROR_CODE_OK;
+}
+
+
 int CGXCommunication::ReadDataBlock(std::vector<CGXByteBuffer>& data, CGXReplyData& reply)
 {
     //If ther is no data to send.
@@ -846,7 +876,7 @@ int CGXCommunication::Read(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVa
     int ret;
     std::vector<CGXByteBuffer> data;
     CGXReplyData reply;
-    //Get meter's send and receive buffers size.
+    //Read data from the meter.
     if ((ret = m_Parser->Read(pObject, attributeIndex, data)) != 0 ||
             (ret = ReadDataBlock(data, reply)) != 0 ||
             (ret = m_Parser->UpdateValue(*pObject, attributeIndex, reply.GetValue())) != 0)
@@ -873,6 +903,33 @@ int CGXCommunication::Read(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVa
     pObject->GetValues(values);
     value = values[attributeIndex - 1];
     return DLMS_ERROR_CODE_OK;
+}
+
+int CGXCommunication::ReadList(std::vector<std::pair<CGXDLMSObject*, unsigned char>>& list)
+{
+    int ret;
+    CGXByteBuffer bb;
+    CGXReplyData reply;
+    std::vector<CGXByteBuffer> data;
+    //Get values from the meter.
+    if ((ret = m_Parser->ReadList(list, data)) != 0)
+    {
+        return ret;
+    }
+
+    for(std::vector<CGXByteBuffer>::iterator it = data.begin(); it != data.end(); ++it)
+    {
+        reply.Clear();
+        if ((ret = ReadDataBlock(*it, reply)) != 0)
+        {
+            return ret;
+        }
+        if (reply.IsComplete())
+        {
+            bb.Set(&reply.GetData(), 0, -1);
+        }
+    }
+    return m_Parser->UpdateValues(list, bb);
 }
 
 //Write selected object.

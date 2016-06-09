@@ -95,6 +95,7 @@ public:
     int Close();
     int Connect(const char* pAddress, unsigned short port = 4059);
     int Read(unsigned char eop, CGXByteBuffer& reply);
+
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
     int GXGetCommState(HANDLE hWnd, LPDCB DCB);
     int GXSetCommState(HANDLE hWnd, LPDCB DCB);
@@ -127,6 +128,7 @@ public:
     }
 
     int ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply);
+    int ReadDataBlock(CGXByteBuffer& data, CGXReplyData& reply);
     int ReadDataBlock(std::vector<CGXByteBuffer>& data, CGXReplyData& reply);
 
     int InitializeConnection();
@@ -136,6 +138,8 @@ public:
 
     //Read selected object.
     int Read(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& value);
+
+    int ReadList(std::vector<std::pair<CGXDLMSObject*, unsigned char>>& list);
 
     //Write selected object.
     int Write(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& value);

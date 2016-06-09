@@ -38,6 +38,7 @@
 #include "../include/communication.h"
 #include "../../development/include/GXDLMSConverter.h"
 #include "../../development/include/GXDLMSProfileGeneric.h"
+#include "../../development/include/GXDLMSDemandRegister.h"
 
 static void WriteValue(std::string line)
 {
@@ -77,7 +78,10 @@ int main( int argc, char* argv[] )
         	CGXDLMSClient cl(true, 3, 0x00020023, DLMS_AUTHENTICATION_LOW, "ABCDEFGH");
         	//Iskra TCP/IP settings.
         	CGXDLMSClient cl(true, 100, 1, DLMS_AUTHENTICATION_LOW, "12345678", DLMS_INTERFACE_TYPE_WRAPPER);
-        	//ZIV settings.
+            CGXDLMSClient cl(true, 1, 1, DLMS_AUTHENTICATION_LOW, "12345678", DLMS_INTERFACE_TYPE_WRAPPER);
+            //Note! New Iskra meters need also this.
+            cl.SetServiceClass(DLMS_SERVICE_CLASS_CONFIRMED);
+            //ZIV settings.
         	CGXDLMSClient cl(true, 1, 1, DLMS_AUTHENTICATION_NONE, NULL, DLMS_INTERFACE_TYPE_WRAPPER);
         */
         //Remove trace file if exists.
@@ -86,7 +90,7 @@ int main( int argc, char* argv[] )
         bool trace = true;
         //Landis+Gyr settings.
         CGXDLMSClient cl(false);
-        CGXCommunication comm(&cl, 1500, trace);
+        CGXCommunication comm(&cl, 5000, trace);
         //Serial port settings.
         /*
         if ((ret = comm.Open("COM3", false)) != 0)
@@ -97,7 +101,7 @@ int main( int argc, char* argv[] )
 
         */
         //TCP/IP settings.
-        if ((ret = comm.Connect("localhost", 4060)) != 0)
+        if ((ret = comm.Connect("localhost", 4059)) != 0)
         {
             TRACE("Connect failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
             return 1;
@@ -113,12 +117,56 @@ int main( int argc, char* argv[] )
             TRACE("InitializeConnection failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
             return 1;
         }
-        std::string str;
-        //Read columns.
         CGXDLMSVariant value;
+        std::string str;
+        std::string ln;
+        std::vector<std::pair<CGXDLMSObject*, unsigned char>> list;
+        // Read scalers and units from the device.
+        for(std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)
+        {
+            if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_REGISTER ||
+                    (*it)->GetObjectType() == DLMS_OBJECT_TYPE_EXTENDED_REGISTER)
+            {
+                list.push_back(std::make_pair(*it, 3));
+            }
+            else if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_DEMAND_REGISTER)
+            {
+                list.push_back(std::make_pair(*it, 4));
+            }
+        }
+        if ((ret = comm.ReadList(list)) != 0)
+        {
+            //If readlist is not supported read in old way.
+            for(std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)
+            {
+                if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_REGISTER ||
+                        (*it)->GetObjectType() == DLMS_OBJECT_TYPE_EXTENDED_REGISTER)
+                {
+                    (*it)->GetLogicalName(ln);
+                    TRACE("%s\r\n", ln.c_str());
+                    if ((ret = comm.Read(*it, 3, value)) != 0)
+                    {
+                        TRACE("Err! Failed to read register: %s", CGXDLMSConverter::GetErrorMessage(ret));
+                        //Continue reading.
+                        continue;
+                    }
+                }
+                else if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_DEMAND_REGISTER)
+                {
+                    (*it)->GetLogicalName(ln);
+                    TRACE("%s\r\n", ln.c_str());
+                    if ((ret = comm.Read(*it, 4, value)) != 0)
+                    {
+                        TRACE("Err! Failed to read demand register: %s", CGXDLMSConverter::GetErrorMessage(ret));
+                        //Continue reading.
+                        continue;
+                    }
+                }
+            }
+        }
+        //Read columns.
         CGXDLMSObjectCollection profileGenerics;
         Objects.GetObjects(DLMS_OBJECT_TYPE_PROFILE_GENERIC, profileGenerics);
-        std::string ln;
         for(std::vector<CGXDLMSObject*>::iterator it = profileGenerics.begin(); it != profileGenerics.end(); ++it)
         {
             //Read Profile Generic columns first.
@@ -130,30 +178,30 @@ int main( int argc, char* argv[] )
                 continue;
             }
 
-            //Read and update columns scalers.
+            //Update columns scalers.
+            DLMS_OBJECT_TYPE ot;
+            CGXDLMSObject* obj;
             for(std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it2 = pg->GetCaptureObjects().begin(); it2 != pg->GetCaptureObjects().end(); ++it2)
             {
-                DLMS_OBJECT_TYPE ot = (*it2).first->GetObjectType();
-                if (ot == DLMS_OBJECT_TYPE_REGISTER)
+                ot = it2->first->GetObjectType();
+                if (ot == DLMS_OBJECT_TYPE_REGISTER ||
+                        ot == DLMS_OBJECT_TYPE_EXTENDED_REGISTER ||
+                        ot == DLMS_OBJECT_TYPE_DEMAND_REGISTER)
                 {
-                    (*it2).first->GetLogicalName(ln);
-                    TRACE("%s\r\n", ln.c_str());
-                    if ((ret = comm.Read((*it2).first, 3, value)) != 0)
+                    it2->first->GetLogicalName(ln);
+                    obj = Objects.FindByLN(ot, ln);
+                    if (obj != NULL)
                     {
-                        TRACE("Err! Failed to read register: %s", CGXDLMSConverter::GetErrorMessage(ret));
-                        //Continue reading.
-                        continue;
-                    }
-                }
-                if ((*it2).first->GetObjectType() == DLMS_OBJECT_TYPE_DEMAND_REGISTER)
-                {
-                    (*it2).first->GetLogicalName(ln);
-                    TRACE("%s\r\n", ln.c_str());
-                    if ((ret = comm.Read((*it2).first, 4, value)) != 0)
-                    {
-                        TRACE("Err! Failed to read demand register: %s", CGXDLMSConverter::GetErrorMessage(ret));
-                        //Continue reading.
-                        continue;
+                        if (ot == DLMS_OBJECT_TYPE_REGISTER || ot == DLMS_OBJECT_TYPE_EXTENDED_REGISTER)
+                        {
+                            ((CGXDLMSRegister*) it2->first)->SetScaler(((CGXDLMSRegister*) obj)->GetScaler());
+                            ((CGXDLMSRegister*) it2->first)->SetUnit(((CGXDLMSRegister*) obj)->GetUnit());
+                        }
+                        else if (ot == DLMS_OBJECT_TYPE_DEMAND_REGISTER)
+                        {
+                            ((CGXDLMSDemandRegister*) it2->first)->SetScaler(((CGXDLMSDemandRegister*) obj)->GetScaler());
+                            ((CGXDLMSDemandRegister*) it2->first)->SetUnit(((CGXDLMSDemandRegister*) obj)->GetUnit());
+                        }
                     }
                 }
             }

@@ -962,15 +962,14 @@ int CGXDLMS::GetHdlcData(
         // If frame is rejected.
         if (tmp == HDLC_CONTROL_FRAME_REJECT)
         {
-            data.SetError(DLMS_ERROR_CODE_REJECTED);
+            return DLMS_ERROR_CODE_REJECTED;
         }
         else if (tmp == HDLC_CONTROL_FRAME_RECEIVE_NOT_READY)
         {
-            data.SetError(DLMS_ERROR_CODE_REJECTED);
+            return DLMS_ERROR_CODE_REJECTED;
         }
         else if (tmp == HDLC_CONTROL_FRAME_RECEIVE_READY)
         {
-            data.SetError(DLMS_ERROR_CODE_OK);
             // Get next frame.
         }
         // Get Eop if there is no data.
@@ -1151,7 +1150,7 @@ int CGXDLMS::HandleMethodResponse(
         }
         if (ch != 0)
         {
-            data.SetError(ch);
+            return ch;
         }
         // Response normal. Get data if exists.
         if (data.GetData().GetPosition() < data.GetData().GetSize())
@@ -1177,7 +1176,7 @@ int CGXDLMS::HandleMethodResponse(
                     {
                         return ret;
                     }
-                    data.SetError(ch);
+                    return ch;
                 }
                 GetDataFromBlock(data.GetData(), 0);
             }
@@ -1380,12 +1379,20 @@ int CGXDLMS::GetPdu(
         case DLMS_COMMAND_READ_RESPONSE:
             if ((ret = HandleReadResponse(data)) != 0)
             {
+                if (ret == DLMS_ERROR_CODE_FALSE)
+                {
+                    return 0;
+                }
                 return ret;
             }
             break;
         case DLMS_COMMAND_GET_RESPONSE:
             if ((ret = HandleGetResponse(settings, data, index)) != 0)
             {
+                if (ret == DLMS_ERROR_CODE_FALSE)
+                {
+                    return 0;
+                }
                 return ret;
             }
             break;
@@ -1605,6 +1612,7 @@ int CGXDLMS::HandleGetResponse(
     unsigned char ch;
     unsigned long number;
     short type;
+    unsigned long count;
     CGXByteBuffer& data = reply.GetData();
 
     // Get type.
@@ -1632,7 +1640,7 @@ int CGXDLMS::HandleGetResponse(
             {
                 return ret;
             }
-            reply.SetError(ch);
+            return ch;
         }
         ret = GetDataFromBlock(data, 0);
     }
@@ -1679,12 +1687,11 @@ int CGXDLMS::HandleGetResponse(
             {
                 return ret;
             }
-            reply.SetError(ch);
+            return ch;
         }
         else
         {
             // Get data size.
-            unsigned long count;
             GXHelpers::GetObjectCount(data, count);
             reply.SetBlockLength(count);
             // if whole block is read.
@@ -1715,6 +1722,11 @@ int CGXDLMS::HandleGetResponse(
     else if (type == 3)
     {
         // Get response with list.
+        //Get count.
+        if ((ret = GXHelpers::GetObjectCount(data, count)) != 0)
+        {
+            return ret;
+        }
         GetDataFromBlock(data, 0);
         return DLMS_ERROR_CODE_FALSE;
     }
@@ -1723,7 +1735,7 @@ int CGXDLMS::HandleGetResponse(
         //Invalid Get response.
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return DLMS_ERROR_CODE_OK;
+    return ret;
 }
 
 int CGXDLMS::HandleWriteResponse(CGXReplyData& data)
@@ -1747,8 +1759,7 @@ int CGXDLMS::HandleWriteResponse(CGXReplyData& data)
             {
                 return ret;
             }
-            data.SetError(ch);
-            return ret;
+            return ch;
         }
     }
     return DLMS_ERROR_CODE_OK;
@@ -1760,14 +1771,12 @@ int CGXDLMS::HandleReadResponse(
     unsigned char ch;
     unsigned long count;
     int ret;
-    int pos = data.GetData().GetPosition();
     if ((ret = GXHelpers::GetObjectCount(data.GetData(), count)) != 0)
     {
         return ret;
     }
     if (count != 1)
     {
-        data.GetData().SetPosition(pos);
         GetDataFromBlock(data.GetData(), 0);
         return DLMS_ERROR_CODE_FALSE;
     }
@@ -1778,7 +1787,6 @@ int CGXDLMS::HandleReadResponse(
     }
     if (ch == 0)
     {
-        data.SetError(0);
         GetDataFromBlock(data.GetData(), 0);
     }
     else
@@ -1788,7 +1796,7 @@ int CGXDLMS::HandleReadResponse(
         {
             return ret;
         }
-        data.SetError(ch);
+        return ch;
     }
     return DLMS_ERROR_CODE_OK;
 }
