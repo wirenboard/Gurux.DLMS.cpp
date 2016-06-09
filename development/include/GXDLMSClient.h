@@ -299,7 +299,7 @@ public:
     * @return Read request as byte array.
     */
     int ReadList(
-        std::vector<std::pair<CGXDLMSObject*, unsigned char>>& list,
+        std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list,
         std::vector<CGXByteBuffer>& reply);
 
     /**
@@ -311,7 +311,7 @@ public:
          *            Received reply from the meter.
          */
     int UpdateValues(
-        std::vector<std::pair<CGXDLMSObject*, unsigned char>>& list,
+        std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list,
         CGXByteBuffer& data);
 
     /**

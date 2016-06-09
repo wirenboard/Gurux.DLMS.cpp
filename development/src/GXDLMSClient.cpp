@@ -961,7 +961,7 @@ int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int a
 * @return Read request as byte array.
 */
 int CGXDLMSClient::ReadList(
-    std::vector<std::pair<CGXDLMSObject*, unsigned char>>& list,
+    std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list,
     std::vector<CGXByteBuffer>& reply)
 {
     if (list.size() == 0)
@@ -989,7 +989,7 @@ int CGXDLMSClient::ReadList(
         }
         // Add length.
         GXHelpers::SetObjectCount(count, bb);
-        for(std::vector<std::pair<CGXDLMSObject*, unsigned char>>::iterator it = list.begin(); it != list.end(); ++it)
+        for(std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = list.begin(); it != list.end(); ++it)
         {
             // CI.
             bb.SetUInt16(it->first->GetObjectType());
@@ -1023,7 +1023,7 @@ int CGXDLMSClient::ReadList(
         cmd = DLMS_COMMAND_READ_REQUEST;
         // Add length.
         GXHelpers::SetObjectCount(list.size(), bb);
-        for(std::vector<std::pair<CGXDLMSObject*, unsigned char>>::iterator it = list.begin(); it != list.end(); ++it)
+        for(std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = list.begin(); it != list.end(); ++it)
         {
             // Add variable type.
             bb.SetUInt8(2);
@@ -1044,14 +1044,14 @@ int CGXDLMSClient::ReadList(
      *            Received reply from the meter.
      */
 int CGXDLMSClient::UpdateValues(
-    std::vector<std::pair<CGXDLMSObject*, unsigned char>>& list,
+    std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list,
     CGXByteBuffer& data)
 {
     int ret;
     CGXDLMSVariant value;
     CGXDataInfo info;
     unsigned char ch;
-    for(std::vector<std::pair<CGXDLMSObject*, unsigned char>>::iterator it = list.begin(); it != list.end(); ++it)
+    for(std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = list.begin(); it != list.end(); ++it)
     {
         ret = data.GetUInt8(&ch);
         if (ret != 0)

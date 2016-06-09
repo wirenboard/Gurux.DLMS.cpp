@@ -132,22 +132,42 @@ public:
     int ReadDataBlock(std::vector<CGXByteBuffer>& data, CGXReplyData& reply);
 
     int InitializeConnection();
-    int GetObjects(CGXDLMSObjectCollection& objects);
+    int GetObjects(
+        CGXDLMSObjectCollection& objects);
+
     //Update objects access.
-    int UpdateAccess(CGXDLMSObject* pObject, CGXDLMSObjectCollection& objects);
+    int UpdateAccess(
+        CGXDLMSObject* pObject,
+        CGXDLMSObjectCollection& objects);
 
     //Read selected object.
     int Read(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& value);
 
-    int ReadList(std::vector<std::pair<CGXDLMSObject*, unsigned char>>& list);
+    int ReadList(
+        std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list);
 
     //Write selected object.
-    int Write(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& value);
+    int Write(
+        CGXDLMSObject* pObject,
+        int attributeIndex,
+        CGXDLMSVariant& value);
 
     //Call action of selected object.
-    int Method(CGXDLMSObject* pObject, int ActionIndex, CGXDLMSVariant& value);
+    int Method(
+        CGXDLMSObject* pObject,
+        int ActionIndex,
+        CGXDLMSVariant& value);
 
-    int ReadRowsByRange(CGXDLMSProfileGeneric* pObject, struct tm* start, struct tm* end, CGXDLMSVariant& rows);
-    int ReadRowsByEntry(CGXDLMSProfileGeneric* pObject, unsigned int Index, unsigned int Count, CGXDLMSVariant& rows);
+    int ReadRowsByRange(
+        CGXDLMSProfileGeneric* pObject,
+        struct tm* start,
+        struct tm* end,
+        CGXDLMSVariant& rows);
+
+    int ReadRowsByEntry(
+        CGXDLMSProfileGeneric* pObject,
+        unsigned int Index,
+        unsigned int Count,
+        CGXDLMSVariant& rows);
 };
 #endif //GXCOMMUNICATION_H

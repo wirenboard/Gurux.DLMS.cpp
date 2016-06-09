@@ -905,7 +905,8 @@ int CGXCommunication::Read(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVa
     return DLMS_ERROR_CODE_OK;
 }
 
-int CGXCommunication::ReadList(std::vector<std::pair<CGXDLMSObject*, unsigned char>>& list)
+int CGXCommunication::ReadList(
+    std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list)
 {
     int ret;
     CGXByteBuffer bb;
@@ -961,7 +962,11 @@ int CGXCommunication::Method(CGXDLMSObject* pObject, int attributeIndex, CGXDLMS
     return DLMS_ERROR_CODE_OK;
 }
 
-int CGXCommunication::ReadRowsByRange(CGXDLMSProfileGeneric* pObject, struct tm* start, struct tm* end, CGXDLMSVariant& rows)
+int CGXCommunication::ReadRowsByRange(
+    CGXDLMSProfileGeneric* pObject,
+    struct tm* start,
+    struct tm* end,
+    CGXDLMSVariant& rows)
 {
     rows.Clear();
     int ret;
@@ -981,7 +986,11 @@ int CGXCommunication::ReadRowsByRange(CGXDLMSProfileGeneric* pObject, struct tm*
     return DLMS_ERROR_CODE_OK;
 }
 
-int CGXCommunication::ReadRowsByEntry(CGXDLMSProfileGeneric* pObject, unsigned int index, unsigned int count, CGXDLMSVariant& rows)
+int CGXCommunication::ReadRowsByEntry(
+    CGXDLMSProfileGeneric* pObject,
+    unsigned int index,
+    unsigned int count,
+    CGXDLMSVariant& rows)
 {
     rows.Clear();
     int ret;

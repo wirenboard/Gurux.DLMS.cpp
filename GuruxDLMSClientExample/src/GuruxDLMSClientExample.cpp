@@ -120,7 +120,7 @@ int main( int argc, char* argv[] )
         CGXDLMSVariant value;
         std::string str;
         std::string ln;
-        std::vector<std::pair<CGXDLMSObject*, unsigned char>> list;
+        std::vector<std::pair<CGXDLMSObject*, unsigned char> > list;
         // Read scalers and units from the device.
         for(std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)
         {
