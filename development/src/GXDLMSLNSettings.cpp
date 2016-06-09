@@ -39,7 +39,7 @@ CGXDLMSLNSettings::CGXDLMSLNSettings(void)
 {
     //Set default values.
     m_ConformanceBlock[0] = 0x00;
-    m_ConformanceBlock[1] = 0x7E;
+    m_ConformanceBlock[1] = 0xFE;
     m_ConformanceBlock[2] = 0x1F;
 }
 

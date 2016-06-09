@@ -148,6 +148,7 @@ int CGXDLMS::ReceiverReady(
     CGXByteBuffer& reply)
 {
     int ret;
+    reply.Clear();
     if (type == DLMS_DATA_REQUEST_TYPES_NONE)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
@@ -165,18 +166,20 @@ int CGXDLMS::ReceiverReady(
     CGXByteBuffer bb(6);
     bb.SetUInt32(settings.GetBlockIndex());
     settings.IncreaseBlockIndex();
+    std::vector<CGXByteBuffer> tmp;
     if (settings.IsServer())
     {
-        if ((ret = CGXDLMS::GetHdlcFrame(settings, DLMS_COMMAND_GET_RESPONSE, NULL, reply)) != 0)
+        if ((ret = CGXDLMS::GetMessages(settings, DLMS_COMMAND_GET_RESPONSE, 2, bb, NULL, tmp)) != 0)
         {
             return ret;
         }
         return ret;
     }
-    if ((ret = CGXDLMS::GetHdlcFrame(settings, DLMS_COMMAND_GET_REQUEST, NULL, reply)) != 0)
+    if ((ret = CGXDLMS::GetMessages(settings, DLMS_COMMAND_GET_REQUEST, 2, bb, NULL, tmp)) != 0)
     {
         return ret;
     }
+    reply.Set(&tmp.at(0), 0, -1);
     return DLMS_ERROR_CODE_OK;
 }
 
