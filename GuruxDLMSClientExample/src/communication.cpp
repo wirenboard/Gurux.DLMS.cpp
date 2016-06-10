@@ -818,7 +818,9 @@ int CGXCommunication::GetObjects(CGXDLMSObjectCollection& objects)
 }
 
 //Update SN or LN access list.
-int CGXCommunication::UpdateAccess(CGXDLMSObject* pObject, CGXDLMSObjectCollection& Objects)
+int CGXCommunication::UpdateAccess(
+    CGXDLMSObject* pObject,
+    CGXDLMSObjectCollection& Objects)
 {
     CGXDLMSVariant data;
     int ret = Read(pObject, 2, data);

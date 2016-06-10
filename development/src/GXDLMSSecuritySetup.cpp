@@ -54,12 +54,12 @@ CGXDLMSSecuritySetup::CGXDLMSSecuritySetup(std::string ln) : CGXDLMSObject(DLMS_
 
 }
 
-DLMS_SECURITY_POLICY CGXDLMSSecuritySetup::GetSecurityPolicy()
+unsigned char CGXDLMSSecuritySetup::GetSecurityPolicy()
 {
     return m_SecurityPolicy;
 }
 
-void CGXDLMSSecuritySetup::SetSecurityPolicy(DLMS_SECURITY_POLICY value)
+void CGXDLMSSecuritySetup::SetSecurityPolicy(unsigned char value)
 {
     m_SecurityPolicy = value;
 }
@@ -112,7 +112,7 @@ void CGXDLMSSecuritySetup::GetValues(std::vector<std::string>& values)
     std::string ln;
     GetLogicalName(ln);
     values.push_back(ln);
-    values.push_back(CGXDLMSConverter::ToString(m_SecurityPolicy));
+    values.push_back(CGXDLMSConverter::ToString((DLMS_SECURITY_POLICY) m_SecurityPolicy));
     values.push_back(CGXDLMSConverter::ToString(m_SecuritySuite));
     std::string str = m_ClientSystemTitle.ToHexString();
     values.push_back(str);

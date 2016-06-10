@@ -39,7 +39,7 @@
 
 class CGXDLMSSecuritySetup : public CGXDLMSObject
 {
-    DLMS_SECURITY_POLICY m_SecurityPolicy;
+    unsigned char m_SecurityPolicy;
     DLMS_SECURITY_SUITE m_SecuritySuite;
     CGXByteBuffer m_ServerSystemTitle;
     CGXByteBuffer m_ClientSystemTitle;
@@ -54,9 +54,11 @@ public:
     //LN Constructor.
     CGXDLMSSecuritySetup(std::string ln);
 
-    DLMS_SECURITY_POLICY GetSecurityPolicy();
+    //Use DLMS_SECURITY_POLICY for version 0 and DLMS_SECURITY_POLICY1 for version 1.
+    unsigned char GetSecurityPolicy();
 
-    void SetSecurityPolicy(DLMS_SECURITY_POLICY value);
+    //Use DLMS_SECURITY_POLICY for version 0 and DLMS_SECURITY_POLICY1 for version 1.
+    void SetSecurityPolicy(unsigned char value);
 
     DLMS_SECURITY_SUITE GetSecuritySuite();
 

@@ -476,16 +476,16 @@ const char* CGXDLMSConverter::ToString(DLMS_SECURITY_POLICY value)
 {
     switch(value)
     {
-    case 0:
+    case DLMS_SECURITY_POLICY_NOTHING:
         return "Nothing";
         break;
-    case 1:
+    case DLMS_SECURITY_POLICY_AUTHENTICATED:
         return "Authenticated";
         break;
-    case 2:
+    case DLMS_SECURITY_POLICY_ENCRYPTED:
         return "Encrypted";
         break;
-    case 3:
+    case DLMS_SECURITY_POLICY_AUTHENTICATED_ENCRYPTED:
         return "AuthenticatedEncrypted";
         break;
     default:

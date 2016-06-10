@@ -542,44 +542,64 @@ typedef enum
     HDLC_CONTROL_FRAME_SELECTIVE_REJECT = 3
 } HDLC_CONTROL_FRAME;
 
+// Security policy Enforces authentication and/or encryption algorithm provided with security_suite.
+//Note! This enumeration values are used in Security Setup version 0.
+typedef enum
+{
+    //No security is used.
+    DLMS_SECURITY_POLICY_NOTHING = 0,
+    /**
+     All messages to be authenticated.
+    */
+    DLMS_SECURITY_POLICY_AUTHENTICATED = 1,
+    /**
+     All messages to be encrypted.
+    */
+    DLMS_SECURITY_POLICY_ENCRYPTED = 2,
+    /**
+     All messages to be authenticated and encrypted.
+    */
+    DLMS_SECURITY_POLICY_AUTHENTICATED_ENCRYPTED = 3
+} DLMS_SECURITY_POLICY;
 
 // Security policy Enforces authentication and/or encryption algorithm provided with security_suite.
+//Note! This enumeration values are used in Security Setup version 1.
 typedef enum
 {
     /**
      * Security is not used.
      */
-    DLMS_SECURITY_POLICY_NOTHING = 0,
+    DLMS_SECURITY_POLICY1_NOTHING = 0,
     /**
      * Request is authenticated.
      */
-    DLMS_SECURITY_POLICY_AUTHENTICATED_REQUEST = 0x20,
+    DLMS_SECURITY_POLICY1_AUTHENTICATED_REQUEST = 0x20,
 
     /**
      * Request is encrypted.
      */
-    DLMS_SECURITY_POLICY_ENCRYPTED_REQUEST = 0x10,
+    DLMS_SECURITY_POLICY1_ENCRYPTED_REQUEST = 0x10,
 
     /**
      * Request is digitally signed.
      */
-    DLMS_SECURITY_POLICY_DIGITALLY_SIGNED_REQUEST = 0x8,
+    DLMS_SECURITY_POLICY1_DIGITALLY_SIGNED_REQUEST = 0x8,
 
     /**
      * Response is authenticated.
      */
-    DLMS_SECURITY_POLICY_AUTHENTICATED_RESPONSE = 0x4,
+    DLMS_SECURITY_POLICY1_AUTHENTICATED_RESPONSE = 0x4,
 
     /**
      * Response is encrypted.
      */
-    DLMS_SECURITY_POLICY_ENCRYPTED_RESPONSE = 0x2,
+    DLMS_SECURITY_POLICY1_ENCRYPTED_RESPONSE = 0x2,
 
     /**
      * Response is digitally signed.
      */
-    DLMS_SECURITY_POLICY_DIGITALLY_SIGNED_RESPONSE = 0x1
-} DLMS_SECURITY_POLICY;
+    DLMS_SECURITY_POLICY1_DIGITALLY_SIGNED_RESPONSE = 0x1
+} DLMS_SECURITY_POLICY1;
 
 
 //Security suite Specifies authentication, encryption and key wrapping algorithm.
