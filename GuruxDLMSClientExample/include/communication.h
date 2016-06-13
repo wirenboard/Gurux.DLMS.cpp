@@ -135,13 +135,8 @@ public:
     int GetObjects(
         CGXDLMSObjectCollection& objects);
 
-    //Update objects access.
-    int UpdateAccess(
-        CGXDLMSObject* pObject,
-        CGXDLMSObjectCollection& objects);
-
     //Read selected object.
-    int Read(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& value);
+    int Read(CGXDLMSObject* pObject, int attributeIndex, std::string& value);
 
     int ReadList(
         std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list);

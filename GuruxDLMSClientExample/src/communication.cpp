@@ -701,7 +701,8 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         return DLMS_ERROR_CODE_SEND_FAILED;
     }
     // Loop until whole DLMS packet is received.
-    while ((ret = m_Parser->GetData(bb, reply)) == DLMS_ERROR_CODE_FALSE)
+    tmp = "";
+    do
     {
         if (m_hComPort != INVALID_HANDLE_VALUE)
         {
@@ -724,11 +725,18 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             }
             bb.Set(m_Receivebuff, ret);
         }
+        if (tmp.size() == 0)
+        {
+            Now(tmp);
+            tmp = "-> " + tmp + "\t";
+        }
+        else
+        {
+            tmp += " ";
+        }
+        tmp += GXHelpers::BytesToHex(m_Receivebuff, ret);
     }
-    tmp = "";
-    Now(tmp);
-    tmp = "-> " + tmp;
-    tmp += "\t" + bb.ToHexString();
+    while ((ret = m_Parser->GetData(bb, reply)) == DLMS_ERROR_CODE_FALSE);
     if (m_Trace)
     {
         printf("%s\r\n", tmp.c_str());
@@ -817,64 +825,10 @@ int CGXCommunication::GetObjects(CGXDLMSObjectCollection& objects)
     return DLMS_ERROR_CODE_OK;
 }
 
-//Update SN or LN access list.
-int CGXCommunication::UpdateAccess(
-    CGXDLMSObject* pObject,
-    CGXDLMSObjectCollection& Objects)
-{
-    CGXDLMSVariant data;
-    int ret = Read(pObject, 2, data);
-    if (ret != DLMS_ERROR_CODE_OK)
-    {
-        return ret;
-    }
-    if (data.vt != DLMS_DATA_TYPE_ARRAY)
-    {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
-    for(std::vector<CGXDLMSVariant>::iterator obj = data.Arr.begin(); obj != data.Arr.end(); ++obj)
-    {
-        if (obj->vt != DLMS_DATA_TYPE_STRUCTURE || obj->Arr.size() != 4)
-        {
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-        CGXDLMSVariant& access_rights = obj->Arr[3];
-        if (access_rights.vt != DLMS_DATA_TYPE_STRUCTURE || access_rights.Arr.size() != 2)
-        {
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-        DLMS_OBJECT_TYPE type = (DLMS_OBJECT_TYPE) obj->Arr[0].uiVal;
-        // unsigned char version = obj->Arr[1].bVal;
-        std::string ln;
-        GXHelpers::GetLogicalName(obj->Arr[2].byteArr, ln);
-        CGXDLMSObject* pObj = Objects.FindByLN(type, ln);
-        if (pObj != NULL)
-        {
-            //Attribute access.
-            for(std::vector<CGXDLMSVariant>::iterator it = access_rights.Arr[0].Arr.begin();
-                    it != access_rights.Arr[0].Arr.end(); ++it)
-            {
-                unsigned char id = it->Arr[0].bVal;
-                DLMS_ACCESS_MODE access = (DLMS_ACCESS_MODE) it->Arr[1].bVal;
-                pObj->SetAccess(id, access);
-            }
-            //Method access.
-            for(std::vector<CGXDLMSVariant>::iterator it = access_rights.Arr[1].Arr.begin();
-                    it != access_rights.Arr[1].Arr.end(); ++it)
-            {
-                unsigned char id = it->Arr[0].bVal;
-                DLMS_METHOD_ACCESS_MODE access = (DLMS_METHOD_ACCESS_MODE) it->Arr[1].bVal;
-                pObj->SetMethodAccess(id, access);
-            }
-        }
-    }
-    return DLMS_ERROR_CODE_OK;
-}
-
 //Read selected object.
-int CGXCommunication::Read(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& value)
+int CGXCommunication::Read(CGXDLMSObject* pObject, int attributeIndex, std::string& value)
 {
-    value.Clear();
+    value.clear();
     int ret;
     std::vector<CGXByteBuffer> data;
     CGXReplyData reply;

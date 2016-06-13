@@ -39,6 +39,8 @@ const char* CGXDLMSConverter::GetErrorMessage(int error)
 {
     switch(error)
     {
+    case DLMS_ERROR_CODE_OK:
+        return "OK";
     case DLMS_ERROR_CODE_INVALID_PARAMETER:
         return "Invalid parameter.";
     case DLMS_ERROR_CODE_NOT_INITIALIZED:

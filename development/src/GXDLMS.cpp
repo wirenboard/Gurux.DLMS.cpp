@@ -1112,14 +1112,13 @@ int CGXDLMS::CheckHdlcAddress(
             if (settings.GetClientAddress() == source && settings.GetServerAddress() == target)
             {
                 reply.SetPosition(index + 1);
-                return DLMS_ERROR_CODE_FALSE;
             }
-            return DLMS_ERROR_CODE_INVALID_CLIENT_ADDRESS;
+            return DLMS_ERROR_CODE_FALSE;
         }
         // Check that server addresses match.
         if (settings.GetServerAddress() != source)
         {
-            return DLMS_ERROR_CODE_INVALID_CLIENT_ADDRESS;
+            return DLMS_ERROR_CODE_FALSE;
         }
     }
     return DLMS_ERROR_CODE_OK;
@@ -1667,10 +1666,10 @@ int CGXDLMS::HandleGetResponse(
         {
             return ret;
         }
-        // If meter's block index is zero based.
-        if (number == 0 && settings.GetBlockIndex() == 1)
+        // If meter's block index is zero based or Actaris is read.
+        if (settings.GetBlockIndex() == 1)
         {
-            settings.SetBlockIndex(0);
+            settings.SetBlockIndex(number);
         }
         if (number != settings.GetBlockIndex())
         {

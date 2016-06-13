@@ -117,7 +117,7 @@ int main( int argc, char* argv[] )
             TRACE("InitializeConnection failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
             return 1;
         }
-        CGXDLMSVariant value;
+        std::string value;
         std::string str;
         std::string ln;
         std::vector<std::pair<CGXDLMSObject*, unsigned char> > list;
@@ -248,7 +248,7 @@ int main( int argc, char* argv[] )
             (*it)->GetAttributeIndexToRead(attributes);
             for(std::vector<int>::iterator pos = attributes.begin(); pos != attributes.end(); ++pos)
             {
-                value.Clear();
+                value.clear();
                 if ((ret = comm.Read(*it, *pos, value)) != DLMS_ERROR_CODE_OK)
                 {
 #if _MSC_VER > 1000
@@ -267,7 +267,7 @@ int main( int argc, char* argv[] )
                     sprintf(buff, "Index: %d Value: ", *pos);
 #endif
                     WriteValue(buff);
-                    WriteValue(value.ToString().c_str());
+                    WriteValue(value.c_str());
                     WriteValue("\r\n");
                 }
             }
@@ -297,7 +297,7 @@ int main( int argc, char* argv[] )
                 //Continue reading.
             }
 
-            int entriesInUse = value.ToInteger();
+            std::string entriesInUse = value;
             if ((ret = comm.Read(*it, 8, value)) != DLMS_ERROR_CODE_OK)
             {
 #if _MSC_VER > 1000
@@ -308,15 +308,15 @@ int main( int argc, char* argv[] )
                 WriteValue(buff);
                 //Continue reading.
             }
-            int entries = value.ToInteger();
+            std::string entries = value;
             str = "Entries: ";
-            str += CGXDLMSVariant(entriesInUse).ToString();
+            str += entriesInUse;
             str += "/";
-            str += CGXDLMSVariant(entries).ToString();
+            str += entries;
             str += "\r\n";
             WriteValue(str);
             //If there are no columns or rows.
-            if (entriesInUse == 0 || ((CGXDLMSProfileGeneric*) *it)->GetCaptureObjects().size() == 0)
+            if (((CGXDLMSProfileGeneric*) *it)->GetEntriesInUse() == 0 || ((CGXDLMSProfileGeneric*) *it)->GetCaptureObjects().size() == 0)
             {
                 continue;
             }
