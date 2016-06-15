@@ -940,6 +940,12 @@ int CGXDLMS::GetHdlcData(
         {
             return DLMS_ERROR_CODE_WRONG_CRC;
         }
+        // Remove CRC and EOP from packet length.
+        data.SetPacketLength(eopPos - 2);
+    }
+    else
+    {
+        data.SetPacketLength(reply.GetSize());
     }
 
     if ((frame & HDLC_FRAME_TYPE_U_FRAME) == HDLC_FRAME_TYPE_U_FRAME)
@@ -1002,11 +1008,6 @@ int CGXDLMS::GetHdlcData(
         {
             GetLLCBytes(server, reply);
         }
-    }
-    // Skip data CRC and EOP.
-    if (reply.GetPosition() != reply.GetSize())
-    {
-        reply.SetSize(eopPos - 2);
     }
     return DLMS_ERROR_CODE_OK;
 }
@@ -1343,6 +1344,7 @@ int CGXDLMS::HandleGbt(CGXDLMSSettings& settings, CGXReplyData& data)
                 && (data.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE
                     || data.GetPeek()))
         {
+            data.GetData().SetPosition(0);
             ret = CGXDLMS::GetValueFromData(settings, data);
         }
     }
@@ -1593,7 +1595,7 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
     {
         return DLMS_ERROR_CODE_FALSE;
     }
-    GetDataFromFrame(reply, data.GetData());
+    GetDataFromFrame(reply, data);
     // If keepalive or get next frame request.
     if ((frame & 0x1) != 0)
     {
@@ -1667,7 +1669,9 @@ int CGXDLMS::HandleGetResponse(
             return ret;
         }
         // If meter's block index is zero based or Actaris is read.
-        if (settings.GetBlockIndex() == 1)
+        // Actaris SL7000 might return wrong block index sometimes.
+        // It's not reseted to 1.
+        if (number != 1 && settings.GetBlockIndex() == 1)
         {
             settings.SetBlockIndex(number);
         }
@@ -1692,12 +1696,11 @@ int CGXDLMS::HandleGetResponse(
         {
             // Get data size.
             GXHelpers::GetObjectCount(data, count);
-            reply.SetBlockLength(count);
             // if whole block is read.
             if ((reply.GetMoreData() & DLMS_DATA_REQUEST_TYPES_FRAME) == 0)
             {
                 // Check Block length.
-                if (reply.GetBlockLength() > data.GetSize() - data.GetPosition())
+                if (count > (unsigned long) (data.GetSize() - data.GetPosition()))
                 {
                     return DLMS_ERROR_CODE_OUTOFMEMORY;
                 }
@@ -1839,6 +1842,10 @@ int CGXDLMS::GetTcpData(
         buff.SetPosition(pos);
         return DLMS_ERROR_CODE_FALSE;
     }
+    else
+    {
+        data.SetPacketLength(buff.GetPosition() + value);
+    }
     return DLMS_ERROR_CODE_OK;
 }
 
@@ -1928,10 +1935,11 @@ int CGXDLMS::GetValueFromData(CGXDLMSSettings& settings, CGXReplyData& reply)
     return 0;
 }
 
-void CGXDLMS::GetDataFromFrame(CGXByteBuffer& reply, CGXByteBuffer& data)
+void CGXDLMS::GetDataFromFrame(CGXByteBuffer& reply, CGXReplyData& info)
 {
+    CGXByteBuffer& data = info.GetData();
     int offset = data.GetSize();
-    int cnt = reply.GetSize() - reply.GetPosition();
+    int cnt = info.GetPacketLength() - reply.GetPosition();
     if (cnt != 0)
     {
         data.Capacity(offset + cnt);

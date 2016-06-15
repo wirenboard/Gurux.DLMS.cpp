@@ -85,14 +85,14 @@ void CGXReplyData::SetReadPosition(int value)
     m_ReadPosition = value;
 }
 
-int CGXReplyData::GetBlockLength()
+int CGXReplyData::GetPacketLength()
 {
-    return m_BlockLength;
+    return m_PacketLength;
 }
 
-void CGXReplyData::SetBlockLength(int value)
+void CGXReplyData::SetPacketLength(int value)
 {
-    m_BlockLength = value;
+    m_PacketLength = value;
 }
 
 void CGXReplyData::SetCommand(DLMS_COMMAND value)
@@ -126,7 +126,7 @@ void CGXReplyData::Clear()
     m_TotalCount = 0;
     m_DataValue.Clear();
     m_ReadPosition = 0;
-    m_BlockLength = 0;
+    m_PacketLength = 0;
     m_DataType = DLMS_DATA_TYPE_NONE;
     m_Gbt = false;
 }

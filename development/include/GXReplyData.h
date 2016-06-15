@@ -75,9 +75,9 @@ private:
     int m_ReadPosition;
 
     /**
-     * Block length.
+     * Packet Length.
      */
-    int m_BlockLength;
+    int m_PacketLength;
 
     /**
      * Try Get value.
@@ -142,9 +142,9 @@ public:
 
     void SetReadPosition(int value);
 
-    int GetBlockLength();
+    int GetPacketLength();
 
-    void SetBlockLength(int value);
+    void SetPacketLength(int value);
 
     void SetCommand(DLMS_COMMAND value);
 

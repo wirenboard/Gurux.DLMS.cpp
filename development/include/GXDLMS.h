@@ -91,15 +91,19 @@ private:
     // settings : DLMS settings.
     // reply : Received data.
     /////////////////////////////////////////////////////////////////////////////
-    static int GetValueFromData(CGXDLMSSettings& settings, CGXReplyData& reply);
+    static int GetValueFromData(
+        CGXDLMSSettings& settings,
+        CGXReplyData& reply);
 
     /////////////////////////////////////////////////////////////////////////////
     // Get data from HDLC or wrapper frame.
     /////////////////////////////////////////////////////////////////////////////
     // reply : Received data that includes HDLC frame.
-    // data : Stored data.
+    // info : Reply data.
     /////////////////////////////////////////////////////////////////////////////
-    static void GetDataFromFrame(CGXByteBuffer& reply, CGXByteBuffer& data);
+    static void GetDataFromFrame(
+        CGXByteBuffer& reply,
+        CGXReplyData& info);
 
 public:
 
