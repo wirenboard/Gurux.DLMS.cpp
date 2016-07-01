@@ -74,6 +74,10 @@ int CGXByteBuffer::GetSize()
 void CGXByteBuffer::SetSize(int value)
 {
     m_Size = value;
+    if (m_Position > m_Size)
+    {
+        m_Position = m_Size;
+    }
 }
 
 int CGXByteBuffer::IncreaseSize(int size)
@@ -116,6 +120,10 @@ void CGXByteBuffer::Capacity(int capacity)
     else
     {
         m_Data = (unsigned char*) realloc(m_Data, m_Capacity);
+        if (m_Size > capacity)
+        {
+            m_Size = capacity;
+        }
     }
 }
 

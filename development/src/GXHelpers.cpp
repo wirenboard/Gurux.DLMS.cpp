@@ -361,7 +361,7 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         skip = (DATETIME_SKIPS) (skip | DATETIME_SKIPS_MS);
         ms = 0;
     }
-    if (deviation != 0x8000)
+    if (deviation != -32768)//0x8000
     {
         tm.tm_min -= deviation;
         time_t t = GetUtcTime(&tm);

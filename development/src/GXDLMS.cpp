@@ -1212,14 +1212,18 @@ int CGXDLMS::HandleMethodResponse(
 /**
     * Handle data notification get data from block and/or update error status.
     *
+    * @param settings
+    *            DLMS settings.
     * @param reply
     *            Received data from the client.
     */
-int HandleDataNotification(CGXReplyData& reply)
+int CGXDLMS::HandleDataNotification(
+    CGXDLMSSettings& settings,
+    CGXReplyData& reply)
 {
     unsigned long id;
     int ret;
-    int index = reply.GetData().GetPosition() - 1;
+    int start = reply.GetData().GetPosition() - 1;
     // Get invoke id.
     if ((ret = reply.GetData().GetUInt32(&id)) != 0)
     {
@@ -1244,14 +1248,41 @@ int HandleDataNotification(CGXReplyData& reply)
         }
         reply.SetTime(&t.dateTime.GetValue());
     }
-    return GetDataFromBlock(reply.GetData(), index);
+    if ((ret = GetDataFromBlock(reply.GetData(), start)) != 0)
+    {
+        return ret;
+    }
+    return GetValueFromData(settings, reply);
 }
 
 int CGXDLMS::HandleSetResponse(
     CGXDLMSSettings& settings,
     CGXReplyData& data)
 {
-    //TODO:
+    unsigned char ch;
+    int ret;
+    if ((ret = data.GetData().GetUInt8(&ch)) != 0)
+    {
+        return ret;
+    }
+    //SetResponseNormal
+    if (ch == 1)
+    {
+        //Invoke ID and priority.
+        if ((ret = data.GetData().GetUInt8(&ch)) != 0)
+        {
+            return ret;
+        }
+
+        if ((ret = data.GetData().GetUInt8(&ch)) != 0)
+        {
+            return ret;
+        }
+        if (ch != 0)
+        {
+            return ch;
+        }
+    }
     return DLMS_ERROR_CODE_OK;
 }
 
@@ -1320,33 +1351,30 @@ int CGXDLMS::HandleGbt(CGXDLMSSettings& settings, CGXReplyData& data)
             return 0;
         }
     }
-    if ((ret = CGXDLMS::GetPdu(settings, data)) != 0)
+
+    if ((ret = GetDataFromBlock(data.GetData(), index)) != 0 ||
+            (ret = CGXDLMS::GetPdu(settings, data)) != 0)
     {
         return ret;
     }
-    ret = GetDataFromBlock(data.GetData(), index);
-    if (ret == 0)
+    // Is Last block,
+    if ((ch & 0x80) == 0)
     {
-        // Is Last block,
-        if ((ch & 0x80) == 0)
-        {
-            data.SetMoreData((DLMS_DATA_REQUEST_TYPES) (data.GetMoreData() | DLMS_DATA_REQUEST_TYPES_BLOCK));
-        }
-        else
-        {
-            data.SetMoreData((DLMS_DATA_REQUEST_TYPES) (data.GetMoreData() & ~DLMS_DATA_REQUEST_TYPES_BLOCK));
-        }
-        // Get data if all data is read or we want to peek data.
-        if (data.GetData().GetPosition() != data.GetData().GetSize()
-                && (data.GetCommand() == DLMS_COMMAND_READ_RESPONSE
-                    || data.GetCommand() == DLMS_COMMAND_GET_RESPONSE
-                    || data.GetCommand() == DLMS_COMMAND_DATA_NOTIFICATION)
-                && (data.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE
-                    || data.GetPeek()))
-        {
-            data.GetData().SetPosition(0);
-            ret = CGXDLMS::GetValueFromData(settings, data);
-        }
+        data.SetMoreData((DLMS_DATA_REQUEST_TYPES) (data.GetMoreData() | DLMS_DATA_REQUEST_TYPES_BLOCK));
+    }
+    else
+    {
+        data.SetMoreData((DLMS_DATA_REQUEST_TYPES) (data.GetMoreData() & ~DLMS_DATA_REQUEST_TYPES_BLOCK));
+    }
+    // Get data if all data is read or we want to peek data.
+    if (data.GetData().GetPosition() != data.GetData().GetSize()
+            && (data.GetCommand() == DLMS_COMMAND_READ_RESPONSE
+                || data.GetCommand() == DLMS_COMMAND_GET_RESPONSE)
+            && (data.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE
+                || data.GetPeek()))
+    {
+        data.GetData().SetPosition(0);
+        ret = CGXDLMS::GetValueFromData(settings, data);
     }
     return ret;
 }
@@ -1492,7 +1520,7 @@ int CGXDLMS::GetPdu(
             }
             break;
         case DLMS_COMMAND_DATA_NOTIFICATION:
-            ret = HandleDataNotification(data);
+            ret = HandleDataNotification(settings, data);
             // Client handles this.
             break;
         default:
@@ -1601,7 +1629,30 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
     {
         return DLMS_ERROR_CODE_OK;
     }
-    return GetPdu(settings, data);
+    if ((ret = GetPdu(settings, data)) != 0)
+    {
+        return ret;
+    }
+
+    if (data.GetCommand() == DLMS_COMMAND_DATA_NOTIFICATION)
+    {
+        // Check is there more messages left. This is Push message special
+        // case.
+        if (reply.GetPosition() == reply.GetSize())
+        {
+            reply.SetSize(0);
+        }
+        else
+        {
+            int cnt = reply.GetSize() - reply.GetPosition();
+            if ((ret = reply.Move(reply.GetPosition(), 0, cnt)) != 0)
+            {
+                return ret;
+            }
+            reply.SetPosition(0);
+        }
+    }
+    return 0;
 }
 
 int CGXDLMS::HandleGetResponse(
@@ -1898,35 +1949,50 @@ int CGXDLMS::GetValueFromData(CGXDLMSSettings& settings, CGXReplyData& reply)
         return ret;
     }
     // If new data.
-    if (value.vt != DLMS_DATA_TYPE_ARRAY)
+    if (value.vt != DLMS_DATA_TYPE_NONE)
     {
-        reply.SetValueType(info.GetType());
-        reply.SetValue(value);
-        reply.SetTotalCount(0);
-    }
-    else
-    {
-        if (value.Arr.size() != 0)
+        if (value.vt != DLMS_DATA_TYPE_ARRAY)
         {
-            if (reply.GetValue().vt == DLMS_DATA_TYPE_NONE)
+            reply.SetValueType(info.GetType());
+            reply.SetValue(value);
+            reply.SetTotalCount(0);
+            if (reply.GetCommand() == DLMS_COMMAND_DATA_NOTIFICATION)
             {
-                reply.SetValue(value);
-            }
-            else
-            {
-                CGXDLMSVariant tmp = reply.GetValue();
-                tmp.Arr.insert(tmp.Arr.end(), value.Arr.begin(), value.Arr.end());
-                reply.SetValue(tmp);
+                reply.SetReadPosition(reply.GetData().GetPosition());
             }
         }
+        else
+        {
+            if (value.Arr.size() != 0)
+            {
+                if (reply.GetValue().vt == DLMS_DATA_TYPE_NONE)
+                {
+                    reply.SetValue(value);
+                }
+                else
+                {
+                    CGXDLMSVariant tmp = reply.GetValue();
+                    tmp.Arr.insert(tmp.Arr.end(), value.Arr.begin(), value.Arr.end());
+                    reply.SetValue(tmp);
+                }
+            }
+            reply.SetReadPosition(reply.GetData().GetPosition());
+            // Element count.
+            reply.SetTotalCount(info.GetCount());
+        }
+    }
+    else if (info.IsCompleate()
+             && reply.GetCommand() == DLMS_COMMAND_DATA_NOTIFICATION)
+    {
+        // If last item is null. This is a special case.
         reply.SetReadPosition(reply.GetData().GetPosition());
-        // Element count.
-        reply.SetTotalCount(info.GetCount());
     }
     reply.GetData().SetPosition(index);
 
     // If last data frame of the data block is read.
-    if (reply.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE)
+    if (reply.GetCommand() != DLMS_COMMAND_DATA_NOTIFICATION
+            && info.IsCompleate()
+            && reply.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE)
     {
         // If all blocks are read.
         settings.ResetBlockIndex();

@@ -44,29 +44,29 @@ enum GX_SORT_METHOD
 
      When circle buffer is full first item is removed.
     */
-    GX_SORT_METHOD_FIFO = 0,
+    DLMS_SORT_METHOD_FIFO = 1,
     /**
      Last in first out.
 
      When circle buffer is full last item is removed.
     */
-    GX_SORT_METHOD_LIFO = 1,
+    DLMS_SORT_METHOD_LIFO = 2,
     /**
      Largest is first.
     */
-    GX_SORT_METHOD_LARGEST = 2,
+    DLMS_SORT_METHOD_LARGEST = 3,
     /**
      Smallest is first.
     */
-    GX_SORT_METHOD_SMALLEST = 3,
+    DLMS_SORT_METHOD_SMALLEST = 4,
     /**
      Nearst to zero is first.
     */
-    GX_SORT_METHOD_NEAREST_TO_ZERO = 4,
+    DLMS_SORT_METHOD_NEAREST_TO_ZERO = 5,
     /**
      Farest from zero is first.
     */
-    GX_SORT_METHOD_FAREST_FROM_ZERO = 5
+    DLMS_SORT_METHOD_FAREST_FROM_ZERO = 6
 };
 
 class CGXDLMSProfileGeneric : public CGXDLMSObject

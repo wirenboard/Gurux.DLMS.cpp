@@ -167,7 +167,7 @@ int CGXDLMSClock::GetAttributeCount()
 // Returns amount of methods.
 int CGXDLMSClock::GetMethodCount()
 {
-    return 0;
+    return 6;
 }
 
 void CGXDLMSClock::GetValues(std::vector<std::string>& values)

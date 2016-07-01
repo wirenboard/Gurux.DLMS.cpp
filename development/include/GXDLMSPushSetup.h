@@ -38,10 +38,11 @@
 #include "GXDLMSObject.h"
 #include "GXDLMSPushObject.h"
 #include "GXSendDestinationAndMethod.h"
+#include "GXDLMSCaptureObject.h"
 
 class CGXDLMSPushSetup : public CGXDLMSObject
 {
-    std::vector<CGXDLMSPushObject> m_PushObjectList;
+    std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> > m_PushObjectList;
     CGXSendDestinationAndMethod m_SendDestinationAndMethod;
     std::vector<std::pair<CGXDateTime, CGXDateTime> > m_CommunicationWindow;
     int m_RandomisationStartInterval, m_NumberOfRetries, m_RepetitionDelay;
@@ -61,7 +62,7 @@ public:
         Upon a call of the push (data) method the selected attributes are sent to the desti-nation
         defined in send_destination_and_method.
     */
-    std::vector<CGXDLMSPushObject>& GetPushObjectList()
+    std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> >& GetPushObjectList()
     {
         return m_PushObjectList;
     }

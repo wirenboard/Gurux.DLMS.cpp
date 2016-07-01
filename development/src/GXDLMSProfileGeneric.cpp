@@ -53,7 +53,7 @@ void CGXDLMSProfileGeneric::Init()
     m_SortObject = NULL;
     m_CapturePeriod = 3600;
     m_EntriesInUse = m_ProfileEntries = 0;
-    m_SortMethod = GX_SORT_METHOD_FIFO;
+    m_SortMethod = DLMS_SORT_METHOD_FIFO;
 }
 
 int CGXDLMSProfileGeneric::GetColumns(CGXByteBuffer& data)
@@ -160,41 +160,50 @@ int CGXDLMSProfileGeneric::GetProfileGenericData(int selector, CGXDLMSVariant& p
     }
     std::vector< std::vector<CGXDLMSVariant> >& table = GetBuffer();
     std::vector< std::vector<CGXDLMSVariant> > items;
-    //TODO: Lock synchronized (this)
+    if (selector == 1) //Read by range
     {
-        if (selector == 1) //Read by range
+        int ret;
+        CGXDLMSVariant value;
+        if ((ret = CGXDLMSClient::ChangeType(parameters.Arr[1], DLMS_DATA_TYPE_DATETIME, value)) != 0)
         {
-            struct tm tmp = parameters.Arr[0].dateTime.GetValue();
-            time_t start = mktime(&tmp);
-            tmp = parameters.Arr[1].dateTime.GetValue();
-            time_t end = mktime(&tmp);
-            for (std::vector< std::vector<CGXDLMSVariant> >::iterator row = table.begin(); row != table.end(); ++row)
+            return ret;
+        }
+        struct tm tmp = value.dateTime.GetValue();
+        time_t start = mktime(&tmp);
+        value.Clear();
+        if ((ret = CGXDLMSClient::ChangeType(parameters.Arr[2], DLMS_DATA_TYPE_DATETIME, value)) != 0)
+        {
+            return ret;
+        }
+        tmp = value.dateTime.GetValue();
+        time_t end = mktime(&tmp);
+        value.Clear();
+        for (std::vector< std::vector<CGXDLMSVariant> >::iterator row = table.begin(); row != table.end(); ++row)
+        {
+            tmp = (*row)[0].dateTime.GetValue();
+            time_t tm = mktime(&tmp);
+            if (tm >= start && tm <= end)
             {
-                tmp = (*row)[0].dateTime.GetValue();
-                time_t tm = mktime(&tmp);
-                if (tm >= start && tm <= end)
-                {
-                    items.push_back(*row);
-                }
+                items.push_back(*row);
             }
         }
-        else if (selector == 2) //Read by entry.
+    }
+    else if (selector == 2) //Read by entry.
+    {
+        int start = parameters.Arr[0].ToInteger();
+        int count = parameters.Arr[1].ToInteger();
+        for (int pos = 0; pos < count; ++pos)
         {
-            int start = parameters.Arr[0].ToInteger();
-            int count = parameters.Arr[1].ToInteger();
-            for (int pos = 0; pos < count; ++pos)
+            if ((unsigned int) (pos + start) == table.size())
             {
-                if ((unsigned int) (pos + start) == table.size())
-                {
-                    break;
-                }
-                items.push_back(table[start + pos]);
+                break;
             }
+            items.push_back(table[start + pos]);
         }
-        else
-        {
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
+    }
+    else
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     return GetData(items, reply);
 }
@@ -539,9 +548,51 @@ int CGXDLMSProfileGeneric::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
         e.SetValue(GetSortMethod());
         return DLMS_ERROR_CODE_OK;
     }
-    if (e.GetIndex() == 5)
+    if (e.GetIndex() == 6)
     {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        char empty[6] = {0};
+        CGXByteBuffer data;
+        data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+        data.SetUInt8(4);
+        if (m_SortObject == NULL)
+        {
+            //ClassID
+            data.SetUInt8(DLMS_DATA_TYPE_UINT16);
+            data.SetUInt16(0);
+            //LN
+            data.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
+            data.SetUInt8(6);
+            data.Set(empty, 6);
+            //Selected Attribute Index
+            data.SetUInt8(DLMS_DATA_TYPE_INT8);
+            data.SetUInt8(0);
+            //Selected Data Index
+            data.SetUInt8(DLMS_DATA_TYPE_UINT16);
+            data.SetUInt16(0);
+        }
+        else
+        {
+            int ret;
+            CGXDLMSVariant ln;
+            //ClassID
+            data.SetUInt8(DLMS_DATA_TYPE_UINT16);
+            data.SetUInt16(m_SortObject->GetObjectType());
+            //LN
+            data.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
+            data.SetUInt8(6);
+            if ((ret = GetLogicalName(m_SortObject, ln)) != 0)
+            {
+                return ret;
+            }
+            data.Set(&ln.byteArr, 6);
+            //Selected Attribute Index
+            data.SetUInt8(DLMS_DATA_TYPE_INT8);
+            data.SetUInt8(m_SortObjectAttributeIndex);
+            //Selected Data Index
+            data.SetUInt8(DLMS_DATA_TYPE_UINT16);
+            data.SetUInt16(m_SortObjectDataIndex);
+        }
+        e.SetValue(data);
     }
     if (e.GetIndex() == 7)
     {

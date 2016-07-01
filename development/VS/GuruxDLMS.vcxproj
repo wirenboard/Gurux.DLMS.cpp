@@ -166,6 +166,7 @@
     <ClCompile Include="..\src\GXDLMSModemConfiguration.cpp" />
     <ClCompile Include="..\src\GXDLMSModemInitialisation.cpp" />
     <ClCompile Include="..\src\GXDLMSMonitoredValue.cpp" />
+    <ClCompile Include="..\src\GXDLMSNotify.cpp" />
     <ClCompile Include="..\src\GXDLMSObject.cpp" />
     <ClCompile Include="..\src\GXDLMSObjectCollection.cpp" />
     <ClCompile Include="..\src\GXDLMSObjectDefinition.cpp" />
@@ -174,7 +175,6 @@
     <ClCompile Include="..\src\GXDLMSPppSetupIPCPOption.cpp" />
     <ClCompile Include="..\src\GXDLMSPppSetupLcpOption.cpp" />
     <ClCompile Include="..\src\GXDLMSProfileGeneric.cpp" />
-    <ClCompile Include="..\src\GXDLMSPushObject.cpp" />
     <ClCompile Include="..\src\GXDLMSPushSetup.cpp" />
     <ClCompile Include="..\src\GXDLMSQualityOfService.cpp" />
     <ClCompile Include="..\src\GXDLMSRegister.cpp" />
@@ -258,6 +258,7 @@
     <ClInclude Include="..\include\GXDLMSModemConfiguration.h" />
     <ClInclude Include="..\include\GXDLMSModemInitialisation.h" />
     <ClInclude Include="..\include\GXDLMSMonitoredValue.h" />
+    <ClInclude Include="..\include\GXDLMSNotify.h" />
     <ClInclude Include="..\include\GXDLMSObject.h" />
     <ClInclude Include="..\include\GXDLMSObjectCollection.h" />
     <ClInclude Include="..\include\GXDLMSObjectDefinition.h" />
@@ -266,7 +267,6 @@
     <ClInclude Include="..\include\GXDLMSPppSetupIPCPOption.h" />
     <ClInclude Include="..\include\GXDLMSPppSetupLcpOption.h" />
     <ClInclude Include="..\include\GXDLMSProfileGeneric.h" />
-    <ClInclude Include="..\include\GXDLMSPushObject.h" />
     <ClInclude Include="..\include\GXDLMSPushSetup.h" />
     <ClInclude Include="..\include\GXDLMSQualityOfService.h" />
     <ClInclude Include="..\include\GXDLMSRegister.h" />

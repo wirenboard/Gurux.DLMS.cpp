@@ -460,6 +460,7 @@ void CGXDLMSVariant::Clear()
         size = 0;
     }
     vt = DLMS_DATA_TYPE_NONE;
+    this->byteArr = NULL;
 }
 
 CGXDLMSVariant::CGXDLMSVariant()
