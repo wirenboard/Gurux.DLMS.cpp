@@ -119,7 +119,7 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
     // Length is updated later.
     data.SetUInt8(0);
     // If custom HDLC parameters are used.
-    if (CGXDLMSLimits::DEFAULT_MAX_INFO_RX == GetLimits().GetMaxInfoTX().ToInteger())
+    if (CGXDLMSLimits::DEFAULT_MAX_INFO_TX == GetLimits().GetMaxInfoTX().ToInteger())
     {
         data.SetUInt8(HDLC_INFO_MAX_INFO_TX);
         data.SetUInt8(GetLimits().GetMaxInfoTX().GetSize());
@@ -146,7 +146,7 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
             return ret;
         }
     }
-    if (CGXDLMSLimits::DEFAULT_WINDOWS_SIZE_TX != GetLimits().GetWindowSizeRX().ToInteger())
+    if (CGXDLMSLimits::DEFAULT_WINDOWS_SIZE_RX != GetLimits().GetWindowSizeRX().ToInteger())
     {
         data.SetUInt8(HDLC_INFO_WINDOW_SIZE_RX);
         data.SetUInt8(GetLimits().GetWindowSizeRX().ToInteger());
@@ -604,19 +604,21 @@ int CGXDLMSClient::ParseUAResponse(CGXByteBuffer& data)
         default:
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
+        // RX / TX are delivered from the partner's point of view =>
+        // reversed to ours
         switch(id)
         {
         case HDLC_INFO_MAX_INFO_TX:
-            m_Settings.GetLimits().SetMaxInfoTX(value);
-            break;
-        case HDLC_INFO_MAX_INFO_RX:
             m_Settings.GetLimits().SetMaxInfoRX(value);
             break;
+        case HDLC_INFO_MAX_INFO_RX:
+            m_Settings.GetLimits().SetMaxInfoTX(value);
+            break;
         case HDLC_INFO_WINDOW_SIZE_TX:
-            m_Settings.GetLimits().SetWindowSizeTX(value);
+            m_Settings.GetLimits().SetWindowSizeRX(value);
             break;
         case HDLC_INFO_WINDOW_SIZE_RX:
-            m_Settings.GetLimits().SetWindowSizeRX(value);
+            m_Settings.GetLimits().SetWindowSizeTX(value);
             break;
         default:
             ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
