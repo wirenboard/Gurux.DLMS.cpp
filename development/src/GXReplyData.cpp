@@ -128,6 +128,7 @@ void CGXReplyData::Clear()
     m_ReadPosition = 0;
     m_PacketLength = 0;
     m_DataType = DLMS_DATA_TYPE_NONE;
+    m_CipherIndex = 0;
     m_Gbt = false;
 }
 

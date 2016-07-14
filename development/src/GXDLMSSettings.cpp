@@ -296,12 +296,12 @@ void CGXDLMSSettings::SetDLMSVersion(unsigned char value)
 }
 
 // Maximum PDU size.
-int CGXDLMSSettings::GetMaxReceivePDUSize()
+unsigned short CGXDLMSSettings::GetMaxReceivePDUSize()
 {
     return m_MaxReceivePDUSize;
 }
 
-void CGXDLMSSettings::SetMaxReceivePDUSize(int value)
+void CGXDLMSSettings::SetMaxReceivePDUSize(unsigned short value)
 {
     m_MaxReceivePDUSize = value;
 }

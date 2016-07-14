@@ -42,6 +42,7 @@ class CGXDLMSAssociationShortName : public CGXDLMSObject
     CGXDLMSVariant m_AccessRightsList;
     CGXDLMSObjectCollection m_ObjectList;
     std::string m_SecuritySetupReference;
+    CGXByteBuffer m_Secret;
 
     int GetAccessRights(CGXDLMSObject* pObj, CGXByteBuffer& data);
     void UpdateAccessRights(CGXDLMSVariant& buff);
@@ -51,6 +52,10 @@ public:
     CGXDLMSAssociationShortName();
 
     CGXDLMSObjectCollection& GetObjectList();
+
+    CGXByteBuffer& GetSecret();
+
+    void SetSecret(CGXByteBuffer& value);
 
     CGXDLMSVariant& GetAccessRightsList()
     {
@@ -85,6 +90,8 @@ public:
 
     // Returns SN Association View.
     int GetObjects(CGXByteBuffer& data);
+
+    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 
     int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 

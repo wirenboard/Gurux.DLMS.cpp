@@ -40,6 +40,7 @@
 void CGXDLMSAssociationLogicalName::Init()
 {
     m_AssociationStatus = DLMS_DLMS_ASSOCIATION_STATUS_NON_ASSOCIATED;
+    m_Secret.AddString("Gurux");
 }
 
 void CGXDLMSAssociationLogicalName::UpdateAccessRights(CGXDLMSObject* pObj, CGXDLMSVariant data)
@@ -336,6 +337,70 @@ int CGXDLMSAssociationLogicalName::GetDataType(int index, DLMS_DATA_TYPE& type)
         return DLMS_ERROR_CODE_OK;
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
+}
+
+int CGXDLMSAssociationLogicalName::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
+{
+    // Check reply_to_HLS_authentication
+    if (e.GetIndex() == 1)
+    {
+        int ret;
+        unsigned long ic = 0;
+        CGXByteBuffer* readSecret;
+        if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
+        {
+            unsigned char ch;
+            readSecret = &settings.GetSourceSystemTitle();
+            CGXByteBuffer bb;
+            bb.Set(e.GetParameters().byteArr, e.GetParameters().GetSize());
+            if ((ret = bb.GetUInt8(&ch)) != 0)
+            {
+                return ret;
+            }
+            if ((ret = bb.GetUInt32(&ic)) != 0)
+            {
+                return ret;
+            }
+        }
+        else
+        {
+            readSecret = &m_Secret;
+        }
+        CGXByteBuffer serverChallenge;
+        if ((ret = CGXSecure::Secure(settings, settings.GetCipher(), ic,
+                                     settings.GetStoCChallenge(), *readSecret, serverChallenge)) != 0)
+        {
+            return ret;
+        }
+        if (serverChallenge.Compare(e.GetParameters().byteArr, e.GetParameters().GetSize()))
+        {
+            if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
+            {
+                readSecret = &settings.GetCipher()->GetSystemTitle();
+                ic = settings.GetCipher()->GetFrameCounter();
+            }
+            else
+            {
+                readSecret = &m_Secret;
+            }
+            if ((ret = CGXSecure::Secure(settings, settings.GetCipher(), ic,
+                                         settings.GetCtoSChallenge(), *readSecret, serverChallenge)) != 0)
+            {
+                return ret;
+            }
+            e.SetValue(serverChallenge);
+            settings.SetConnected(true);
+        }
+        else
+        {
+            settings.SetConnected(false);
+        }
+    }
+    else
+    {
+        e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+    }
+    return 0;
 }
 
 int CGXDLMSAssociationLogicalName::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)

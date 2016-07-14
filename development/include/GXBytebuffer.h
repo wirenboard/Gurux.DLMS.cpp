@@ -42,9 +42,9 @@ const unsigned char VECTOR_CAPACITY = 50;
 class CGXByteBuffer
 {
     unsigned char* m_Data;
-    int m_Capacity;
-    int m_Size;
-    int m_Position;
+    unsigned long m_Capacity;
+    unsigned long m_Size;
+    unsigned long m_Position;
 public:
     //Constructor.
     CGXByteBuffer();
@@ -59,38 +59,38 @@ public:
     ~CGXByteBuffer();
 
     //Returns buffer size.
-    int GetSize();
+    unsigned long GetSize();
 
     //Set buffer size.
-    void SetSize(int value);
+    void SetSize(unsigned long value);
 
     //Increase buffer size.
-    int IncreaseSize(int size);
+    int IncreaseSize(unsigned long size);
 
     //Returns position of the buffer.
-    int GetPosition();
+    unsigned long GetPosition();
 
     //Returns position of the buffer.
-    void SetPosition(int value);
+    void SetPosition(unsigned long value);
 
     //Allocate new size for the array in bytes.
-    void Capacity(int capacity);
+    void Capacity(unsigned long capacity);
 
     //Get buffer capacity.
-    int Capacity();
+    unsigned long Capacity();
 
     //Fill buffer it with zeros.
-    void Zero(int index, int count);
+    void Zero(unsigned long index, unsigned long count);
 
     //Push new data to the byteArray.
     void SetUInt8(unsigned char item);
 
-    void SetUInt8(int index, int item);
+    void SetUInt8(unsigned long index, unsigned char item);
     void SetUInt16(unsigned short item);
 
     void SetUInt32(unsigned long item);
 
-    void SetUInt32ByIndex(int index, unsigned long item);
+    void SetUInt32ByIndex(unsigned long index, unsigned long item);
 
     void SetUInt64(unsigned long long item);
 
@@ -106,9 +106,9 @@ public:
 
     void SetDouble(double value);
 
-    void Set(const void* pSource, int count);
+    void Set(const void* pSource, unsigned long count);
 
-    void Set(CGXByteBuffer* data, int index = 0, int count = -1);
+    void Set(CGXByteBuffer* data, unsigned long index = 0, unsigned long count = -1);
 
     void AddString(const char* value);
 
@@ -118,7 +118,7 @@ public:
 
     int GetUInt8(unsigned char* value);
 
-    int GetUInt8(int index, unsigned char* value);
+    int GetUInt8(unsigned long index, unsigned char* value);
 
     int GetUInt16(unsigned short* value);
 
@@ -138,11 +138,11 @@ public:
     int GetDouble(
         double* value);
 
-    int Get(unsigned char* value, int count);
+    int Get(unsigned char* value, unsigned long count);
 
     unsigned char* GetData();
 
-    void ToArray(unsigned char*& value, int& count);
+    void ToArray(unsigned char*& value, unsigned long& count);
 
     /**
      * Remove handled bytes. This can be used in debugging to remove handled
@@ -159,12 +159,12 @@ public:
      *            Array to compare.
      * @return True, if arrays are similar. False, if the arrays differ.
      */
-    bool Compare(unsigned char* buff, int length);
+    bool Compare(unsigned char* buff, unsigned long length);
 
-    int GetUInt16(int index, unsigned short* value);
-    int GetUInt32(int index, unsigned long* value);
-    int GetUInt64(int index, unsigned long long* value);
-    int GetUInt128(int index, unsigned char* value);
+    int GetUInt16(unsigned long index, unsigned short* value);
+    int GetUInt32(unsigned long index, unsigned long* value);
+    int GetUInt64(unsigned long index, unsigned long long* value);
+    int GetUInt128(unsigned long index, unsigned char* value);
 
     //Get byte array as a std::string.
     std::string ToString();
@@ -183,15 +183,15 @@ public:
         *
         * @param bb Byte buffer as a byte array.
         */
-    int SubArray(int index, int count, CGXByteBuffer& bb);
+    int SubArray(unsigned long index, int count, CGXByteBuffer& bb);
 
     //Move data insize byte array.
-    int Move(int srcPos, int destPos, int count);
+    int Move(unsigned long srcPos, unsigned long destPos, unsigned long count);
 
     //Little Endian methods.
     int GetUInt32LE(unsigned long* value);
-    int GetUInt32LE(int index, unsigned long* value);
-    void SetUInt32ByIndexLE(int index, unsigned long item);
+    int GetUInt32LE(unsigned long index, unsigned long* value);
+    void SetUInt32ByIndexLE(unsigned long index, unsigned long item);
 
     CGXByteBuffer& operator=(CGXByteBuffer& value);
 };

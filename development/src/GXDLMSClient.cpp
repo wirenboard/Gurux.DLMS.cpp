@@ -159,7 +159,7 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
     if (data.GetSize() != 3)
     {
         // Length.
-        data.SetUInt8(2, data.GetPosition() - 3);
+        data.SetUInt8(2, (unsigned char) (data.GetPosition() - 3));
     }
     else
     {
@@ -660,24 +660,6 @@ int CGXDLMSClient::AARQRequest(std::vector<CGXByteBuffer>& packets)
     return CGXDLMS::GetMessages(m_Settings, DLMS_COMMAND_AARQ, 0, buff, NULL, packets);
 }
 
-/**
-* Parses the AARE response. Parse method will update the following data:
-* <ul>
-* <li>DLMSVersion</li>
-* <li>MaxReceivePDUSize</li>
-* <li>UseLogicalNameReferencing</li>
-* <li>LNSettings or SNSettings</li>
-* </ul>
-* LNSettings or SNSettings will be updated, depending on the referencing,
-* Logical name or Short name.
-*
-* reply
-*            Received data.
-* @see GXDLMSClient#aarqRequest
-* @see GXDLMSClient#getUseLogicalNameReferencing
-* @see GXDLMSClient#getLNSettings
-* @see GXDLMSClient#getSNSettings
-*/
 int CGXDLMSClient::ParseAAREResponse(CGXByteBuffer& reply)
 {
     int ret;
@@ -687,13 +669,124 @@ int CGXDLMSClient::ParseAAREResponse(CGXByteBuffer& reply)
     {
         return ret;
     }
-    m_IsAuthenticationRequired = sd == DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_REQUIRED;
+    m_IsAuthenticationRequired = (DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_REQUIRED == sd);
     if (m_Settings.GetDLMSVersion() != 6)
     {
         //Invalid DLMS version number.
         return DLMS_ERROR_CODE_INVALID_VERSION_NUMBER;
     }
     m_Settings.SetConnected(true);
+    return 0;
+}
+
+bool CGXDLMSClient::IsAuthenticationRequired()
+{
+    return m_IsAuthenticationRequired;
+}
+
+int CGXDLMSClient::GetApplicationAssociationRequest(
+    std::vector<CGXByteBuffer>& packets)
+{
+    int ret;
+    packets.clear();
+    if (m_Settings.GetPassword().GetSize() == 0)
+    {
+        //Password is invalid.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    m_Settings.ResetBlockIndex();
+    CGXByteBuffer pw, challenge;
+    if (m_Settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
+    {
+        pw = m_Settings.GetCipher()->GetSystemTitle();
+    }
+    else
+    {
+        pw = m_Settings.GetPassword();
+    }
+    long ic = 0;
+    if (m_Settings.GetCipher() != NULL)
+    {
+        ic = m_Settings.GetCipher()->GetFrameCounter();
+    }
+    if ((ret = CGXSecure::Secure(m_Settings, m_Settings.GetCipher(), ic,
+                                 m_Settings.GetStoCChallenge(), pw, challenge)) != 0)
+    {
+        return ret;
+    }
+    CGXByteBuffer bb;
+    bb.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
+    GXHelpers::SetObjectCount(challenge.GetSize(), bb);
+    bb.Set(&challenge);
+    CGXDLMSVariant name, data = bb;
+    if (GetUseLogicalNameReferencing())
+    {
+        name = "0.0.40.0.0.255";
+        return Method(name, DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME,
+                      1, data, packets);
+    }
+    name = 0xFA00;
+    return Method(name, DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME, 8, data,
+                  packets);
+}
+
+int CGXDLMSClient::ParseApplicationAssociationResponse(
+    CGXByteBuffer& reply)
+{
+    CGXDataInfo info;
+    unsigned char ch;
+    bool equals = false;
+    CGXByteBuffer secret;
+    int ret;
+    unsigned long ic = 0;
+    CGXDLMSVariant value;
+    if ((ret = GXHelpers::GetData(reply, info, value)) != 0)
+    {
+        return ret;
+    }
+    if (value.vt != DLMS_DATA_TYPE_NONE)
+    {
+        if (m_Settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
+        {
+            secret = m_Settings.GetSourceSystemTitle();
+            CGXByteBuffer bb;
+            bb.Set(value.byteArr, value.GetSize());
+            if ((ret = bb.GetUInt8(&ch)) != 0)
+            {
+                return ret;
+            }
+            if ((ret = bb.GetUInt32(&ic)) != 0)
+            {
+                return ret;
+            }
+        }
+        else
+        {
+            secret = m_Settings.GetPassword();
+        }
+        CGXByteBuffer challenge, cToS = m_Settings.GetCtoSChallenge();
+        if ((ret = CGXSecure::Secure(
+                       m_Settings,
+                       m_Settings.GetCipher(),
+                       ic,
+                       cToS,
+                       secret,
+                       challenge)) != 0)
+        {
+            return ret;
+        }
+        equals = challenge.Compare(value.byteArr, value.GetSize());
+    }
+    else
+    {
+        // Server did not accept CtoS.
+    }
+
+    if (!equals)
+    {
+        //ParseApplicationAssociationResponse failed. Server to Client do not match.
+        return DLMS_ERROR_CODE_AUTHENTICATION_FAILURE;
+    }
     return 0;
 }
 
@@ -1237,7 +1330,6 @@ int CGXDLMSClient::Method(CGXDLMSVariant name, DLMS_OBJECT_TYPE objectType,
     {
         if (data.vt == DLMS_DATA_TYPE_OCTET_STRING)
         {
-            GXHelpers::SetData(bb, data.vt, data);
             bb.Set(data.byteArr, data.size);
         }
         else

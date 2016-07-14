@@ -131,6 +131,11 @@ int CGXDLMS::CheckInit(CGXDLMSSettings& settings)
 /////////////////////////////////////////////////////////////////////////////
 int GetDataFromBlock(CGXByteBuffer& data, int index)
 {
+    if (data.GetSize() == data.GetPosition())
+    {
+        data.Clear();
+        return 0;
+    }
     int len = data.GetPosition() - index;
     if (len < 0)
     {
@@ -211,7 +216,7 @@ int CGXDLMS::GetWrapperFrame(
         reply.SetUInt16(settings.GetServerAddress());
     }
     // Data length.
-    reply.SetUInt16(data.GetSize());
+    reply.SetUInt16((unsigned short) data.GetSize());
     // Data
     reply.Set(&data, data.GetPosition(), -1);
 
@@ -249,7 +254,8 @@ int CGXDLMS::GetHdlcFrame(
     CGXByteBuffer& reply)
 {
     reply.Clear();
-    int ret, frameSize, len = 0;
+    unsigned short frameSize;
+    int ret, len = 0;
     CGXByteBuffer primaryAddress, secondaryAddress;
     if (settings.IsServer())
     {
@@ -297,13 +303,13 @@ int CGXDLMS::GetHdlcFrame(
     // Frame len.
     if (len == 0)
     {
-        reply.SetUInt8((5 + primaryAddress.GetSize()
-                        + secondaryAddress.GetSize() + len));
+        reply.SetUInt8((unsigned char) (5 + primaryAddress.GetSize() +
+                                        secondaryAddress.GetSize() + len));
     }
     else
     {
-        reply.SetUInt8((7 + primaryAddress.GetSize()
-                        + secondaryAddress.GetSize() + len));
+        reply.SetUInt8((unsigned char)(7 + primaryAddress.GetSize() +
+                                       secondaryAddress.GetSize() + len));
     }
     // Add primary address.
     reply.Set(&primaryAddress);
@@ -473,7 +479,7 @@ int CGXDLMS::GetLNPdu(CGXDLMSSettings& settings,
                       struct tm* date)
 {
     int ret;
-    int len = 0;
+    unsigned long len = 0;
     bool ciphering = settings.GetCipher() != NULL && settings.GetCipher()->GetSecurity() != DLMS_SECURITY_NONE;
     int offset = 0;
     if (settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC)
@@ -623,12 +629,16 @@ int CGXDLMS::GetLNPdu(CGXDLMSSettings& settings,
             return ret;
         }
         if ((ret = settings.GetCipher()->Encrypt(
+                       settings.GetCipher()->GetSecurity(),
+                       DLMS_COUNT_TYPE_PACKET,
+                       settings.GetCipher()->GetFrameCounter() + 1,
                        GetGloMessage(command),
                        settings.GetCipher()->GetSystemTitle(),
                        tmp, crypted)) != 0)
         {
             return ret;
         }
+        settings.GetCipher()->SetFrameCounter(settings.GetCipher()->GetFrameCounter() + 1);
         bb.SetSize(offset);
         bb.Set(&crypted);
     }
@@ -728,7 +738,10 @@ int CGXDLMS::GetSNPdu(CGXDLMSSettings& settings,
             && command != DLMS_COMMAND_AARQ && command != DLMS_COMMAND_AARE)
     {
         CGXByteBuffer crypted;
-        if ((ret = settings.GetCipher()->Encrypt(GetGloMessage(command),
+        if ((ret = settings.GetCipher()->Encrypt(settings.GetCipher()->GetSecurity(),
+                   DLMS_COUNT_TYPE_PACKET,
+                   settings.GetCipher()->GetFrameCounter(),
+                   GetGloMessage(command),
                    settings.GetCipher()->GetSystemTitle(), tmp, crypted)) != 0)
         {
             return ret;
@@ -816,8 +829,10 @@ int CGXDLMS::GetHdlcData(
     CGXReplyData& data,
     unsigned char& frame)
 {
+    unsigned long packetStartID = reply.GetPosition(), frameLen = 0;
+    unsigned long pos;
     unsigned char ch;
-    int ret, pos, packetStartID = reply.GetPosition(), frameLen = 0;
+    int ret;
     unsigned short crc, crcRead;
     // If whole frame is not received yet.
     if (reply.GetSize() - reply.GetPosition() < 9)
@@ -1021,7 +1036,7 @@ int CGXDLMS::GetHDLCAddress(
     unsigned long l;
     int ret, size = 0;
     address = 0;
-    for (int pos = buff.GetPosition(); pos != buff.GetSize(); ++pos)
+    for (unsigned long pos = buff.GetPosition(); pos != buff.GetSize(); ++pos)
     {
         ++size;
         if ((ret = buff.GetUInt8(pos, &ch)) != 0)
@@ -1396,7 +1411,7 @@ int CGXDLMS::GetPdu(
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         int index = data.GetData().GetPosition();
-        // Get DLMS_COMMAND_
+        // Get Command.
         if ((ret = data.GetData().GetUInt8(&ch)) != 0)
         {
             return ret;
@@ -1479,7 +1494,7 @@ int CGXDLMS::GetPdu(
                 {
                     return ret;
                 }
-                // Get DLMS_COMMAND_
+                // Get command
                 if ((ret = data.GetData().GetUInt8(&ch)) != 0)
                 {
                     return ret;
@@ -1513,10 +1528,10 @@ int CGXDLMS::GetPdu(
                 {
                     return ret;
                 }
-                data.GetData().Set(&bb);
+                data.GetData().Set(&bb, bb.GetPosition(), bb.GetSize() - bb.GetPosition());
                 data.SetCommand(DLMS_COMMAND_NONE);
                 ret = GetPdu(settings, data);
-                data.SetCipherIndex(data.GetData().GetSize());
+                data.SetCipherIndex((unsigned short) data.GetData().GetSize());
             }
             break;
         case DLMS_COMMAND_DATA_NOTIFICATION:

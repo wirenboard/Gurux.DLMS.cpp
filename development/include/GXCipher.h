@@ -35,13 +35,40 @@
 #ifndef GXCIPHER_H
 #define GXCIPHER_H
 
+#include "GXBytebuffer.h"
+
+//This is reserved for internal use to save block info.
+class CGXGMacBlock
+{
+public:
+    unsigned long c0;
+    unsigned long c1;
+    unsigned long c2;
+    unsigned long c3;
+    // How many bytes are not crypted/encrypted.
+    int bytesRemaining;
+    long totalLength;
+    CGXByteBuffer tag;
+    CGXGMacBlock();
+};
+
 class CGXCipher
 {
+private:
+    /**
+    * DLMS command.
+    */
+    unsigned char m_Command;
     DLMS_SECURITY m_Security;
     /**
     * System title.
     */
     CGXByteBuffer m_SystemTitle;
+
+    /**
+    * Is data encrypted.
+    */
+    bool m_Encrypt;
 
     /**
     *  Block cipher key.
@@ -57,15 +84,138 @@ class CGXCipher
      */
     unsigned long m_FrameCounter;
 
+
+    /**
+    * Working key is counted only once from block cipher key.
+    */
+    unsigned long* m_WorkingKey;
+    CGXByteBuffer m_H;
+    CGXByteBuffer m_J0;
+    CGXByteBuffer m_S;
+    CGXByteBuffer m_Counter;
+    unsigned long* m_mArray;
+
+    static int GetRounds(
+        CGXCipher* settings);
+
+    /**
+    * Count GHash.
+    */
+    static void GetGHash(
+        CGXCipher* settings,
+        CGXByteBuffer *aad);
+
+    /**
+    * Generate AES keys.
+    *
+    */
+    static int GenerateKey(
+        CGXCipher* settings);
+
+    static void MultiplyH(
+        CGXCipher* settings,
+        unsigned char* value);
+
+    static int GetAuthenticatedData(
+        DLMS_SECURITY security,
+        CGXByteBuffer& authenticationKey,
+        CGXByteBuffer& plainText,
+        CGXByteBuffer& result);
+
+    /**
+    * Encrypt data block.
+    *
+    */
+    static void EncryptBlock(
+        CGXCipher* settings,
+        CGXGMacBlock *block);
+
+    void Init(
+        unsigned char* systemTitle,
+        unsigned char count);
+
+    static int Init(
+        CGXCipher* settings,
+        CGXByteBuffer& aad,
+        CGXByteBuffer& iv,
+        unsigned long frameCounter,
+        CGXByteBuffer& bufBlock,
+        CGXGMacBlock& block);
+
+    /**
+    * Write bytes to decrypt/encrypt.
+    *
+    * @param input
+    */
+    static void Write(
+        CGXCipher *settings,
+        CGXByteBuffer *data,
+        CGXByteBuffer *bufBlock,
+        CGXGMacBlock *block,
+        CGXByteBuffer* output);
+
+    static int Init2(
+        CGXCipher* settings);
+
+    /**
+    * Process encrypting/decrypting.
+    *
+    * @return
+    */
+    static int FlushFinalBlock(
+        DLMS_SECURITY security,
+        CGXCipher *settings,
+        CGXByteBuffer *aad,
+        CGXByteBuffer *bufBlock,
+        CGXGMacBlock *block,
+        CGXByteBuffer *output);
+
+    /**
+    * Reset
+    */
+    static void Reset(
+        CGXCipher *settings,
+        CGXByteBuffer *aad);
+
+    static int ProcessBlock(
+        CGXCipher* settings,
+        CGXByteBuffer* input,
+        unsigned long inOffset,
+        CGXByteBuffer* output,
+        unsigned long outOffset,
+        CGXGMacBlock *block);
+
+    static void gCTRBlock(
+        CGXCipher *settings,
+        CGXByteBuffer *buf,
+        int bufCount,
+        CGXGMacBlock *block,
+        CGXByteBuffer *output);
+
 public:
     /**
     * Constructor.
     */
-    CGXCipher()
-    {
-    	m_FrameCounter = 0;
-        m_Security = DLMS_SECURITY_NONE;
-    }
+    CGXCipher(CGXByteBuffer& systemTitle);
+
+    /**
+    * Constructor.
+    */
+    CGXCipher(const char* systemTitle);
+
+    /**
+    * Constructor.
+    */
+    CGXCipher(
+        unsigned char* systemTitle,
+        unsigned char count);
+
+    /**
+    * Destructor.
+    */
+    ~CGXCipher();
+
+
     /**
       * Encrypt PDU.
       *
@@ -78,11 +228,14 @@ public:
       * @param reply
       *            Encrypted data.
       */
-    int Encrypt(unsigned char tag, CGXByteBuffer& systemTitle, CGXByteBuffer& data, CGXByteBuffer& reply)
-    {
-        //Encryption is not supported in C++ at the moment.
-        return 0;
-    }
+    int Encrypt(
+        DLMS_SECURITY security,
+        DLMS_COUNT_TYPE type,
+        unsigned long frameCounter,
+        unsigned char tag,
+        CGXByteBuffer& systemTitle,
+        CGXByteBuffer& plainText,
+        CGXByteBuffer& encrypted);
 
     /**
       * Decrypt data.
@@ -94,101 +247,80 @@ public:
       * @param security
       *            Used security level.
       */
-    int Decrypt(CGXByteBuffer& title, CGXByteBuffer& data, DLMS_SECURITY& security)
-    {
-    	security = DLMS_SECURITY_NONE;
-        //Decryption is not supported in C++ at the moment.
-        return 0;
-    }
+    int Decrypt(
+        CGXByteBuffer& title,
+        CGXByteBuffer& data,
+        DLMS_SECURITY& security);
+
+    /**
+     * Encrypt data using AES.
+     *
+     * @param data
+     *            Encrypted data.
+     * @param offset
+     *            Data offset.
+     * @param secret
+     *            Secret.
+     */
+    static int Aes1Encrypt(
+        CGXByteBuffer& data,
+        unsigned short offset,
+        CGXByteBuffer& secret);
 
     /**
      * @return Is ciphering used.
      */
-    bool IsCiphered()
-    {
-        //Decryption is not supported in C++ at the moment.
-        return false;
-    }
+    bool IsCiphered();
+
     /**
      * @return Used security.
      */
-    DLMS_SECURITY GetSecurity()
-    {
-        return m_Security;
-    }
+    DLMS_SECURITY GetSecurity();
 
     /**
     * @param value
     *            Used security.
     */
-    void SetSecurity(DLMS_SECURITY value)
-    {
-        m_Security = value;
-    }
+    void SetSecurity(DLMS_SECURITY value);
 
     /**
      * @return System title.
      */
-    CGXByteBuffer& GetSystemTitle()
-    {
-        return m_SystemTitle;
-    }
+    CGXByteBuffer& GetSystemTitle();
 
     /**
     *  @param value System title.
     */
-    void SetSystemTitle(CGXByteBuffer& value)
-    {
-        m_SystemTitle.Clear();
-        m_SystemTitle.Set(&value);
-    }
+    void SetSystemTitle(CGXByteBuffer& value);
 
     /**
      * @return Block cipher key.
      */
-    CGXByteBuffer& GetBlockCipherKey()
-    {
-        return m_BlockCipherKey;
-    }
+    CGXByteBuffer& GetBlockCipherKey();
 
     /**
     *  @param value Block cipher key.
     */
-    void SetBlockCipherKey(CGXByteBuffer& value)
-    {
-        m_BlockCipherKey.Clear();
-        m_BlockCipherKey.Set(&value);
-    }
+    void SetBlockCipherKey(CGXByteBuffer& value);
 
     /**
      * @return Authentication key.
      */
-    CGXByteBuffer& GetAuthenticationKey()
-    {
-        return m_AuthenticationKey;
-    }
+    CGXByteBuffer& GetAuthenticationKey();
 
     /**
      * @param value
      *            Authentication key.
      */
-    void SetAuthenticationKey(CGXByteBuffer& value)
-    {
-        m_AuthenticationKey.Clear();
-        m_AuthenticationKey.Set(&value);
-    }
+    void SetAuthenticationKey(CGXByteBuffer& value);
 
     /**
      * @return Frame counter. Invocation counter.
      */
-    unsigned long GetFrameCounter()
-    {
-        return m_FrameCounter;
-    }
+    unsigned long GetFrameCounter();
 
-    void Reset()
-    {
+    void SetFrameCounter(unsigned long value);
 
-    }
+    void Reset();
 };
 #endif //GXCIPHER_H

@@ -66,13 +66,14 @@ CGXByteBuffer::~CGXByteBuffer()
     Clear();
 }
 //Returns buffer size.
-int CGXByteBuffer::GetSize()
+unsigned long CGXByteBuffer::GetSize()
 {
     return m_Size;
 }
 
-void CGXByteBuffer::SetSize(int value)
+void CGXByteBuffer::SetSize(unsigned long value)
 {
+    assert(!(value > m_Capacity));
     m_Size = value;
     if (m_Position > m_Size)
     {
@@ -80,7 +81,7 @@ void CGXByteBuffer::SetSize(int value)
     }
 }
 
-int CGXByteBuffer::IncreaseSize(int size)
+int CGXByteBuffer::IncreaseSize(unsigned long size)
 {
     if (size > 1)
     {
@@ -92,19 +93,20 @@ int CGXByteBuffer::IncreaseSize(int size)
 
 
 //Returns position of the buffer.
-int CGXByteBuffer::GetPosition()
+unsigned long CGXByteBuffer::GetPosition()
 {
     return m_Position;
 }
 
 //Sets position of the buffer.
-void CGXByteBuffer::SetPosition(int value)
+void CGXByteBuffer::SetPosition(unsigned long value)
 {
+    assert(!(value > m_Size));
     m_Position = value;
 }
 
 // Allocate new size for the array in bytes.
-void CGXByteBuffer::Capacity(int capacity)
+void CGXByteBuffer::Capacity(unsigned long capacity)
 {
     m_Capacity = capacity;
     if (capacity == 0)
@@ -127,13 +129,13 @@ void CGXByteBuffer::Capacity(int capacity)
     }
 }
 
-int CGXByteBuffer::Capacity()
+unsigned long CGXByteBuffer::Capacity()
 {
     return m_Capacity;
 }
 
 // Fill buffer it with zeros.
-void CGXByteBuffer::Zero(int index, int count)
+void CGXByteBuffer::Zero(unsigned long index, unsigned long count)
 {
     if (index + count > m_Capacity)
     {
@@ -153,7 +155,7 @@ void CGXByteBuffer::SetUInt8(unsigned char item)
     ++m_Size;
 }
 
-void CGXByteBuffer::SetUInt8(int index, int item)
+void CGXByteBuffer::SetUInt8(unsigned long index, unsigned char item)
 {
     if(m_Capacity == 0 || index + 1 > m_Capacity)
     {
@@ -183,9 +185,8 @@ void CGXByteBuffer::SetUInt32(unsigned long item)
     m_Size += 4;
 }
 
-void CGXByteBuffer::SetUInt32ByIndex(int index, unsigned long item)
+void CGXByteBuffer::SetUInt32ByIndex(unsigned long index, unsigned long item)
 {
-
     if(m_Capacity == 0 ||index + 4 > m_Capacity)
     {
         m_Capacity += VECTOR_CAPACITY;
@@ -285,7 +286,7 @@ void CGXByteBuffer::SetInt64(long long item)
     CGXByteBuffer::SetUInt64((unsigned long long) item);
 }
 
-void CGXByteBuffer::Set(const void* pSource, int count)
+void CGXByteBuffer::Set(const void* pSource, unsigned long count)
 {
     if(m_Size + count > m_Capacity)
     {
@@ -304,9 +305,9 @@ void CGXByteBuffer::Set(const void* pSource, int count)
     m_Size += count;
 }
 
-void CGXByteBuffer::Set(CGXByteBuffer* data, int index, int count)
+void CGXByteBuffer::Set(CGXByteBuffer* data, unsigned long index, unsigned long count)
 {
-    if (count == -1)
+    if (count == (unsigned long) -1)
     {
         count = data->m_Size - index;
     }
@@ -346,7 +347,7 @@ int CGXByteBuffer::GetUInt8(unsigned char* value)
     return 0;
 }
 
-int CGXByteBuffer::GetUInt8(int index, unsigned char* value)
+int CGXByteBuffer::GetUInt8(unsigned long index, unsigned char* value)
 {
     if (index >= m_Size)
     {
@@ -398,7 +399,7 @@ int CGXByteBuffer::GetUInt32LE(unsigned long* value)
     return 0;
 }
 
-int CGXByteBuffer::GetUInt32LE(int index, unsigned long* value)
+int CGXByteBuffer::GetUInt32LE(unsigned long index, unsigned long* value)
 {
     if (index + 4 > m_Size)
     {
@@ -411,7 +412,7 @@ int CGXByteBuffer::GetUInt32LE(int index, unsigned long* value)
     return 0;
 }
 
-void CGXByteBuffer::SetUInt32ByIndexLE(int index, unsigned long item)
+void CGXByteBuffer::SetUInt32ByIndexLE(unsigned long index, unsigned long item)
 {
 
     if(m_Capacity == 0 ||index + 4 > m_Capacity)
@@ -440,12 +441,12 @@ int CGXByteBuffer::GetInt16(short* value)
 
 int CGXByteBuffer::GetInt32(long* value)
 {
-    int ret = CGXByteBuffer::GetUInt32(m_Position, (unsigned long*) value);
+    int ret = GetUInt32(m_Position, (unsigned long*) value);
     m_Position += 4;
     return ret;
 }
 
-int CGXByteBuffer::GetUInt32(int index, unsigned long* value)
+int CGXByteBuffer::GetUInt32(unsigned long index, unsigned long* value)
 {
     if (index + 4 > m_Size)
     {
@@ -478,7 +479,7 @@ int CGXByteBuffer::GetUInt64(unsigned long long* value)
     return ret;
 }
 
-int CGXByteBuffer::GetUInt64(int index, unsigned long long* value)
+int CGXByteBuffer::GetUInt64(unsigned long index, unsigned long long* value)
 {
     if (index + 8 > m_Size)
     {
@@ -495,7 +496,7 @@ int CGXByteBuffer::GetUInt64(int index, unsigned long long* value)
     return 0;
 }
 
-int CGXByteBuffer::GetUInt128(int index, unsigned char* value)
+int CGXByteBuffer::GetUInt128(unsigned long index, unsigned char* value)
 {
     int ret = CGXByteBuffer::GetUInt32(index, (unsigned long*) value);
     if (ret == 0)
@@ -549,9 +550,9 @@ int CGXByteBuffer::GetDouble(double* value)
     return 0;
 }
 
-int CGXByteBuffer::Get(unsigned char* value, int count)
+int CGXByteBuffer::Get(unsigned char* value, unsigned long count)
 {
-    if (value == NULL || count < 0 || m_Size - m_Position < count)
+    if (value == NULL || m_Size - m_Position < count)
     {
         return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
@@ -565,7 +566,7 @@ unsigned char* CGXByteBuffer::GetData()
     return m_Data;
 }
 
-int CGXByteBuffer::GetUInt16(int index, unsigned short* value)
+int CGXByteBuffer::GetUInt16(unsigned long index, unsigned short* value)
 {
     if (index + 2 > m_Size)
     {
@@ -626,16 +627,16 @@ void CGXByteBuffer::AddDoubleAsString(double value)
     *
     * @return Byte buffer as a byte array.
     */
-int CGXByteBuffer::SubArray(int index, int count, CGXByteBuffer& bb)
+int CGXByteBuffer::SubArray(unsigned long index, int count, CGXByteBuffer& bb)
 {
     bb.Clear();
     bb.Set(this, index, count);
     return 0;
 }
 
-int CGXByteBuffer::Move(int srcPos, int destPos, int count)
+int CGXByteBuffer::Move(unsigned long srcPos, unsigned long destPos, unsigned long count)
 {
-    if (m_Size < destPos + count || srcPos < 0 || destPos < 0 || count < 0)
+    if (m_Size < destPos + count)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
@@ -673,7 +674,7 @@ void CGXByteBuffer::Trim()
    *            Array to compare.
    * @return True, if arrays are similar. False, if the arrays differ.
    */
-bool CGXByteBuffer::Compare(unsigned char* buff, int length)
+bool CGXByteBuffer::Compare(unsigned char* buff, unsigned long length)
 {
     if (m_Size - m_Position < length)
     {
@@ -687,13 +688,13 @@ bool CGXByteBuffer::Compare(unsigned char* buff, int length)
     return equal;
 }
 
-void CGXByteBuffer::ToArray(unsigned char*& value, int& count)
+void CGXByteBuffer::ToArray(unsigned char*& value, unsigned long& count)
 {
     if (value != NULL)
     {
         free(value);
     }
-    count =m_Size;
+    count = m_Size;
     value = (unsigned char*) malloc(count);
     memcpy(value, m_Data, count);
 }

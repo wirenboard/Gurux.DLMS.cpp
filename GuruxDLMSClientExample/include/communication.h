@@ -69,7 +69,7 @@
 #include <fcntl.h>
 #endif
 
-#include "../../development/include/GXDLMSClient.h"
+#include "../../development/include/GXDLMSSecureClient.h"
 
 class CGXCommunication
 {

@@ -654,7 +654,7 @@ int GetBcd(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMSVarian
             return ret;
         }
         // If there is not enough data available.
-        if ((buff.GetSize() - buff.GetPosition()) < (int) len)
+        if ((buff.GetSize() - buff.GetPosition()) < len)
         {
             info.SetCompleate(false);
             return 0;
@@ -875,7 +875,7 @@ int GetUtfString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMS
             return ret;
         }
         // If there is not enough data available.
-        if (buff.GetSize() - buff.GetPosition() < (int) len)
+        if (buff.GetSize() - buff.GetPosition() < len)
         {
             info.SetCompleate(false);
             return 0;
@@ -919,7 +919,7 @@ int GetOctetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDL
             return ret;
         }
         // If there is not enough data available.
-        if (buff.GetSize() - buff.GetPosition() < (int) len)
+        if (buff.GetSize() - buff.GetPosition() < len)
         {
             info.SetCompleate(false);
             return 0;
@@ -967,7 +967,7 @@ int GetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMSVar
             return ret;
         }
         // If there is not enough data available.
-        if (buff.GetSize() - buff.GetPosition() < (int) len)
+        if (buff.GetSize() - buff.GetPosition() < len)
         {
             info.SetCompleate(false);
             return 0;
@@ -1079,7 +1079,7 @@ static int GetBitString(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& 
     {
         ++t;
     }
-    int byteCnt = (int) t;
+    unsigned int byteCnt = (unsigned int) t;
     // If there is not enough data available.
     if (buff.GetSize() - buff.GetPosition() < byteCnt)
     {
@@ -1129,7 +1129,10 @@ static int GetBool(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value
     return 0;
 }
 
-int GXHelpers::GetData(CGXByteBuffer& data, CGXDataInfo& info, CGXDLMSVariant& value)
+int GXHelpers::GetData(
+    CGXByteBuffer& data,
+    CGXDataInfo& info,
+    CGXDLMSVariant& value)
 {
     int ret;
     unsigned char ch;

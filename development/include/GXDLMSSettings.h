@@ -256,10 +256,10 @@ public:
     void SetDLMSVersion(unsigned char value);
 
 // Maximum PDU size.
-    int GetMaxReceivePDUSize();
+    unsigned short GetMaxReceivePDUSize();
 
 // Maximum PDU size.
-    void SetMaxReceivePDUSize(int value);
+    void SetMaxReceivePDUSize(unsigned short value);
 
 // Is Logical Name Referencing used.
     bool GetUseLogicalNameReferencing();

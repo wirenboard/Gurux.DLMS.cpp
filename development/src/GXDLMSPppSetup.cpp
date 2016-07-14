@@ -288,11 +288,11 @@ int CGXDLMSPppSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         data.SetUInt8(2);
         //Add username.
         data.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
-        data.SetUInt8(m_UserName.GetSize());
+        data.SetUInt8((unsigned char) m_UserName.GetSize());
         data.Set(&m_UserName, 0, -1);
         //Add password.
         data.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
-        data.SetUInt8(m_Password.GetSize());
+        data.SetUInt8((unsigned char) m_Password.GetSize());
         data.Set(&m_Password, 0, -1);
         e.SetValue(data);
         return DLMS_ERROR_CODE_OK;

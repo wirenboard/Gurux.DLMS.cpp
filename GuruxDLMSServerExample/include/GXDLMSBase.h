@@ -38,9 +38,9 @@
 #include <Winsock.h> //Add support for sockets	
 #endif
 
-#include "../../development/include/GXDLMSServer.h"
+#include "../../development/include/GXDLMSSecureServer.h"
 
-class CGXDLMSBase : public CGXDLMSServer
+class CGXDLMSBase : public CGXDLMSSecureServer
 {
 private:
 #if defined(_WIN32) || defined(_WIN64)//If Windows 
@@ -59,7 +59,7 @@ public:
     CGXDLMSBase(
         bool UseLogicalNameReferencing = true,
         DLMS_INTERFACE_TYPE IntefaceType = DLMS_INTERFACE_TYPE_HDLC) :
-        CGXDLMSServer(UseLogicalNameReferencing, IntefaceType)
+        CGXDLMSSecureServer(UseLogicalNameReferencing, IntefaceType)
     {
 #if defined(_WIN32) || defined(_WIN64)//If Windows 
         m_ReceiverThread = INVALID_HANDLE_VALUE;

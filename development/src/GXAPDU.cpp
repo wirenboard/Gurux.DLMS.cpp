@@ -75,11 +75,11 @@ int GetAuthenticationString(
         // 0xAC
         data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AUTHENTICATION_VALUE);
         // Len
-        data.SetUInt8((2 + callingAuthenticationValue.GetSize()));
+        GXHelpers::SetObjectCount(2 + callingAuthenticationValue.GetSize(), data);
         // Add authentication information.
         data.SetUInt8(BER_TYPE_CONTEXT);
         // Len.
-        data.SetUInt8(callingAuthenticationValue.GetSize());
+        GXHelpers::SetObjectCount(callingAuthenticationValue.GetSize(), data);
         if (callingAuthenticationValue.GetSize() != 0)
         {
             data.Set(&callingAuthenticationValue);
@@ -144,11 +144,11 @@ int GenerateApplicationContextName(
         // Add calling-AP-title
         data.SetUInt8((BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | 6));
         // LEN
-        data.SetUInt8((2 + cipher->GetSystemTitle().GetSize()));
+        GXHelpers::SetObjectCount(2 + cipher->GetSystemTitle().GetSize(), data);
         data.SetUInt8(BER_TYPE_OCTET_STRING);
         // LEN
-        data.SetUInt8(cipher->GetSystemTitle().GetSize());
-        data.Set(&cipher->GetSystemTitle());
+        GXHelpers::SetObjectCount(cipher->GetSystemTitle().GetSize(), data);
+        data.Set(cipher->GetSystemTitle().GetData(), cipher->GetSystemTitle().GetSize());
     }
     return 0;
 }
@@ -234,16 +234,22 @@ int GenerateUserInformation(
         {
             return ret;
         }
-        if ((ret = cipher->Encrypt(0x21, cipher->GetSystemTitle(), tmp, crypted)) != 0)
+        if ((ret = cipher->Encrypt(cipher->GetSecurity(),
+                                   DLMS_COUNT_TYPE_PACKET,
+                                   settings.GetCipher()->GetFrameCounter(),
+                                   0x21,
+                                   cipher->GetSystemTitle(),
+                                   tmp,
+                                   crypted)) != 0)
         {
             return ret;
         }
 
         // Length for AARQ user field
-        data.SetUInt8((2 + crypted.GetSize()));
+        GXHelpers::SetObjectCount(2 + crypted.GetSize(), data);
         // Coding the choice for user-information (Octet string, universal)
         data.SetUInt8(BER_TYPE_OCTET_STRING);
-        data.SetUInt8(crypted.GetSize());
+        GXHelpers::SetObjectCount(crypted.GetSize(), data);
         data.Set(&crypted);
     }
     return 0;
@@ -637,7 +643,7 @@ int UpdatePassword(
     {
         return DLMS_ERROR_CODE_INVALID_TAG;
     }
-    if ((ret == buff.GetUInt8(&len)) != 0)
+    if ((ret = buff.GetUInt8(&len)) != 0)
     {
         return ret;
     }
@@ -766,7 +772,13 @@ int GetUserInformation(
     {
         CGXByteBuffer tmp(data);
         data.Clear();
-        return cipher->Encrypt(0x28, cipher->GetSystemTitle(), tmp, data);
+        return cipher->Encrypt(cipher->GetSecurity(),
+                               DLMS_COUNT_TYPE_PACKET,
+                               settings.GetCipher()->GetFrameCounter(),
+                               0x28,
+                               cipher->GetSystemTitle(),
+                               tmp,
+                               data);
     }
     return 0;
 }
@@ -780,7 +792,7 @@ int CGXAPDU::GenerateAarq(
     // AARQ APDU Tag
     data.SetUInt8(BER_TYPE_APPLICATION | BER_TYPE_CONSTRUCTED);
     // Length is updated later.
-    int offset = data.GetSize();
+    unsigned long offset = data.GetSize();
     data.SetUInt8(0);
     ///////////////////////////////////////////
     // Add Application context name.
@@ -796,7 +808,7 @@ int CGXAPDU::GenerateAarq(
     {
         return ret;
     }
-    data.SetUInt8(offset, (data.GetSize() - offset - 1));
+    data.SetUInt8(offset, (unsigned char) (data.GetSize() - offset - 1));
     return 0;
 }
 
@@ -826,7 +838,6 @@ int CGXAPDU::ParsePDU(
         return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
     DLMS_ASSOCIATION_RESULT resultComponent = DLMS_ASSOCIATION_RESULT_ACCEPTED;
-    DLMS_SOURCE_DIAGNOSTIC resultDiagnosticValue = DLMS_SOURCE_DIAGNOSTIC_NONE;
     while (buff.GetPosition() < buff.GetSize())
     {
         if ((ret = buff.GetUInt8(&tag)) != 0)
@@ -916,7 +927,7 @@ int CGXAPDU::ParsePDU(
             {
                 return ret;
             }
-            resultDiagnosticValue = (DLMS_SOURCE_DIAGNOSTIC) tag;
+            diagnostic = (DLMS_SOURCE_DIAGNOSTIC) tag;
             break;
         // 0xA4 Result
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLED_AP_INVOCATION_ID:
@@ -1028,7 +1039,7 @@ int CGXAPDU::ParsePDU(
         // 0xBE
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_USER_INFORMATION:
             if (resultComponent != DLMS_ASSOCIATION_RESULT_ACCEPTED
-                    && resultDiagnosticValue != DLMS_SOURCE_DIAGNOSTIC_NONE)
+                    && diagnostic != DLMS_SOURCE_DIAGNOSTIC_NONE)
             {
                 return DLMS_ERROR_CODE_REJECTED_PERMAMENT;
             }
@@ -1082,7 +1093,7 @@ int CGXAPDU::GenerateAARE(
     CGXCipher* cipher)
 {
     int ret;
-    int offset = data.GetPosition();
+    unsigned long offset = data.GetPosition();
     // Set AARE tag and length 0x61
     data.SetUInt8(BER_TYPE_APPLICATION | BER_TYPE_CONSTRUCTED | PDU_TYPE_APPLICATION_CONTEXT_NAME);
     // Length is updated later.
@@ -1116,9 +1127,9 @@ int CGXAPDU::GenerateAARE(
                 || cipher->IsCiphered()))
     {
         data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLED_AP_INVOCATION_ID);
-        data.SetUInt8((2 + cipher->GetSystemTitle().GetSize()));
+        GXHelpers::SetObjectCount(2 + cipher->GetSystemTitle().GetSize(), data);
         data.SetUInt8(BER_TYPE_OCTET_STRING);
-        data.SetUInt8(cipher->GetSystemTitle().GetSize());
+        GXHelpers::SetObjectCount(cipher->GetSystemTitle().GetSize(), data);
         data.Set(&cipher->GetSystemTitle());
     }
 
@@ -1141,10 +1152,10 @@ int CGXAPDU::GenerateAARE(
         data.SetUInt8(settings.GetAuthentication());
         // Add tag.
         data.SetUInt8(0xAA);
-        data.SetUInt8((2 + settings.GetStoCChallenge().GetSize())); // Len
+        GXHelpers::SetObjectCount(2 + settings.GetStoCChallenge().GetSize(), data); // Len
         data.SetUInt8(BER_TYPE_CONTEXT);
-        data.SetUInt8(settings.GetStoCChallenge().GetSize());
-        data.Set(&settings.GetStoCChallenge());
+        GXHelpers::SetObjectCount(settings.GetStoCChallenge().GetSize(), data);
+        data.Set(settings.GetStoCChallenge().GetData(), settings.GetStoCChallenge().GetSize());
     }
     // Add User Information
     // Tag 0xBE
@@ -1154,12 +1165,12 @@ int CGXAPDU::GenerateAARE(
     {
         return ret;
     }
-    data.SetUInt8((2 + tmp.GetSize()));
+    GXHelpers::SetObjectCount(2 + tmp.GetSize(), data);
     // Coding the choice for user-information (Octet STRING, universal)
     data.SetUInt8(BER_TYPE_OCTET_STRING);
     // Length
-    data.SetUInt8(tmp.GetSize());
+    GXHelpers::SetObjectCount(tmp.GetSize(), data);
     data.Set(&tmp);
-    data.SetUInt8((short) (offset + 1), (data.GetSize() - offset - 2));
+    data.SetUInt8(offset + 1, (unsigned char) (data.GetSize() - offset - 2));
     return 0;
 }

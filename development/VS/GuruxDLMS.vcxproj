@@ -126,6 +126,7 @@
     <ClCompile Include="..\src\GXApplicationContextName.cpp" />
     <ClCompile Include="..\src\GXAuthenticationMechanismName.cpp" />
     <ClCompile Include="..\src\gxbytebuffer.cpp" />
+    <ClCompile Include="..\src\GXCipher.cpp" />
     <ClCompile Include="..\src\GXDateTime.cpp" />
     <ClCompile Include="..\src\GXDLMS.cpp" />
     <ClCompile Include="..\src\GXDLMSActionItem.cpp" />
@@ -187,6 +188,8 @@
     <ClCompile Include="..\src\GXDLMSScriptAction.cpp" />
     <ClCompile Include="..\src\GXDLMSScriptTable.cpp" />
     <ClCompile Include="..\src\GXDLMSSeasonProfile.cpp" />
+    <ClCompile Include="..\src\GXDLMSSecureClient.cpp" />
+    <ClCompile Include="..\src\GXDLMSSecureServer.cpp" />
     <ClCompile Include="..\src\GXDLMSSecuritySetup.cpp" />
     <ClCompile Include="..\src\GXDLMSServer.cpp" />
     <ClCompile Include="..\src\GXDLMSSettings.cpp" />
@@ -207,6 +210,7 @@
     <ClCompile Include="..\src\GXStandardObisCodeCollection.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\chipperingenums.h" />
     <ClInclude Include="..\include\Enums.h" />
     <ClInclude Include="..\include\ErrorCodes.h" />
     <ClInclude Include="..\include\GXAPDU.h" />
@@ -279,6 +283,8 @@
     <ClInclude Include="..\include\GXDLMSScriptAction.h" />
     <ClInclude Include="..\include\GXDLMSScriptTable.h" />
     <ClInclude Include="..\include\GXDLMSSeasonProfile.h" />
+    <ClInclude Include="..\include\GXDLMSSecureClient.h" />
+    <ClInclude Include="..\include\GXDLMSSecureServer.h" />
     <ClInclude Include="..\include\GXDLMSSecuritySetup.h" />
     <ClInclude Include="..\include\GXDLMSServer.h" />
     <ClInclude Include="..\include\GXDLMSSettings.h" />
@@ -290,6 +296,7 @@
     <ClInclude Include="..\include\GXDLMSValueEventCollection.h" />
     <ClInclude Include="..\include\GXDLMSVariant.h" />
     <ClInclude Include="..\include\GXDLMSWeekProfile.h" />
+    <ClInclude Include="..\include\GXGMac.h" />
     <ClInclude Include="..\include\GXHelpers.h" />
     <ClInclude Include="..\include\GXReplyData.h" />
     <ClInclude Include="..\include\GXSecure.h" />

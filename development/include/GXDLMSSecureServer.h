@@ -32,45 +32,31 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXSECURE_H
-#define GXSECURE_H
+#ifndef GXDLMSSECURESERVER_H
+#define GXDLMSSECURESERVER_H
 
-#include "../include/enums.h"
-#include "../include/GXBytebuffer.h"
-#include "../include/GXDLMSSettings.h"
+#include "GXDLMSServer.h"
 
-class CGXSecure
+class CGXDLMSSecureServer : public CGXDLMSServer
 {
+private:
+    CGXCipher m_Cipher;
 public:
-    /**
-    * Generates challenge.
-    *
-    * @param authentication
-    *            Used authentication.
-    * @return Generated challenge.
-    */
-    static int GenerateChallenge(
-        DLMS_AUTHENTICATION authentication,
-        CGXByteBuffer& challenge);
+    /////////////////////////////////////////////////////////////////////////////
+    //Constructor
+    /////////////////////////////////////////////////////////////////////////////
+    CGXDLMSSecureServer(
+        bool UseLogicalNameReferencing = true,
+        DLMS_INTERFACE_TYPE intefaceType = DLMS_INTERFACE_TYPE_HDLC);
+
+    /////////////////////////////////////////////////////////////////////////////
+    //Destructor.
+    /////////////////////////////////////////////////////////////////////////////
+    ~CGXDLMSSecureServer();
 
     /**
-    * Chipher text.
-    *
-    * @param auth
-    *            Authentication level.
-    * @param data
-    *            Text to chipher.
-    * @param secret
-    *            Secret.
-    * @return Chiphered text.
-    */
-    static int Secure(
-        CGXDLMSSettings& settings,
-        CGXCipher* cipher,
-        unsigned long ic,
-        CGXByteBuffer& data,
-        CGXByteBuffer& secret,
-        CGXByteBuffer& reply);
+     * @return Ciphering settings.
+     */
+    CGXCipher* GetCiphering();
 };
-
-#endif //GXSECURE_H
+#endif //GXDLMSSECURESERVER_H

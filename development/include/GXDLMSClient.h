@@ -38,12 +38,14 @@
 #include "GXDLMS.h"
 #include "GXStandardObisCodeCollection.h"
 #include "GXDLMSProfileGeneric.h"
+#include "GXSecure.h"
 
 class CGXDLMSClient
 {
+protected:
+    CGXDLMSSettings m_Settings;
 private:
     bool m_IsAuthenticationRequired;
-    CGXDLMSSettings m_Settings;
     static void UpdateOBISCodes(CGXDLMSObjectCollection& objects);
     // SN referencing
     int ParseSNObjects(CGXByteBuffer& buff, CGXDLMSObjectCollection& objects, bool onlyKnownObjects);
@@ -149,16 +151,48 @@ public:
     // Returns: 0 if succeed. Otherwise error number.
     /////////////////////////////////////////////////////////////////////////////
     int AARQRequest(
-        std::vector<CGXByteBuffer>& Packets);
+        std::vector<CGXByteBuffer>& packets);
 
-    /////////////////////////////////////////////////////////////////////////////
-    // Parses AAREResponse byte array.
-    /////////////////////////////////////////////////////////////////////////////
-    // data: buffer containing the data from the meter.
-    // Returns: 0 if succeed. Otherwise error number.
-    /////////////////////////////////////////////////////////////////////////////
+    /**
+    * Parses the AARE response. Parse method will update the following data:
+    * <ul>
+    * <li>DLMSVersion</li>
+    * <li>MaxReceivePDUSize</li>
+    * <li>UseLogicalNameReferencing</li>
+    * <li>LNSettings or SNSettings</li>
+    * </ul>
+    * LNSettings or SNSettings will be updated, depending on the referencing,
+    * Logical name or Short name.
+    *
+    * reply
+    *            Received data.
+    * @see GXDLMSClient#aarqRequest
+    * @see GXDLMSClient#getUseLogicalNameReferencing
+    * @see GXDLMSClient#getLNSettings
+    * @see GXDLMSClient#getSNSettings
+    */
     int ParseAAREResponse(
         CGXByteBuffer& data);
+
+    /**
+    * @return Is authentication Required.
+    */
+    bool IsAuthenticationRequired();
+
+    /**
+     * @return Get challenge request if HLS authentication is used.
+     */
+    int GetApplicationAssociationRequest(
+        std::vector<CGXByteBuffer>& packets);
+
+    /**
+     * Parse server's challenge if HLS authentication is used.
+     *
+     * @param reply
+     *            Received reply from the server.
+     */
+    int ParseApplicationAssociationResponse(
+        CGXByteBuffer& reply);
 
     /////////////////////////////////////////////////////////////////////////////
     // Returns ReceiverReady query as byte array.

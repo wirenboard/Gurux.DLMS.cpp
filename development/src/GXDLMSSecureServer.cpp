@@ -32,45 +32,22 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXSECURE_H
-#define GXSECURE_H
+#include "../include/GXDLMSSecureServer.h"
 
-#include "../include/enums.h"
-#include "../include/GXBytebuffer.h"
-#include "../include/GXDLMSSettings.h"
-
-class CGXSecure
+CGXDLMSSecureServer::CGXDLMSSecureServer(bool UseLogicalNameReferencing,
+        DLMS_INTERFACE_TYPE intefaceType) :
+    CGXDLMSServer(
+        UseLogicalNameReferencing,
+        intefaceType), m_Cipher("ABCDEFGH")
 {
-public:
-    /**
-    * Generates challenge.
-    *
-    * @param authentication
-    *            Used authentication.
-    * @return Generated challenge.
-    */
-    static int GenerateChallenge(
-        DLMS_AUTHENTICATION authentication,
-        CGXByteBuffer& challenge);
+    m_Settings.SetCipher(&m_Cipher);
+}
 
-    /**
-    * Chipher text.
-    *
-    * @param auth
-    *            Authentication level.
-    * @param data
-    *            Text to chipher.
-    * @param secret
-    *            Secret.
-    * @return Chiphered text.
-    */
-    static int Secure(
-        CGXDLMSSettings& settings,
-        CGXCipher* cipher,
-        unsigned long ic,
-        CGXByteBuffer& data,
-        CGXByteBuffer& secret,
-        CGXByteBuffer& reply);
-};
+CGXDLMSSecureServer::~CGXDLMSSecureServer()
+{
+}
 
-#endif //GXSECURE_H
+CGXCipher* CGXDLMSSecureServer::GetCiphering()
+{
+    return m_Settings.GetCipher();
+}

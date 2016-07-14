@@ -589,7 +589,7 @@ CGXDLMSVariant::CGXDLMSVariant(struct tm value)
 CGXDLMSVariant::CGXDLMSVariant(CGXByteBuffer& value)
 {
     vt = DLMS_DATA_TYPE_OCTET_STRING;
-    size = value.GetSize();
+    size = (unsigned short) value.GetSize();
     if (size != 0)
     {
         byteArr = (unsigned char*) malloc(size);
@@ -694,7 +694,7 @@ CGXDLMSVariant& CGXDLMSVariant::operator=(CGXByteBuffer& value)
 {
     Clear();
     vt = DLMS_DATA_TYPE_OCTET_STRING;
-    size = value.GetSize();
+    size = (unsigned short) value.GetSize();
     if (size != 0)
     {
         byteArr = (unsigned char*) malloc(size);

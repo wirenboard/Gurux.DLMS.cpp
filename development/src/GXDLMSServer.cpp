@@ -1054,15 +1054,29 @@ int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
             // If action.
             if ((*e1)->IsAction())
             {
-                if ((ret = GXHelpers::SetData(bb, value.vt, value)) != 0)
+                if (((*e1)->GetDataType() == DLMS_DATA_TYPE_ARRAY ||
+                        (*e1)->GetDataType() == DLMS_DATA_TYPE_STRUCTURE) &&
+                        value.vt == DLMS_DATA_TYPE_OCTET_STRING)
+                {
+                    // If byte array is added do not add type.
+                    bb.Set(value.byteArr, value.GetSize());
+                }
+                else if ((ret = GXHelpers::SetData(bb, value.vt, value)) != 0)
                 {
                     return ret;
                 }
             }
             else
             {
-                if ((ret = CGXDLMS::AppendData((*e1)->GetTarget(),
-                                               (*e1)->GetIndex(), bb, value)) != 0)
+                if (((*e1)->GetDataType() == DLMS_DATA_TYPE_ARRAY ||
+                        (*e1)->GetDataType() == DLMS_DATA_TYPE_STRUCTURE) &&
+                        value.vt == DLMS_DATA_TYPE_OCTET_STRING)
+                {
+                    // If byte array is added do not add type.
+                    bb.Set(value.byteArr, value.GetSize());
+                }
+                else if ((ret = CGXDLMS::AppendData((*e1)->GetTarget(),
+                                                    (*e1)->GetIndex(), bb, value)) != 0)
                 {
                     return ret;
                 }
@@ -1381,7 +1395,10 @@ int CGXDLMSServer::HandleMethodRequest(CGXByteBuffer& data)
 
 int CGXDLMSServer::HandleRequest(CGXByteBuffer& data, CGXByteBuffer& reply)
 {
-    return HandleRequest(data.GetData(), data.GetSize() - data.GetPosition(), reply);
+    return HandleRequest(
+               data.GetData(),
+               (unsigned short) (data.GetSize() - data.GetPosition()),
+               reply);
 }
 
 int CGXDLMSServer::HandleRequest(unsigned char* buff, unsigned short size, CGXByteBuffer& reply)

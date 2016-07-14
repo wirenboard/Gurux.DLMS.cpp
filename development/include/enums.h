@@ -296,6 +296,13 @@ typedef enum
     DLMS_SECURITY_AUTHENTICATION_ENCRYPTION = 0x30,
 } DLMS_SECURITY;
 
+typedef enum
+{
+    DLMS_COUNT_TYPE_TAG = 0x1,
+    DLMS_COUNT_TYPE_DATA = 2,
+    DLMS_COUNT_TYPE_PACKET = 3
+} DLMS_COUNT_TYPE;
+
 /**
 * HDLC frame types.
 */
@@ -819,6 +826,16 @@ typedef enum
     DLMS_COMMAND_GLO_GET_RESPONSE = 0xCC,
     DLMS_COMMAND_GLO_SET_REQUEST = 0xC9,
     DLMS_COMMAND_GLO_SET_RESPONSE = 0xCD,
+    /**
+     * Glo general ciphering.
+     */
+    DLMS_COMMAND_GLO_GENERAL_CIPHERING = 0xDB,
+
+    /**
+    * Glo event notification request.
+    */
+    DLMS_COMMAND_GLO_EVENT_NOTIFICATION_REQUEST = 0xCA,
+
     DLMS_COMMAND_GLO_METHOD_REQUEST = 0xCB,
     DLMS_COMMAND_GLO_METHOD_RESPONSE = 0xCF
 } DLMS_COMMAND;

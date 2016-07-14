@@ -335,7 +335,7 @@ int CGXDLMSBase::Init(int port)
     profileGeneric->SetCapturePeriod(60);
     //Maximum row count.
     profileGeneric->SetProfileEntries(100);
-    profileGeneric->SetSortMethod(GX_SORT_METHOD_FIFO);
+    profileGeneric->SetSortMethod(DLMS_SORT_METHOD_FIFO);
     profileGeneric->SetSortObject(pClock);
     //Add colums.
     //Set saved attribute index.

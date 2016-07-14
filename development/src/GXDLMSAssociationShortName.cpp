@@ -101,12 +101,22 @@ void CGXDLMSAssociationShortName::UpdateAccessRights(CGXDLMSVariant& buff)
 CGXDLMSAssociationShortName::CGXDLMSAssociationShortName() : CGXDLMSObject(DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME)
 {
     GXHelpers::SetLogicalName("0.0.40.0.0.255", m_LN);
+    m_Secret.AddString("Gurux");
     m_SN = 0xFA00;
 }
 
 CGXDLMSObjectCollection& CGXDLMSAssociationShortName::GetObjectList()
 {
     return m_ObjectList;
+}
+
+CGXByteBuffer& CGXDLMSAssociationShortName::GetSecret()
+{
+    return m_Secret;
+}
+void CGXDLMSAssociationShortName::SetSecret(CGXByteBuffer& value)
+{
+    m_Secret = value;
 }
 
 /* TODO:
@@ -225,6 +235,78 @@ int CGXDLMSAssociationShortName::GetObjects(CGXByteBuffer& data)
         }
     }
     return DLMS_ERROR_CODE_OK;
+}
+
+int CGXDLMSAssociationShortName::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
+{
+    // Check reply_to_HLS_authentication
+    if (e.GetIndex() == 8)
+    {
+        int ret;
+        unsigned long ic = 0;
+        CGXByteBuffer* readSecret;
+        if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
+        {
+            unsigned char ch;
+            readSecret = &settings.GetSourceSystemTitle();
+            CGXByteBuffer bb;
+            bb.Set(e.GetParameters().byteArr, e.GetParameters().GetSize());
+            if ((ret = bb.GetUInt8(&ch)) != 0)
+            {
+                return ret;
+            }
+            if ((ret = bb.GetUInt32(&ic)) != 0)
+            {
+                return ret;
+            }
+        }
+        else
+        {
+            readSecret = &m_Secret;
+        }
+        CGXByteBuffer serverChallenge;
+        if ((ret = CGXSecure::Secure(settings, settings.GetCipher(), ic,
+                                     settings.GetStoCChallenge(), *readSecret, serverChallenge)) != 0)
+        {
+            return ret;
+        }
+
+        if (serverChallenge.Compare(e.GetParameters().byteArr, e.GetParameters().GetSize()))
+        {
+            if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
+            {
+                readSecret = &settings.GetCipher()->GetSystemTitle();
+                ic = settings.GetCipher()->GetFrameCounter();
+            }
+            else
+            {
+                readSecret = &m_Secret;
+            }
+            serverChallenge.Clear();
+            if ((ret = CGXSecure::Secure(settings,
+                                         settings.GetCipher(),
+                                         ic,
+                                         settings.GetCtoSChallenge(),
+                                         *readSecret,
+                                         serverChallenge)) != 0)
+            {
+                return ret;
+            }
+            e.SetValue(serverChallenge);
+            settings.SetConnected(true);
+
+        }
+        else
+        {
+            settings.SetConnected(false);
+            return 0;
+        }
+    }
+    else
+    {
+        e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+    }
+    return 0;
 }
 
 int CGXDLMSAssociationShortName::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)

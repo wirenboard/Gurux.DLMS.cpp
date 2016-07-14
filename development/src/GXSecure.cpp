@@ -37,19 +37,100 @@
 
 int CGXSecure::GenerateChallenge(DLMS_AUTHENTICATION authentication, CGXByteBuffer& challenge)
 {
-    challenge.Clear();
     // Random challenge is 8 to 64 bytes.
-    int len = rand() % 58 + 8;
+    // Texas Instruments accepts only 16 byte long challenge.
+    // For this reason challenge size is 16 bytes at the moment.
+    int len = 16;
+    //int len = rand() % 58 + 8;
     unsigned char val;
     for (int pos = 0; pos != len; ++pos)
     {
-        // Allow printable characters only.
-        do
-        {
-            val = rand() % 0x7A;
-        }
-        while (val < 0x21);
+        val = rand() % 0x7A;
         challenge.SetUInt8(val);
     }
     return 0;
+}
+
+/**
+    * Chipher text.
+    *
+    * @param auth
+    *            Authentication level.
+    * @param data
+    *            Text to chipher.
+    * @param secret
+    *            Secret.
+    * @return Chiphered text.
+    */
+int CGXSecure::Secure(
+    CGXDLMSSettings& settings,
+    CGXCipher* cipher,
+    unsigned long ic,
+    CGXByteBuffer& data,
+    CGXByteBuffer& secret,
+    CGXByteBuffer& reply)
+{
+    int ret = 0, pos;
+    reply.Clear();
+    if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH)
+    {
+        CGXByteBuffer s;
+        int len = data.GetSize();
+        if (len % 16 != 0)
+        {
+            len += (16 - (data.GetSize() % 16));
+        }
+        if (secret.GetSize() > data.GetSize())
+        {
+            len = secret.GetSize();
+            if (len % 16 != 0)
+            {
+                len += (16 - (secret.GetSize() % 16));
+            }
+        }
+        s.Zero(0, len);
+        s.SetSize(0);
+        s.Set(&secret);
+        s.SetSize(len);
+        reply.Zero(0, len);
+        reply.SetSize(0);
+        reply.Set(&data);
+        reply.SetSize(len);
+        for (pos = 0; pos < len / 16; ++pos)
+        {
+            CGXCipher::Aes1Encrypt(reply, pos * 16, s);
+        }
+        return 0;
+    }
+    // Get server Challenge.
+    CGXByteBuffer challenge;
+    // Get shared secret
+    if (settings.GetAuthentication() != DLMS_AUTHENTICATION_HIGH_GMAC)
+    {
+        challenge.Set(&data);
+        challenge.Set(&secret);
+    }
+    if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_MD5)
+    {
+        //MD5 is not supported at the moment.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA1)
+    {
+        //SHA-1 is not supported at the moment.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
+    {
+        CGXByteBuffer tmp;
+        ret = cipher->Encrypt(DLMS_SECURITY_AUTHENTICATION,
+                              DLMS_COUNT_TYPE_TAG, ic, 0, secret, data, tmp);
+        if (ret == 0)
+        {
+            reply.SetUInt8(DLMS_SECURITY_AUTHENTICATION);
+            reply.SetUInt32(ic);
+            reply.Set(&tmp);
+        }
+    }
+    return ret;
 }

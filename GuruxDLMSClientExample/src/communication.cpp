@@ -643,6 +643,17 @@ int CGXCommunication::InitializeConnection()
         TRACE("AARQRequest failed %d.\r\n", ret);
         return ret;
     }
+    reply.Clear();
+    // Get challenge Is HLS authentication is used.
+    if (m_Parser->IsAuthenticationRequired())
+    {
+        if ((ret = m_Parser->GetApplicationAssociationRequest(data)) != 0 ||
+                (ret = ReadDataBlock(data, reply)) != 0 ||
+                (ret = m_Parser->ParseApplicationAssociationResponse(reply.GetData())) != 0)
+        {
+            return ret;
+        }
+    }
     return DLMS_ERROR_CODE_OK;
 }
 
