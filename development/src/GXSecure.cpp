@@ -45,7 +45,7 @@ int CGXSecure::GenerateChallenge(DLMS_AUTHENTICATION authentication, CGXByteBuff
     unsigned char val;
     for (int pos = 0; pos != len; ++pos)
     {
-        val = rand() % 0x7A;
+        val = rand();
         challenge.SetUInt8(val);
     }
     return 0;
@@ -88,14 +88,10 @@ int CGXSecure::Secure(
                 len += (16 - (secret.GetSize() % 16));
             }
         }
-        s.Zero(0, len);
-        s.SetSize(0);
         s.Set(&secret);
-        s.SetSize(len);
-        reply.Zero(0, len);
-        reply.SetSize(0);
+        s.Zero(s.GetSize(), len - s.GetSize());
         reply.Set(&data);
-        reply.SetSize(len);
+        reply.Zero(reply.GetSize(), len - reply.GetSize());
         for (pos = 0; pos < len / 16; ++pos)
         {
             CGXCipher::Aes1Encrypt(reply, pos * 16, s);

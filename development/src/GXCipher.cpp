@@ -701,6 +701,7 @@ int CGXCipher::Init(
     CGXByteBuffer& aad,
     CGXByteBuffer& iv,
     unsigned long frameCounter,
+    CGXByteBuffer& systemTitle,
     CGXByteBuffer& bufBlock,
     CGXGMacBlock& block)
 {
@@ -727,7 +728,7 @@ int CGXCipher::Init(
     {
         bufLength = (BLOCK_SIZE + TAG_SIZE);
     }
-    if ((ret = GetNonse(frameCounter, settings->m_SystemTitle, iv)) != 0)
+    if ((ret = GetNonse(frameCounter, systemTitle, iv)) != 0)
     {
         return ret;
     }
@@ -872,10 +873,8 @@ int CGXCipher::FlushFinalBlock(
     // Crypt/Uncrypt remaining bytes.
     if (block->bytesRemaining > 0)
     {
-        tmp.Zero(0, BLOCK_SIZE);
-        tmp.SetSize(0);
         tmp.Set(bufBlock, 0, block->bytesRemaining);
-        tmp.SetSize(BLOCK_SIZE);
+        tmp.Zero(block->bytesRemaining, BLOCK_SIZE - block->bytesRemaining);
         gCTRBlock(settings, &tmp, block->bytesRemaining, block, output);
     }
     // If tag is not needed.
@@ -929,7 +928,7 @@ int CGXCipher::Encrypt(
     {
         return ret;
     }
-    if ((ret = Init(this, aad, iv, frameCounter, bufBlock, block)) != 0)
+    if ((ret = Init(this, aad, iv, frameCounter, systemTitle, bufBlock, block)) != 0)
     {
         return ret;
     }
@@ -1029,12 +1028,11 @@ int CGXCipher::Decrypt(
     CGXByteBuffer& data,
     DLMS_SECURITY& security)
 {
-    CGXByteBuffer tag, ciphertext, systemTitle;
+    CGXByteBuffer tag, ciphertext, systemTitle, countTag;
     DLMS_COMMAND cmd = DLMS_COMMAND_NONE;
     int length;
     int ret;
     unsigned char ch;
-    CGXByteBuffer CountTag;
     unsigned long len, frameCounter;
     if (data.GetSize() - data.GetPosition() < 2)
     {
@@ -1095,11 +1093,11 @@ int CGXCipher::Decrypt(
                        0,
                        cmd == DLMS_COMMAND_GLO_GENERAL_CIPHERING ? systemTitle : title,
                        data,
-                       CountTag)) != 0)
+                       countTag)) != 0)
         {
             return ret;
         }
-        if (!TagsEquals(tag, CountTag))
+        if (!TagsEquals(tag, countTag))
         {
             //Decrypt failed. Invalid tag.
             return DLMS_ERROR_CODE_INVALID_TAG;

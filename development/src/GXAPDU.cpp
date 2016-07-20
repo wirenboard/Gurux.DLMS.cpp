@@ -60,29 +60,26 @@ int GetAuthenticationString(
         unsigned char p[] = { 0x60, 0x85, 0x74, 0x05, 0x08, 0x02, settings.GetAuthentication()};
         data.Set(p, 7);
         // Add Calling authentication information.
-        CGXByteBuffer callingAuthenticationValue;
+        CGXByteBuffer *callingAuthenticationValue;
         if (settings.GetAuthentication() == DLMS_AUTHENTICATION_LOW)
         {
-            if (settings.GetPassword().GetSize() != 0)
-            {
-                callingAuthenticationValue = settings.GetPassword();
-            }
+            callingAuthenticationValue = &settings.GetPassword();
         }
         else
         {
-            callingAuthenticationValue = settings.GetCtoSChallenge();
+            callingAuthenticationValue = &settings.GetCtoSChallenge();
         }
         // 0xAC
         data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AUTHENTICATION_VALUE);
         // Len
-        GXHelpers::SetObjectCount(2 + callingAuthenticationValue.GetSize(), data);
+        GXHelpers::SetObjectCount(2 + callingAuthenticationValue->GetSize(), data);
         // Add authentication information.
         data.SetUInt8(BER_TYPE_CONTEXT);
         // Len.
-        GXHelpers::SetObjectCount(callingAuthenticationValue.GetSize(), data);
-        if (callingAuthenticationValue.GetSize() != 0)
+        GXHelpers::SetObjectCount(callingAuthenticationValue->GetSize(), data);
+        if (callingAuthenticationValue->GetSize() != 0)
         {
-            data.Set(&callingAuthenticationValue);
+            data.Set(callingAuthenticationValue);
         }
     }
     return 0;

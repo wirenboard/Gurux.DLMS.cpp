@@ -525,7 +525,7 @@ int CGXDLMS::GetLNPdu(CGXDLMSSettings& settings,
         // Add Addl fields
         bb.SetUInt8(0);
     }
-    // Add DLMS_COMMAND_
+    // Add command.
     bb.SetUInt8(command);
 
     if (command != DLMS_COMMAND_DATA_NOTIFICATION)
@@ -634,7 +634,8 @@ int CGXDLMS::GetLNPdu(CGXDLMSSettings& settings,
                        settings.GetCipher()->GetFrameCounter() + 1,
                        GetGloMessage(command),
                        settings.GetCipher()->GetSystemTitle(),
-                       tmp, crypted)) != 0)
+                       tmp,
+                       crypted)) != 0)
         {
             return ret;
         }

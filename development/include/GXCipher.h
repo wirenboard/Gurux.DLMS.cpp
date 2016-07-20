@@ -55,10 +55,6 @@ public:
 class CGXCipher
 {
 private:
-    /**
-    * DLMS command.
-    */
-    unsigned char m_Command;
     DLMS_SECURITY m_Security;
     /**
     * System title.
@@ -139,6 +135,7 @@ private:
         CGXByteBuffer& aad,
         CGXByteBuffer& iv,
         unsigned long frameCounter,
+        CGXByteBuffer& systemTitle,
         CGXByteBuffer& bufBlock,
         CGXGMacBlock& block);
 
