@@ -89,7 +89,7 @@ public:
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
     // Returns SN Association View.
-    int GetObjects(CGXByteBuffer& data);
+    int GetObjects(CGXDLMSSettings& settings, CGXByteBuffer& data);
 
     int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 

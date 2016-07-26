@@ -50,7 +50,7 @@ CGXDLMSSettings::CGXDLMSSettings(bool isServer)
     m_ServerAddress = 0;
     m_InterfaceType = DLMS_INTERFACE_TYPE_HDLC;
     m_Authentication = DLMS_AUTHENTICATION_NONE;
-    m_MaxReceivePDUSize = 0xFFFF;
+    m_MaxServerPDUSize = m_MaxReceivePDUSize = 0xFFFF;
     m_Cipher = NULL;
     m_SourceSystemTitle.Clear();
     m_Index = 0;
@@ -305,6 +305,18 @@ void CGXDLMSSettings::SetMaxReceivePDUSize(unsigned short value)
 {
     m_MaxReceivePDUSize = value;
 }
+
+// Maximum server PDU size.
+unsigned short CGXDLMSSettings::GetMaxServerPDUSize()
+{
+    return m_MaxServerPDUSize;
+}
+
+void CGXDLMSSettings::SetMaxServerPDUSize(unsigned short value)
+{
+    m_MaxServerPDUSize = value;
+}
+
 
 bool CGXDLMSSettings::GetUseLogicalNameReferencing()
 {

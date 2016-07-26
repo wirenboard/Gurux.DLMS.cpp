@@ -521,9 +521,8 @@ int CGXDLMSProfileGeneric::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
             return ret;
         }
         e.SetValue(tmp);
-        return DLMS_ERROR_CODE_OK;
     }
-    if (e.GetIndex() == 2)
+    else if (e.GetIndex() == 2)
     {
         CGXByteBuffer tmp;
         tmp.Set(e.GetValue().byteArr, e.GetValue().size);
@@ -531,24 +530,22 @@ int CGXDLMSProfileGeneric::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
         e.SetValue(tmp);
         return ret;
     }
-    if (e.GetIndex() == 3)
+    else if (e.GetIndex() == 3)
     {
         CGXByteBuffer data;
         int ret = GetColumns(data);
         e.SetValue(data);
         return ret;
     }
-    if (e.GetIndex() == 4)
+    else if (e.GetIndex() == 4)
     {
         e.SetValue(GetCapturePeriod());
-        return DLMS_ERROR_CODE_OK;
     }
-    if (e.GetIndex() == 5)
+    else if (e.GetIndex() == 5)
     {
         e.SetValue(GetSortMethod());
-        return DLMS_ERROR_CODE_OK;
     }
-    if (e.GetIndex() == 6)
+    else if (e.GetIndex() == 6)
     {
         char empty[6] = {0};
         CGXByteBuffer data;
@@ -594,17 +591,19 @@ int CGXDLMSProfileGeneric::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
         }
         e.SetValue(data);
     }
-    if (e.GetIndex() == 7)
+    else if (e.GetIndex() == 7)
     {
         e.SetValue(GetEntriesInUse());
-        return DLMS_ERROR_CODE_OK;
     }
-    if (e.GetIndex() == 8)
+    else if (e.GetIndex() == 8)
     {
         e.SetValue(GetProfileEntries());
-        return DLMS_ERROR_CODE_OK;
     }
-    return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    else
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    return DLMS_ERROR_CODE_OK;
 }
 
 /*

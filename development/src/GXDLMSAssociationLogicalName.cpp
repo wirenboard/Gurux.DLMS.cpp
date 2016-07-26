@@ -98,22 +98,43 @@ int CGXDLMSAssociationLogicalName::GetAccessRights(CGXDLMSObject* pItem, CGXByte
 }
 
 // Returns LN Association View.
-int CGXDLMSAssociationLogicalName::GetObjects(CGXByteBuffer& data)
+int CGXDLMSAssociationLogicalName::GetObjects(CGXDLMSSettings& settings, CGXByteBuffer& data)
 {
-    data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-    //Add count
-    GXHelpers::SetObjectCount(m_ObjectList.size(), data);
+    int ret;
+    unsigned long pos = 0;
+    //Add count only for first time.
+    if (settings.GetIndex() == 0)
+    {
+        settings.SetCount(m_ObjectList.size());
+        data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
+        //Add count
+        GXHelpers::SetObjectCount(m_ObjectList.size(), data);
+    }
     for(CGXDLMSObjectCollection::iterator it = m_ObjectList.begin(); it != m_ObjectList.end(); ++it)
     {
-        data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
-        data.SetUInt8(4);//Count
-        CGXDLMSVariant type = (*it)->GetObjectType();
-        CGXDLMSVariant version = (*it)->GetVersion();
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, type);//ClassID
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, version);//Version
-        CGXDLMSVariant ln((*it)->m_LN, 6, DLMS_DATA_TYPE_OCTET_STRING);
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln);//LN
-        GetAccessRights(*it, data);//Access rights.
+        ++pos;
+        if (!(pos <= settings.GetIndex()))
+        {
+            data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+            data.SetUInt8(4);//Count
+            CGXDLMSVariant type = (*it)->GetObjectType();
+            CGXDLMSVariant version = (*it)->GetVersion();
+            GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, type);//ClassID
+            GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, version);//Version
+            CGXDLMSVariant ln((*it)->m_LN, 6, DLMS_DATA_TYPE_OCTET_STRING);
+            GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln);//LN
+            //Access rights.
+            if ((ret = GetAccessRights(*it, data)) != 0)
+            {
+                return ret;
+            };
+            settings.SetIndex(settings.GetIndex() + 1);
+            //If PDU is full.
+            if (data.GetSize() >= settings.GetMaxReceivePDUSize())
+            {
+                break;
+            }
+        }
     }
     return DLMS_ERROR_CODE_OK;
 }
@@ -419,9 +440,9 @@ int CGXDLMSAssociationLogicalName::GetValue(CGXDLMSSettings& settings, CGXDLMSVa
     }
     if (e.GetIndex() == 2)
     {
-        CGXByteBuffer Packets;
-        ret = GetObjects(Packets);
-        e.SetValue(Packets);
+        CGXByteBuffer buff;
+        ret = GetObjects(settings, buff);
+        e.SetValue(buff);
         return ret;
     }
     if (e.GetIndex() == 3)

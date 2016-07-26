@@ -60,7 +60,7 @@ private:
     int GetAccessRights(CGXDLMSObject* pItem, CGXByteBuffer& data);
 
     // Returns LN Association View.
-    int GetObjects(CGXByteBuffer& data);
+    int GetObjects(CGXDLMSSettings& settings, CGXByteBuffer& data);
 
 public:
     /**

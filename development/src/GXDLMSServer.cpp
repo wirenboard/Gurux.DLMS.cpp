@@ -110,12 +110,12 @@ CGXDLMSLimits CGXDLMSServer::GetLimits()
 
 unsigned short CGXDLMSServer::GetMaxReceivePDUSize()
 {
-    return m_Settings.GetMaxReceivePDUSize();
+    return m_Settings.GetMaxServerPDUSize();
 }
 
 void CGXDLMSServer::SetMaxReceivePDUSize(unsigned short value)
 {
-    m_Settings.SetMaxReceivePDUSize(value);
+    m_Settings.SetMaxServerPDUSize(value);
 }
 
 bool CGXDLMSServer::GetUseLogicalNameReferencing()
@@ -663,6 +663,7 @@ int CGXDLMSServer::HandleGetRequest(
                 return ret;
             }
             m_Transaction = new CGXDLMSLongTransaction(arr, DLMS_COMMAND_GET_REQUEST, bb);
+            arr.clear();
         }
         else
         {
@@ -707,7 +708,6 @@ int CGXDLMSServer::HandleGetRequest(
             else
             {
                 bb.Set(&m_Transaction->GetData());
-                // m_ReplyData.Clear();
                 bool moreData = false;
                 if (m_Settings.GetIndex() != m_Settings.GetCount())
                 {
@@ -722,14 +722,14 @@ int CGXDLMSServer::HandleGetRequest(
                         for (std::vector<CGXDLMSValueEventArg*>::iterator arg = m_Transaction->GetTargets().begin();
                                 arg != m_Transaction->GetTargets().end(); ++arg)
                         {
-                            if ((*arg)->GetHandled())
+                            if (!(*arg)->GetHandled())
                             {
-                                value = (*arg)->GetValue();
+                                if ((ret = (*arg)->GetTarget()->GetValue(m_Settings, *(*arg))) != 0)
+                                {
+                                    return ret;
+                                }
                             }
-                            else
-                            {
-                                value = (*arg)->GetTarget()->GetValue(m_Settings, *(*arg));
-                            }
+                            value = (*arg)->GetValue();
                             // Add data.
                             CGXDLMS::AppendData((*arg)->GetTarget(), (*arg)->GetIndex(), bb, value);
                             moreData = m_Settings.GetIndex() != m_Settings.GetCount();
@@ -746,7 +746,7 @@ int CGXDLMSServer::HandleGetRequest(
                 {
                     return ret;
                 }
-                if (moreData || bb.GetSize() != 0)
+                if (moreData || bb.GetSize() - bb.GetPosition() != 0)
                 {
                     m_Transaction->SetData(bb);
                 }
@@ -1089,13 +1089,8 @@ int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
         }
         if (m_Transaction == NULL && m_Settings.GetCount() != m_Settings.GetIndex())
         {
-            CGXDLMSValueEventCollection reads;
-            for (std::vector<CGXDLMSValueEventArg*>::iterator it = list.begin(); it != list.end(); ++it)
-            {
-                reads.push_back(*it);
-            }
-            CGXByteBuffer bb;
-            m_Transaction = new CGXDLMSLongTransaction(reads, DLMS_COMMAND_READ_REQUEST, bb);
+            m_Transaction = new CGXDLMSLongTransaction(list, DLMS_COMMAND_READ_REQUEST, bb);
+            list.clear();
         }
         else if (m_Transaction != NULL)
         {

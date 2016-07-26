@@ -105,7 +105,6 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
     m_Settings.SetConnected(false);
     packets.clear();
     m_IsAuthenticationRequired = false;
-    m_Settings.SetMaxReceivePDUSize(0xFFFF);
     // SNRM request is not used in network connections.
     if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER)
     {

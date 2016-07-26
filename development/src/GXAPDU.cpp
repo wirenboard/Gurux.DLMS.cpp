@@ -474,6 +474,12 @@ int ParseUserInformation(
         {
             return ret;
         }
+        //If client asks too high PDU.
+        if (pduSize > settings.GetMaxServerPDUSize())
+        {
+            pduSize = settings.GetMaxServerPDUSize();
+        }
+        settings.SetMaxReceivePDUSize(pduSize);
     }
     else
     {

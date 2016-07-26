@@ -212,26 +212,42 @@ int CGXDLMSAssociationShortName::GetDataType(int index, DLMS_DATA_TYPE& type)
 }
 
 // Returns SN Association View.
-int CGXDLMSAssociationShortName::GetObjects(CGXByteBuffer& data)
+int CGXDLMSAssociationShortName::GetObjects(CGXDLMSSettings& settings, CGXByteBuffer& data)
 {
+    unsigned long pos = 0;
     int ret;
-    data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-    //Add count
-    GXHelpers::SetObjectCount(m_ObjectList.size(), data);
+    //Add count only for first time.
+    if (settings.GetIndex() == 0)
+    {
+        settings.SetCount(m_ObjectList.size());
+        data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
+        //Add count
+        GXHelpers::SetObjectCount(m_ObjectList.size(), data);
+    }
     for(CGXDLMSObjectCollection::iterator it = m_ObjectList.begin(); it != m_ObjectList.end(); ++it)
     {
-        data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
-        data.SetUInt8(4);//Count
-        CGXDLMSVariant type = (*it)->GetObjectType();
-        CGXDLMSVariant version = (*it)->GetVersion();
-        CGXDLMSVariant sn = (*it)->GetShortName();
-        CGXDLMSVariant ln((*it)->m_LN, 6, DLMS_DATA_TYPE_OCTET_STRING);
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_INT16, sn)) != 0 || //base address.
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, type)) != 0 || //ClassID
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, version)) != 0 || //Version
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0) //LN
+        ++pos;
+        if (!(pos <= settings.GetIndex()))
         {
-            return ret;
+            data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+            data.SetUInt8(4);//Count
+            CGXDLMSVariant type = (*it)->GetObjectType();
+            CGXDLMSVariant version = (*it)->GetVersion();
+            CGXDLMSVariant sn = (*it)->GetShortName();
+            CGXDLMSVariant ln((*it)->m_LN, 6, DLMS_DATA_TYPE_OCTET_STRING);
+            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_INT16, sn)) != 0 || //base address.
+                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, type)) != 0 || //ClassID
+                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, version)) != 0 || //Version
+                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0) //LN
+            {
+                return ret;
+            }
+            settings.SetIndex(settings.GetIndex() + 1);
+            //If PDU is full.
+            if (data.GetSize() >= settings.GetMaxReceivePDUSize())
+            {
+                break;
+            }
         }
     }
     return DLMS_ERROR_CODE_OK;
@@ -323,9 +339,9 @@ int CGXDLMSAssociationShortName::GetValue(CGXDLMSSettings& settings, CGXDLMSValu
     }
     else if (e.GetIndex() == 2)
     {
-        CGXByteBuffer Packets;
-        int ret = GetObjects(Packets);
-        e.SetValue(Packets);
+        CGXByteBuffer buff;
+        int ret = GetObjects(settings, buff);
+        e.SetValue(buff);
         return ret;
     }
     else if (e.GetIndex() == 3)

@@ -73,7 +73,7 @@ public:
     {
         m_Targets = targets;
         m_Command = command;
-        m_Data = data;
+        m_Data.Set(&data, data.GetPosition());
     }
 
     /**
@@ -107,7 +107,7 @@ public:
     void SetData(CGXByteBuffer& value)
     {
         m_Data.Clear();
-        m_Data.Set(&value);
+        m_Data.Set(&value, value.GetPosition());
     }
 };
 #endif //GXDLMSLONGTRANSACTION_H

@@ -127,6 +127,9 @@ class CGXDLMSSettings
     // Maximum receivers PDU size.
     unsigned short m_MaxReceivePDUSize;
 
+    // Maximum server PDU size.
+    unsigned short m_MaxServerPDUSize;
+
     // HDLC sender frame sequence number.
     unsigned char m_SenderFrame;
 
@@ -260,6 +263,12 @@ public:
 
 // Maximum PDU size.
     void SetMaxReceivePDUSize(unsigned short value);
+
+// Maximum server PDU size.
+    unsigned short GetMaxServerPDUSize();
+
+// Maximum server PDU size.
+    void SetMaxServerPDUSize(unsigned short value);
 
 // Is Logical Name Referencing used.
     bool GetUseLogicalNameReferencing();
