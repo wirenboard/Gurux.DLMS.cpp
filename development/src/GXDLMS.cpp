@@ -141,8 +141,9 @@ int GetDataFromBlock(CGXByteBuffer& data, int index)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    data.Move(data.GetPosition(), data.GetPosition() - len, data.GetSize() - data.GetPosition());
-    data.SetPosition(data.GetPosition() - len);
+    unsigned long pos = data.GetPosition();
+    data.SetPosition(pos - len);
+    data.Move(pos, pos - len, data.GetSize() - pos);
     return 0;
 }
 
