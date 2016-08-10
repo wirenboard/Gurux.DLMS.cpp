@@ -301,8 +301,12 @@ unsigned short CGXDLMSSettings::GetMaxReceivePDUSize()
     return m_MaxReceivePDUSize;
 }
 
-void CGXDLMSSettings::SetMaxReceivePDUSize(unsigned short value)
+int CGXDLMSSettings::SetMaxReceivePDUSize(unsigned short value)
 {
+    if (value < 64)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
     m_MaxReceivePDUSize = value;
 }
 
@@ -312,8 +316,12 @@ unsigned short CGXDLMSSettings::GetMaxServerPDUSize()
     return m_MaxServerPDUSize;
 }
 
-void CGXDLMSSettings::SetMaxServerPDUSize(unsigned short value)
+int CGXDLMSSettings::SetMaxServerPDUSize(unsigned short value)
 {
+    if (value < 64)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
     m_MaxServerPDUSize = value;
 }
 

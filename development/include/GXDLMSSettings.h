@@ -262,13 +262,13 @@ public:
     unsigned short GetMaxReceivePDUSize();
 
 // Maximum PDU size.
-    void SetMaxReceivePDUSize(unsigned short value);
+    int SetMaxReceivePDUSize(unsigned short value);
 
 // Maximum server PDU size.
     unsigned short GetMaxServerPDUSize();
 
 // Maximum server PDU size.
-    void SetMaxServerPDUSize(unsigned short value);
+    int SetMaxServerPDUSize(unsigned short value);
 
 // Is Logical Name Referencing used.
     bool GetUseLogicalNameReferencing();

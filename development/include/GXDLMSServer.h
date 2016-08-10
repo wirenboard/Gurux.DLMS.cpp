@@ -65,6 +65,14 @@ private:
      */
     bool m_Initialized;
 
+    /**
+    * Parse SNRM Request. If server do not accept client empty byte array is
+    * returned.
+    *
+    * @return Returns returned UA packet.
+    */
+    int HandleSnrmRequest(CGXDLMSSettings& settings, CGXByteBuffer& reply);
+
 protected:
     /**
      * Server m_Settings.

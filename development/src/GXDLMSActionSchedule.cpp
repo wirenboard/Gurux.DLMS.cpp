@@ -40,7 +40,7 @@
 void CGXDLMSActionSchedule::Init()
 {
     m_ExecutedScriptSelector = 0;
-    m_Type = SINGLE_ACTION_SCHEDULE_TYPE1;
+    m_Type = DLMS_SINGLE_ACTION_SCHEDULE_TYPE1;
 }
 
 /**
@@ -90,11 +90,11 @@ void CGXDLMSActionSchedule::SetExecutedScriptSelector(int value)
     m_ExecutedScriptSelector = value;
 }
 
-SINGLE_ACTION_SCHEDULE_TYPE CGXDLMSActionSchedule::GetType()
+DLMS_SINGLE_ACTION_SCHEDULE_TYPE CGXDLMSActionSchedule::GetType()
 {
     return m_Type;
 }
-void CGXDLMSActionSchedule::SetType(SINGLE_ACTION_SCHEDULE_TYPE value)
+void CGXDLMSActionSchedule::SetType(DLMS_SINGLE_ACTION_SCHEDULE_TYPE value)
 {
     m_Type = value;
 }
@@ -212,6 +212,7 @@ int CGXDLMSActionSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     if (e.GetIndex() == 2)
     {
+        e.SetByteArray(true);
         int ret;
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(2);
@@ -232,6 +233,7 @@ int CGXDLMSActionSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     if (e.GetIndex() == 4)
     {
+        e.SetByteArray(true);
         int ret;
         CGXByteBuffer bb;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
@@ -269,7 +271,7 @@ int CGXDLMSActionSchedule::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     else if (e.GetIndex() == 3)
     {
-        SetType((SINGLE_ACTION_SCHEDULE_TYPE) e.GetValue().ToInteger());
+        SetType((DLMS_SINGLE_ACTION_SCHEDULE_TYPE) e.GetValue().ToInteger());
         return DLMS_ERROR_CODE_OK;
     }
     else if (e.GetIndex() == 4)

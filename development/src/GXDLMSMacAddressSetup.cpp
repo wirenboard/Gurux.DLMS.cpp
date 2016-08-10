@@ -143,6 +143,7 @@ int CGXDLMSMacAddressSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEven
     }
     if (e.GetIndex() == 2)
     {
+        e.SetByteArray(true);
         std::string add = GetMacAddress();
         GXHelpers::Replace(add, ":", ".");
         CGXByteBuffer data;

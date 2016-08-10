@@ -264,6 +264,7 @@ int CGXDLMSAutoConnect::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
     }
     if (e.GetIndex() == 5)
     {
+        e.SetByteArray(true);
         int cnt = m_CallingWindow.size();
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
@@ -291,6 +292,7 @@ int CGXDLMSAutoConnect::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
     }
     if (e.GetIndex() == 6)
     {
+        e.SetByteArray(true);
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int ret;

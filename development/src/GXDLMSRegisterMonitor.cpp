@@ -216,6 +216,7 @@ int CGXDLMSRegisterMonitor::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEven
     }
     if (e.GetIndex() == 2)
     {
+        e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         //Add count
         GXHelpers::SetObjectCount(m_Thresholds.size(), data);
@@ -234,6 +235,7 @@ int CGXDLMSRegisterMonitor::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEven
     }
     if (e.GetIndex() == 3)
     {
+        e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(3);
         int ret;
@@ -251,6 +253,7 @@ int CGXDLMSRegisterMonitor::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEven
     }
     if (e.GetIndex() == 4)
     {
+        e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int ret;
         //Add count

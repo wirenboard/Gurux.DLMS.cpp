@@ -203,7 +203,6 @@
     <ClCompile Include="..\src\GXHelpers.cpp" />
     <ClCompile Include="..\src\GXReplyData.cpp" />
     <ClCompile Include="..\src\GXSecure.cpp" />
-    <ClCompile Include="..\src\GXSendDestinationAndMethod.cpp" />
     <ClCompile Include="..\src\GXSerialNumberCounter.cpp" />
     <ClCompile Include="..\src\GXSNInfo.cpp" />
     <ClCompile Include="..\src\GXStandardObisCode.cpp" />
@@ -300,7 +299,6 @@
     <ClInclude Include="..\include\GXHelpers.h" />
     <ClInclude Include="..\include\GXReplyData.h" />
     <ClInclude Include="..\include\GXSecure.h" />
-    <ClInclude Include="..\include\GXSendDestinationAndMethod.h" />
     <ClInclude Include="..\include\GXSerialNumberCounter.h" />
     <ClInclude Include="..\include\GXSNInfo.h" />
     <ClInclude Include="..\include\GXStandardObisCode.h" />

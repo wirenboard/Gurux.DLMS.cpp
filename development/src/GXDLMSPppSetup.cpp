@@ -247,6 +247,7 @@ int CGXDLMSPppSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     if (e.GetIndex() == 3)
     {
+        e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         data.SetUInt8(m_LCPOptions.size());
         CGXDLMSVariant type, len;
@@ -266,6 +267,7 @@ int CGXDLMSPppSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     if (e.GetIndex() == 4)
     {
+        e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         data.SetUInt8(m_IPCPOptions.size());
         CGXDLMSVariant type, len;
@@ -284,6 +286,7 @@ int CGXDLMSPppSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     else if (e.GetIndex() == 5)
     {
+        e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(2);
         //Add username.

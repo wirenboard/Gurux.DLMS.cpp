@@ -41,7 +41,7 @@
 class CGXDLMSIp4Setup : public CGXDLMSObject
 {
     std::string m_DataLinkLayerReference;
-    long m_IPAddress;
+    std::string m_IPAddress;
     std::vector<unsigned long> m_MulticastIPAddress;
     std::vector<CGXDLMSIp4SetupIpOption> m_IPOptions;
     unsigned long m_SubnetMask;
@@ -64,8 +64,8 @@ public:
     std::string& GetDataLinkLayerReference();
     void SetDataLinkLayerReference(std::string value);
 
-    unsigned long GetIPAddress();
-    void SetIPAddress(unsigned long value);
+    std::string& GetIPAddress();
+    void SetIPAddress(std::string& value);
 
     std::vector<unsigned long>& GetMulticastIPAddress();
 

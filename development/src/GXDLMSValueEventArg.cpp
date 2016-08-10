@@ -65,16 +65,6 @@ void CGXDLMSValueEventArg::SetValue(CGXDLMSVariant value)
     m_Value = value;
 }
 
-DLMS_DATA_TYPE CGXDLMSValueEventArg::GetDataType()
-{
-    return m_DataType;
-}
-
-void CGXDLMSValueEventArg::SetDataType(DLMS_DATA_TYPE value)
-{
-    m_DataType = value;
-}
-
 bool CGXDLMSValueEventArg::GetHandled()
 {
     return m_Handled;
@@ -95,17 +85,16 @@ CGXDLMSVariant& CGXDLMSValueEventArg::GetParameters()
     return m_Parameters;
 }
 
-
 CGXDLMSValueEventArg::CGXDLMSValueEventArg(
     CGXDLMSObject* target,
     int index)
 {
     m_Handled = false;
-    m_DataType = DLMS_DATA_TYPE_NONE;
     SetTarget(target);
     SetIndex(index);
     m_Selector = 0;
     m_Error = DLMS_ERROR_CODE_OK;
+    m_ByteArray = 0;
 }
 
 CGXDLMSValueEventArg::CGXDLMSValueEventArg(
@@ -115,12 +104,12 @@ CGXDLMSValueEventArg::CGXDLMSValueEventArg(
     CGXDLMSVariant& parameters)
 {
     m_Handled = false;
-    m_DataType = DLMS_DATA_TYPE_NONE;
     SetTarget(target);
     SetIndex(index);
     m_Selector = selector;
     m_Parameters = parameters;
     m_Error = DLMS_ERROR_CODE_OK;
+    m_ByteArray = 0;
 }
 
 DLMS_ERROR_CODE CGXDLMSValueEventArg::GetError()
@@ -141,4 +130,14 @@ bool CGXDLMSValueEventArg::IsAction()
 void CGXDLMSValueEventArg::SetAction(bool value)
 {
     m_Action = value;
+}
+
+bool CGXDLMSValueEventArg::IsByteArray()
+{
+    return m_ByteArray;
+}
+
+void CGXDLMSValueEventArg::SetByteArray(bool value)
+{
+    m_ByteArray = value;
 }

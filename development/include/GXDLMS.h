@@ -136,11 +136,14 @@ public:
     *            DLMS settings.
     * @param bb
     *            Send data.
-    * @return Returns true if multiple blocks are needed.
+    * @param offset
+    *            How many bytes there are on the buffer already.
+    * @return True, if multiple blocks are needed.
     */
     static bool MultipleBlocks(
         CGXDLMSSettings& settings,
-        CGXByteBuffer& bb);
+        CGXByteBuffer& bb,
+        unsigned long offset);
 
     /**
     * Handle General block transfer message.
@@ -223,13 +226,25 @@ public:
      */
     static int GetHDLCAddress(
         CGXByteBuffer& buff,
-        int& address);
+        unsigned long& address);
 
+    /**
+     * Check that client and server address match.
+     *
+     * @param server
+     *            Is server.
+     * @param settings
+     *            DLMS settings.
+     * @param reply
+     *            Received data.
+     * @param index
+     *            Position.
+     * @return True, if client and server address match.
+     */
     static int CheckHdlcAddress(
         bool server,
         CGXDLMSSettings& settings,
         CGXByteBuffer& reply,
-        CGXReplyData& data,
         int index);
 
     /////////////////////////////////////////////////////////////////////////////

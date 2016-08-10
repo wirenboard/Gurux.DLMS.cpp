@@ -37,13 +37,15 @@
 
 #include "GXDLMSObject.h"
 #include "GXDLMSPushObject.h"
-#include "GXSendDestinationAndMethod.h"
 #include "GXDLMSCaptureObject.h"
 
 class CGXDLMSPushSetup : public CGXDLMSObject
 {
+private:
+    DLMS_SERVICE_TYPE m_Service;
+    std::string m_Destination;
+    DLMS_MESSAGE_TYPE m_Message;
     std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> > m_PushObjectList;
-    CGXSendDestinationAndMethod m_SendDestinationAndMethod;
     std::vector<std::pair<CGXDateTime, CGXDateTime> > m_CommunicationWindow;
     int m_RandomisationStartInterval, m_NumberOfRetries, m_RepetitionDelay;
 
@@ -67,10 +69,14 @@ public:
         return m_PushObjectList;
     }
 
-    CGXSendDestinationAndMethod& GetSendDestinationAndMethod()
-    {
-        return m_SendDestinationAndMethod;
-    }
+    DLMS_SERVICE_TYPE GetService();
+    void SetService(DLMS_SERVICE_TYPE value);
+
+    std::string& GetDestination();
+    void SetDestination(std::string& value);
+
+    DLMS_MESSAGE_TYPE GetMessage();
+    void SetMessage(DLMS_MESSAGE_TYPE value);
 
     /**
      Contains the start and end date/time

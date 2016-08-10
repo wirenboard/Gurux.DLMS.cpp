@@ -271,11 +271,21 @@ void CGXDLMSServer::Reset()
 int CGXDLMSServer::HandleAarqRequest(CGXByteBuffer& data)
 {
     int ret;
+    unsigned long serverAddress, clientAddress;
     DLMS_ASSOCIATION_RESULT result = DLMS_ASSOCIATION_RESULT_ACCEPTED;
     m_Settings.GetCtoSChallenge().Clear();
     m_Settings.GetStoCChallenge().Clear();
     DLMS_SOURCE_DIAGNOSTIC diagnostic;
-    if ((ret = CGXAPDU::ParsePDU(m_Settings, m_Settings.GetCipher(), data, diagnostic)) != 0)
+    ret = CGXAPDU::ParsePDU(m_Settings, m_Settings.GetCipher(), data, diagnostic);
+    if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER)
+    {
+        serverAddress = m_Settings.GetServerAddress();
+        clientAddress = m_Settings.GetClientAddress();
+        Reset();
+        m_Settings.SetServerAddress(serverAddress);
+        m_Settings.SetClientAddress(clientAddress);
+    }
+    if (ret != 0)
     {
         return ret;
     }
@@ -316,9 +326,16 @@ int CGXDLMSServer::HandleAarqRequest(CGXByteBuffer& data)
  *
  * @return Returns returned UA packet.
  */
-int HandleSnrmRequest(CGXDLMSSettings& settings, CGXByteBuffer& reply)
+int CGXDLMSServer::HandleSnrmRequest(CGXDLMSSettings& settings, CGXByteBuffer& reply)
 {
     int ret;
+    unsigned long serverAddress, clientAddress;
+    serverAddress = m_Settings.GetServerAddress();
+    clientAddress = m_Settings.GetClientAddress();
+    Reset();
+    m_Settings.SetServerAddress(serverAddress);
+    m_Settings.SetClientAddress(clientAddress);
+
     reply.SetUInt8(0x81); // FromatID
     reply.SetUInt8(0x80); // GroupID
     reply.SetUInt8(0); // Length
@@ -649,13 +666,19 @@ int CGXDLMSServer::HandleGetRequest(
             {
                 error = e->GetError();
             }
-            if ((ret = CGXDLMS::AppendData(obj, index, bb, e->GetValue())) != 0)
+            value = e->GetValue();
+            if (e->IsByteArray() && value.vt == DLMS_DATA_TYPE_OCTET_STRING)
+            {
+                // If byte array is added do not add type.
+                bb.Set(value.byteArr, value.GetSize());
+            }
+            else if ((ret = CGXDLMS::AppendData(obj, index, bb, value)) != 0)
             {
                 error = DLMS_ERROR_CODE_HARDWARE_FAULT;
             }
         }
         if (m_Settings.GetCount() != m_Settings.GetIndex()
-                || CGXDLMS::MultipleBlocks(m_Settings, bb))
+                || CGXDLMS::MultipleBlocks(m_Settings, bb, 0))
         {
             if ((ret = CGXDLMS::GetLNPdu(m_Settings, DLMS_COMMAND_GET_RESPONSE, 2, bb,
                                          m_ReplyData, error, true, false, NULL)) != 0)
@@ -713,7 +736,7 @@ int CGXDLMSServer::HandleGetRequest(
                 {
                     // If there is multiple blocks on the buffer.
                     // This might happen when Max PDU size is very small.
-                    if (CGXDLMS::MultipleBlocks(m_Settings, bb))
+                    if (CGXDLMS::MultipleBlocks(m_Settings, bb, 0))
                     {
                         moreData = true;
                     }
@@ -738,7 +761,7 @@ int CGXDLMSServer::HandleGetRequest(
                 }
                 else
                 {
-                    moreData = CGXDLMS::MultipleBlocks(m_Settings, bb);
+                    moreData = CGXDLMS::MultipleBlocks(m_Settings, bb, 0);
                 }
                 if ((ret = CGXDLMS::GetLNPdu(m_Settings, DLMS_COMMAND_GET_RESPONSE, 2, bb,
                                              m_ReplyData, DLMS_ERROR_CODE_OK, true, !moreData,
@@ -852,7 +875,7 @@ int CGXDLMSServer::HandleGetRequest(
             pos++;
         }
         if ((ret = CGXDLMS::GetLNPdu(m_Settings, DLMS_COMMAND_GET_RESPONSE, 3, bb, m_ReplyData,
-                                     0xFF, CGXDLMS::MultipleBlocks(m_Settings, bb), true, NULL)) != 0)
+                                     0xFF, CGXDLMS::MultipleBlocks(m_Settings, bb, 0), true, NULL)) != 0)
         {
             return ret;
         }
@@ -1054,9 +1077,7 @@ int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
             // If action.
             if ((*e1)->IsAction())
             {
-                if (((*e1)->GetDataType() == DLMS_DATA_TYPE_ARRAY ||
-                        (*e1)->GetDataType() == DLMS_DATA_TYPE_STRUCTURE) &&
-                        value.vt == DLMS_DATA_TYPE_OCTET_STRING)
+                if ((*e1)->IsByteArray() && value.vt == DLMS_DATA_TYPE_OCTET_STRING)
                 {
                     // If byte array is added do not add type.
                     bb.Set(value.byteArr, value.GetSize());
@@ -1068,9 +1089,7 @@ int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
             }
             else
             {
-                if (((*e1)->GetDataType() == DLMS_DATA_TYPE_ARRAY ||
-                        (*e1)->GetDataType() == DLMS_DATA_TYPE_STRUCTURE) &&
-                        value.vt == DLMS_DATA_TYPE_OCTET_STRING)
+                if ((*e1)->IsByteArray() && value.vt == DLMS_DATA_TYPE_OCTET_STRING)
                 {
                     // If byte array is added do not add type.
                     bb.Set(value.byteArr, value.GetSize());
@@ -1279,15 +1298,19 @@ int CGXDLMSServer::HandleCommand(
         //Invalid command.
         break;
     }
-    if (ret != 0)
+
+    if (ret == 0)
     {
-        return ret;
+        if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER)
+        {
+            ret = CGXDLMS::GetWrapperFrame(m_Settings, m_ReplyData, reply);
+        }
+        else
+        {
+            ret = CGXDLMS::GetHdlcFrame(m_Settings, frame, &m_ReplyData, reply);
+        }
     }
-    if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER)
-    {
-        return CGXDLMS::GetWrapperFrame(m_Settings, m_ReplyData, reply);
-    }
-    return CGXDLMS::GetHdlcFrame(m_Settings, frame, &m_ReplyData, reply);
+    return ret;
 }
 
 /**

@@ -268,6 +268,7 @@ int CGXDLMSAutoAnswer::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg&
     }
     if (e.GetIndex() == 3)
     {
+        e.SetByteArray(true);
         int ret;
         int cnt = m_ListeningWindow.size();
         CGXByteBuffer data;
@@ -303,6 +304,7 @@ int CGXDLMSAutoAnswer::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg&
     }
     if (e.GetIndex() == 6)
     {
+        e.SetByteArray(true);
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         GXHelpers::SetObjectCount(2, data);

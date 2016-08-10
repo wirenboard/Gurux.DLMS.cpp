@@ -38,25 +38,13 @@
 #include "GXDLMSObject.h"
 #include "GXDLMSImageActivateInfo.h"
 
-enum IMAGE_TRANSFER_STATUS
-{
-    IMAGE_TRANSFER_STATUSNOT_INITIATED,
-    IMAGE_TRANSFER_STATUS_INITIATED,
-    IMAGE_TRANSFER_STATUS_VERIFICATION_INITIATED,
-    IMAGE_TRANSFER_STATUS_VERIFICATION_SUCCESSFUL,
-    IMAGE_TRANSFER_STATUS_VERIFICATION_FAILED,
-    IMAGE_TRANSFER_STATUS_ACTIVATION_INITIATED,
-    IMAGE_TRANSFER_STATUS_ACTIVATION_SUCCESSFUL,
-    IMAGE_TRANSFER_STATUS_ACTIVATION_FAILED
-};
-
 class CGXDLMSImageTransfer : public CGXDLMSObject
 {
     long m_ImageBlockSize;
     std::string m_ImageTransferredBlocksStatus;
     long m_ImageFirstNotTransferredBlockNumber;
     bool m_ImageTransferEnabled;
-    IMAGE_TRANSFER_STATUS m_ImageTransferStatus;
+    DLMS_IMAGE_TRANSFER_STATUS m_ImageTransferStatus;
     std::vector<CGXDLMSImageActivateInfo> m_ImageActivateInfo;
 public:
     //Constructor.
@@ -101,8 +89,8 @@ public:
     /**
      * Holds the status of the Image transfer process.
      */
-    IMAGE_TRANSFER_STATUS GetImageTransferStatus();
-    void SetImageTransferStatus(IMAGE_TRANSFER_STATUS value);
+    DLMS_IMAGE_TRANSFER_STATUS GetImageTransferStatus();
+    void SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS value);
 
     std::vector<CGXDLMSImageActivateInfo>& GetImageActivateInfo();
 

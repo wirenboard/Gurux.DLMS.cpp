@@ -63,14 +63,11 @@ CGXDLMSObject* CGXDLMSObjectCollection::FindByLN(DLMS_OBJECT_TYPE type, CGXByteB
     {
         return NULL;
     }
-
-    std::string ln2;
     for (CGXDLMSObjectCollection::iterator it = this->begin(); it != end(); ++it)
     {
         if (type == DLMS_OBJECT_TYPE_ALL || (*it)->GetObjectType() == type)
         {
-            (*it)->GetLogicalName(ln2);
-            if (ln.Compare((unsigned char*) ln2.c_str(), 6) == 0)
+            if (memcmp(ln.GetData(), (*it)->m_LN, 6) == 0)
             {
                 return *it;
             }

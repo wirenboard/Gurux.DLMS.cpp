@@ -389,6 +389,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     }
     if (e.GetIndex() == 3)
     {
+        e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int cnt = m_SeasonProfileActive.size();
         //Add count
@@ -411,6 +412,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     }
     if (e.GetIndex() == 4)
     {
+        e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int cnt = m_WeekProfileTableActive.size();
         //Add count
@@ -442,6 +444,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     }
     if (e.GetIndex() == 5)
     {
+        e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int cnt = m_DayProfileTableActive.size();
         //Add count
@@ -478,6 +481,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     //
     if (e.GetIndex() == 7)
     {
+        e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int cnt = m_SeasonProfilePassive.size();
         //Add count
@@ -500,6 +504,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     }
     if (e.GetIndex() == 8)
     {
+        e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int cnt = m_WeekProfileTablePassive.size();
         //Add count
@@ -531,6 +536,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     }
     if (e.GetIndex() == 9)
     {
+        e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int cnt = m_DayProfileTablePassive.size();
         //Add count

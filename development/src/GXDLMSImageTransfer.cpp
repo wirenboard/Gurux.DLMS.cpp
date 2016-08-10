@@ -42,7 +42,7 @@ CGXDLMSImageTransfer::CGXDLMSImageTransfer() : CGXDLMSObject(DLMS_OBJECT_TYPE_IM
     m_ImageBlockSize = 0;
     m_ImageFirstNotTransferredBlockNumber = 0;
     m_ImageTransferEnabled = false;
-    m_ImageTransferStatus = IMAGE_TRANSFER_STATUSNOT_INITIATED;
+    m_ImageTransferStatus = DLMS_IMAGE_TRANSFER_STATUS_NOT_INITIATED;
 }
 
 //SN Constructor.
@@ -51,7 +51,7 @@ CGXDLMSImageTransfer::CGXDLMSImageTransfer(unsigned short sn) : CGXDLMSObject(DL
     m_ImageBlockSize = 0;
     m_ImageFirstNotTransferredBlockNumber = 0;
     m_ImageTransferEnabled = false;
-    m_ImageTransferStatus = IMAGE_TRANSFER_STATUSNOT_INITIATED;
+    m_ImageTransferStatus = DLMS_IMAGE_TRANSFER_STATUS_NOT_INITIATED;
 }
 
 //LN Constructor.
@@ -60,7 +60,7 @@ CGXDLMSImageTransfer::CGXDLMSImageTransfer(std::string ln) : CGXDLMSObject(DLMS_
     m_ImageBlockSize = 0;
     m_ImageFirstNotTransferredBlockNumber = 0;
     m_ImageTransferEnabled = false;
-    m_ImageTransferStatus = IMAGE_TRANSFER_STATUSNOT_INITIATED;
+    m_ImageTransferStatus = DLMS_IMAGE_TRANSFER_STATUS_NOT_INITIATED;
 }
 /**
  Holds the ImageBlockSize, expressed in octets,
@@ -119,11 +119,11 @@ void CGXDLMSImageTransfer::SetImageTransferEnabled(bool value)
 /**
  * Holds the status of the Image transfer process.
  */
-IMAGE_TRANSFER_STATUS CGXDLMSImageTransfer::GetImageTransferStatus()
+DLMS_IMAGE_TRANSFER_STATUS CGXDLMSImageTransfer::GetImageTransferStatus()
 {
     return m_ImageTransferStatus;
 }
-void CGXDLMSImageTransfer::SetImageTransferStatus(IMAGE_TRANSFER_STATUS value)
+void CGXDLMSImageTransfer::SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS value)
 {
     m_ImageTransferStatus = value;
 }
@@ -294,6 +294,7 @@ int CGXDLMSImageTransfer::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     }
     if (e.GetIndex() == 7)
     {
+        e.SetByteArray(true);
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         data.SetUInt8(m_ImageActivateInfo.size()); //Count
@@ -343,7 +344,7 @@ int CGXDLMSImageTransfer::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     }
     else if (e.GetIndex() == 6)
     {
-        m_ImageTransferStatus = (IMAGE_TRANSFER_STATUS) e.GetValue().ToInteger();
+        m_ImageTransferStatus = (DLMS_IMAGE_TRANSFER_STATUS) e.GetValue().ToInteger();
     }
     else if (e.GetIndex() == 7)
     {

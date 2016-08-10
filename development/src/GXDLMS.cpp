@@ -400,13 +400,14 @@ unsigned char GetGloMessage(DLMS_COMMAND command)
 
 bool CGXDLMS::MultipleBlocks(
     CGXDLMSSettings& settings,
-    CGXByteBuffer& bb)
+    CGXByteBuffer& bb,
+    unsigned long offset)
 {
     if (!settings.GetUseLogicalNameReferencing())
     {
         return false;
     }
-    return bb.GetSize() - bb.GetPosition() > settings.GetMaxReceivePDUSize();
+    return offset + bb.GetSize() - bb.GetPosition() > settings.GetMaxReceivePDUSize();
 }
 
 unsigned char GetInvokeIDPriority(CGXDLMSSettings& settings)
@@ -504,7 +505,7 @@ int CGXDLMS::GetLNPdu(CGXDLMSSettings& settings,
             // If this is a last block make sure that all data is fit to it.
             if (lastBlock)
             {
-                lastBlock = !CGXDLMS::MultipleBlocks(settings, data);
+                lastBlock = !CGXDLMS::MultipleBlocks(settings, data, bb.GetSize());
             }
         }
         // Is last block
@@ -567,7 +568,7 @@ int CGXDLMS::GetLNPdu(CGXDLMSSettings& settings,
             // If this is a last block make sure that all data is fit to it.
             if (lastBlock)
             {
-                lastBlock = !CGXDLMS::MultipleBlocks(settings, data);
+                lastBlock = !CGXDLMS::MultipleBlocks(settings, data, bb.GetSize());
             }
             // Is last block.
             if (lastBlock)
@@ -662,7 +663,7 @@ int GetLNMessages(
     {
         frame = 0x10;
     }
-    bool multipleBlocks = CGXDLMS::MultipleBlocks(settings, data);
+    bool multipleBlocks = CGXDLMS::MultipleBlocks(settings, data, 0);
     do
     {
         if (command == DLMS_COMMAND_AARQ)
@@ -902,7 +903,7 @@ int CGXDLMS::GetHdlcData(
     }
 
     // Check addresses.
-    ret = CheckHdlcAddress(server, settings, reply, data, eopPos);
+    ret = CheckHdlcAddress(server, settings, reply, eopPos);
     if (ret != 0)
     {
         if (ret == DLMS_ERROR_CODE_FALSE)
@@ -1031,7 +1032,7 @@ int CGXDLMS::GetHdlcData(
 
 int CGXDLMS::GetHDLCAddress(
     CGXByteBuffer& buff,
-    int& address)
+    unsigned long& address)
 {
     unsigned char ch;
     unsigned short s;
@@ -1086,10 +1087,11 @@ int CGXDLMS::CheckHdlcAddress(
     bool server,
     CGXDLMSSettings& settings,
     CGXByteBuffer& reply,
-    CGXReplyData& data,
     int index)
 {
-    int ret, source, target;
+    unsigned char ch;
+    unsigned long source, target;
+    int ret;
     // Get destination and source addresses.
     if ((ret = GetHDLCAddress(reply, target)) != 0)
     {
@@ -1104,7 +1106,20 @@ int CGXDLMS::CheckHdlcAddress(
         // Check that server addresses match.
         if (settings.GetServerAddress() != 0 && settings.GetServerAddress() != target)
         {
-            return DLMS_ERROR_CODE_INVALID_SERVER_ADDRESS;
+            // Get frame command.
+            if (reply.GetUInt8(reply.GetPosition(), &ch) != 0)
+            {
+                return DLMS_ERROR_CODE_INVALID_SERVER_ADDRESS;
+            }
+            //If SNRM and client has not call disconnect and changes client ID.
+            if (ch == DLMS_COMMAND_SNRM)
+            {
+                settings.SetServerAddress(target);
+            }
+            else
+            {
+                return DLMS_ERROR_CODE_INVALID_SERVER_ADDRESS;
+            }
         }
         else
         {
@@ -1114,7 +1129,20 @@ int CGXDLMS::CheckHdlcAddress(
         // Check that client addresses match.
         if (settings.GetClientAddress() != 0 && settings.GetClientAddress() != source)
         {
-            return DLMS_ERROR_CODE_INVALID_CLIENT_ADDRESS;
+            // Get frame command.
+            if (reply.GetUInt8(reply.GetPosition(), &ch) != 0)
+            {
+                return DLMS_ERROR_CODE_INVALID_CLIENT_ADDRESS;
+            }
+            //If SNRM and client has not call disconnect and changes client ID.
+            if (ch == DLMS_COMMAND_SNRM)
+            {
+                settings.SetClientAddress(source);
+            }
+            else
+            {
+                return DLMS_ERROR_CODE_INVALID_CLIENT_ADDRESS;
+            }
         }
         else
         {

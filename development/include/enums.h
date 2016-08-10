@@ -273,6 +273,47 @@ typedef enum
     DLMS_ADDRESS_STATE_ASSIGNED
 } DLMS_ADDRESS_STATE;
 
+
+typedef enum
+{
+    /**
+     Size of execution_time = 1. Wildcard in date allowed.
+    */
+    DLMS_SINGLE_ACTION_SCHEDULE_TYPE1 = 0,
+    /**
+     Size of execution_time = n.
+     All time values are the same, wildcards in date not allowed.
+    */
+    DLMS_SINGLE_ACTION_SCHEDULE_TYPE2 = 1,
+    /**
+     Size of execution_time = n.
+     All time values are the same, wildcards in date are allowed,
+    */
+    DLMS_SINGLE_ACTION_SCHEDULE_TYPE3 = 2,
+    /**
+     Size of execution_time = n.
+     Time values may be different, wildcards in date not allowed,
+    */
+    DLMS_SINGLE_ACTION_SCHEDULE_TYPE4 = 3,
+    /**
+     Size of execution_time = n.
+     Time values may be different, wildcards in date are allowed
+    */
+    DLMS_SINGLE_ACTION_SCHEDULE_TYPE5 = 4
+} DLMS_SINGLE_ACTION_SCHEDULE_TYPE;
+
+typedef enum
+{
+    DLMS_IMAGE_TRANSFER_STATUS_NOT_INITIATED,
+    DLMS_IMAGE_TRANSFER_STATUS_INITIATED,
+    DLMS_IMAGE_TRANSFER_STATUS_VERIFICATION_INITIATED,
+    DLMS_IMAGE_TRANSFER_STATUS_VERIFICATION_SUCCESSFUL,
+    DLMS_IMAGE_TRANSFER_STATUS_VERIFICATION_FAILED,
+    DLMS_IMAGE_TRANSFER_STATUS_ACTIVATION_INITIATED,
+    DLMS_IMAGE_TRANSFER_STATUS_ACTIVATION_SUCCESSFUL,
+    DLMS_IMAGE_TRANSFER_STATUS_ACTIVATION_FAILED
+} DLMS_IMAGE_TRANSFER_STATUS;
+
 typedef enum
 {
     /**

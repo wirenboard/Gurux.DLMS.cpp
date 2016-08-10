@@ -339,6 +339,7 @@ int CGXDLMSAssociationShortName::GetValue(CGXDLMSSettings& settings, CGXDLMSValu
     }
     else if (e.GetIndex() == 2)
     {
+        e.SetByteArray(true);
         CGXByteBuffer buff;
         int ret = GetObjects(settings, buff);
         e.SetValue(buff);
@@ -346,6 +347,7 @@ int CGXDLMSAssociationShortName::GetValue(CGXDLMSSettings& settings, CGXDLMSValu
     }
     else if (e.GetIndex() == 3)
     {
+        e.SetByteArray(true);
         int ret;
         bool lnExists = m_ObjectList.FindBySN(GetShortName()) != NULL;
         //Add count
@@ -375,6 +377,7 @@ int CGXDLMSAssociationShortName::GetValue(CGXDLMSSettings& settings, CGXDLMSValu
     }
     else if (e.GetIndex() == 4)
     {
+        e.SetByteArray(true);
         CGXByteBuffer data;
         CGXDLMSVariant tmp = m_SecuritySetupReference;
         GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);

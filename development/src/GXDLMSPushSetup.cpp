@@ -42,6 +42,8 @@ CGXDLMSPushSetup::CGXDLMSPushSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_PUSH_SETUP
 {
     m_RandomisationStartInterval = m_NumberOfRetries = m_RepetitionDelay = 0;
     GXHelpers::SetLogicalName("0.7.25.9.0.255", m_LN);
+    m_Service = DLMS_SERVICE_TYPE_TCP;
+    m_Message = DLMS_MESSAGE_TYPE_COSEM_APDU;
 }
 
 //SN Constructor.
@@ -55,9 +57,35 @@ CGXDLMSPushSetup::CGXDLMSPushSetup(unsigned short sn) : CGXDLMSObject(DLMS_OBJEC
 CGXDLMSPushSetup::CGXDLMSPushSetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_PUSH_SETUP, ln)
 {
     m_RandomisationStartInterval = m_NumberOfRetries = m_RepetitionDelay = 0;
-    GXHelpers::SetLogicalName("0.7.25.9.0.255", m_LN);
+    GXHelpers::SetLogicalName(ln.c_str(), m_LN);
 }
 
+DLMS_SERVICE_TYPE CGXDLMSPushSetup::GetService()
+{
+    return m_Service;
+}
+void CGXDLMSPushSetup::SetService(DLMS_SERVICE_TYPE value)
+{
+    m_Service = value;
+}
+
+std::string& CGXDLMSPushSetup::GetDestination()
+{
+    return m_Destination;
+}
+void CGXDLMSPushSetup::SetDestination(std::string& value)
+{
+    m_Destination = value;
+}
+
+DLMS_MESSAGE_TYPE CGXDLMSPushSetup::GetMessage()
+{
+    return m_Message;
+}
+void CGXDLMSPushSetup::SetMessage(DLMS_MESSAGE_TYPE value)
+{
+    m_Message = value;
+}
 // Returns amount of attributes.
 int CGXDLMSPushSetup::GetAttributeCount()
 {
@@ -95,11 +123,11 @@ void CGXDLMSPushSetup::GetValues(std::vector<std::string>& values)
     values.push_back(sb.str());
 
     sb.str(std::string());
-    sb << m_SendDestinationAndMethod.GetService();
+    sb << GetService();
     sb << " ";
-    sb << m_SendDestinationAndMethod.GetDestination().c_str();
+    sb << GetDestination().c_str();
     sb << " ";
-    sb << m_SendDestinationAndMethod.GetMessage();
+    sb << GetMessage();
     values.push_back(sb.str());
 
     sb.str(std::string());
@@ -221,6 +249,7 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
     }
     if (e.GetIndex() == 2)
     {
+        e.SetByteArray(true);
         buff.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         GXHelpers::SetObjectCount(m_PushObjectList.size(), buff);
         for(std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> >::iterator it = m_PushObjectList.begin(); it != m_PushObjectList.end(); ++it)
@@ -258,21 +287,24 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
     }
     if (e.GetIndex() == 3)
     {
+        e.SetByteArray(true);
         buff.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         buff.SetUInt8(3);
-        tmp = m_SendDestinationAndMethod.GetService();
+        tmp = GetService();
         if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT8, tmp)) != 0)
         {
             return ret;
         }
 
-        tmp = m_SendDestinationAndMethod.GetDestination();
+        CGXByteBuffer bb;
+        bb.AddString(GetDestination().c_str());
+        tmp = bb;
         if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
         {
             return ret;
         }
 
-        tmp = m_SendDestinationAndMethod.GetMessage();
+        tmp = GetMessage();
         if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT8, tmp)) != 0)
         {
             return ret;
@@ -282,6 +314,7 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
     }
     if (e.GetIndex() == 4)
     {
+        e.SetByteArray(true);
         buff.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         GXHelpers::SetObjectCount(m_CommunicationWindow.size(), buff);
         for(std::vector<std::pair< CGXDateTime, CGXDateTime> >::iterator it = m_CommunicationWindow.begin(); it != m_CommunicationWindow.end(); ++it)
@@ -352,11 +385,11 @@ int CGXDLMSPushSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
     {
         if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
-            m_SendDestinationAndMethod.SetService((DLMS_SERVICE_TYPE) e.GetValue().Arr[0].ToInteger());
+            SetService((DLMS_SERVICE_TYPE) e.GetValue().Arr[0].ToInteger());
             std::string str;
             str.append(reinterpret_cast< char const* >(e.GetValue().Arr[1].byteArr), e.GetValue().Arr[1].size);
-            m_SendDestinationAndMethod.SetDestination(str);
-            m_SendDestinationAndMethod.SetMessage((DLMS_MESSAGE_TYPE) e.GetValue().Arr[2].ToInteger());
+            SetDestination(str);
+            SetMessage((DLMS_MESSAGE_TYPE) e.GetValue().Arr[2].ToInteger());
         }
     }
     else if (e.GetIndex() == 4)

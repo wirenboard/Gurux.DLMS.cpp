@@ -447,6 +447,25 @@ public:
         int count,
         std::vector<CGXByteBuffer>& reply);
 
+
+    /**
+    * Read rows by entry.
+    *
+    * @param pg
+    *            Profile generic object to read.
+    * @param index
+    *            Zero bases start index.
+    * @param count
+    *            Rows count to read.
+    * @return Read message as byte array.
+    */
+    int ReadRowsByEntry(
+        CGXDLMSProfileGeneric* pg,
+        int index,
+        int count,
+        std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns,
+        std::vector<CGXByteBuffer>& reply);
+
     /**
      * Read rows by range. Use this method to read Profile Generic table between
      * dates.
@@ -463,6 +482,25 @@ public:
         CGXDLMSProfileGeneric* pg,
         struct tm* start,
         struct tm* end,
+        std::vector<CGXByteBuffer>& reply);
+
+    /**
+    * Read rows by range. Use this method to read Profile Generic table between
+    * dates.
+    *
+    * @param pg
+    *            Profile generic object to read.
+    * @param start
+    *            Start time.
+    * @param end
+    *            End time.
+    * @return Generated read message.
+    */
+    int ReadRowsByRange(
+        CGXDLMSProfileGeneric* pg,
+        struct tm* start,
+        struct tm* end,
+        std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns,
         std::vector<CGXByteBuffer>& reply);
 
     /**

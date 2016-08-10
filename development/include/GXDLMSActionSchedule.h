@@ -37,39 +37,11 @@
 
 #include "GXDLMSObject.h"
 
-enum SINGLE_ACTION_SCHEDULE_TYPE
-{
-    /**
-     Size of execution_time = 1. Wildcard in date allowed.
-    */
-    SINGLE_ACTION_SCHEDULE_TYPE1 = 0,
-    /**
-     Size of execution_time = n.
-     All time values are the same, wildcards in date not allowed.
-    */
-    SINGLE_ACTION_SCHEDULE_TYPE2 = 1,
-    /**
-     Size of execution_time = n.
-     All time values are the same, wildcards in date are allowed,
-    */
-    SINGLE_ACTION_SCHEDULE_TYPE3 = 2,
-    /**
-     Size of execution_time = n.
-     Time values may be different, wildcards in date not allowed,
-    */
-    SINGLE_ACTION_SCHEDULE_TYPE4 = 3,
-    /**
-     Size of execution_time = n.
-     Time values may be different, wildcards in date are allowed
-    */
-    SINGLE_ACTION_SCHEDULE_TYPE5 = 4
-};
-
 class CGXDLMSActionSchedule : public CGXDLMSObject
 {
     std::string m_ExecutedScriptLogicalName;
     int m_ExecutedScriptSelector;
-    SINGLE_ACTION_SCHEDULE_TYPE m_Type;
+    DLMS_SINGLE_ACTION_SCHEDULE_TYPE m_Type;
     std::vector<CGXDateTime> m_ExecutionTime;
 
     void Init();
@@ -101,8 +73,8 @@ public:
     int GetExecutedScriptSelector();
     void SetExecutedScriptSelector(int value);
 
-    SINGLE_ACTION_SCHEDULE_TYPE GetType();
-    void SetType(SINGLE_ACTION_SCHEDULE_TYPE value);
+    DLMS_SINGLE_ACTION_SCHEDULE_TYPE GetType();
+    void SetType(DLMS_SINGLE_ACTION_SCHEDULE_TYPE value);
 
     std::vector<CGXDateTime> GetExecutionTime();
     void SetExecutionTime(std::vector<CGXDateTime> value);

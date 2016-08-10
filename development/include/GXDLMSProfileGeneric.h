@@ -87,16 +87,51 @@ private:
     void Init();
 
     int GetColumns(CGXByteBuffer& data);
-    int GetData(std::vector< std::vector<CGXDLMSVariant> >& table, CGXByteBuffer& data);
+    int GetData(
+        std::vector< std::vector<CGXDLMSVariant> >& table,
+        std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns,
+        CGXByteBuffer& data);
 
     /*
     * Add new capture object (column) to the profile generic.
     */
-    int AddCaptureObject(CGXDLMSObject* pObj, int attributeIndex, int dataIndex);
+    int AddCaptureObject(
+        CGXDLMSObject* pObj,
+        int attributeIndex,
+        int dataIndex);
 
-    int GetProfileGenericData(int selector, CGXDLMSVariant& parameters, CGXByteBuffer& reply);
+    int GetProfileGenericData(
+        int selector,
+        CGXDLMSVariant& parameters,
+        CGXByteBuffer& reply);
 
+    /**
+     * Get selected columns.
+     *
+     * @param parameters
+     *            Received data.
+     * @param cols
+     *            Selected columns.
+     */
+    int GetSelectedColumns(
+        std::vector<CGXDLMSVariant>& cols,
+        std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns);
 public:
+
+    /**
+    * Get selected columns from parameters.
+    *
+    * @param selector
+    *            Is read by entry or range.
+    * @param parameters
+    *            Received parameters where columns information is found.
+    * @return Selected columns.
+    */
+    int GetSelectedColumns(
+        int selector,
+        CGXDLMSVariant& parameters,
+        std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns);
+
     /**
      Constructor.
     */

@@ -61,10 +61,6 @@ private:
     */
     int m_Index;
     /**
-    * Data type of the value.
-    */
-    DLMS_DATA_TYPE m_DataType;
-    /**
     * Optional selector.
     */
     int m_Selector;
@@ -81,6 +77,11 @@ private:
     * Is action. This is reserved for internal use.
     */
     bool m_Action;
+
+    /**
+    * Is data handled as byte array.
+    */
+    bool m_ByteArray;
 
 public:
     /**
@@ -191,5 +192,16 @@ public:
     *            Is action.
     */
     void SetAction(bool value);
+
+    /**
+       * @return Is byte array.
+       */
+    bool IsByteArray();
+
+    /**
+    * @param value
+    *            Is byte array.
+    */
+    void SetByteArray(bool value);
 };
 #endif //GXDLMSVALUEEVENTARGS_H

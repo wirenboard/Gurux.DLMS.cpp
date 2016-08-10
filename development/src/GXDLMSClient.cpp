@@ -1339,8 +1339,22 @@ int CGXDLMSClient::Method(CGXDLMSVariant name, DLMS_OBJECT_TYPE objectType,
     return CGXDLMS::GetMessages(m_Settings, cmd, 1, bb, NULL, reply);
 }
 
-int CGXDLMSClient::ReadRowsByEntry(CGXDLMSProfileGeneric* pg,
-                                   int index, int count, std::vector<CGXByteBuffer>& reply)
+int CGXDLMSClient::ReadRowsByEntry(
+    CGXDLMSProfileGeneric* pg,
+    int index,
+    int count,
+    std::vector<CGXByteBuffer>& reply)
+{
+    std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> > cols;
+    return ReadRowsByEntry(pg, index, count, cols, reply);
+}
+
+int CGXDLMSClient::ReadRowsByEntry(
+    CGXDLMSProfileGeneric* pg,
+    int index,
+    int count,
+    std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns,
+    std::vector<CGXByteBuffer>& reply)
 {
     CGXByteBuffer buff(19);
     // Add AccessSelector value
@@ -1372,10 +1386,23 @@ int CGXDLMSClient::ReadRowsByEntry(CGXDLMSProfileGeneric* pg,
     return Read(name, DLMS_OBJECT_TYPE_PROFILE_GENERIC, 2, &buff, reply);
 }
 
-int CGXDLMSClient::ReadRowsByRange(CGXDLMSProfileGeneric* pg,
-                                   struct tm* start,
-                                   struct tm* end,
-                                   std::vector<CGXByteBuffer>& reply)
+
+int CGXDLMSClient::ReadRowsByRange(
+    CGXDLMSProfileGeneric* pg,
+    struct tm* start,
+    struct tm* end,
+    std::vector<CGXByteBuffer>& reply)
+{
+    std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> > columns;
+    return ReadRowsByRange(pg, start, end, columns, reply);
+}
+
+int CGXDLMSClient::ReadRowsByRange(
+    CGXDLMSProfileGeneric* pg,
+    struct tm* start,
+    struct tm* end,
+    std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns,
+    std::vector<CGXByteBuffer>& reply)
 {
     int ret;
     CGXDLMSVariant name = pg->GetName();

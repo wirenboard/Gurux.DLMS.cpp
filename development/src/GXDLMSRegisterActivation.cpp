@@ -195,6 +195,7 @@ int CGXDLMSRegisterActivation::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
     }
     if (e.GetIndex() == 2)
     {
+        e.SetByteArray(true);
         int ret;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         GXHelpers::SetObjectCount(m_RegisterAssignment.size(), data);
@@ -216,6 +217,7 @@ int CGXDLMSRegisterActivation::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
     }
     if (e.GetIndex() == 3)
     {
+        e.SetByteArray(true);
         //TODO: e.SetValue(m_MaskList);
         return DLMS_ERROR_CODE_OK;
     }
