@@ -39,7 +39,10 @@
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
 #include <Winsock.h> //Add support for sockets
 #else
-
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 #endif
 
 
@@ -351,14 +354,14 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         //If address is give as name
         if(add.sin_addr.s_addr == INADDR_NONE)
         {
-            hostent *Hostent = gethostbyname(m_IPAddress.c_str());
+            struct hostent *Hostent = gethostbyname(m_IPAddress.c_str());
             if (Hostent == NULL)
             {
                 return DLMS_ERROR_CODE_INVALID_PARAMETER;
             };
             add.sin_addr = *(in_addr*)(void*)Hostent->h_addr_list[0];
         };
-        e.SetValue(add.sin_addr.s_addr);
+        e.SetValue((unsigned long) add.sin_addr.s_addr);
         return DLMS_ERROR_CODE_OK;
     }
     else if (e.GetIndex() == 4)

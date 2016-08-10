@@ -89,10 +89,10 @@ class CGXDLMSSettings
     DLMS_SERVICE_CLASS m_ServiceClass;
 
     // Client address.
-    int m_ClientAddress;
+    unsigned long m_ClientAddress;
 
     // Server address.
-    int m_ServerAddress;
+    unsigned long m_ServerAddress;
 
     // Is Logical Name referencing used.
     bool m_UseLogicalNameReferencing;
@@ -241,16 +241,16 @@ public:
     void SetInterfaceType(DLMS_INTERFACE_TYPE value);
 
 // Gets client address.
-    int GetClientAddress();
+    unsigned long GetClientAddress();
 
 // Sets client address.
-    void SetClientAddress(int value);
+    void SetClientAddress(unsigned long value);
 
 // Server address.
-    int GetServerAddress();
+    unsigned long GetServerAddress();
 
 // Server address.
-    void SetServerAddress(int value);
+    void SetServerAddress(unsigned long value);
 
 // DLMS version number.
     unsigned char GetDLMSVersion();

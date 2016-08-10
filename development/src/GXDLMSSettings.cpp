@@ -262,23 +262,23 @@ void CGXDLMSSettings::SetInterfaceType(DLMS_INTERFACE_TYPE value)
     m_InterfaceType = value;
 }
 
-int CGXDLMSSettings::GetClientAddress()
+unsigned long CGXDLMSSettings::GetClientAddress()
 {
     return m_ClientAddress;
 }
 
-void CGXDLMSSettings::SetClientAddress(int value)
+void CGXDLMSSettings::SetClientAddress(unsigned long value)
 {
     m_ClientAddress = value;
 }
 
-int CGXDLMSSettings::GetServerAddress()
+unsigned long CGXDLMSSettings::GetServerAddress()
 {
     return m_ServerAddress;
 }
 
 // Server address.
-void CGXDLMSSettings::SetServerAddress(int value)
+void CGXDLMSSettings::SetServerAddress(unsigned long value)
 {
     m_ServerAddress = value;
 }
@@ -308,6 +308,7 @@ int CGXDLMSSettings::SetMaxReceivePDUSize(unsigned short value)
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     m_MaxReceivePDUSize = value;
+    return 0;
 }
 
 // Maximum server PDU size.
@@ -323,6 +324,7 @@ int CGXDLMSSettings::SetMaxServerPDUSize(unsigned short value)
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     m_MaxServerPDUSize = value;
+    return 0;
 }
 
 
