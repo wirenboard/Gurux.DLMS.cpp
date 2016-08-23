@@ -40,6 +40,9 @@
 #include "GXReplyData.h"
 #include "GXDLMSSettings.h"
 #include "GXSNInfo.h"
+#include "GXDLMSSNParameters.h"
+#include "GXDLMSLNParameters.h"
+#include "GXDLMSConnectionEventArgs.h"
 
 class CGXDLMSServer
 {
@@ -72,6 +75,131 @@ private:
     * @return Returns returned UA packet.
     */
     int HandleSnrmRequest(CGXDLMSSettings& settings, CGXByteBuffer& reply);
+
+    /**
+    * Handle get request normal command.
+    *
+    * @param data
+    *            Received data.
+    */
+    int GetRequestNormal(CGXByteBuffer& data);
+
+    /**
+    * Handle get request next data block command.
+    *
+    * @param data
+    *            Received data.
+    */
+    int GetRequestNextDataBlock(CGXByteBuffer& data);
+
+    /**
+     * Handle get request with list command.
+     *
+     * @param data
+     *            Received data.
+     */
+    int GetRequestWithList(CGXByteBuffer& data);
+
+    int HandleSetRequest(
+        CGXByteBuffer& data,
+        short type,
+        CGXDLMSLNParameters& p);
+
+    int HanleSetRequestWithDataBlock(
+        CGXByteBuffer& data,
+        CGXDLMSLNParameters& p);
+
+    /**
+    * Handle read Block in blocks.
+    *
+    * @param data
+    *            Received data.
+    */
+    int HandleReadBlockNumberAccess(
+        CGXByteBuffer& data);
+
+    int HandleReadDataBlockAccess(
+        DLMS_COMMAND command,
+        CGXByteBuffer& data,
+        int cnt);
+
+    int ReturnSNError(
+        DLMS_COMMAND cmd,
+        DLMS_ERROR_CODE error);
+
+    int HandleRead(
+        DLMS_VARIABLE_ACCESS_SPECIFICATION type,
+        CGXByteBuffer& data,
+        CGXDLMSValueEventCollection& list,
+        std::vector<CGXDLMSValueEventArg*>& reads,
+        std::vector<CGXDLMSValueEventArg*>& actions);
+
+    /**
+    * Reset settings when connection is made or close.
+    *
+    * @param connected
+    *            Is co3nnected.
+    */
+    void Reset(bool connected);
+
+    /**
+    * Handle received command.
+    */
+    int HandleCommand(
+        CGXDLMSConnectionEventArgs& connectionInfo,
+        DLMS_COMMAND cmd,
+        CGXByteBuffer& data,
+        CGXByteBuffer& reply);
+
+    /**
+    * Parse AARQ request that client send and returns AARE request.
+    *
+    * @return Reply to the client.
+    */
+    int HandleAarqRequest(
+        CGXByteBuffer& data,
+        CGXDLMSConnectionEventArgs& connectionInfo);
+
+    /**
+     * Handle Set request.
+     *
+     * @return Reply to the client.
+     */
+    int HandleSetRequest(
+        CGXByteBuffer& data);
+
+    /**
+    * Handle Get request.
+    *
+    * @return Reply to the client.
+    */
+    int HandleGetRequest(
+        CGXByteBuffer& data);
+
+    /**
+    * Handle read request.
+    */
+    int HandleReadRequest(CGXByteBuffer& data);
+
+    /**
+    * Handle write request.
+    *
+    * @param reply
+    *            Received data from the client.
+    * @return Reply.
+    */
+    int HandleWriteRequest(CGXByteBuffer& data);
+
+    /**
+    * Handle action request.
+    *
+    * @param reply
+    *            Received data from the client.
+    * @return Reply.
+    */
+    int HandleMethodRequest(
+        CGXByteBuffer& data,
+        CGXDLMSConnectionEventArgs& connectionInfo);
 
 protected:
     /**
@@ -154,12 +282,20 @@ protected:
      * Accepted connection is made for the server. All initialization is done
      * here.
      */
-    virtual void Connected() = 0;
+    virtual void Connected(CGXDLMSConnectionEventArgs& connectionInfo) = 0;
+
+    /**
+     * Client has try to made invalid connection. Password is incorrect.
+     *
+     * @param connectionInfo
+     *            Connection information.
+     */
+    virtual void InvalidConnection(CGXDLMSConnectionEventArgs& connectionInfo) = 0;
 
     /**
      * Server has close the connection. All clean up is made here.
      */
-    virtual void Disconnected() = 0;
+    virtual void Disconnected(CGXDLMSConnectionEventArgs& connectionInfo) = 0;
 
     /**
      * Action is occurred.
@@ -308,6 +444,19 @@ public:
         CGXByteBuffer& reply);
 
     /**
+    * Handles client request.
+    *
+    * @param data
+    *            Received data from the client.
+    * @return Response to the request. Response is NULL if request packet is
+    *         not complete.
+    */
+    int HandleRequest(
+        CGXDLMSConnectionEventArgs& connectionInfo,
+        CGXByteBuffer& data,
+        CGXByteBuffer& reply);
+
+    /**
      * Handles client request.
      *
      * @param data
@@ -321,58 +470,19 @@ public:
         CGXByteBuffer& reply);
 
     /**
-    * Handle received command.
-    */
-    int HandleCommand(
-        DLMS_COMMAND cmd,
-        CGXByteBuffer& data,
+     * Handles client request.
+     *
+     * @param data
+     *            Received data from the client.
+     * @return Response to the request. Response is NULL if request packet is
+     *         not complete.
+     */
+    int HandleRequest(
+        CGXDLMSConnectionEventArgs& connectionInfo,
+        unsigned char* data,
+        unsigned short size,
         CGXByteBuffer& reply);
 
-    /**
-    * Parse AARQ request that client send and returns AARE request.
-    *
-    * @return Reply to the client.
-    */
-    int HandleAarqRequest(CGXByteBuffer& data);
-
-    /**
-     * Handle Set request.
-     *
-     * @return Reply to the client.
-     */
-    int HandleSetRequest(
-        CGXByteBuffer& data);
-
-    /**
-    * Handle Get request.
-    *
-    * @return Reply to the client.
-    */
-    int HandleGetRequest(
-        CGXByteBuffer& data);
-
-    /**
-    * Handle read request.
-    */
-    int HandleReadRequest(CGXByteBuffer& data);
-
-    /**
-    * Handle write request.
-    *
-    * @param reply
-    *            Received data from the client.
-    * @return Reply.
-    */
-    int HandleWriteRequest(CGXByteBuffer& data);
-
-    /**
-    * Handle action request.
-    *
-    * @param reply
-    *            Received data from the client.
-    * @return Reply.
-    */
-    int HandleMethodRequest(CGXByteBuffer& data);
 
     /**
     * Find Short Name object.

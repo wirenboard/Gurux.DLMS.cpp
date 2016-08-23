@@ -80,9 +80,19 @@ int CGXDLMSValueEventArg::GetSelector()
     return m_Selector;
 }
 
+void CGXDLMSValueEventArg::SetSelector(int value)
+{
+    m_Selector = value;
+}
+
 CGXDLMSVariant& CGXDLMSValueEventArg::GetParameters()
 {
     return m_Parameters;
+}
+
+void CGXDLMSValueEventArg::SetParameters(CGXDLMSVariant& value)
+{
+    m_Parameters = value;
 }
 
 CGXDLMSValueEventArg::CGXDLMSValueEventArg(

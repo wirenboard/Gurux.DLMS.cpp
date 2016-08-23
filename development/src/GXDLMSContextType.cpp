@@ -45,7 +45,7 @@ void CGXDLMSContextType::SetConformance(std::string value)
     m_Conformance = value;
 }
 
-int CGXDLMSContextType::GetMaxReceivePduSize()
+int CGXDLMSContextType::GetMaxPduSize()
 {
     return m_MaxReceivePduSize;
 }

@@ -40,6 +40,7 @@
 #include <process.h>//Add support for threads
 #else //Linux includes.
 #define closesocket close
+#include <unistd.h>
 #include <pthread.h>
 #include <termios.h>
 #include <sys/types.h>
@@ -61,11 +62,7 @@ int Close(int& s)
 {
     if (s != -1)
     {
-#if defined(_WIN32) || defined(_WIN64)//Windows includes
         closesocket(s);
-#else
-        close(s);
-#endif
         s = -1;
     }
     return 0;
@@ -140,7 +137,8 @@ int Test()
             {
                 break;
             }
-            clock.SetTime(CGXDateTime::Now());
+            CGXDateTime now = CGXDateTime::Now();
+            clock.SetTime(now);
             std::vector<CGXByteBuffer> reply;
             if ((ret = cl.GeneratePushSetupMessages(NULL, &p, reply)) != 0)
             {

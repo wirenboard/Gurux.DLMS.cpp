@@ -828,57 +828,200 @@ typedef enum
     DLMS_OBJECT_TYPE_ZIG_BEE_NETWORK_CONTROL = 104
 } DLMS_OBJECT_TYPE;
 
+/**
+ * DLMS commands.
+ */
 typedef enum
 {
-    DLMS_COMMAND_NONE,
+    /**
+    * No command to execute.
+    */
+    DLMS_COMMAND_NONE = 0,
+
+    /**
+    * Initiate request.
+    */
+    DLMS_COMMAND_INITIATE_REQUEST = 0x1,
+
+    /**
+     * Initiate response.
+     */
+    DLMS_COMMAND_INITIATE_RESPONSE = 0x8,
+    /**
+     * Read request.
+     */
     DLMS_COMMAND_READ_REQUEST = 0x5,
+
+    /**
+     * Read response.
+     */
     DLMS_COMMAND_READ_RESPONSE = 0xC,
+
+    /**
+     * Write request.
+     */
     DLMS_COMMAND_WRITE_REQUEST = 0x6,
+
+    /**
+     * Write response.
+     */
     DLMS_COMMAND_WRITE_RESPONSE = 0xD,
+
+    /**
+     * Get request.
+     */
     DLMS_COMMAND_GET_REQUEST = 0xC0,
+
+    /**
+     * Get response.
+     */
     DLMS_COMMAND_GET_RESPONSE = 0xC4,
+
+    /**
+     * Set request.
+     */
     DLMS_COMMAND_SET_REQUEST = 0xC1,
+
+    /**
+     * Set response.
+     */
     DLMS_COMMAND_SET_RESPONSE = 0xC5,
+
+    /**
+     * Action request.
+     */
     DLMS_COMMAND_METHOD_REQUEST = 0xC3,
+
+    /**
+     * Action response.
+     */
     DLMS_COMMAND_METHOD_RESPONSE = 0xC7,
+
+    /**
+     * Command rejected.
+     */
     DLMS_COMMAND_REJECTED = 0x97,
-    // SNRM request.
+
+    /**
+     * SNRM request.
+     */
     DLMS_COMMAND_SNRM = 0x93,
-    // UA request.
+
+    /**
+     * UA request.
+     */
     DLMS_COMMAND_UA = 0x73,
+
+    /**
+     * AARQ request.
+     */
     DLMS_COMMAND_AARQ = 0x60,
+
+    /**
+     * AARE request.
+     */
     DLMS_COMMAND_AARE = 0x61,
+
     /**
      * Disconnect request for HDLC framing.
      */
     DLMS_COMMAND_DISC = 0x53,
+
+    /**
+     * Disconnect request.
+     */
     DLMS_COMMAND_DISCONNECT_REQUEST = 0x62,
+
+    /**
+     * Disconnect response.
+     */
     DLMS_COMMAND_DISCONNECT_RESPONSE = 0x63,
-    // Exception response.
+
+    /**
+     * Confirmed Service Error.
+     */
+    DLMS_COMMAND_CONFIRMED_SERVICE_ERROR = 0x0E,
+
+    /**
+     * Exception Response.
+     */
     DLMS_COMMAND_EXCEPTION_RESPONSE = 0xD8,
 
-    // General block transfer.
+    /**
+     * General Block Transfer.
+     */
     DLMS_COMMAND_GENERAL_BLOCK_TRANSFER = 0xE0,
-    // Data Notification request.
+
+    /**
+     * Data Notification request.
+     */
     DLMS_COMMAND_DATA_NOTIFICATION = 0x0F,
 
-    //Glo messages
+    /**
+     * Glo get request.
+     */
     DLMS_COMMAND_GLO_GET_REQUEST = 0xC8,
+
+    /**
+     * Glo get response.
+     */
     DLMS_COMMAND_GLO_GET_RESPONSE = 0xCC,
+
+    /**
+     * Glo set request.
+     */
     DLMS_COMMAND_GLO_SET_REQUEST = 0xC9,
+
+    /**
+     * Glo set response.
+     */
     DLMS_COMMAND_GLO_SET_RESPONSE = 0xCD,
+
     /**
      * Glo general ciphering.
      */
     DLMS_COMMAND_GLO_GENERAL_CIPHERING = 0xDB,
 
     /**
-    * Glo event notification request.
-    */
+     * Glo event notification request.
+     */
     DLMS_COMMAND_GLO_EVENT_NOTIFICATION_REQUEST = 0xCA,
 
+    /**
+     * Glo method request.
+     */
     DLMS_COMMAND_GLO_METHOD_REQUEST = 0xCB,
-    DLMS_COMMAND_GLO_METHOD_RESPONSE = 0xCF
+
+    /**
+     * Glo method response.
+     */
+    DLMS_COMMAND_GLO_METHOD_RESPONSE = 0xCF,
+
+    /**
+     * Glo Initiate request.
+     */
+    DLMS_COMMAND_GLO_INITIATE_REQUEST = 0x21,
+    /**
+     * Glo read request.
+     */
+    DLMS_COMMAND_GLO_READ_REQUEST = 37,
+
+    /**
+     * Glo write request.
+     */
+    DLMS_COMMAND_GLO_WRITE_REQUEST = 38,
+    /**
+     * Glo Initiate response.
+     */
+    DLMS_COMMAND_GLO_INITIATE_RESPONSE = 40,
+    /**
+     * Glo read response.
+     */
+    DLMS_COMMAND_GLO_READ_RESPONSE = 44,
+    /**
+     * Glo write response.
+     */
+    DLMS_COMMAND_GLO_WRITE_RESPONSE = 45
 } DLMS_COMMAND;
 
 typedef enum
@@ -963,4 +1106,491 @@ typedef enum
     DLMS_ASSOCIATION_STATUS_ASSOCIATED = 2
 } DLMS_ASSOCIATION_STATUS;
 
+/**
+ * Enumerates Action request types.
+ */
+typedef enum
+{
+    /**
+     * Normal action.
+     */
+    DLMS_ACTION_COMMAND_TYPE_NORMAL = 1,
+    /**
+     * Next block.
+     */
+    DLMS_ACTION_COMMAND_TYPE_NEXT_BLOCK = 2,
+    /**
+     * Action with list.
+     */
+    DLMS_ACTION_COMMAND_TYPE_WITH_LIST = 3,
+    /**
+     * Action with first block.
+     */
+    DLMS_ACTION_COMMAND_TYPE_WITH_FIRST_BLOCK = 4,
+    /**
+     * Action with list and first block.
+     */
+    DLMS_ACTION_COMMAND_TYPE_WITH_LIST_AND_FIRST_BLOCK = 5,
+    /**
+     * Action with block.
+     */
+    DLMS_ACTION_COMMAND_TYPE_WITH_BLOCK = 6
+} DLMS_ACTION_COMMAND_TYPE;
+
+/**
+* Confirmed service error tells when error has occurred.
+*/
+typedef enum
+{
+    /**
+     * Error has occurred on initialize.
+     */
+    DLMS_CONFIRMED_SERVICE_ERROR_INITIATE_ERROR = 1,
+    /**
+     * Error has occurred on read.
+     */
+    DLMS_CONFIRMED_SERVICE_ERROR_READ = 5,
+    /**
+     * Error has occurred on write.
+     */
+    DLMS_CONFIRMED_SERVICE_ERROR_WRITE = 6
+} DLMS_CONFIRMED_SERVICE_ERROR;
+
+/**
+ * Access describes access errors.
+ */
+typedef enum
+{
+    /**
+     * Other error.
+     */
+    DLMS_ACCESS_OTHER = 0,
+    /**
+     * Scope of access violated.
+     */
+    DLMS_ACCESS_SCOPE_OF_ACCESS_VIOLATED = 1,
+    /**
+     * Object access is invalid.
+     */
+    DLMS_ACCESS_OBJECT_ACCESS_INVALID = 2,
+    /**
+     * Hardware fault.
+     */
+    DLMS_ACCESS_HARDWARE_FAULT = 3,
+    /**
+     * Object is unavailable.
+     */
+    DLMS_ACCESS_OBJECT_UNAVAILABLE = 4
+} DLMS_ACCESS;
+
+/**
+ * Application reference describes application errors.
+ */
+typedef enum
+{
+    /**
+     * Other error is occurred.
+     */
+    DLMS_APPLICATION_REFERENCE_OTHER = 0,
+    /**
+     * Time elapsed.
+     */
+    DLMS_APPLICATION_REFERENCE_TIME_ELAPSED = 1,
+    /**
+     * Application unreachable.
+     */
+    DLMS_APPLICATION_REFERENCE_APPLICATION_UNREACHABLE = 2,
+    /**
+     * Application reference is invalid.
+     */
+    DLMS_APPLICATION_REFERENCE_APPLICATION_REFERENCE_INVALID = 3,
+    /**
+     * Application context unsupported.
+     */
+    DLMS_APPLICATION_REFERENCE_APPLICATION_CONTEXT_UNSUPPORTED = 4,
+    /**
+     * Provider communication error.
+     */
+    DLMS_APPLICATION_REFERENCE_PROVIDER_COMMUNICATION_ERROR = 5,
+    /**
+     * Deciphering error.
+     */
+    DLMS_APPLICATION_REFERENCE_DECIPHERING_ERROR = 6
+} DLMS_APPLICATION_REFERENCE;
+
+
+/**
+ * Definition describes definition errors.
+ */
+typedef enum
+{
+    /**
+     * Other error.
+     */
+    DLMS_DEFINITION_OTHER = 0,
+    /**
+     * Object is Undefined.
+     */
+    DLMS_DEFINITION_OBJECT_UNDEFINED = 1,
+    /**
+     * Object class inconsistent.
+     */
+    DLMS_DEFINITION_OBJECT_CLASS_INCONSISTENT = 2,
+    /**
+     * Object attribute inconsistent.
+     */
+    DLMS_DEFINITION_OBJECT_ATTRIBUTE_INCONSISTENT = 3
+} DLMS_DEFINITION;
+
+/**
+ * DLMS service errors.
+ *
+ * @author Gurux Ltd.
+ */
+typedef enum
+{
+    /**
+     * Operation is not possible
+     */
+    DLMS_EXCEPTION_SERVICE_ERROR_OPERATION_NOT_POSSIBLE = 1,
+    /**
+     * Service is not supported.
+     */
+    DLMS_EXCEPTION_SERVICE_ERROR_SERVICE_NOT_SUPPORTED = 2,
+    /**
+     * Other reason.
+     */
+    DLMS_EXCEPTION_SERVICE_ERROR_OTHER_REASON = 3
+} DLMS_EXCEPTION_SERVICE_ERROR;
+
+
+/**
+ * Hardware resource describes hardware errors.
+ */
+typedef enum
+{
+    /**
+     * Other hardware resource error.
+     */
+    DLMS_HARDWARE_RESOURCE_OTHER = 0,
+    /**
+     * Memory is unavailable.
+     */
+    DLMS_HARDWARE_RESOURCE_MEMORY_UNAVAILABLE = 1,
+    /**
+     * Processor resource is unavailable.
+     */
+    DLMS_HARDWARE_RESOURCE_PROCESSOR_RESOURCE_UNAVAILABLE = 2,
+    /**
+     * Mass storage is unavailable.
+     */
+    DLMS_HARDWARE_RESOURCE_MASS_STORAGE_UNAVAILABLE = 3,
+    /**
+     * Other resource is unavailable.
+     */
+    DLMS_HARDWARE_RESOURCE_OTHER_RESOURCE_UNAVAILABLE = 4
+} DLMS_HARDWARE_RESOURCE;
+
+
+/**
+ * Initiate describes onitiate errors.
+ */
+typedef enum
+{
+    /**
+     * Other error.
+     */
+    DLMS_INITIATE_OTHER = 0,
+    /**
+     * Dlms version is too low.
+     */
+    DLMS_INITIATE_DLMS_VERSION_TOO_LOW = 1,
+    /**
+     * Incompatible conformance.
+     */
+    DLMS_INITIATE_INCOMPATIBLE_CONFORMANCE = 2,
+    /**
+     * Pdu size is too short.
+     */
+    DLMS_INITIATE_PDU_SIZE_TOOSHORT = 3,
+    /**
+     * Refused by the VDE handler.
+     */
+    DLMS_INITIATE_REFUSED_BY_THE_VDE_HANDLER = 4
+} DLMS_INITIATE;
+
+/**
+ * LoadDataSet describes load dataset errors.
+ */
+typedef enum
+{
+    /**
+     * Other error.
+     */
+    DLMS_LOAD_DATASET_OTHER = 0,
+    /**
+     * Primitive out of sequence.
+     */
+    DLMS_LOAD_DATASET_PRIMITIVE_OUT_OF_SEQUENCE = 1,
+    /**
+     * Not loadable.
+     */
+    DLMS_LOAD_DATASET_NOT_LOADABLE = 2,
+    /**
+     * Dataset size is too large.
+     */
+    DLMS_LOAD_DATASET_SIZE_TOO_LARGE = 3,
+    /**
+     * Not awaited segment.
+     */
+    DLMS_LOAD_DATASET_NOT_AWAITED_SEGMENT = 4,
+    /**
+     * Interpretation failure.
+     */
+    DLMS_LOAD_DATASET_INTERPRETATION_FAILURE = 5,
+    /**
+     * Storage failure.
+     */
+    DLMS_LOAD_DATASET_STORAGE_FAILURE = 6,
+    /**
+     * Dataset not ready.
+     */
+    DLMS_LOAD_DATASET_NOT_READY = 7
+} DLMS_LOAD_DATASET;
+
+/**
+ * Task describes load task errors.
+ */
+typedef enum
+{
+    /**
+     * Other error.
+     */
+    DLMS_TASK_OTHER = 0,
+    /**
+     * No remote control.
+     */
+    DLMS_TASK_NO_REMOTE_CONTROL = 1,
+    /**
+     * Ti is stopped.
+     */
+    DLMS_TASK_TI_STOPPED = 2,
+    /**
+     * TI is running.
+     */
+    DLMS_TASK_TI_RUNNIN = 3,
+    /**
+     * TI is unusable.
+     */
+    DLMS_TASK_TI_UNUSABLE = 4
+} DLMS_TASK;
+
+
+/**
+ * VdeState error describes Vde state errors.
+ */
+typedef enum
+{
+    /**
+     * Other error.
+     */
+    DLMS_VDE_STATE_ERROR_OTHER = 0,
+    /**
+     * No DLMS context.
+     */
+    DLMS_VDE_STATE_ERROR_NO_DLMS_CONTEXT = 1,
+    /**
+     * Loading dataset error.
+     */
+    DLMS_VDE_STATE_ERROR_LOADING_DATASET = 2,
+    /**
+     * Status No change.
+     */
+    DLMS_VDE_STATE_ERROR_STATUS_NO_CHANGE = 3,
+    /**
+     * Status Inoperable.
+     */
+    DLMS_VDE_STATE_ERROR_STATUS_INOPERABLE = 4
+} DLMS_VDE_STATE_ERROR;
+
+/**
+ * Enumerates Get request and response types.
+ */
+typedef enum
+{
+    /**
+     * Normal Get.
+     */
+    DLMS_GET_COMMAND_TYPE_NORMAL = 1,
+    /**
+     * Next data block.
+     */
+    DLMS_GET_COMMAND_TYPE_NEXT_DATA_BLOCK = 2,
+    /**
+     * Get request with list.
+     */
+    DLMS_GET_COMMAND_TYPE_WITH_LIST = 3
+} DLMS_GET_COMMAND_TYPE;
+
+/**
+ * Service describes service errors.
+ */
+typedef enum
+{
+    /**
+     * Other error.
+     */
+    DLMS_SERVICE_OTHER = 0,
+    /**
+     * PDU size is wrong.
+     */
+    DLMS_SERVICE_PDU_SIZE = 1,
+    /**
+     * Service is unsupported.
+     */
+    DLMS_SERVICE_UNSUPPORTED = 2
+} DLMS_SERVICE;
+
+/**
+ * ServiceError enumerates service errors.
+ */
+typedef enum
+{
+    /**
+     * Application error.
+     */
+    DLMS_SERVICE_ERROR_APPLICATION_REFERENCE = 0,
+    /**
+     * Hardware error.
+     */
+    DLMS_SERVICE_ERROR_HARDWARE_RESOURCE = 1,
+    /**
+     * Vde state error.
+     */
+    DLMS_SERVICE_ERROR_VDE_STATE_ERROR = 2,
+    /**
+     * Service error.
+     */
+    DLMS_SERVICE_ERROR_SERVICE = 3,
+    /**
+     * Definition error.
+     */
+    DLMS_SERVICE_ERROR_DEFINITION = 4,
+    /**
+     * Access error.
+     */
+    DLMS_SERVICE_ERROR_ACCESS = 5,
+    /**
+     * Initiate error.
+     */
+    DLMS_SERVICE_ERROR_INITIATE = 6,
+    /**
+     * LoadDataSet error.
+     */
+    DLMS_SERVICE_ERROR_LOAD_DATASET = 7,
+    /**
+     * Task error.
+     */
+    DLMS_SERVICE_ERROR_TAS = 8,
+    /**
+     * Other error describes manufacturer specific error code.
+     */
+    DLMS_SERVICE_ERROR_OTHER_ERROR = 9
+} DLMS_SERVICE_ERROR;
+
+/**
+ * Enumerates Set request types.
+ */
+typedef enum
+{
+    /**
+     * Normal Set.
+     */
+    DLMS_SET_COMMAND_TYPE_NORMAL = 1,
+    /**
+     * Set with first data block.
+     */
+    DLMS_SET_COMMAND_TYPE_FIRST_DATABLOCK = 2,
+    /**
+     * Set with data block.
+     */
+    DLMS_SET_COMMAND_TYPE_WITH_DATABLOCK = 3,
+    /**
+     * Set with list .
+     */
+    DLMS_SET_COMMAND_TYPE_WITH_LIST = 4,
+    /**
+     * Set with list and first data block.
+     */
+    DLMS_SET_COMMAND_TYPE_WITH_LIST_AND_WITH_FIRST_DATA_BLOCK = 5
+} DLMS_SET_COMMAND_TYPE;
+
+/**
+ * Enumerates single read response types.
+ */
+typedef enum
+{
+    /**
+     * Normal data.
+     */
+    DLMS_SINGLE_READ_RESPONSE_DATA = 0,
+    /**
+     * Error has occurred on read.
+     */
+    DLMS_SINGLE_READ_RESPONSE_DATA_ACCESS_ERROR = 1,
+    /**
+     * Return data as blocks.
+     */
+    DLMS_SINGLE_READ_RESPONSE_DATA_BLOCK_RESULT = 2,
+    /**
+     * Return block number.
+     */
+    DLMS_SINGLE_READ_RESPONSE_BLOCK_NUMBER = 3
+} DLMS_SINGLE_READ_RESPONSE;
+
+/**
+ * Enumerates single write response types.
+ */
+typedef enum
+{
+    /**
+     * Write succeeded.
+     */
+    DLMS_SINGLE_WRITE_RESPONSE_SUCCESS = 0,
+    /**
+     * Write error has occurred.
+     */
+    DLMS_SINGLE_WRITE_RESPONSE_DATA_ACCESS_ERROR = 1,
+    /**
+     * Get next block.
+     */
+    DLMS_SINGLE_WRITE_RESPONSE_BLOCK_NUMBER = 2
+} DLMS_SINGLE_WRITE_RESPONSE;
+
+/**
+ * Enumerates how data is access on read or write.
+ */
+typedef enum
+{
+    /**
+     * Read data using SN.
+     */
+    DLMS_VARIABLE_ACCESS_SPECIFICATION_VARIABLE_NAME = 2,
+    /**
+     * Get data using parameterized access.
+     */
+    DLMS_VARIABLE_ACCESS_SPECIFICATION_PARAMETERISED_ACCESS = 4,
+    /**
+     * Get next block.
+     */
+    DLMS_VARIABLE_ACCESS_SPECIFICATION_BLOCK_NUMBER_ACCESS = 5,
+    /**
+     * Read data as blocks.
+     */
+    DLMS_VARIABLE_ACCESS_SPECIFICATION_READ_DATA_BLOCK_ACCESS = 6,
+    /**
+     * Write data as blocks.
+     */
+    DLMS_VARIABLE_ACCESS_SPECIFICATION_WRITE_DATA_BLOCK_ACCESS = 7
+} DLMS_VARIABLE_ACCESS_SPECIFICATION;
 #endif //ENUMS_H

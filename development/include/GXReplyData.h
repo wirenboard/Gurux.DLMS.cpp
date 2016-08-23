@@ -50,6 +50,12 @@ private:
      * Received command.
      */
     DLMS_COMMAND m_Command;
+
+    /**
+    * Received command type.
+    */
+    unsigned char m_CommandType;
+
     /**
      * Received data.
      */
@@ -72,7 +78,7 @@ private:
     /**
      * Last read position. This is used in peek to solve how far data is read.
      */
-    int m_ReadPosition;
+    unsigned long m_ReadPosition;
 
     /**
      * Packet Length.
@@ -120,8 +126,7 @@ public:
         DLMS_DATA_REQUEST_TYPES more,
         DLMS_COMMAND cmd,
         CGXByteBuffer& buff,
-        bool complete,
-        unsigned char error);
+        bool complete);
 
     /**
      * Constructor.
@@ -138,15 +143,20 @@ public:
 
     void SetValue(CGXDLMSVariant& value);
 
-    int GetReadPosition();
+    unsigned long GetReadPosition();
 
-    void SetReadPosition(int value);
+    void SetReadPosition(unsigned long value);
 
     int GetPacketLength();
 
     void SetPacketLength(int value);
 
     void SetCommand(DLMS_COMMAND value);
+
+    void SetCommandType(unsigned char value);
+
+    unsigned char GetCommandType();
+
 
     void SetData(CGXByteBuffer& value);
 

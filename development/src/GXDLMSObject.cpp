@@ -181,17 +181,17 @@ int CGXDLMSObject::SetDataType(int index, DLMS_DATA_TYPE type)
 
 DLMS_ACCESS_MODE CGXDLMSObject::GetAccess(int index)
 {
+    //LN is read only.
+    if (index == 1)
+    {
+        return DLMS_ACCESS_MODE_READ;
+    }
     for(CGXAttributeCollection::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
     {
         if ((*it).GetIndex() == index)
         {
             return (*it).GetAccess();
         }
-    }
-    //LN is read only.
-    if (index == 1)
-    {
-        return DLMS_ACCESS_MODE_READ;
     }
     return DLMS_ACCESS_MODE_READ_WRITE;
 }
@@ -221,7 +221,7 @@ DLMS_METHOD_ACCESS_MODE CGXDLMSObject::GetMethodAccess(int index)
             return (*it).GetMethodAccess();
         }
     }
-    return DLMS_METHOD_ACCESS_MODE_NONE;
+    return DLMS_METHOD_ACCESS_MODE_ACCESS;
 }
 
 void CGXDLMSObject::SetMethodAccess(int index, DLMS_METHOD_ACCESS_MODE access)

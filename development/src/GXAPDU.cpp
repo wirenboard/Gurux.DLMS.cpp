@@ -163,7 +163,7 @@ int GetInitiateRequest(
     CGXCipher* cipher, CGXByteBuffer& data)
 {
     // Tag for xDLMS-Initiate request
-    data.SetUInt8(INITIAL_REQUEST);
+    data.SetUInt8(DLMS_COMMAND_INITIATE_REQUEST);
     // Usage field for the response allowed component.
 
     // Usage field for dedicated-key component. Not used
@@ -191,7 +191,7 @@ int GetInitiateRequest(
     {
         data.Set(settings.GetSnSettings().m_ConformanceBlock, 3);
     }
-    data.SetUInt16(settings.GetMaxReceivePDUSize());
+    data.SetUInt16(settings.GetMaxPduSize());
     return 0;
 }
 
@@ -234,7 +234,7 @@ int GenerateUserInformation(
         if ((ret = cipher->Encrypt(cipher->GetSecurity(),
                                    DLMS_COUNT_TYPE_PACKET,
                                    settings.GetCipher()->GetFrameCounter(),
-                                   0x21,
+                                   DLMS_COMMAND_GLO_INITIATE_REQUEST,
                                    cipher->GetSystemTitle(),
                                    tmp,
                                    crypted)) != 0)
@@ -291,7 +291,7 @@ int ParseUserInformation(
     {
         return ret;
     }
-    if (tag == INITIAL_RESPONSE_GLO)
+    if (tag == DLMS_COMMAND_GLO_INITIATE_RESPONSE)
     {
         data.SetPosition(data.GetPosition() - 1);
         DLMS_SECURITY security = DLMS_SECURITY_NONE;
@@ -305,7 +305,7 @@ int ParseUserInformation(
             return ret;
         }
     }
-    else if (tag == INITIAL_REQUEST_GLO)
+    else if (tag == DLMS_COMMAND_GLO_INITIATE_REQUEST)
     {
         data.SetPosition(data.GetPosition() - 1);
         // InitiateRequest
@@ -320,7 +320,7 @@ int ParseUserInformation(
             return ret;
         }
     }
-    bool response = tag == INITIAL_RESPONSE;
+    bool response = tag == DLMS_COMMAND_INITIATE_RESPONSE;
     if (response)
     {
         // Optional usage field of the negotiated quality of service
@@ -338,7 +338,7 @@ int ParseUserInformation(
             data.SetPosition(data.GetPosition() + len);
         }
     }
-    else if (tag == INITIAL_REQUEST)
+    else if (tag == DLMS_COMMAND_INITIATE_REQUEST)
     {
         // Optional usage field of the negotiated quality of service
         // component
@@ -739,7 +739,7 @@ int GetUserInformation(
     CGXByteBuffer& data)
 {
     data.Clear();
-    data.SetUInt8(INITIAL_RESPONSE); // Tag for xDLMS-Initiate
+    data.SetUInt8(DLMS_COMMAND_INITIATE_RESPONSE); // Tag for xDLMS-Initiate
     // response
     data.SetUInt8(0x01);
     data.SetUInt8(0x00); // Usage field for the response allowed component
@@ -761,7 +761,7 @@ int GetUserInformation(
         data.Set(settings.GetSnSettings().m_ConformanceBlock, 3);
 
     }
-    data.SetUInt16(settings.GetMaxReceivePDUSize());
+    data.SetUInt16(settings.GetMaxPduSize());
     // VAA Name VAA name (0x0007 for LN referencing and 0xFA00 for SN)
     if (settings.GetUseLogicalNameReferencing())
     {
@@ -778,7 +778,7 @@ int GetUserInformation(
         return cipher->Encrypt(cipher->GetSecurity(),
                                DLMS_COUNT_TYPE_PACKET,
                                settings.GetCipher()->GetFrameCounter(),
-                               0x28,
+                               DLMS_COMMAND_GLO_INITIATE_RESPONSE,
                                cipher->GetSystemTitle(),
                                tmp,
                                data);

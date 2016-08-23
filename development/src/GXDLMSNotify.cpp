@@ -86,9 +86,9 @@ CGXDLMSLimits& CGXDLMSNotify::GetLimits()
     return m_Settings.GetLimits();
 }
 
-int CGXDLMSNotify::GetMaxReceivePDUSize()
+int CGXDLMSNotify::GetMaxPduSize()
 {
-    return m_Settings.GetMaxReceivePDUSize();
+    return m_Settings.GetMaxPduSize();
 }
 
 void CGXDLMSNotify::SetMaxReceivePDUSize(int value)
@@ -170,11 +170,23 @@ int CGXDLMSNotify::AddData(
 }
 
 int CGXDLMSNotify::GenerateDataNotificationMessages(
-    struct tm* date,
+    struct tm* time,
     CGXByteBuffer& data,
     std::vector<CGXByteBuffer>& reply)
 {
-    return CGXDLMS::GetMessages(m_Settings, DLMS_COMMAND_DATA_NOTIFICATION, 0, data, date, reply);
+    int ret;
+    if (GetUseLogicalNameReferencing())
+    {
+        CGXDLMSLNParameters p(&m_Settings, DLMS_COMMAND_DATA_NOTIFICATION, 0, NULL, &data, 0xff);
+        p.SetTime(time);
+        ret = CGXDLMS::GetLnMessages(p, reply);
+    }
+    else
+    {
+        CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_DATA_NOTIFICATION, 1, 0, &data, NULL);
+        ret = CGXDLMS::GetSnMessages(p, reply);
+    }
+    return ret;
 }
 
 int CGXDLMSNotify::GenerateDataNotificationMessages(

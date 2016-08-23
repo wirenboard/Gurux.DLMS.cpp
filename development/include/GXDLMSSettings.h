@@ -259,7 +259,7 @@ public:
     void SetDLMSVersion(unsigned char value);
 
 // Maximum PDU size.
-    unsigned short GetMaxReceivePDUSize();
+    unsigned short GetMaxPduSize();
 
 // Maximum PDU size.
     int SetMaxReceivePDUSize(unsigned short value);

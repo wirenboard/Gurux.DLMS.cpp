@@ -115,10 +115,17 @@ public:
     * Accepted connection is made for the server. All initialization is done
     * here.
     */
-    void Connected();
+    void Connected(CGXDLMSConnectionEventArgs& connectionInfo);
 
+    /**
+     * Client has try to made invalid connection. Password is incorrect.
+     *
+     * @param connectionInfo
+     *            Connection information.
+     */
+    void InvalidConnection(CGXDLMSConnectionEventArgs& connectionInfo);
     /**
      * Server has close the connection. All clean up is made here.
      */
-    void Disconnected();
+    void Disconnected(CGXDLMSConnectionEventArgs& connectionInfo);
 };

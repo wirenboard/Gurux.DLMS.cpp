@@ -71,7 +71,8 @@ public:
     CGXDLMSLongTransaction(CGXDLMSValueEventCollection& targets,
                            DLMS_COMMAND command, CGXByteBuffer& data)
     {
-        m_Targets = targets;
+        m_Targets.insert(m_Targets.end(), targets.begin(), targets.end());
+        targets.clear();
         m_Command = command;
         m_Data.Set(&data, data.GetPosition());
     }

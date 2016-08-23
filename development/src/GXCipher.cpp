@@ -1042,27 +1042,32 @@ int CGXCipher::Decrypt(
     {
         return ret;
     }
-    if (!(ch == 0x21 || ch == 0x28))
+    cmd = (DLMS_COMMAND) ch;
+    switch (cmd)
     {
-        cmd = (DLMS_COMMAND) ch;
-        if (cmd == DLMS_COMMAND_GLO_GENERAL_CIPHERING)
+    case DLMS_COMMAND_GLO_GENERAL_CIPHERING:
+        if ((ret = GXHelpers::GetObjectCount(data, len)) != 0)
         {
-            if ((ret = GXHelpers::GetObjectCount(data, len)) != 0)
-            {
-                return ret;
-            }
-            systemTitle.Set(&data, 0, len);
+            return ret;
         }
-        else if (!(cmd == DLMS_COMMAND_GLO_GET_REQUEST
-                   || cmd == DLMS_COMMAND_GLO_GET_RESPONSE
-                   || cmd == DLMS_COMMAND_GLO_SET_REQUEST
-                   || cmd == DLMS_COMMAND_GLO_SET_RESPONSE
-                   || cmd == DLMS_COMMAND_GLO_METHOD_REQUEST
-                   || cmd == DLMS_COMMAND_GLO_METHOD_RESPONSE
-                   || cmd == DLMS_COMMAND_GLO_EVENT_NOTIFICATION_REQUEST))
-        {
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
+        systemTitle.Set(&data, data.GetPosition(), len);
+        break;
+    case DLMS_COMMAND_GLO_INITIATE_REQUEST:
+    case DLMS_COMMAND_GLO_INITIATE_RESPONSE:
+    case DLMS_COMMAND_GLO_READ_REQUEST:
+    case DLMS_COMMAND_GLO_READ_RESPONSE:
+    case DLMS_COMMAND_GLO_WRITE_REQUEST:
+    case DLMS_COMMAND_GLO_WRITE_RESPONSE:
+    case DLMS_COMMAND_GLO_GET_REQUEST:
+    case DLMS_COMMAND_GLO_GET_RESPONSE:
+    case DLMS_COMMAND_GLO_SET_REQUEST:
+    case DLMS_COMMAND_GLO_SET_RESPONSE:
+    case DLMS_COMMAND_GLO_METHOD_REQUEST:
+    case DLMS_COMMAND_GLO_METHOD_RESPONSE:
+    case DLMS_COMMAND_GLO_EVENT_NOTIFICATION_REQUEST:
+        break;
+    default:
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     if ((ret = GXHelpers::GetObjectCount(data, len)) != 0)
     {

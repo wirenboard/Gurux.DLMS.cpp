@@ -52,7 +52,7 @@ public:
     std::string GetConformance();
     void SetConformance(std::string value);
 
-    int GetMaxReceivePduSize();
+    int GetMaxPduSize();
     void SetMaxReceivePduSize(int value);
 
     int GetMaxSendPpuSize();

@@ -307,12 +307,15 @@ void CGXByteBuffer::Set(const void* pSource, unsigned long count)
 
 void CGXByteBuffer::Set(CGXByteBuffer* data, unsigned long index, unsigned long count)
 {
-    if (count == (unsigned long) -1)
+    if (data != NULL)
     {
-        count = data->m_Size - index;
+        if (count == 0xFFFFFFFF)
+        {
+            count = data->m_Size - index;
+        }
+        CGXByteBuffer::Set(data->m_Data + index, count);
+        data->m_Position += count;
     }
-    CGXByteBuffer::Set(data->m_Data + index, count);
-    data->m_Position += count;
 }
 
 void CGXByteBuffer::AddString(const char* value)
@@ -705,7 +708,7 @@ CGXByteBuffer& CGXByteBuffer::operator=(CGXByteBuffer& value)
     m_Size = 0;
     if (value.GetSize() != 0)
     {
-        Set(&value, 0, -1);
+        Set(&value, 0, 0xFFFFFFFF);
     }
     return *this;
 }

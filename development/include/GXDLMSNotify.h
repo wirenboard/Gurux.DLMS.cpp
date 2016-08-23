@@ -83,15 +83,6 @@ public:
                   int clientAddress,
                   int serverAddress,
                   DLMS_INTERFACE_TYPE interfaceType);
-    /*
-    : m_Settings(true)
-    {
-        m_Settings.SetUseLogicalNameReferencing(useLogicalNameReferencing);
-        m_Settings.SetClientAddress(clientAddress);
-        m_Settings.SetServerAddress(serverAddress);
-        m_Settings.SetInterfaceType(interfaceType);
-    }
-    */
 
     /**
      * @return Is General block transfer supported.
@@ -125,7 +116,7 @@ public:
      * @see GXDLMSClient#getUseLogicalNameReferencing
      * @return Maximum size of received PDU.
      */
-    int GetMaxReceivePDUSize();
+    int GetMaxPduSize();
 
     /**
      * @param value

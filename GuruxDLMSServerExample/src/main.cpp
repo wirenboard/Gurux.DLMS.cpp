@@ -39,7 +39,6 @@
 #include <time.h>
 #include <process.h>//Add support for threads
 #else //Linux includes.
-#define closesocket close
 #include <pthread.h>
 #include <termios.h>
 #include <sys/types.h>

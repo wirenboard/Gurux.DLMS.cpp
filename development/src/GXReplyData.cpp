@@ -38,13 +38,13 @@ CGXReplyData::CGXReplyData(
     DLMS_DATA_REQUEST_TYPES more,
     DLMS_COMMAND cmd,
     CGXByteBuffer& buff,
-    bool complete,
-    unsigned char error)
+    bool complete)
 {
     Clear();
     m_DataType = DLMS_DATA_TYPE_NONE;
     m_MoreData = more;
     m_Command = cmd;
+    m_CommandType = 0;
     m_Data = buff;
     m_Complete = complete;
     m_Time = NULL;
@@ -75,12 +75,12 @@ void CGXReplyData::SetValue(CGXDLMSVariant& value)
     m_DataValue = value;
 }
 
-int CGXReplyData::GetReadPosition()
+unsigned long CGXReplyData::GetReadPosition()
 {
     return m_ReadPosition;
 }
 
-void CGXReplyData::SetReadPosition(int value)
+void CGXReplyData::SetReadPosition(unsigned long value)
 {
     m_ReadPosition = value;
 }
@@ -151,6 +151,17 @@ DLMS_COMMAND CGXReplyData::GetCommand()
 {
     return m_Command;
 }
+
+void CGXReplyData::SetCommandType(unsigned char value)
+{
+    m_CommandType = value;
+}
+
+unsigned char CGXReplyData::GetCommandType()
+{
+    return m_CommandType;
+}
+
 
 CGXByteBuffer& CGXReplyData::GetData()
 {

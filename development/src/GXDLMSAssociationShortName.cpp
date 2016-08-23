@@ -244,7 +244,7 @@ int CGXDLMSAssociationShortName::GetObjects(CGXDLMSSettings& settings, CGXByteBu
             }
             settings.SetIndex(settings.GetIndex() + 1);
             //If PDU is full.
-            if (data.GetSize() >= settings.GetMaxReceivePDUSize())
+            if (data.GetSize() >= settings.GetMaxPduSize())
             {
                 break;
             }
@@ -310,7 +310,6 @@ int CGXDLMSAssociationShortName::Invoke(CGXDLMSSettings& settings, CGXDLMSValueE
             }
             e.SetValue(serverChallenge);
             settings.SetConnected(true);
-
         }
         else
         {

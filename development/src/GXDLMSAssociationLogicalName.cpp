@@ -130,7 +130,7 @@ int CGXDLMSAssociationLogicalName::GetObjects(CGXDLMSSettings& settings, CGXByte
             };
             settings.SetIndex(settings.GetIndex() + 1);
             //If PDU is full.
-            if (data.GetSize() >= settings.GetMaxReceivePDUSize())
+            if (data.GetSize() >= settings.GetMaxPduSize())
             {
                 break;
             }
@@ -494,7 +494,7 @@ int CGXDLMSAssociationLogicalName::GetValue(CGXDLMSSettings& settings, CGXDLMSVa
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(6);
         CGXDLMSVariant conformance = m_XDLMSContextInfo.GetConformance();
-        CGXDLMSVariant rx = m_XDLMSContextInfo.GetMaxReceivePduSize();
+        CGXDLMSVariant rx = m_XDLMSContextInfo.GetMaxPduSize();
         CGXDLMSVariant tx = m_XDLMSContextInfo.GetMaxSendPpuSize();
         CGXDLMSVariant version = m_XDLMSContextInfo.GetDlmsVersionNumber();
         CGXDLMSVariant quality = m_XDLMSContextInfo.GetQualityOfService();

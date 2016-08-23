@@ -40,6 +40,7 @@
 #include <time.h>
 #include <process.h>//Add support for threads
 #else //Linux includes.
+#define closesocket close
 #include <stdio.h>
 #include <pthread.h>
 #include <termios.h>
@@ -52,6 +53,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <errno.h>
+#include <netdb.h>
 #endif
 
 #include "../include/GXDLMSBase.h"
@@ -107,11 +109,10 @@ void ListenerThread(void* pVoid)
         {
             if ((ret = getpeername(socket, (sockaddr*) &add, &AddrLen)) == -1)
             {
-#if defined(_WIN32) || defined(_WIN64)//If Windows
                 closesocket(socket);
+#if defined(_WIN32) || defined(_WIN64)//If Windows
                 socket = INVALID_SOCKET;
 #else //If Linux
-                close(socket);
                 socket = -1;
 #endif
                 continue;
@@ -157,6 +158,8 @@ void ListenerThread(void* pVoid)
                     break;
                 }
                 bb.SetSize(bb.GetSize() + ret);
+                printf("-> %s\r\n", bb.ToHexString().c_str());
+
                 if (server->HandleRequest(bb, reply) != 0)
                 {
 #if defined(_WIN32) || defined(_WIN64)//If Windows
@@ -170,6 +173,7 @@ void ListenerThread(void* pVoid)
                 bb.SetSize(0);
                 if (reply.GetSize() != 0)
                 {
+                    printf("<- %s\r\n", reply.ToHexString().c_str());
                     if (send(socket, (const char*) reply.GetData(), reply.GetSize() - reply.GetPosition(), 0) == -1)
                     {
                         //If error has occured
@@ -284,10 +288,9 @@ int CGXDLMSBase::StopServer()
 int GetIpAddress(std::string& address)
 {
     int ret;
-#if defined(_WIN32) || defined(_WIN64)//If Windows 
     struct hostent *phe;
     char ac[80];
-    if ((ret = gethostname(ac, sizeof(ac))) != SOCKET_ERROR)
+    if ((ret = gethostname(ac, sizeof(ac))) == 0)
     {
         phe = gethostbyname(ac);
         if (phe == 0)
@@ -300,9 +303,6 @@ int GetIpAddress(std::string& address)
             address = inet_ntoa(*addr);
         }
     }
-#else if defined(__linux__)
-
-#endif
     return ret;
 }
 
@@ -680,21 +680,45 @@ DLMS_SOURCE_DIAGNOSTIC CGXDLMSBase::ValidateAuthentication(
     DLMS_AUTHENTICATION authentication,
     CGXByteBuffer& password)
 {
+    char EXPECTED_PASSWORD[] = "Gurux";
+    if (authentication == DLMS_AUTHENTICATION_NONE)
+    {
+        //Uncomment this if authentication is always required.
+        //return DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_MECHANISM_NAME_REQUIRED;
+    }
+    //Check Low Level security..
+    if (authentication == DLMS_AUTHENTICATION_LOW)
+    {
+        if (password.GetSize() != strlen(EXPECTED_PASSWORD) &&
+                memcmp(EXPECTED_PASSWORD, password.GetData(), strlen(EXPECTED_PASSWORD)) != 0)
+        {
+            return DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_FAILURE;
+        }
+    }
+    //High Level security is checked later.
     return DLMS_SOURCE_DIAGNOSTIC_NONE;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-void CGXDLMSBase::Connected()
+void CGXDLMSBase::Connected(
+    CGXDLMSConnectionEventArgs& connectionInfo)
 {
-    printf("Connected. PDU size: %d\r\n", m_Settings.GetMaxReceivePDUSize());
+    printf("Connected.\r\n");
 }
 
+void CGXDLMSBase::InvalidConnection(
+    CGXDLMSConnectionEventArgs& connectionInfo)
+{
+    printf("InvalidConnection.\r\n");
+
+}
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-void CGXDLMSBase::Disconnected()
+void CGXDLMSBase::Disconnected(
+    CGXDLMSConnectionEventArgs& connectionInfo)
 {
     printf("Disconnected.\r\n");
 }

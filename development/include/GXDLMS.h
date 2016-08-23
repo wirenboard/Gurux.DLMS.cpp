@@ -45,6 +45,8 @@
 #include "GXDLMSVariant.h"
 #include "GXCipher.h"
 #include "GXReplyData.h"
+#include "GXDLMSLNParameters.h"
+#include "GXDLMSSNParameters.h"
 
 class CGXDLMS
 {
@@ -105,6 +107,20 @@ private:
         CGXByteBuffer& reply,
         CGXReplyData& info);
 
+    /**
+    * Handle read response data block result.
+    *
+    * @param settings
+    *            DLMS settings.
+    * @param reply
+    *            Received reply.
+    * @param index
+    *            Starting index.
+    */
+    static int ReadResponseDataBlockResult(
+        CGXDLMSSettings& settings,
+        CGXReplyData& reply,
+        int index);
 public:
 
     /////////////////////////////////////////////////////////////////////////////
@@ -112,38 +128,31 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     static int CheckInit(CGXDLMSSettings& settings);
 
-    static int GetLNPdu(
-        CGXDLMSSettings& settings,
-        DLMS_COMMAND command,
-        unsigned char commandType,
-        CGXByteBuffer& data,
-        CGXByteBuffer& bb,
-        unsigned char status,
-        bool multipleBlocks,
-        bool lastBlock,
-        struct tm* date);
-
-    static int GetSNPdu(
-        CGXDLMSSettings& settings,
-        DLMS_COMMAND command,
-        CGXByteBuffer& data,
-        CGXByteBuffer& bb);
+    /**
+     * Get all Logical name messages. Client uses this to generate messages.
+     *
+     * @param p
+     *            LN settings.
+     * @param reply
+     *            Generated messages.
+     * @return    Status code.
+     */
+    static int GetLnMessages(
+        CGXDLMSLNParameters& p,
+        std::vector<CGXByteBuffer>& reply);
 
     /**
-    * Is multiple blocks needed for send data.
+    * Get all Short Name messages. Client uses this to generate messages.
     *
-    * @param settings
-    *            DLMS settings.
-    * @param bb
-    *            Send data.
-    * @param offset
-    *            How many bytes there are on the buffer already.
-    * @return True, if multiple blocks are needed.
+    * @param p
+    *            DLMS SN parameters.
+    * @param reply
+    *            Generated messages.
+    * @return    Status code.
     */
-    static bool MultipleBlocks(
-        CGXDLMSSettings& settings,
-        CGXByteBuffer& bb,
-        unsigned long offset);
+    static int GetSnMessages(
+        CGXDLMSSNParameters& p,
+        std::vector<CGXByteBuffer>& reply);
 
     /**
     * Handle General block transfer message.
@@ -168,6 +177,28 @@ public:
         CGXDLMSSettings& settings,
         CGXByteBuffer& data,
         CGXByteBuffer& reply);
+
+
+    /**
+    * Get next logical name PDU.
+    *
+    * @param p
+    *            LN parameters.
+    * @param reply
+    *            Generated message.
+    */
+    static int GetLNPdu(
+        CGXDLMSLNParameters& p,
+        CGXByteBuffer& reply);
+
+    /**
+    * @param p
+    * @param reply
+    */
+    static int GetSNPdu(
+        CGXDLMSSNParameters& p,
+        CGXByteBuffer& reply);
+
 
     /////////////////////////////////////////////////////////////////////////////
     // Generates an acknowledgment message, with which the server is informed to
@@ -198,17 +229,6 @@ public:
         unsigned char frame,
         CGXByteBuffer* data,
         CGXByteBuffer& reply);
-
-    /////////////////////////////////////////////////////////////////////////////
-    //Get messages.
-    /////////////////////////////////////////////////////////////////////////////
-    static int GetMessages(
-        CGXDLMSSettings& settings,
-        DLMS_COMMAND command,
-        int commandType,
-        CGXByteBuffer& data,
-        struct tm* time,
-        std::vector<CGXByteBuffer>& reply);
 
     static int GetHdlcData(
         bool server,
@@ -265,7 +285,9 @@ public:
     // data : Received data from the client.
     /////////////////////////////////////////////////////////////////////////////
     static int HandleReadResponse(
-        CGXReplyData& data);
+        CGXDLMSSettings& settings,
+        CGXReplyData& data,
+        int index);
 
     /////////////////////////////////////////////////////////////////////////////
     // Handle method response and get data from block and/or update error status.

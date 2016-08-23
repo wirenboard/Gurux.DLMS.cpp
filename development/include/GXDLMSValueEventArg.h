@@ -137,9 +137,22 @@ public:
     int GetSelector();
 
     /**
+    * @param value
+    *           Selector.
+    */
+    void SetSelector(int value);
+
+    /**
     * @return Optional parameters.
     */
     CGXDLMSVariant& GetParameters();
+
+    /**
+    * @param value
+    *           Parameters.
+    */
+    void SetParameters(CGXDLMSVariant& value);
+
 
     /**
     * Constructor.
