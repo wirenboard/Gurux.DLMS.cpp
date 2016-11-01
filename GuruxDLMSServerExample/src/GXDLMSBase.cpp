@@ -57,6 +57,9 @@
 #endif
 
 #include "../include/GXDLMSBase.h"
+
+#include "../../development/include/GXTime.h"
+#include "../../development/include/GXDate.h"
 #include "../../development/include/GXDLMSClient.h"
 #include "../../development/include/GXDLMSData.h"
 #include "../../development/include/GXDLMSRegister.h"
@@ -306,10 +309,249 @@ int GetIpAddress(std::string& address)
     return ret;
 }
 
-/// <summary>
-/// Generic initialize for all servers.
-/// </summary>
-/// <param name="server"></param>
+///////////////////////////////////////////////////////////////////////
+//Add Logical Device Name. 123456 is meter serial number.
+///////////////////////////////////////////////////////////////////////
+// COSEM Logical Device Name is defined as an octet-string of 16 octets.
+// The first three octets uniquely identify the manufacturer of the device and it corresponds
+// to the manufacturer's identification in IEC 62056-21.
+// The following 13 octets are assigned by the manufacturer.
+//The manufacturer is responsible for guaranteeing the uniqueness of these octets.
+CGXDLMSData* AddLogicalDeviceName(CGXDLMSObjectCollection& items, unsigned long sn)
+{
+    char buff[17];
+    sprintf(buff, "GRX%.13d", sn);
+    CGXDLMSVariant id;
+    id.Add((const char*) buff, 16);
+    CGXDLMSData* ldn = new CGXDLMSData("0.0.42.0.0.255", id);
+    items.push_back(ldn);
+    return ldn;
+}
+
+/*
+* Add firmware version.
+*/
+void AddFirmwareVersion(CGXDLMSObjectCollection& items)
+{
+    CGXDLMSVariant version;
+    version = "Gurux FW 0.0.1";
+    CGXDLMSData* fw = new CGXDLMSData("1.0.0.2.0.255");
+    fw->SetValue(version);
+    items.push_back(fw);
+}
+
+/*
+* Add Electricity ID 1.
+*/
+void AddElectricityID1(CGXDLMSObjectCollection& items, unsigned long sn)
+{
+    char buff[17];
+    sprintf(buff, "GRX%.13d", sn);
+    CGXDLMSVariant id;
+    id.Add((const char*) buff, 16);
+    CGXDLMSData* d = new CGXDLMSData("1.1.0.0.0.255", id);
+    d->GetAttributes().push_back(CGXDLMSAttribute(2, DLMS_DATA_TYPE_STRING));
+    items.push_back(d);
+}
+
+/*
+* Add Electricity ID 2.
+*/
+void AddElectricityID2(CGXDLMSObjectCollection& items, unsigned long sn)
+{
+    CGXDLMSVariant id2(sn);
+    CGXDLMSData* d = new CGXDLMSData("1.1.0.0.1.255", id2);
+    d->GetAttributes().push_back(CGXDLMSAttribute(2, DLMS_DATA_TYPE_UINT32));
+    items.push_back(d);
+}
+
+/*
+* Add Auto connect object.
+*/
+void AddAutoConnect(CGXDLMSObjectCollection& items)
+{
+    CGXDLMSAutoConnect* pAC = new CGXDLMSAutoConnect();
+    pAC->SetMode(AUTO_CONNECT_MODE_AUTO_DIALLING_ALLOWED_ANYTIME);
+    pAC->SetRepetitions(10);
+    pAC->SetRepetitionDelay(60);
+    //Calling is allowed between 1am to 6am.
+    pAC->GetCallingWindow().push_back(std::make_pair(CGXTime(1, 0, 0, -1), CGXTime(6, 0, 0, -1)));
+    pAC->GetDestinations().push_back("www.gurux.org");
+    items.push_back(pAC);
+}
+
+/*
+* Add Activity Calendar object.
+*/
+void AddActivityCalendar(CGXDLMSObjectCollection& items)
+{
+    CGXDLMSActivityCalendar* pActivity = new CGXDLMSActivityCalendar();
+    pActivity->SetCalendarNameActive("Active");
+    pActivity->GetSeasonProfileActive().push_back(CGXDLMSSeasonProfile("Summer time", CGXDate(-1, 3, 31), ""));
+    pActivity->GetWeekProfileTableActive().push_back(CGXDLMSWeekProfile("Monday", 1, 1, 1, 1, 1, 1, 1));
+    CGXDLMSDayProfile aDp;
+    aDp.SetDayId(1);
+    aDp.GetDaySchedules().push_back(CGXDLMSDayProfileAction(CGXDateTime::Now(), "test", 1));
+    pActivity->GetDayProfileTableActive().push_back(aDp);
+    pActivity->SetCalendarNamePassive("Passive");
+    pActivity->GetSeasonProfilePassive().push_back(CGXDLMSSeasonProfile("Winter time", CGXDate(-1, 10, 30), ""));
+    pActivity->GetWeekProfileTablePassive().push_back(CGXDLMSWeekProfile("Tuesday", 1, 1, 1, 1, 1, 1, 1));
+
+    CGXDLMSDayProfile passive;
+    passive.SetDayId(1);
+    passive.GetDaySchedules().push_back(CGXDLMSDayProfileAction(CGXDateTime::Now(), "0.0.1.0.0.255", 1));
+    pActivity->GetDayProfileTablePassive().push_back(passive);
+    CGXDateTime dt(CGXDateTime::Now());
+    pActivity->SetTime(dt);
+    items.push_back(pActivity);
+}
+
+/*
+* Add Optical Port Setup object.
+*/
+void AddOpticalPortSetup(CGXDLMSObjectCollection& items)
+{
+    CGXDLMSIECOpticalPortSetup* pOptical = new CGXDLMSIECOpticalPortSetup();
+    pOptical->SetDefaultMode(DLMS_OPTICAL_PROTOCOL_MODE_DEFAULT);
+    pOptical->SetProposedBaudrate(DLMS_BAUD_RATE_9600);
+    pOptical->SetDefaultBaudrate(DLMS_BAUD_RATE_300);
+    pOptical->SetResponseTime(DLMS_LOCAL_PORT_RESPONSE_TIME_200_MS);
+    pOptical->SetDeviceAddress("Gurux");
+    pOptical->SetPassword1("Gurux1");
+    pOptical->SetPassword2("Gurux2");
+    pOptical->SetPassword5("Gurux5");
+    items.push_back(pOptical);
+}
+
+/*
+* Add Demand Register object.
+*/
+void AddDemandRegister(CGXDLMSObjectCollection& items)
+{
+    CGXDLMSDemandRegister* pDr = new CGXDLMSDemandRegister("0.0.1.0.0.255");
+    pDr->SetCurrentAvarageValue(10);
+    pDr->SetLastAvarageValue(20);
+    pDr->SetStatus(1);
+    pDr->SetStartTimeCurrent(CGXDateTime::Now());
+    pDr->SetCaptureTime(CGXDateTime::Now());
+    pDr->SetPeriod(10);
+    pDr->SetNumberOfPeriods(1);
+    items.push_back(pDr);
+}
+
+/*
+* Add Register Monitor object.
+*/
+void AddRegisterMonitor(CGXDLMSObjectCollection& items, CGXDLMSRegister* pRegister)
+{
+    CGXDLMSRegisterMonitor* pRm = new CGXDLMSRegisterMonitor("0.0.1.0.0.255");
+    CGXDLMSVariant threshold;
+    vector<CGXDLMSVariant> thresholds;
+    threshold.Add("Gurux1", 6);
+    thresholds.push_back(threshold);
+    threshold.Clear();
+    threshold.Add("Gurux2", 6);
+    thresholds.push_back(threshold);
+    pRm->SetThresholds(thresholds);
+    CGXDLMSMonitoredValue mv;
+    mv.Update(pRegister, 2);
+    pRm->SetMonitoredValue(mv);
+    CGXDLMSActionSet action;
+    string ln;
+    pRm->GetLogicalName(ln);
+    action.GetActionDown().SetLogicalName(ln);
+    action.GetActionDown().SetScriptSelector(1);
+    pRm->GetLogicalName(ln);
+    action.GetActionUp().SetLogicalName(ln);
+    action.GetActionUp().SetScriptSelector(1);
+    vector<CGXDLMSActionSet> actions;
+    actions.push_back(action);
+    pRm->SetActions(actions);
+    items.push_back(pRm);
+}
+
+/*
+* Add action schedule object.
+*/
+void AddActionSchedule(CGXDLMSObjectCollection& items)
+{
+    CGXDLMSActionSchedule* pActionS = new CGXDLMSActionSchedule("0.0.1.0.0.255");
+    pActionS->SetExecutedScriptLogicalName("1.2.3.4.5.6");
+    pActionS->SetExecutedScriptSelector(1);
+    pActionS->SetType(DLMS_SINGLE_ACTION_SCHEDULE_TYPE1);
+    pActionS->GetExecutionTime().push_back(CGXDateTime::Now());
+    items.push_back(pActionS);
+}
+
+/*
+* Add SAP Assignment object.
+*/
+void AddSapAssignment(CGXDLMSObjectCollection& items)
+{
+    CGXDLMSSapAssignment* pSap = new CGXDLMSSapAssignment();
+    std::map<int, basic_string<char> > list;
+    list[1] = "Gurux";
+    list[16] = "Gurux-2";
+    pSap->SetSapAssignmentList(list);
+    items.push_back(pSap);
+}
+
+/**
+* Add Auto Answer object.
+*/
+void AddAutoAnswer(CGXDLMSObjectCollection& items)
+{
+    CGXDLMSAutoAnswer* pAa = new CGXDLMSAutoAnswer();
+    pAa->SetMode(AUTO_CONNECT_MODE_EMAIL_SENDING);
+    pAa->GetListeningWindow().push_back(std::pair<CGXDateTime, CGXDateTime>(CGXDateTime(-1, -1, -1, 6, -1, -1, -1), CGXDateTime(-1, -1, -1, 8, -1, -1, -1)));
+    pAa->SetStatus(AUTO_ANSWER_STATUS_INACTIVE);
+    pAa->SetNumberOfCalls(0);
+    pAa->SetNumberOfRingsInListeningWindow(1);
+    pAa->SetNumberOfRingsOutListeningWindow(2);
+    items.push_back(pAa);
+}
+
+/*
+* Add Modem Configuration object.
+*/
+void AddModemConfiguration(CGXDLMSObjectCollection& items)
+{
+    CGXDLMSModemConfiguration* pMc = new CGXDLMSModemConfiguration();
+    pMc->SetCommunicationSpeed(DLMS_BAUD_RATE_38400);
+    CGXDLMSModemInitialisation init;
+    vector<CGXDLMSModemInitialisation> initialisationStrings;
+    init.SetRequest("AT");
+    init.SetResponse("OK");
+    init.SetDelay(0);
+    initialisationStrings.push_back(init);
+    pMc->SetInitialisationStrings(initialisationStrings);
+    items.push_back(pMc);
+}
+
+/**
+* Add MAC Address Setup object.
+*/
+void AddMacAddressSetup(CGXDLMSObjectCollection& items)
+{
+    CGXDLMSMacAddressSetup* pMac = new CGXDLMSMacAddressSetup();
+    pMac->SetMacAddress("00:11:22:33:44:55:66");
+    items.push_back(pMac);
+}
+
+/**
+* Add IP4 setup object.
+*/
+CGXDLMSIp4Setup* AddIp4Setup(CGXDLMSObjectCollection& items, std::string& address)
+{
+    CGXDLMSIp4Setup* pIp4 = new CGXDLMSIp4Setup();
+    pIp4->SetIPAddress(address);
+    items.push_back(pIp4);
+    return pIp4;
+}
+
+/*
+* Generic initialize for all servers.
+*/
 int CGXDLMSBase::Init(int port)
 {
     int ret;
@@ -317,30 +559,17 @@ int CGXDLMSBase::Init(int port)
     {
         return ret;
     }
-    char buff[17];
+    //Get local IP address.
+    std::string address;
+    GetIpAddress(address);
+
     unsigned long sn = 123456;
-    ///////////////////////////////////////////////////////////////////////
-    //Add Logical Device Name. 123456 is meter serial number.
-    ///////////////////////////////////////////////////////////////////////
-    // COSEM Logical Device Name is defined as an octet-string of 16 octets.
-    // The first three octets uniquely identify the manufacturer of the device and it corresponds
-    // to the manufacturer's identification in IEC 62056-21.
-    // The following 13 octets are assigned by the manufacturer.
-    //The manufacturer is responsible for guaranteeing the uniqueness of these octets.
-    CGXDLMSVariant id2(sn);
-    sprintf(buff, "GRX%.13d", sn);
-    CGXDLMSVariant id;
-    id.Add((const char*) buff, 16);
-    CGXDLMSData* ldn = new CGXDLMSData("0.0.42.0.0.255", id);
-    GetItems().push_back(ldn);
-    // Electricity ID 1
-    CGXDLMSData* d = new CGXDLMSData("1.1.0.0.0.255", id);
-    d->GetAttributes().push_back(CGXDLMSAttribute(2, DLMS_DATA_TYPE_STRING));
-    GetItems().push_back(d);
-    // Electricity ID 2
-    d = new CGXDLMSData("1.1.0.0.1.255", id2);
-    d->GetAttributes().push_back(CGXDLMSAttribute(2, DLMS_DATA_TYPE_UINT32));
-    GetItems().push_back(d);
+    CGXDLMSData* ldn = AddLogicalDeviceName(GetItems(), sn);
+    //Add firmaware.
+    AddFirmwareVersion(GetItems());
+    AddElectricityID1(GetItems(), sn);
+    AddElectricityID2(GetItems(), sn);
+
     //Add Last avarage.
     CGXDLMSRegister* pRegister = new CGXDLMSRegister("1.1.21.25.0.255");
     //Set access right. Client can't change Device name.
@@ -376,144 +605,46 @@ int CGXDLMSBase::Init(int port)
 
     ///////////////////////////////////////////////////////////////////////
     //Add Auto connect object.
-    CGXDLMSAutoConnect* pAC = new CGXDLMSAutoConnect();
-    pAC->SetMode(AUTO_CONNECT_MODE_AUTO_DIALLING_ALLOWED_ANYTIME);
-    pAC->SetRepetitions(10);
-    pAC->SetRepetitionDelay(60);
-    //Calling is allowed between 1am to 6am.
-    pAC->GetCallingWindow().push_back(std::make_pair(CGXDateTime(-1, -1, -1, 1, 0, 0, -1), CGXDateTime(-1, -1, -1, 6, 0, 0, -1)));
-    pAC->GetDestinations().push_back("www.gurux.org");
-    GetItems().push_back(pAC);
+    AddAutoConnect(GetItems());
+
     ///////////////////////////////////////////////////////////////////////
     //Add Activity Calendar object.
-    CGXDLMSActivityCalendar* pActivity = new CGXDLMSActivityCalendar();
-    pActivity->SetCalendarNameActive("Active");
-    pActivity->GetSeasonProfileActive().push_back(CGXDLMSSeasonProfile("Summer time", CGXDateTime(-1, 3, 31, -1, -1, -1, -1), ""));
-    pActivity->GetWeekProfileTableActive().push_back(CGXDLMSWeekProfile("Monday", 1, 1, 1, 1, 1, 1, 1));
-    CGXDLMSDayProfile aDp;
-    aDp.SetDayId(1);
-    aDp.GetDaySchedules().push_back(CGXDLMSDayProfileAction(CGXDateTime::Now(), "test", 1));
-    pActivity->GetDayProfileTableActive().push_back(aDp);
-    pActivity->SetCalendarNamePassive("Passive");
-    pActivity->GetSeasonProfilePassive().push_back(CGXDLMSSeasonProfile("Winter time", CGXDateTime(-1, 10, 30, -1, -1, -1, -1), ""));
-    pActivity->GetWeekProfileTablePassive().push_back(CGXDLMSWeekProfile("Tuesday", 1, 1, 1, 1, 1, 1, 1));
-
-    CGXDLMSDayProfile passive;
-    passive.SetDayId(1);
-    passive.GetDaySchedules().push_back(CGXDLMSDayProfileAction(CGXDateTime::Now(), "0.0.1.0.0.255", 1));
-    pActivity->GetDayProfileTablePassive().push_back(passive);
-    CGXDateTime dt(CGXDateTime::Now());
-    pActivity->SetTime(dt);
-    GetItems().push_back(pActivity);
+    AddActivityCalendar(GetItems());
 
     ///////////////////////////////////////////////////////////////////////
     //Add Optical Port Setup object.
-    CGXDLMSIECOpticalPortSetup* pOptical = new CGXDLMSIECOpticalPortSetup();
-    pOptical->SetDefaultMode(DLMS_OPTICAL_PROTOCOL_MODE_DEFAULT);
-    pOptical->SetProposedBaudrate(DLMS_BAUD_RATE_9600);
-    pOptical->SetDefaultBaudrate(DLMS_BAUD_RATE_300);
-    pOptical->SetResponseTime(DLMS_LOCAL_PORT_RESPONSE_TIME_200_MS);
-    pOptical->SetDeviceAddress("Gurux");
-    pOptical->SetPassword1("Gurux1");
-    pOptical->SetPassword2("Gurux2");
-    pOptical->SetPassword5("Gurux5");
-    GetItems().push_back(pOptical);
-
+    AddOpticalPortSetup(GetItems());
     ///////////////////////////////////////////////////////////////////////
     //Add Demand Register object.
-    CGXDLMSDemandRegister* pDr = new CGXDLMSDemandRegister("0.0.1.0.0.255");
-    pDr->SetCurrentAvarageValue(10);
-    pDr->SetLastAvarageValue(20);
-    pDr->SetStatus(1);
-    pDr->SetStartTimeCurrent(CGXDateTime::Now());
-    pDr->SetCaptureTime(CGXDateTime::Now());
-    pDr->SetPeriod(10);
-    pDr->SetNumberOfPeriods(1);
-    GetItems().push_back(pDr);
+    AddDemandRegister(GetItems());
 
     ///////////////////////////////////////////////////////////////////////
     //Add Register Monitor object.
-    CGXDLMSRegisterMonitor* pRm = new CGXDLMSRegisterMonitor("0.0.1.0.0.255");
-    CGXDLMSVariant threshold;
-    vector<CGXDLMSVariant> thresholds;
-    threshold.Add("Gurux1", 6);
-    thresholds.push_back(threshold);
-    threshold.Clear();
-    threshold.Add("Gurux2", 6);
-    thresholds.push_back(threshold);
-    pRm->SetThresholds(thresholds);
-    CGXDLMSMonitoredValue mv;
-    mv.Update(pRegister, 2);
-    pRm->SetMonitoredValue(mv);
-    CGXDLMSActionSet action;
-    string ln;
-    pRm->GetLogicalName(ln);
-    action.GetActionDown().SetLogicalName(ln);
-    action.GetActionDown().SetScriptSelector(1);
-    pRm->GetLogicalName(ln);
-    action.GetActionUp().SetLogicalName(ln);
-    action.GetActionUp().SetScriptSelector(1);
-    vector<CGXDLMSActionSet> actions;
-    actions.push_back(action);
-    pRm->SetActions(actions);
-    GetItems().push_back(pRm);
+    AddRegisterMonitor(GetItems(), pRegister);
 
     ///////////////////////////////////////////////////////////////////////
     //Add action schedule object.
-    CGXDLMSActionSchedule* pActionS = new CGXDLMSActionSchedule("0.0.1.0.0.255");
-    pActionS->SetExecutedScriptLogicalName("1.2.3.4.5.6");
-    pActionS->SetExecutedScriptSelector(1);
-    pActionS->SetType(DLMS_SINGLE_ACTION_SCHEDULE_TYPE1);
-    pActionS->GetExecutionTime().push_back(CGXDateTime::Now());
-    GetItems().push_back(pActionS);
+    AddActionSchedule(GetItems());
 
     ///////////////////////////////////////////////////////////////////////
     //Add SAP Assignment object.
-    CGXDLMSSapAssignment* pSap = new CGXDLMSSapAssignment();
-    std::map<int, basic_string<char> > list;
-    list[1] = "Gurux";
-    list[16] = "Gurux-2";
-    pSap->SetSapAssignmentList(list);
-    GetItems().push_back(pSap);
+    AddSapAssignment(GetItems());
 
     ///////////////////////////////////////////////////////////////////////
     //Add Auto Answer object.
-    CGXDLMSAutoAnswer* pAa = new CGXDLMSAutoAnswer();
-    pAa->SetMode(AUTO_CONNECT_MODE_EMAIL_SENDING);
-    pAa->GetListeningWindow().push_back(std::pair<CGXDateTime, CGXDateTime>(CGXDateTime(-1, -1, -1, 6, -1, -1, -1), CGXDateTime(-1, -1, -1, 8, -1, -1, -1)));
-    pAa->SetStatus(AUTO_ANSWER_STATUS_INACTIVE);
-    pAa->SetNumberOfCalls(0);
-    pAa->SetNumberOfRingsInListeningWindow(1);
-    pAa->SetNumberOfRingsOutListeningWindow(2);
-    GetItems().push_back(pAa);
+    AddAutoAnswer(GetItems());
 
     ///////////////////////////////////////////////////////////////////////
     //Add Modem Configuration object.
-    CGXDLMSModemConfiguration* pMc = new CGXDLMSModemConfiguration();
-    pMc->SetCommunicationSpeed(DLMS_BAUD_RATE_38400);
-    CGXDLMSModemInitialisation init;
-    vector<CGXDLMSModemInitialisation> initialisationStrings;
-    init.SetRequest("AT");
-    init.SetResponse("OK");
-    init.SetDelay(0);
-    initialisationStrings.push_back(init);
-    pMc->SetInitialisationStrings(initialisationStrings);
-    GetItems().push_back(pMc);
+    AddModemConfiguration(GetItems());
 
     ///////////////////////////////////////////////////////////////////////
     //Add Mac Address Setup object.
-    CGXDLMSMacAddressSetup* pMac = new CGXDLMSMacAddressSetup();
-    pMac->SetMacAddress("00:11:22:33:44:55:66");
-    GetItems().push_back(pMac);
-
+    AddMacAddressSetup(GetItems());
     ///////////////////////////////////////////////////////////////////////
     //Add IP4 Setup object.
-    CGXDLMSIp4Setup* pIp4 = new CGXDLMSIp4Setup();
-    //Get local IP address.
-    std::string address;
-    GetIpAddress(address);
-    pIp4->SetIPAddress(address);
-    GetItems().push_back(pIp4);
+    CGXDLMSIp4Setup* pIp4 = AddIp4Setup(GetItems(), address);
+
     ///////////////////////////////////////////////////////////////////////
     //Add Push Setup object.
     CGXDLMSPushSetup* pPush = new CGXDLMSPushSetup();
@@ -525,7 +656,7 @@ int CGXDLMSBase::Init(int port)
     pPush->GetPushObjectList().push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject>(pPush, CGXDLMSCaptureObject(2, 0)));
     //Add logical device name.
     pPush->GetPushObjectList().push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject>(ldn, CGXDLMSCaptureObject(2, 0)));
-    // Add .0.0.25.1.0.255 Ch. 0 IPv4 setup IP address.
+    // Add 0.0.25.1.0.255 Ch. 0 IPv4 setup IP address.
     pPush->GetPushObjectList().push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject>(pIp4, CGXDLMSCaptureObject(3, 0)));
     ///////////////////////////////////////////////////////////////////////
     //Server must initialize after all objects are added.

@@ -104,7 +104,8 @@ CGXDLMSValueEventArg::CGXDLMSValueEventArg(
     SetIndex(index);
     m_Selector = 0;
     m_Error = DLMS_ERROR_CODE_OK;
-    m_ByteArray = 0;
+    m_ByteArray = false;
+    m_SkipMaxPduSize = false;
 }
 
 CGXDLMSValueEventArg::CGXDLMSValueEventArg(
@@ -119,7 +120,8 @@ CGXDLMSValueEventArg::CGXDLMSValueEventArg(
     m_Selector = selector;
     m_Parameters = parameters;
     m_Error = DLMS_ERROR_CODE_OK;
-    m_ByteArray = 0;
+    m_ByteArray = false;
+    m_SkipMaxPduSize = false;
 }
 
 DLMS_ERROR_CODE CGXDLMSValueEventArg::GetError()
@@ -150,4 +152,14 @@ bool CGXDLMSValueEventArg::IsByteArray()
 void CGXDLMSValueEventArg::SetByteArray(bool value)
 {
     m_ByteArray = value;
+}
+
+bool CGXDLMSValueEventArg::GetSkipMaxPduSize()
+{
+    return m_SkipMaxPduSize;
+}
+
+void CGXDLMSValueEventArg::SetSkipMaxPduSize(bool value)
+{
+    m_SkipMaxPduSize = value;
 }

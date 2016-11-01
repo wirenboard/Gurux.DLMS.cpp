@@ -50,17 +50,31 @@ private:
     CGXApplicationContextName m_ApplicationContextName;
     CGXDLMSContextType m_XDLMSContextInfo;
     CGXAuthenticationMechanismName m_AuthenticationMechanismName;
-    CGXByteBuffer m_Secret;
+    /**
+     * Secret used in Low Level Authentication.
+     */
+    CGXByteBuffer m_LlsSecret;
+    /**
+     * Secret used in High Level Authentication.
+     */
+    CGXByteBuffer m_HlsSecret;
     std::string m_SecuritySetupReference;
 
     void Init();
 
-    void UpdateAccessRights(CGXDLMSObject* pObj, CGXDLMSVariant data);
+    void UpdateAccessRights(
+        CGXDLMSObject* pObj,
+        CGXDLMSVariant data);
 
-    int GetAccessRights(CGXDLMSObject* pItem, CGXByteBuffer& data);
+    int GetAccessRights(
+        CGXDLMSObject* pItem,
+        CGXByteBuffer& data);
 
     // Returns LN Association View.
-    int GetObjects(CGXDLMSSettings& settings, CGXByteBuffer& data);
+    int GetObjects(
+        CGXDLMSSettings& settings,
+        CGXDLMSValueEventArg& e,
+        CGXByteBuffer& data);
 
 public:
     /**

@@ -1165,7 +1165,7 @@ int CGXDLMS::GetHdlcData(
     }
     else
     {
-        data.SetPacketLength(reply.GetSize());
+        data.SetPacketLength(reply.GetPosition() + 1);
     }
 
     if ((frame & HDLC_FRAME_TYPE_U_FRAME) == HDLC_FRAME_TYPE_U_FRAME)
@@ -1882,6 +1882,10 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
     // If keepalive or get next frame request.
     if ((frame & 0x1) != 0)
     {
+        if (settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC && data.GetData().GetSize() != 0)
+        {
+            reply.SetPosition(reply.GetPosition() + 3);
+        }
         return DLMS_ERROR_CODE_OK;
     }
     if ((ret = GetPdu(settings, data)) != 0)
@@ -2148,7 +2152,10 @@ int CGXDLMS::HandleReadResponse(
     {
         return ret;
     }
-    reply.SetTotalCount(cnt);
+    if (reply.GetTotalCount() == 0)
+    {
+        reply.SetTotalCount(cnt);
+    }
     DLMS_SINGLE_READ_RESPONSE type;
     CGXDLMSVariant values;
     values.vt = DLMS_DATA_TYPE_ARRAY;

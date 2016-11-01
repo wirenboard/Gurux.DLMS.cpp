@@ -32,6 +32,8 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
+#include "../include/GXDate.h"
+#include "../include/GXTime.h"
 #include "../include/GXHelpers.h"
 
 /**
@@ -136,7 +138,7 @@ int GetTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         return ret;
     }
     ms = ch;
-    CGXDateTime dt(-1, -1, -1, hour, minute, second, ms);
+    CGXTime dt(hour, minute, second, ms);
     value = dt;
     return 0;
 }
@@ -152,8 +154,9 @@ int GetTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     */
 int GetDate(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 {
-    int ret, year, month, day;
-    unsigned char ch;
+    unsigned short year;
+    int ret;
+    unsigned char ch, month, day;
     if (buff.GetSize() - buff.GetPosition() < 5)
     {
         // If there is not enough data available.
@@ -161,29 +164,30 @@ int GetDate(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         return 0;
     }
     // Get year.
-    if ((ret = buff.GetUInt8(&ch)) != 0)
+    if ((ret = buff.GetUInt16(&year)) != 0)
     {
         return ret;
     }
-    year = ch;
     // Get month
-    if ((ret = buff.GetUInt8(&ch)) != 0)
+    if ((ret = buff.GetUInt8(&month)) != 0)
     {
         return ret;
     }
-    month = ch;
     // Get day
-    if ((ret = buff.GetUInt8(&ch)) != 0)
+    if ((ret = buff.GetUInt8(&day)) != 0)
     {
         return ret;
     }
-    day = ch;
+    CGXDate dt(year, month, day);
     // Skip week day
     if ((ret = buff.GetUInt8(&ch)) != 0)
     {
         return ret;
     }
-    CGXDateTime dt(year, month, day, -1, -1, -1, -1);
+    if (ch == 0xFF)
+    {
+        dt.SetSkip((DATETIME_SKIPS)(dt.GetSkip() | DATETIME_SKIPS_DAYOFWEEK));
+    }
     value = dt;
     return 0;
 }
@@ -220,14 +224,14 @@ static time_t GetUtcTime(struct tm * timeptr)
 }
 
 /**
-    * Get date and time from DLMS data.
-    *
-    * buff
-    *            Received DLMS data.
-    * info
-    *            Data info.
-    * Returns  Parsed date and time.
-    */
+* Get date and time from DLMS data.
+*
+* buff
+*            Received DLMS data.
+* info
+*            Data info.
+* Returns  Parsed date and time.
+*/
 int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 {
     struct tm tm = {0};
@@ -375,15 +379,6 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         tm = *localtime(&t);
 #endif
     }
-    // If summer time and it is not set on our environment.
-    if (tm.tm_isdst == 0 && (status & DLMS_CLOCK_STATUS_DAYLIGHT_SAVE_ACTIVE) != 0)
-    {
-        tm.tm_hour += 1;
-        if (mktime(&tm) == -1)
-        {
-            assert(0);
-        }
-    }
     dt.SetValue(tm);
     dt.SetDeviation(deviation);
     dt.SetSkip(skip);
@@ -392,30 +387,24 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 }
 
 /**
-    * Get double value from DLMS data.
-    *
-    * buff
-    *            Received DLMS data.
-    * info
-    *            Data info.
-    * Returns  Parsed double value.
-    */
+* Get double value from DLMS data.
+*
+* buff
+*            Received DLMS data.
+* info
+*            Data info.
+* Returns  Parsed double value.
+*/
 int GetDouble(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 {
-    int ret;
-    double val;
     // If there is not enough data available.
     if (buff.GetSize() - buff.GetPosition() < 8)
     {
         info.SetCompleate(false);
         return 0;
     }
-    if ((ret = buff.GetDouble(&val)) != 0)
-    {
-        return ret;
-    }
-    value = val;
-    return 0;
+    value.vt = DLMS_DATA_TYPE_FLOAT64;
+    return buff.GetDouble(&value.dblVal);
 }
 
 /**
@@ -435,6 +424,7 @@ int GetFloat(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         info.SetCompleate(false);
         return 0;
     }
+    value.vt = DLMS_DATA_TYPE_FLOAT32;
     return buff.GetFloat(&value.fltVal);
 }
 
@@ -639,40 +629,15 @@ int GetInt8(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 */
 int GetBcd(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMSVariant& value)
 {
-    const char hexArray[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
-    int ret;
-    unsigned long len = 0;
     unsigned char ch;
-    if (knownType)
+    // If there is not enough data available.
+    if (buff.GetUInt8(&ch) != 0)
     {
-        len = buff.GetSize();
+        info.SetCompleate(false);
+        return 0;
     }
-    else
-    {
-        if ((ret = GXHelpers::GetObjectCount(buff, len)) != 0)
-        {
-            return ret;
-        }
-        // If there is not enough data available.
-        if ((buff.GetSize() - buff.GetPosition()) < len)
-        {
-            info.SetCompleate(false);
-            return 0;
-        }
-    }
-    CGXByteBuffer bcd(len * 2);
-    for (unsigned long a = 0; a != len; ++a)
-    {
-        if ((ret = buff.GetUInt8(&ch)) != 0)
-        {
-            return ret;
-        }
-        int idHigh = ch >> 4;
-        int idLow = ch & 0x0F;
-        bcd.SetUInt8(hexArray[idHigh]);
-        bcd.SetUInt8(hexArray[idLow]);
-    }
-    value = bcd.ToString();
+    value = ch;
+    value.vt = DLMS_DATA_TYPE_BINARY_CODED_DESIMAL;
     return 0;
 }
 
@@ -1088,15 +1053,16 @@ static int GetBitString(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& 
     }
 
     CGXByteBuffer bb;
-    while (cnt > 0)
+    while (byteCnt > 0)
     {
         if ((ret = buff.GetUInt8(&ch)) != 0)
         {
             return ret;
         }
         ToBitString(bb, ch, cnt);
-        cnt -= 8;
+        --byteCnt;
     }
+    value.vt = DLMS_DATA_TYPE_BIT_STRING;
     value = bb.ToString();
     return 0;
 }
@@ -1253,8 +1219,6 @@ static int SetTime(CGXByteBuffer& buff, CGXDLMSVariant& value)
 {
     DATETIME_SKIPS skip = value.dateTime.GetSkip();
     struct tm dt = value.dateTime.GetValue();
-    // Add size
-    buff.SetUInt8(4);
     // Add time.
     if ((skip & DATETIME_SKIPS_HOUR) != 0)
     {
@@ -1280,25 +1244,30 @@ static int SetTime(CGXByteBuffer& buff, CGXDLMSVariant& value)
     {
         buff.SetUInt8(dt.tm_sec);
     }
-    // Hundredths of second is not used.
-    buff.SetUInt8(0xFF);
+    if ((skip & DATETIME_SKIPS_MS) != 0)
+    {
+        // Hundredths of second is not used.
+        buff.SetUInt8(0xFF);
+    }
+    else
+    {
+        buff.SetUInt8(0);
+    }
     return 0;
 }
 
 /**
-    * Convert date to DLMS bytes.
-    *
-    * buff
-    *            Byte buffer where data is write.
-    * value
-    *            Added value.
-    */
+* Convert date to DLMS bytes.
+*
+* buff
+*            Byte buffer where data is write.
+* value
+*            Added value.
+*/
 static int SetDate(CGXByteBuffer& buff, CGXDLMSVariant& value)
 {
     struct tm dt = value.dateTime.GetValue();
     DATETIME_SKIPS skip = value.dateTime.GetSkip();
-    // Add size
-    buff.SetUInt8(5);
     // Add year.
     if ((skip & DATETIME_SKIPS_YEAR) != 0)
     {
@@ -1306,7 +1275,7 @@ static int SetDate(CGXByteBuffer& buff, CGXDLMSVariant& value)
     }
     else
     {
-        buff.SetUInt16(dt.tm_year);
+        buff.SetUInt16(1900 + dt.tm_year);
     }
     // Add month
     if (value.dateTime.GetDaylightSavingsBegin())
@@ -1334,23 +1303,34 @@ static int SetDate(CGXByteBuffer& buff, CGXDLMSVariant& value)
     {
         buff.SetUInt8(dt.tm_mday);
     }
-    // Week day is not spesified.
-    buff.SetUInt8(0xFF);
+    //Add week day
+    if ((skip & DATETIME_SKIPS_DAYOFWEEK) != 0)
+    {
+        buff.SetUInt8(0xFF);
+    }
+    else
+    {
+        int val = dt.tm_wday;
+        //If Sunday.
+        if (val == 0)
+        {
+            val = 8;
+        }
+        buff.SetUInt8(val - 1);
+    }
     return 0;
 }
 
 /**
-    * Convert date time to DLMS bytes.
-    *
-    * buff
-    *            Byte buffer where data is write.
-    * value
-    *            Added value.
-    */
+* Convert date time to DLMS bytes.
+*
+* buff
+*            Byte buffer where data is write.
+* value
+*            Added value.
+*/
 static int SetDateTime(CGXByteBuffer& buff, CGXDLMSVariant& value)
 {
-    // Add size
-    buff.SetUInt8(12);
     //Add year.
     unsigned short year = 0xFFFF;
     struct tm dt = value.dateTime.GetValue();
@@ -1359,12 +1339,6 @@ static int SetDateTime(CGXByteBuffer& buff, CGXDLMSVariant& value)
     {
         year = 1900 + dt.tm_year;
     }
-    //If sumer time
-    if (dt.tm_isdst != 0)
-    {
-        dt.tm_hour -= 1;
-    }
-
     buff.SetUInt16(year);
     //Add month
     if (value.dateTime.GetDaylightSavingsBegin())
@@ -1393,7 +1367,20 @@ static int SetDateTime(CGXByteBuffer& buff, CGXDLMSVariant& value)
         buff.SetUInt8(0xFF);
     }
     //Add week day
-    buff.SetUInt8(0xFF);
+    if ((skip & DATETIME_SKIPS_DAYOFWEEK) != 0)
+    {
+        buff.SetUInt8(0xFF);
+    }
+    else
+    {
+        int val = dt.tm_wday;
+        //If Sunday.
+        if (val == 0)
+        {
+            val = 8;
+        }
+        buff.SetUInt8(val - 1);
+    }
     //Add Hours
     if (dt.tm_hour != -1 && (skip & DATETIME_SKIPS_HOUR) == 0)
     {
@@ -1422,7 +1409,15 @@ static int SetDateTime(CGXByteBuffer& buff, CGXDLMSVariant& value)
         buff.SetUInt8(0xFF);
     }
     //Add ms.
-    buff.SetUInt8(0xFF);
+    if ((skip & DATETIME_SKIPS_MS) != 0)
+    {
+        // Hundredths of second is not used.
+        buff.SetUInt8(0xFF);
+    }
+    else
+    {
+        buff.SetUInt8(0);
+    }
     // devitation not used.
     if ((skip & DATETIME_SKIPS_DEVITATION) != 0)
     {
@@ -1468,28 +1463,8 @@ static unsigned char GetBCD(char ch)
 */
 static int SetBcd(CGXByteBuffer& buff, CGXDLMSVariant& value)
 {
-    int ch1, ch2;
-    if (value.vt != DLMS_DATA_TYPE_STRING)
-    {
-        //BCD value must give as std::string.
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
-    std::string str = value.strVal;
-    int len = str.length();
-    if (len % 2 != 0)
-    {
-        str = "0" + str;
-        ++len;
-    }
-    len /= 2;
-    buff.SetUInt8(len);
-    const char *tmp = str.c_str();
-    for (int pos = 0; pos != len; ++pos)
-    {
-        ch1 = GetBCD(tmp[pos]);
-        ch2 = GetBCD(tmp[pos + 1]);
-        buff.SetUInt8(ch1 << 4 | ch2);
-    }
+    // Standard supports only size of byte.
+    buff.SetUInt8(value.bVal);
     return 0;
 }
 
@@ -1703,18 +1678,8 @@ static int SetBitString(CGXByteBuffer& buff, CGXDLMSVariant& value)
 
 int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant& value)
 {
-    if (type == DLMS_DATA_TYPE_OCTET_STRING
-            && (value.vt == DLMS_DATA_TYPE_DATETIME || value.vt == DLMS_DATA_TYPE_DATE))
-    {
-        type = DLMS_DATA_TYPE_DATETIME;
-    }
-    if (type == DLMS_DATA_TYPE_DATETIME || type == DLMS_DATA_TYPE_DATE ||
-            type == DLMS_DATA_TYPE_TIME)
-    {
-        buff.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
-    }
-    else if ((type == DLMS_DATA_TYPE_ARRAY || type == DLMS_DATA_TYPE_STRUCTURE)
-             && value.vt == DLMS_DATA_TYPE_OCTET_STRING)
+    if ((type == DLMS_DATA_TYPE_ARRAY || type == DLMS_DATA_TYPE_STRUCTURE)
+            && value.vt == DLMS_DATA_TYPE_OCTET_STRING)
     {
         // If byte array is added do not add type.
         buff.Set(value.byteArr, value.size);
@@ -1771,7 +1736,28 @@ int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant&
     }
     else if (type == DLMS_DATA_TYPE_OCTET_STRING)
     {
-        return SetOctetString(buff, value);
+        if (value.vt == DLMS_DATA_TYPE_DATE)
+        {
+            // Add size
+            buff.SetUInt8(5);
+            SetDate(buff, value);
+        }
+        else if (value.vt == DLMS_DATA_TYPE_TIME)
+        {
+            // Add size
+            buff.SetUInt8(4);
+            SetTime(buff, value);
+        }
+        else if (value.vt == DLMS_DATA_TYPE_DATETIME)
+        {
+            // Date an calendar are always written as date time.
+            buff.SetUInt8(12);
+            SetDateTime(buff, value);
+        }
+        else
+        {
+            return SetOctetString(buff, value);
+        }
     }
     else if (type == DLMS_DATA_TYPE_ARRAY || type == DLMS_DATA_TYPE_STRUCTURE)
     {

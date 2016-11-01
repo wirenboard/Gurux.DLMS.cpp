@@ -83,6 +83,11 @@ private:
     */
     bool m_ByteArray;
 
+    /**
+    * Is value max PDU size skipped.
+    */
+    bool m_SkipMaxPduSize;
+
 public:
     /**
     * @return Target DLMS object.
@@ -216,5 +221,16 @@ public:
     *            Is byte array.
     */
     void SetByteArray(bool value);
+
+    /**
+    * @return Is value max PDU size skipped.
+    */
+    bool GetSkipMaxPduSize();
+
+    /**
+     * @param value
+     *            Is value max PDU size skipped.
+     */
+    void SetSkipMaxPduSize(bool value);
 };
 #endif //GXDLMSVALUEEVENTARGS_H

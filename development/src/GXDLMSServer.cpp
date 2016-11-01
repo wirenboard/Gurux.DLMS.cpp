@@ -502,7 +502,10 @@ int ReportError(CGXDLMSSettings& settings, DLMS_COMMAND command, DLMS_ERROR_CODE
     return ret;
 }
 
-int CGXDLMSServer::HandleSetRequest(CGXByteBuffer& data, short type, CGXDLMSLNParameters& p)
+int CGXDLMSServer::HandleSetRequest(
+    CGXByteBuffer& data,
+    short type,
+    CGXDLMSLNParameters& p)
 {
     CGXDataInfo i;
     CGXDLMSVariant value;
@@ -909,7 +912,13 @@ int CGXDLMSServer::GetRequestNextDataBlock(CGXByteBuffer& data)
                     for (std::vector<CGXDLMSValueEventArg*>::iterator arg = m_Transaction->GetTargets().begin();
                             arg != m_Transaction->GetTargets().end(); ++arg)
                     {
-                        if (!(*arg)->GetHandled())
+                        if ((*arg)->GetHandled())
+                        {
+                            std::vector<CGXDLMSValueEventArg*> arr;
+                            arr.push_back(*arg);
+                            Read(arr);
+                        }
+                        else
                         {
                             if ((ret = (*arg)->GetTarget()->GetValue(m_Settings, *(*arg))) != 0)
                             {
@@ -920,6 +929,7 @@ int CGXDLMSServer::GetRequestNextDataBlock(CGXByteBuffer& data)
                         // Add data.
                         CGXDLMS::AppendData((*arg)->GetTarget(), (*arg)->GetIndex(), bb, value);
                     }
+                    moreData = m_Settings.GetIndex() != m_Settings.GetCount();
                 }
             }
             p.SetMultipleBlocks(true);
@@ -1035,7 +1045,6 @@ int CGXDLMSServer::GetRequestWithList(CGXByteBuffer& data)
     return CGXDLMS::GetLNPdu(p, m_ReplyData);
 }
 
-
 int CGXDLMSServer::HandleGetRequest(
     CGXByteBuffer& data)
 {
@@ -1131,7 +1140,7 @@ int CGXDLMSServer::FindSNObject(int sn, CGXSNInfo& i)
 }
 
 /**
-* Get data for Read DLMS_COMMAND_
+* Get data for Read command.
 *
 * @param settings
 *            DLMS settings.
@@ -1273,9 +1282,9 @@ int CGXDLMSServer::HandleReadBlockNumberAccess(
     {
         return ret;
     }
-    CGXByteBuffer bb;
     if (blockNumber != m_Settings.GetBlockIndex())
     {
+        CGXByteBuffer bb;
         bb.SetUInt8(DLMS_ERROR_CODE_DATA_BLOCK_NUMBER_INVALID);
         CGXDLMSSNParameters p(&m_Settings,
                               DLMS_COMMAND_READ_RESPONSE, 1,
@@ -1319,7 +1328,7 @@ int CGXDLMSServer::HandleReadBlockNumberAccess(
     m_Settings.IncreaseBlockIndex();
     CGXByteBuffer& tmp = m_Transaction->GetData();
     CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_READ_RESPONSE, 1,
-                          DLMS_SINGLE_READ_RESPONSE_DATA_BLOCK_RESULT, &bb, &tmp);
+                          DLMS_SINGLE_READ_RESPONSE_DATA_BLOCK_RESULT, NULL, &tmp);
     p.SetMultipleBlocks(true);
     ret = CGXDLMS::GetSNPdu(p, m_ReplyData);
     // If all data is sent.
@@ -1342,7 +1351,6 @@ int CGXDLMSServer::HandleReadDataBlockAccess(
     int cnt)
 {
     int ret;
-    CGXByteBuffer bb;
     unsigned long size;
     unsigned short blockNumber;
     unsigned char isLast, ch;
@@ -1357,6 +1365,7 @@ int CGXDLMSServer::HandleReadDataBlockAccess(
     }
     if (blockNumber != m_Settings.GetBlockIndex())
     {
+        CGXByteBuffer bb;
         bb.SetUInt8(DLMS_ERROR_CODE_DATA_BLOCK_NUMBER_INVALID);
         CGXDLMSSNParameters p(&m_Settings, command, 1, DLMS_SINGLE_READ_RESPONSE_DATA_ACCESS_ERROR, &bb, NULL);
         ret = CGXDLMS::GetSNPdu(p, m_ReplyData);
@@ -1379,6 +1388,7 @@ int CGXDLMSServer::HandleReadDataBlockAccess(
     unsigned long realSize = data.GetSize() - data.GetPosition();
     if (count != 1 || type != DLMS_DATA_TYPE_OCTET_STRING || size != realSize)
     {
+        CGXByteBuffer bb;
         bb.SetUInt8(DLMS_ERROR_CODE_BLOCK_UNAVAILABLE);
         CGXDLMSSNParameters p(&m_Settings, command, cnt,
                               DLMS_SINGLE_READ_RESPONSE_DATA_ACCESS_ERROR, &bb, NULL);
@@ -1397,6 +1407,7 @@ int CGXDLMSServer::HandleReadDataBlockAccess(
     }
     if (!isLast)
     {
+        CGXByteBuffer bb;
         bb.SetUInt16(blockNumber);
         m_Settings.IncreaseBlockIndex();
         if (command == DLMS_COMMAND_READ_RESPONSE)
@@ -1446,7 +1457,7 @@ int CGXDLMSServer::ReturnSNError(DLMS_COMMAND cmd, DLMS_ERROR_CODE error)
 
 int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
 {
-    CGXByteBuffer attributeDescriptor, bb;
+    CGXByteBuffer bb;
     int ret;
     unsigned char ch;
     unsigned long cnt = 0xFF;
@@ -1509,7 +1520,7 @@ int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
     DLMS_SINGLE_READ_RESPONSE requestType;
     ret = GetReadData(m_Settings, list, bb, requestType);
     CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_READ_RESPONSE, cnt,
-                          requestType, &attributeDescriptor, &bb);
+                          requestType, NULL, &bb);
     CGXDLMS::GetSNPdu(p, m_ReplyData);
     if (m_Transaction == NULL && (bb.GetSize() != bb.GetPosition()
                                   || m_Settings.GetCount() != m_Settings.GetIndex()))

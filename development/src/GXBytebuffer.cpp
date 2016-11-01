@@ -231,10 +231,10 @@ void CGXByteBuffer::SetFloat(float value)
         m_Capacity += VECTOR_CAPACITY;
         m_Data = (unsigned char*) realloc(m_Data, m_Capacity);
     }
-    m_Data[m_Size + 4] = tmp.b[3];
-    m_Data[m_Size + 5] = tmp.b[2];
-    m_Data[m_Size + 6] = tmp.b[1];
-    m_Data[m_Size + 7] = tmp.b[0];
+    m_Data[m_Size] = tmp.b[0];
+    m_Data[m_Size + 1] = tmp.b[1];
+    m_Data[m_Size + 2] = tmp.b[2];
+    m_Data[m_Size + 3] = tmp.b[3];
     m_Size += 4;
 }
 
@@ -253,14 +253,14 @@ void CGXByteBuffer::SetDouble(double value)
         m_Capacity += VECTOR_CAPACITY;
         m_Data = (unsigned char*) realloc(m_Data, m_Capacity);
     }
-    m_Data[m_Size] = tmp.b[7];
-    m_Data[m_Size + 1] = tmp.b[6];
-    m_Data[m_Size + 2] = tmp.b[5];
-    m_Data[m_Size + 3] = tmp.b[4];
-    m_Data[m_Size + 4] = tmp.b[3];
-    m_Data[m_Size + 5] = tmp.b[2];
-    m_Data[m_Size + 6] = tmp.b[1];
-    m_Data[m_Size + 7] = tmp.b[0];
+    m_Data[m_Size] = tmp.b[0];
+    m_Data[m_Size + 1] = tmp.b[1];
+    m_Data[m_Size + 2] = tmp.b[2];
+    m_Data[m_Size + 3] = tmp.b[3];
+    m_Data[m_Size + 4] = tmp.b[4];
+    m_Data[m_Size + 5] = tmp.b[5];
+    m_Data[m_Size + 6] = tmp.b[6];
+    m_Data[m_Size + 7] = tmp.b[7];
     m_Size += 8;
 }
 
@@ -519,37 +519,47 @@ int CGXByteBuffer::GetUInt128(unsigned long index, unsigned char* value)
 
 int CGXByteBuffer::GetFloat(float* value)
 {
-    if (m_Position + 8 > m_Size)
+    if (m_Position + 4 > m_Size)
     {
         return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
-    *value = (float) ((unsigned long long)m_Data[m_Position] << 56 |
-                      (unsigned long long)m_Data[m_Position + 1] << 48 |
-                      (unsigned long long)m_Data[m_Position + 2] << 40 |
-                      (unsigned long long)m_Data[m_Position + 3] << 32 |
-                      m_Data[m_Position + 4] << 24 |
-                      m_Data[m_Position + 5] << 16 |
-                      m_Data[m_Position + 6] << 8 |
-                      m_Data[m_Position + 7]);
-    m_Position += 8;
+    typedef union
+    {
+        float value;
+        char b[sizeof(float)];
+    } HELPER;
+    HELPER tmp;
+    tmp.b[0] = m_Data[m_Position];
+    tmp.b[1] = m_Data[m_Position + 1];
+    tmp.b[2] = m_Data[m_Position + 2];
+    tmp.b[3] = m_Data[m_Position + 3];
+    *value = tmp.value;
+    m_Position += 4;
     return 0;
 }
 
 int CGXByteBuffer::GetDouble(double* value)
 {
-    if (m_Position + 16 > m_Size)
+    if (m_Position + 8 > m_Size)
     {
         return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
-    *value = (double)((unsigned long long)m_Data[m_Position] << 56 |
-                      (unsigned long long)m_Data[m_Position + 1] << 48 |
-                      (unsigned long long)m_Data[m_Position + 2] << 40 |
-                      (unsigned long long)m_Data[m_Position + 3] << 32 |
-                      m_Data[m_Position + 4] << 24 |
-                      m_Data[m_Position + 5] << 16 |
-                      m_Data[m_Position + 6] << 8 |
-                      m_Data[m_Position + 7]);
-    m_Position += 16;
+    typedef union
+    {
+        double value;
+        char b[sizeof(double)];
+    } HELPER;
+    HELPER tmp;
+    tmp.b[0] = m_Data[m_Position];
+    tmp.b[1] = m_Data[m_Position + 1];
+    tmp.b[2] = m_Data[m_Position + 2];
+    tmp.b[3] = m_Data[m_Position + 3];
+    tmp.b[4] = m_Data[m_Position + 4];
+    tmp.b[5] = m_Data[m_Position + 5];
+    tmp.b[6] = m_Data[m_Position + 6];
+    tmp.b[7] = m_Data[m_Position + 7];
+    *value = tmp.value;
+    m_Position += 8;
     return 0;
 }
 

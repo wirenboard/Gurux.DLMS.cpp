@@ -42,7 +42,8 @@ class CGXDLMSAssociationShortName : public CGXDLMSObject
     CGXDLMSVariant m_AccessRightsList;
     CGXDLMSObjectCollection m_ObjectList;
     std::string m_SecuritySetupReference;
-    CGXByteBuffer m_Secret;
+    CGXByteBuffer m_LlsSecret;
+    CGXByteBuffer m_HlsSecret;
 
     int GetAccessRights(CGXDLMSObject* pObj, CGXByteBuffer& data);
     void UpdateAccessRights(CGXDLMSVariant& buff);
@@ -76,9 +77,11 @@ public:
     }
 
     //Get attribute values of object.
-    void GetValues(std::vector<std::string>& values);
+    void GetValues(
+        std::vector<std::string>& values);
 
-    void GetAttributeIndexToRead(std::vector<int>& attributes);
+    void GetAttributeIndexToRead(
+        std::vector<int>& attributes);
 
     // Returns amount of attributes.
     int GetAttributeCount();
@@ -86,15 +89,26 @@ public:
     // Returns amount of methods.
     int GetMethodCount();
 
-    int GetDataType(int index, DLMS_DATA_TYPE& type);
+    int GetDataType(
+        int index,
+        DLMS_DATA_TYPE& type);
 
     // Returns SN Association View.
-    int GetObjects(CGXDLMSSettings& settings, CGXByteBuffer& data);
+    int GetObjects(
+        CGXDLMSSettings& settings,
+        CGXDLMSValueEventArg& e,
+        CGXByteBuffer& data);
 
-    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+    int Invoke(
+        CGXDLMSSettings& settings,
+        CGXDLMSValueEventArg& e);
 
-    int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+    int GetValue(
+        CGXDLMSSettings& settings,
+        CGXDLMSValueEventArg& e);
 
-    int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+    int SetValue(
+        CGXDLMSSettings& settings,
+        CGXDLMSValueEventArg& e);
 };
 #endif //GXDLMSASSOCIATIONSHORTNAME_H

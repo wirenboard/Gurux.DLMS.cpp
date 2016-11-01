@@ -35,6 +35,8 @@
 #ifndef GXDLMSVARIANT_H
 #define GXDLMSVARIANT_H
 
+#include "GXDate.h"
+#include "GXTime.h"
 #include "GXDateTime.h"
 #include "GXBytebuffer.h"
 
@@ -99,6 +101,8 @@ public:
     CGXDLMSVariant(long value);
     CGXDLMSVariant(struct tm value);
     CGXDLMSVariant(unsigned char* value, int count);
+    CGXDLMSVariant(CGXDate& value);
+    CGXDLMSVariant(CGXTime& value);
     CGXDLMSVariant(CGXDateTime& value);
     CGXDLMSVariant(CGXDLMSVariant* value);
     CGXDLMSVariant(unsigned char* pValue, int count, DLMS_DATA_TYPE type);
@@ -132,6 +136,8 @@ public:
     CGXDLMSVariant& operator=(unsigned int value);
     CGXDLMSVariant& operator=(unsigned long value);
     CGXDLMSVariant& operator=(struct tm value);
+    CGXDLMSVariant& operator=(CGXDate& value);
+    CGXDLMSVariant& operator=(CGXTime& value);
     CGXDLMSVariant& operator=(CGXDateTime& value);
     void Add(const unsigned char*, int count);
     void Add(const char*, int count);
