@@ -218,3 +218,7 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 *.a
+*.db
+GuruxDLMSServerExample/VS/GuruxDLMSServerExample.VC.db
+GuruxDLMSServerExample/VS/GuruxDLMSServerExample.VC.db
+GuruxDLMSServerExample/VS/GuruxDLMSServerExample.VC.VC.opendb
