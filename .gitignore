@@ -222,3 +222,4 @@ pip-log.txt
 GuruxDLMSServerExample/VS/GuruxDLMSServerExample.VC.db
 GuruxDLMSServerExample/VS/GuruxDLMSServerExample.VC.db
 GuruxDLMSServerExample/VS/GuruxDLMSServerExample.VC.VC.opendb
+*.opendb

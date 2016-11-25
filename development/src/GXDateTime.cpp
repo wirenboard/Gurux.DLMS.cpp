@@ -43,7 +43,7 @@
 // Constructor.
 CGXDateTime::CGXDateTime()
 {
-    m_Deviation = (short) 0x8000;
+    m_Deviation = (short)0x8000;
     m_Skip = DATETIME_SKIPS_NONE;
     memset(&m_Value, 0xFF, sizeof(m_Value));
     m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
@@ -53,7 +53,7 @@ CGXDateTime::CGXDateTime()
 // Constructor.
 CGXDateTime::CGXDateTime(struct tm value)
 {
-    m_Deviation =  (short)  0x8000;
+    m_Deviation = (short)0x8000;
     m_Value = value;
     m_Skip = DATETIME_SKIPS_NONE;
     m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
@@ -125,7 +125,7 @@ void CGXDateTime::Init(int year, int month, int day, int hour, int minute, int s
         skip |= DATETIME_SKIPS_MS;
         millisecond = 0;
     }
-    m_Skip = (DATETIME_SKIPS) skip;
+    m_Skip = (DATETIME_SKIPS)skip;
     if (year != 0)
     {
         m_Value.tm_year = year - 1900;
@@ -146,20 +146,20 @@ struct tm& CGXDateTime::GetValue()
 
 unsigned char CGXDateTime::DaysInMonth(int year, short month)
 {
-    if(month == 0 || month == 2 || month == 4 ||
-            month == 6 || month == 7 || month == 9 || month == 11)
+    if (month == 0 || month == 2 || month == 4 ||
+        month == 6 || month == 7 || month == 9 || month == 11)
     {
         return 31;
     }
-    else if(month == 3 || month == 5 || month == 8 || month == 10)
+    else if (month == 3 || month == 5 || month == 8 || month == 10)
     {
         return 30;
     }
-    if(year % 4 == 0)
+    if (year % 4 == 0)
     {
-        if(year % 100 == 0)
+        if (year % 100 == 0)
         {
-            if(year % 400 == 0)
+            if (year % 400 == 0)
             {
                 return 29;
             }
@@ -234,12 +234,12 @@ typedef enum
 int GetDateFormat(GXDLMS_DATE_FORMAT& format, char& separator)
 {
     int ret = 0, value, lastPos = 0, pos;
-    char buff[10];
-    struct tm order = {0};
+    char buff[11];
+    struct tm order = { 0 };
     order.tm_year = 0;
     order.tm_mday = 1;
     order.tm_mon = 1;//Month is zero based.
-    ret = strftime(buff, 10, "%x", &order);
+    ret = strftime(buff, 11, "%x", &order);
     if (ret > 0)
     {
         for (pos = 0; pos != ret; ++pos)
@@ -290,7 +290,7 @@ std::string CGXDateTime::ToString()
         if ((m_Skip & (DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY)) != (DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY))
         {
             ret = GetDateFormat(format, separator);
-            switch(format)
+            switch (format)
             {
             case GXDLMS_DATE_FORMAT_DMY:
             {
@@ -304,7 +304,7 @@ std::string CGXDateTime::ToString()
                     {
                         ba.SetUInt8(separator);
                     }
-                    ba.AddIntAsString(1+ m_Value.tm_mon);
+                    ba.AddIntAsString(1 + m_Value.tm_mon);
                 }
                 if (m_Value.tm_year != -1 && (m_Skip & DATETIME_SKIPS_YEAR) == 0)
                 {
