@@ -725,7 +725,7 @@ int UpdateAuthentication(
     {
         return ret;
     }
-    if (ch < 0 || ch > 5)
+    if (ch > 5)
     {
         return DLMS_ERROR_CODE_INVALID_TAG;
     }
