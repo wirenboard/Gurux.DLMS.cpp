@@ -86,8 +86,8 @@ using namespace std;
 void ListenerThread(void* pVoid)
 {
     CGXByteBuffer reply;
-    CGXDLMSBase* server = (CGXDLMSBase*) pVoid;
-    sockaddr_in add = {0};
+    CGXDLMSBase* server = (CGXDLMSBase*)pVoid;
+    sockaddr_in add = { 0 };
     int ret;
     char tmp[10];
     CGXByteBuffer bb;
@@ -100,17 +100,17 @@ void ListenerThread(void* pVoid)
     socklen_t AddrLen = sizeof(add);
 #endif
     struct sockaddr_in client;
-    memset(&client,0,sizeof(client));
+    memset(&client, 0, sizeof(client));
     //Get buffer data
     basic_string<char> senderInfo;
-    while(server->IsConnected())
+    while (server->IsConnected())
     {
         len = sizeof(client);
         senderInfo.clear();
-        int socket = accept(server->GetSocket(),(struct sockaddr*)&client, &len);
+        int socket = accept(server->GetSocket(), (struct sockaddr*)&client, &len);
         if (server->IsConnected())
         {
-            if ((ret = getpeername(socket, (sockaddr*) &add, &AddrLen)) == -1)
+            if ((ret = getpeername(socket, (sockaddr*)&add, &AddrLen)) == -1)
             {
                 closesocket(socket);
 #if defined(_WIN32) || defined(_WIN64)//If Windows
@@ -133,8 +133,8 @@ void ListenerThread(void* pVoid)
             {
                 //If client is left wait for next client.
                 if ((ret = recv(socket, (char*)
-                                bb.GetData() + bb.GetSize(),
-                                bb.Capacity() - bb.GetSize(), 0)) == -1)
+                    bb.GetData() + bb.GetSize(),
+                    bb.Capacity() - bb.GetSize(), 0)) == -1)
                 {
                     //Notify error.
                     server->Reset();
@@ -177,7 +177,7 @@ void ListenerThread(void* pVoid)
                 if (reply.GetSize() != 0)
                 {
                     printf("<- %s\r\n", reply.ToHexString().c_str());
-                    if (send(socket, (const char*) reply.GetData(), reply.GetSize() - reply.GetPosition(), 0) == -1)
+                    if (send(socket, (const char*)reply.GetData(), reply.GetSize() - reply.GetPosition(), 0) == -1)
                     {
                         //If error has occured
                         server->Reset();
@@ -239,7 +239,7 @@ int CGXDLMSBase::StartServer(int port)
         //setsockopt.
         return -1;
     }
-    sockaddr_in add = {0};
+    sockaddr_in add = { 0 };
     add.sin_port = htons(port);
     add.sin_addr.s_addr = htonl(INADDR_ANY);
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
@@ -247,18 +247,18 @@ int CGXDLMSBase::StartServer(int port)
 #else
     add.sin_family = AF_INET;
 #endif
-    if((ret = ::bind(m_ServerSocket, (sockaddr*) &add, sizeof(add))) == -1)
+    if ((ret = ::bind(m_ServerSocket, (sockaddr*)&add, sizeof(add))) == -1)
     {
         //bind;
         return -1;
     }
-    if((ret = listen(m_ServerSocket, 1)) == -1)
+    if ((ret = listen(m_ServerSocket, 1)) == -1)
     {
         //socket listen failed.
         return -1;
     }
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
-    m_ReceiverThread = (HANDLE) _beginthread(ListenerThread, 0, (LPVOID) this);
+    m_ReceiverThread = (HANDLE)_beginthread(ListenerThread, 0, (LPVOID) this);
 #else
     ret = pthread_create(&m_ReceiverThread, NULL, UnixListenerThread, (void *) this);
 #endif
@@ -322,7 +322,7 @@ CGXDLMSData* AddLogicalDeviceName(CGXDLMSObjectCollection& items, unsigned long 
     char buff[17];
     sprintf(buff, "GRX%.13d", sn);
     CGXDLMSVariant id;
-    id.Add((const char*) buff, 16);
+    id.Add((const char*)buff, 16);
     CGXDLMSData* ldn = new CGXDLMSData("0.0.42.0.0.255", id);
     items.push_back(ldn);
     return ldn;
@@ -348,7 +348,7 @@ void AddElectricityID1(CGXDLMSObjectCollection& items, unsigned long sn)
     char buff[17];
     sprintf(buff, "GRX%.13d", sn);
     CGXDLMSVariant id;
-    id.Add((const char*) buff, 16);
+    id.Add((const char*)buff, 16);
     CGXDLMSData* d = new CGXDLMSData("1.1.0.0.0.255", id);
     d->GetAttributes().push_back(CGXDLMSAttribute(2, DLMS_DATA_TYPE_STRING));
     items.push_back(d);
@@ -693,7 +693,7 @@ void CGXDLMSBase::Read(std::vector<CGXDLMSValueEventArg*>& args)
     int ret, index;
     DLMS_OBJECT_TYPE type;
     std::string ln;
-    for(std::vector<CGXDLMSValueEventArg*>::iterator it = args.begin(); it != args.end(); ++it)
+    for (std::vector<CGXDLMSValueEventArg*>::iterator it = args.begin(); it != args.end(); ++it)
     {
         //Let framework handle Logical Name read.
         if ((*it)->GetIndex() == 1)
@@ -707,15 +707,15 @@ void CGXDLMSBase::Read(std::vector<CGXDLMSValueEventArg*>& args)
         type = pObj->GetObjectType();
         if (type == DLMS_OBJECT_TYPE_PROFILE_GENERIC && index == 2)
         {
-            CGXDLMSProfileGeneric* pg = (CGXDLMSProfileGeneric*) pObj;
+            CGXDLMSProfileGeneric* pg = (CGXDLMSProfileGeneric*)pObj;
             std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> > columns;
             if ((ret = pg->GetSelectedColumns((*it)->GetSelector(), (*it)->GetParameters(), columns)) != 0)
             {
                 continue;
             }
             //Show columns.
-            for(std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it = columns.begin();
-                    it != columns.end(); ++it)
+            for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it = columns.begin();
+                it != columns.end(); ++it)
             {
                 it->first->GetLogicalName(ln);
                 printf("%s : %s, ", CGXDLMSClient::ObjectTypeToString(it->first->GetObjectType()).c_str(), ln.c_str());
@@ -726,10 +726,10 @@ void CGXDLMSBase::Read(std::vector<CGXDLMSValueEventArg*>& args)
             }
         }
         //Framework will handle Association objects automatically.
-        if ( type== DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME ||
-                type == DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME ||
-                //Framework will handle profile generic automatically.
-                type == DLMS_OBJECT_TYPE_PROFILE_GENERIC)
+        if (type == DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME ||
+            type == DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME ||
+            //Framework will handle profile generic automatically.
+            type == DLMS_OBJECT_TYPE_PROFILE_GENERIC)
         {
             continue;
         }
@@ -745,11 +745,11 @@ void CGXDLMSBase::Read(std::vector<CGXDLMSValueEventArg*>& args)
         }
         else if (type == DLMS_OBJECT_TYPE_REGISTER_MONITOR)
         {
-            CGXDLMSRegisterMonitor* pRm = (CGXDLMSRegisterMonitor*) pObj;
+            CGXDLMSRegisterMonitor* pRm = (CGXDLMSRegisterMonitor*)pObj;
             if (index == 2)
             {
                 //Initialize random seed.
-                srand ((unsigned int)time(NULL));
+                srand((unsigned int)time(NULL));
                 pRm->GetThresholds().clear();
                 pRm->GetThresholds().push_back(rand() % 100 + 1);
                 continue;
@@ -759,7 +759,7 @@ void CGXDLMSBase::Read(std::vector<CGXDLMSValueEventArg*>& args)
         {
             CGXDLMSVariant null;
             CGXDLMSValueEventArg e(pObj, index);
-            ret = ((IGXDLMSBase*) pObj)->GetValue(m_Settings, e);
+            ret = ((IGXDLMSBase*)pObj)->GetValue(m_Settings, e);
             if (ret != DLMS_ERROR_CODE_OK)
             {
                 //TODO: Show error.
@@ -768,16 +768,16 @@ void CGXDLMSBase::Read(std::vector<CGXDLMSValueEventArg*>& args)
             //If data is not assigned and value type is unknown return number.
             DLMS_DATA_TYPE tp = e.GetValue().vt;
             if (tp == DLMS_DATA_TYPE_INT8 ||
-                    tp == DLMS_DATA_TYPE_INT16 ||
-                    tp == DLMS_DATA_TYPE_INT32 ||
-                    tp == DLMS_DATA_TYPE_INT64 ||
-                    tp == DLMS_DATA_TYPE_UINT8 ||
-                    tp == DLMS_DATA_TYPE_UINT16 ||
-                    tp == DLMS_DATA_TYPE_UINT32 ||
-                    tp == DLMS_DATA_TYPE_UINT64)
+                tp == DLMS_DATA_TYPE_INT16 ||
+                tp == DLMS_DATA_TYPE_INT32 ||
+                tp == DLMS_DATA_TYPE_INT64 ||
+                tp == DLMS_DATA_TYPE_UINT8 ||
+                tp == DLMS_DATA_TYPE_UINT16 ||
+                tp == DLMS_DATA_TYPE_UINT32 ||
+                tp == DLMS_DATA_TYPE_UINT64)
             {
                 //Initialize random seed.
-                srand ((unsigned int)time(NULL));
+                srand((unsigned int)time(NULL));
                 value = rand() % 100 + 1;
                 value.vt = tp;
                 e.SetValue(value);
@@ -791,6 +791,13 @@ void CGXDLMSBase::Read(std::vector<CGXDLMSValueEventArg*>& args)
 /////////////////////////////////////////////////////////////////////////////
 void CGXDLMSBase::Write(std::vector<CGXDLMSValueEventArg*>& args)
 {
+    std::string ln;
+    for (std::vector<CGXDLMSValueEventArg*>::iterator it = args.begin(); it != args.end(); ++it)
+    {
+        (*it)->GetTarget()->GetLogicalName(ln);
+        printf("Writing: %s \r\n", ln.c_str());
+        ln.clear();
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -821,7 +828,7 @@ DLMS_SOURCE_DIAGNOSTIC CGXDLMSBase::ValidateAuthentication(
     if (authentication == DLMS_AUTHENTICATION_LOW)
     {
         if (password.GetSize() != strlen(EXPECTED_PASSWORD) &&
-                memcmp(EXPECTED_PASSWORD, password.GetData(), strlen(EXPECTED_PASSWORD)) != 0)
+            memcmp(EXPECTED_PASSWORD, password.GetData(), strlen(EXPECTED_PASSWORD)) != 0)
         {
             return DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_FAILURE;
         }

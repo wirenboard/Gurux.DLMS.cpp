@@ -620,13 +620,16 @@ int CGXDLMSServer::HandleSetRequest(
             e->SetValue(value);
             CGXDLMSValueEventCollection list;
             list.push_back(e);
-            Write(list);
             if (p.IsMultipleBlocks())
             {
                 m_Transaction = new CGXDLMSLongTransaction(list, DLMS_COMMAND_GET_REQUEST, data);
             }
             Write(list);
-            if (!e->GetHandled() && !p.IsMultipleBlocks())
+            if (e->GetError() != 0)
+            {
+                p.SetStatus(e->GetError());
+            }
+            else if (!e->GetHandled() && !p.IsMultipleBlocks())
             {
                 obj->SetValue(m_Settings, *e);
             }
@@ -1644,7 +1647,11 @@ int CGXDLMSServer::HandleWriteRequest(CGXByteBuffer& data)
                 CGXDLMSValueEventCollection arr;
                 arr.push_back(e);
                 Write(arr);
-                if (!e->GetHandled())
+                if (e->GetError() != 0)
+                {
+                    results.SetUInt8(pos, e->GetError());
+                }
+                else if (!e->GetHandled())
                 {
                     target.GetItem()->SetValue(m_Settings, *e);
                 }
