@@ -159,7 +159,7 @@ void CGXDLMSActivityCalendar::GetValues(std::vector<std::string>& values)
     std::stringstream sb;
     sb << '[';
     bool empty = true;
-    for(std::vector<CGXDLMSSeasonProfile>::iterator it = m_SeasonProfileActive.begin(); it != m_SeasonProfileActive.end(); ++it)
+    for (std::vector<CGXDLMSSeasonProfile>::iterator it = m_SeasonProfileActive.begin(); it != m_SeasonProfileActive.end(); ++it)
     {
         if (!empty)
         {
@@ -175,7 +175,7 @@ void CGXDLMSActivityCalendar::GetValues(std::vector<std::string>& values)
 
     sb << '[';
     empty = true;
-    for(std::vector<CGXDLMSWeekProfile>::iterator it = m_WeekProfileTableActive.begin(); it != m_WeekProfileTableActive.end(); ++it)
+    for (std::vector<CGXDLMSWeekProfile>::iterator it = m_WeekProfileTableActive.begin(); it != m_WeekProfileTableActive.end(); ++it)
     {
         if (!empty)
         {
@@ -191,7 +191,7 @@ void CGXDLMSActivityCalendar::GetValues(std::vector<std::string>& values)
 
     sb << '[';
     empty = true;
-    for(std::vector<CGXDLMSDayProfile>::iterator it = m_DayProfileTableActive.begin(); it != m_DayProfileTableActive.end(); ++it)
+    for (std::vector<CGXDLMSDayProfile>::iterator it = m_DayProfileTableActive.begin(); it != m_DayProfileTableActive.end(); ++it)
     {
         if (!empty)
         {
@@ -208,7 +208,7 @@ void CGXDLMSActivityCalendar::GetValues(std::vector<std::string>& values)
     values.push_back(m_CalendarNamePassive);
     sb << '[';
     empty = true;
-    for(std::vector<CGXDLMSSeasonProfile>::iterator it = m_SeasonProfilePassive.begin(); it != m_SeasonProfilePassive.end(); ++it)
+    for (std::vector<CGXDLMSSeasonProfile>::iterator it = m_SeasonProfilePassive.begin(); it != m_SeasonProfilePassive.end(); ++it)
     {
         if (!empty)
         {
@@ -224,7 +224,7 @@ void CGXDLMSActivityCalendar::GetValues(std::vector<std::string>& values)
 
     sb << '[';
     empty = true;
-    for(std::vector<CGXDLMSWeekProfile>::iterator it = m_WeekProfileTablePassive.begin(); it != m_WeekProfileTablePassive.end(); ++it)
+    for (std::vector<CGXDLMSWeekProfile>::iterator it = m_WeekProfileTablePassive.begin(); it != m_WeekProfileTablePassive.end(); ++it)
     {
         if (!empty)
         {
@@ -240,7 +240,7 @@ void CGXDLMSActivityCalendar::GetValues(std::vector<std::string>& values)
 
     sb << '[';
     empty = true;
-    for(std::vector<CGXDLMSDayProfile>::iterator it = m_DayProfileTablePassive.begin(); it != m_DayProfileTablePassive.end(); ++it)
+    for (std::vector<CGXDLMSDayProfile>::iterator it = m_DayProfileTablePassive.begin(); it != m_DayProfileTablePassive.end(); ++it)
     {
         if (!empty)
         {
@@ -552,7 +552,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
             //Add count
             GXHelpers::SetObjectCount((*it).GetDaySchedules().size(), data);
             for (std::vector<CGXDLMSDayProfileAction>::iterator action = (*it).GetDaySchedules().begin();
-                    action != (*it).GetDaySchedules().end(); ++action)
+                action != (*it).GetDaySchedules().end(); ++action)
             {
                 time = action->GetStartTime();
                 ln = action->GetScriptLogicalName();
@@ -589,15 +589,15 @@ int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     else if (e.GetIndex() == 3)
     {
         m_SeasonProfileActive.clear();
-        for(std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
+        for (std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
         {
             CGXDLMSSeasonProfile it;
             CGXDLMSVariant tmp;
-            CGXDLMSClient::ChangeType((*item).Arr[0], DLMS_DATA_TYPE_STRING, tmp);
+            CGXDLMSClient::ChangeType((*item).Arr[0], DLMS_DATA_TYPE_OCTET_STRING, tmp);
             it.SetName(tmp.strVal);
             CGXDLMSClient::ChangeType((*item).Arr[1], DLMS_DATA_TYPE_DATETIME, tmp);
             it.SetStart(tmp.dateTime);
-            CGXDLMSClient::ChangeType((*item).Arr[2], DLMS_DATA_TYPE_STRING, tmp);
+            CGXDLMSClient::ChangeType((*item).Arr[2], DLMS_DATA_TYPE_OCTET_STRING, tmp);
             it.SetWeekName(tmp.strVal);
             m_SeasonProfileActive.push_back(it);
         }
@@ -605,7 +605,7 @@ int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     else if (e.GetIndex() == 4)
     {
         m_WeekProfileTableActive.clear();
-        for(std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
+        for (std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
         {
             CGXDLMSVariant tmp;
             CGXDLMSWeekProfile it;
@@ -624,17 +624,16 @@ int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     else if (e.GetIndex() == 5)
     {
         m_DayProfileTableActive.clear();
-        for(std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
+        for (std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
         {
             CGXDLMSDayProfile it;
             it.SetDayId(item->Arr[0].ToInteger());
-            for(std::vector<CGXDLMSVariant>::iterator it2 = (*item).Arr[1].Arr.begin(); it2 != (*item).Arr[1].Arr.end(); ++it2)
+            for (std::vector<CGXDLMSVariant>::iterator it2 = (*item).Arr[1].Arr.begin(); it2 != (*item).Arr[1].Arr.end(); ++it2)
             {
                 CGXDLMSDayProfileAction ac;
                 CGXDLMSVariant tmp;
-                CGXDLMSClient::ChangeType(it2->Arr[0], DLMS_DATA_TYPE_TIME, tmp);
-                ac.SetStartTime(tmp.dateTime);
-                CGXDLMSClient::ChangeType(it2->Arr[1], DLMS_DATA_TYPE_STRING, tmp);
+                ac.SetStartTime(it2->Arr[0].dateTime);
+                CGXDLMSClient::ChangeType(it2->Arr[1], DLMS_DATA_TYPE_OCTET_STRING, tmp);
                 ac.SetScriptLogicalName(tmp.strVal);
                 ac.SetScriptSelector(it2->Arr[2].ToInteger());
                 it.GetDaySchedules().push_back(ac);
@@ -650,22 +649,22 @@ int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     }
     else if (e.GetIndex() == 7)
     {
-        for(std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
+        for (std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
         {
             CGXDLMSSeasonProfile it;
             CGXDLMSVariant tmp;
-            CGXDLMSClient::ChangeType((*item).Arr[0], DLMS_DATA_TYPE_STRING, tmp);
+            CGXDLMSClient::ChangeType((*item).Arr[0], DLMS_DATA_TYPE_OCTET_STRING, tmp);
             it.SetName(tmp.strVal);
             CGXDLMSClient::ChangeType((*item).Arr[1], DLMS_DATA_TYPE_DATETIME, tmp);
             it.SetStart(tmp.dateTime);
-            CGXDLMSClient::ChangeType((*item).Arr[2], DLMS_DATA_TYPE_STRING, tmp);
+            CGXDLMSClient::ChangeType((*item).Arr[2], DLMS_DATA_TYPE_OCTET_STRING, tmp);
             it.SetWeekName(tmp.strVal);
             m_SeasonProfilePassive.push_back(it);
         }
     }
     else if (e.GetIndex() == 8)
     {
-        for(std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
+        for (std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
         {
             CGXDLMSWeekProfile it;
             CGXDLMSVariant tmp;
@@ -683,17 +682,16 @@ int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     }
     else if (e.GetIndex() == 9)
     {
-        for(std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
+        for (std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin(); item != e.GetValue().Arr.end(); ++item)
         {
             CGXDLMSDayProfile it;
             it.SetDayId((*item).Arr[0].iVal);
-            for(std::vector<CGXDLMSVariant>::iterator it2 = (*item).Arr[1].Arr.begin(); it2 != (*item).Arr[1].Arr.end(); ++it2)
+            for (std::vector<CGXDLMSVariant>::iterator it2 = (*item).Arr[1].Arr.begin(); it2 != (*item).Arr[1].Arr.end(); ++it2)
             {
                 CGXDLMSDayProfileAction ac;
                 CGXDLMSVariant tmp;
-                CGXDLMSClient::ChangeType((*it2).Arr[0], DLMS_DATA_TYPE_TIME, tmp);
-                ac.SetStartTime(tmp.dateTime);
-                CGXDLMSClient::ChangeType((*it2).Arr[1], DLMS_DATA_TYPE_STRING, tmp);
+                ac.SetStartTime((*it2).Arr[0].dateTime);
+                CGXDLMSClient::ChangeType((*it2).Arr[1], DLMS_DATA_TYPE_OCTET_STRING, tmp);
                 ac.SetScriptLogicalName(tmp.strVal);
                 ac.SetScriptSelector((*it2).Arr[2].lVal);
                 it.GetDaySchedules().push_back(ac);
@@ -703,9 +701,7 @@ int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     }
     else if (e.GetIndex() == 10)
     {
-        CGXDLMSVariant tmp;
-        CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_DATETIME, tmp);
-        SetTime(tmp.dateTime);
+        SetTime(e.GetValue().dateTime);
     }
     else
     {

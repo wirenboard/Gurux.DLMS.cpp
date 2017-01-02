@@ -184,7 +184,7 @@ void CGXDLMSIp4Setup::GetValues(std::vector<std::string>& values)
     std::stringstream sb;
     sb << '[';
     bool empty = true;
-    for(std::vector<unsigned long>::iterator it = m_MulticastIPAddress.begin(); it != m_MulticastIPAddress.end(); ++it)
+    for (std::vector<unsigned long>::iterator it = m_MulticastIPAddress.begin(); it != m_MulticastIPAddress.end(); ++it)
     {
         if (!empty)
         {
@@ -201,7 +201,7 @@ void CGXDLMSIp4Setup::GetValues(std::vector<std::string>& values)
     sb.str(std::string());
     sb << '[';
     empty = true;
-    for(std::vector<CGXDLMSIp4SetupIpOption>::iterator it = m_IPOptions.begin(); it != m_IPOptions.end(); ++it)
+    for (std::vector<CGXDLMSIp4SetupIpOption>::iterator it = m_IPOptions.begin(); it != m_IPOptions.end(); ++it)
     {
         if (!empty)
         {
@@ -352,7 +352,7 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         struct sockaddr_in add;
         add.sin_addr.s_addr = inet_addr(m_IPAddress.c_str());
         //If address is give as name
-        if(add.sin_addr.s_addr == INADDR_NONE)
+        if (add.sin_addr.s_addr == INADDR_NONE)
         {
             struct hostent *Hostent = gethostbyname(m_IPAddress.c_str());
             if (Hostent == NULL)
@@ -361,7 +361,7 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
             };
             add.sin_addr = *(in_addr*)(void*)Hostent->h_addr_list[0];
         };
-        e.SetValue((unsigned long) add.sin_addr.s_addr);
+        e.SetValue((unsigned long)add.sin_addr.s_addr);
         return DLMS_ERROR_CODE_OK;
     }
     else if (e.GetIndex() == 4)
@@ -372,7 +372,7 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         GXHelpers::SetObjectCount(m_MulticastIPAddress.size(), data);
         int ret;
         CGXDLMSVariant tmp;
-        for(std::vector<unsigned long>::iterator it = m_MulticastIPAddress.begin(); it != m_MulticastIPAddress.end(); ++it)
+        for (std::vector<unsigned long>::iterator it = m_MulticastIPAddress.begin(); it != m_MulticastIPAddress.end(); ++it)
         {
             tmp = *it;
             if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT32, tmp)) != 0)
@@ -390,7 +390,7 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         GXHelpers::SetObjectCount(m_IPOptions.size(), bb);
         int ret;
         CGXDLMSVariant type, len, data;
-        for(std::vector<CGXDLMSIp4SetupIpOption>::iterator it = m_IPOptions.begin(); it != m_IPOptions.end(); ++it)
+        for (std::vector<CGXDLMSIp4SetupIpOption>::iterator it = m_IPOptions.begin(); it != m_IPOptions.end(); ++it)
         {
             bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
             bb.SetUInt8(3);
@@ -398,8 +398,8 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
             len = it->GetLength();
             data = it->GetData();
             if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT8, type)) != 0 ||
-                    (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT8, len)) != 0 ||
-                    (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_OCTET_STRING, data)) != 0)
+                (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT8, len)) != 0 ||
+                (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_OCTET_STRING, data)) != 0)
             {
                 return ret;
             }
@@ -468,7 +468,7 @@ int CGXDLMSIp4Setup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         m_MulticastIPAddress.clear();
         if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
-            for(std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
+            for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 m_MulticastIPAddress.push_back((*it).ToInteger());
             }
@@ -479,10 +479,10 @@ int CGXDLMSIp4Setup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         m_IPOptions.clear();
         if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
-            for(std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
+            for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 CGXDLMSIp4SetupIpOption item;
-                item.SetType((IP_OPTION_TYPE) it->Arr[0].ToInteger());
+                item.SetType((IP_OPTION_TYPE)it->Arr[0].ToInteger());
                 item.SetLength(it->Arr[1].ToInteger());
                 CGXByteBuffer tmp;
                 tmp.Set(it->Arr[0].byteArr, it->Arr[0].size);

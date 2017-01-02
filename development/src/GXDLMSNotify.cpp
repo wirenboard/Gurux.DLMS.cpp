@@ -45,9 +45,9 @@ CGXDLMSSettings& CGXDLMSNotify::GetSettings()
 }
 
 CGXDLMSNotify::CGXDLMSNotify(bool useLogicalNameReferencing,
-                             int clientAddress,
-                             int serverAddress,
-                             DLMS_INTERFACE_TYPE interfaceType) : m_Settings(true)
+    int clientAddress,
+    int serverAddress,
+    DLMS_INTERFACE_TYPE interfaceType) : m_Settings(true)
 {
     m_Settings.SetUseLogicalNameReferencing(useLogicalNameReferencing);
     m_Settings.SetClientAddress(clientAddress);
@@ -240,10 +240,10 @@ int CGXDLMSNotify::ParsePush(std::vector<CGXDLMSVariant>& data, std::vector<std:
             {
                 return ret;
             }
-            obj = GetObjects().FindByLN((DLMS_OBJECT_TYPE) classID, ln.strVal);
+            obj = GetObjects().FindByLN((DLMS_OBJECT_TYPE)classID, ln.strVal);
             if (obj == NULL)
             {
-                obj = CGXDLMSObjectFactory::CreateObject((DLMS_OBJECT_TYPE) classID, ln.strVal);
+                obj = CGXDLMSObjectFactory::CreateObject((DLMS_OBJECT_TYPE)classID, ln.strVal);
                 GetObjects().push_back(obj);
             }
             items.push_back(std::pair<CGXDLMSObject*, unsigned char>(obj, it->Arr[2].ToInteger()));

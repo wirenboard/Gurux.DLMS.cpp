@@ -135,7 +135,7 @@ void CGXDLMSModemConfiguration::GetValues(std::vector<std::string>& values)
     std::stringstream sb;
     sb << '[';
     bool empty = true;
-    for(std::vector<CGXDLMSModemInitialisation>::iterator it = m_InitialisationStrings.begin(); it != m_InitialisationStrings.end(); ++it)
+    for (std::vector<CGXDLMSModemInitialisation>::iterator it = m_InitialisationStrings.begin(); it != m_InitialisationStrings.end(); ++it)
     {
         if (!empty)
         {
@@ -152,7 +152,7 @@ void CGXDLMSModemConfiguration::GetValues(std::vector<std::string>& values)
     sb.str(std::string());
     sb << '[';
     empty = true;
-    for(std::vector< std::string >::iterator it = m_ModemProfile.begin(); it != m_ModemProfile.end(); ++it)
+    for (std::vector< std::string >::iterator it = m_ModemProfile.begin(); it != m_ModemProfile.end(); ++it)
     {
         if (!empty)
         {
@@ -245,7 +245,7 @@ int CGXDLMSModemConfiguration::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
         GXHelpers::SetObjectCount(cnt, data);
         CGXDLMSVariant request, response, delay;
         for (std::vector<CGXDLMSModemInitialisation>::iterator it = m_InitialisationStrings.begin();
-                it != m_InitialisationStrings.end(); ++it)
+            it != m_InitialisationStrings.end(); ++it)
         {
             data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
             data.SetUInt8(3); //Count
@@ -253,8 +253,8 @@ int CGXDLMSModemConfiguration::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
             response = it->GetResponse();
             delay = it->GetDelay();
             if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, request)) != 0 ||
-                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, response)) != 0 ||
-                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, delay)) != 0)
+                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, response)) != 0 ||
+                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, delay)) != 0)
             {
                 return ret;
             }
@@ -273,7 +273,7 @@ int CGXDLMSModemConfiguration::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
         GXHelpers::SetObjectCount(cnt, data);
         CGXDLMSVariant tmp;
         for (std::vector< std::string >::iterator it = m_ModemProfile.begin();
-                it != m_ModemProfile.end(); ++it)
+            it != m_ModemProfile.end(); ++it)
         {
             tmp = *it;
             if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
@@ -296,7 +296,7 @@ int CGXDLMSModemConfiguration::SetValue(CGXDLMSSettings& settings, CGXDLMSValueE
     }
     else if (e.GetIndex() == 2)
     {
-        m_CommunicationSpeed = (DLMS_BAUD_RATE) e.GetValue().bVal;
+        m_CommunicationSpeed = (DLMS_BAUD_RATE)e.GetValue().bVal;
         return DLMS_ERROR_CODE_OK;
     }
     else if (e.GetIndex() == 3)
@@ -307,12 +307,12 @@ int CGXDLMSModemConfiguration::SetValue(CGXDLMSSettings& settings, CGXDLMSValueE
         {
             CGXDLMSModemInitialisation item;
             CGXDLMSVariant tmp;
-            if((ret = CGXDLMSClient::ChangeType(it->Arr[0], DLMS_DATA_TYPE_STRING, tmp)) != DLMS_ERROR_CODE_OK)
+            if ((ret = CGXDLMSClient::ChangeType(it->Arr[0], DLMS_DATA_TYPE_STRING, tmp)) != DLMS_ERROR_CODE_OK)
             {
                 return ret;
             }
             item.SetRequest(tmp.ToString());
-            if((ret = CGXDLMSClient::ChangeType(it->Arr[1], DLMS_DATA_TYPE_STRING, tmp)) != DLMS_ERROR_CODE_OK)
+            if ((ret = CGXDLMSClient::ChangeType(it->Arr[1], DLMS_DATA_TYPE_STRING, tmp)) != DLMS_ERROR_CODE_OK)
             {
                 return ret;
             }
@@ -332,7 +332,7 @@ int CGXDLMSModemConfiguration::SetValue(CGXDLMSSettings& settings, CGXDLMSValueE
         for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
         {
             CGXDLMSVariant tmp;
-            if((ret = CGXDLMSClient::ChangeType(*it, DLMS_DATA_TYPE_STRING, tmp)) != DLMS_ERROR_CODE_OK)
+            if ((ret = CGXDLMSClient::ChangeType(*it, DLMS_DATA_TYPE_STRING, tmp)) != DLMS_ERROR_CODE_OK)
             {
                 return ret;
             }

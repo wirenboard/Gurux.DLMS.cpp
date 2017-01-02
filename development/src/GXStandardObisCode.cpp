@@ -35,8 +35,8 @@
 #include "../include/GXStandardObisCode.h"
 
 CGXStandardObisCode::CGXStandardObisCode(std::vector< std::string > obis,
-        std::string& desc,
-        std::string& interfaces, std::string& dataType)
+    std::string& desc,
+    std::string& interfaces, std::string& dataType)
 {
     m_OBIS.clear();
     m_OBIS.insert(m_OBIS.end(), obis.begin(), obis.end());

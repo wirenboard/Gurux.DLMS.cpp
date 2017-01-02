@@ -74,7 +74,7 @@
 // Reserved for internal use.
 CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
 {
-    switch(type)
+    switch (type)
     {
     case DLMS_OBJECT_TYPE_ACTION_SCHEDULE:
         return new CGXDLMSActionSchedule();
@@ -176,7 +176,7 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type, std::st
 
 std::string CGXDLMSObjectFactory::ObjectTypeToString(DLMS_OBJECT_TYPE type)
 {
-    switch(type)
+    switch (type)
     {
     case DLMS_OBJECT_TYPE_ACTION_SCHEDULE:
         return "GXDLMSActionSchedule";

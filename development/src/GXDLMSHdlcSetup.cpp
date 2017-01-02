@@ -315,7 +315,7 @@ int CGXDLMSIecHdlcSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventAr
     }
     else if (e.GetIndex() == 2)
     {
-        m_CommunicationSpeed = (DLMS_BAUD_RATE) e.GetValue().ToInteger();
+        m_CommunicationSpeed = (DLMS_BAUD_RATE)e.GetValue().ToInteger();
     }
     else if (e.GetIndex() == 3)
     {

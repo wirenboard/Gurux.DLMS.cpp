@@ -104,12 +104,12 @@ void CGXDLMSDemandRegister::SetLastAvarageValue(CGXDLMSVariant value)
 */
 double CGXDLMSDemandRegister::GetScaler()
 {
-    return pow((float) 10, m_Scaler);
+    return pow((float)10, m_Scaler);
 }
 
 void CGXDLMSDemandRegister::SetScaler(double value)
 {
-    m_Scaler = (unsigned char) log10(value);
+    m_Scaler = (unsigned char)log10(value);
 }
 
 // Unit of COSEM Register object.
@@ -444,15 +444,11 @@ int CGXDLMSDemandRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     else if (e.GetIndex() == 6)
     {
-        CGXDLMSVariant tmp;
-        CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_DATETIME, tmp);
-        SetCaptureTime(tmp.dateTime);
+        SetCaptureTime(e.GetValue().dateTime);
     }
     else if (e.GetIndex() == 7)
     {
-        CGXDLMSVariant tmp;
-        CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_DATETIME, tmp);
-        SetStartTimeCurrent(tmp.dateTime);
+        SetStartTimeCurrent(e.GetValue().dateTime);
     }
     else if (e.GetIndex() == 8)
     {

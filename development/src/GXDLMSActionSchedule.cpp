@@ -131,7 +131,7 @@ void CGXDLMSActionSchedule::GetValues(std::vector<std::string>& values)
     std::stringstream sb;
     sb << '[';
     bool empty = true;
-    for(std::vector<CGXDateTime>::iterator it = m_ExecutionTime.begin(); it != m_ExecutionTime.end(); ++it)
+    for (std::vector<CGXDateTime>::iterator it = m_ExecutionTime.begin(); it != m_ExecutionTime.end(); ++it)
     {
         if (!empty)
         {
@@ -219,7 +219,7 @@ int CGXDLMSActionSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
         CGXDLMSVariant ln = m_ExecutedScriptLogicalName;
         CGXDLMSVariant ss = m_ExecutedScriptSelector;
         if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0 ||
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, ss)) != 0)
+            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, ss)) != 0)
         {
             return ret;
         }
@@ -245,7 +245,7 @@ int CGXDLMSActionSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
             data.SetUInt8(2); //Count
             val = *it;
             if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_TIME, val)) != 0 || //Time
-                    (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_DATE, val)) != 0) //Date
+                (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_DATE, val)) != 0) //Date
             {
                 return ret;
             }
@@ -271,14 +271,14 @@ int CGXDLMSActionSchedule::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     else if (e.GetIndex() == 3)
     {
-        SetType((DLMS_SINGLE_ACTION_SCHEDULE_TYPE) e.GetValue().ToInteger());
+        SetType((DLMS_SINGLE_ACTION_SCHEDULE_TYPE)e.GetValue().ToInteger());
         return DLMS_ERROR_CODE_OK;
     }
     else if (e.GetIndex() == 4)
     {
         m_ExecutionTime.clear();
         for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin();
-                it != e.GetValue().Arr.end(); ++it)
+            it != e.GetValue().Arr.end(); ++it)
         {
             CGXDLMSVariant time, date;
             CGXDLMSClient::ChangeType((*it).Arr[0], DLMS_DATA_TYPE_TIME, time);
@@ -289,7 +289,7 @@ int CGXDLMSActionSchedule::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
             val2.tm_min = val.tm_min;
             val2.tm_sec = val.tm_sec;
             date.dateTime.SetValue(val2);
-            date.dateTime.SetSkip((DATETIME_SKIPS) (time.dateTime.GetSkip() | date.dateTime.GetSkip()));
+            date.dateTime.SetSkip((DATETIME_SKIPS)(time.dateTime.GetSkip() | date.dateTime.GetSkip()));
             m_ExecutionTime.push_back(date.dateTime);
         }
         return DLMS_ERROR_CODE_OK;

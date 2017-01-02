@@ -35,7 +35,7 @@
 #include "../include/GXDLMSSecureServer.h"
 
 CGXDLMSSecureServer::CGXDLMSSecureServer(bool UseLogicalNameReferencing,
-        DLMS_INTERFACE_TYPE intefaceType) :
+    DLMS_INTERFACE_TYPE intefaceType) :
     CGXDLMSServer(
         UseLogicalNameReferencing,
         intefaceType), m_Cipher("ABCDEFGH")

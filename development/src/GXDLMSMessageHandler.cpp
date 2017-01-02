@@ -90,7 +90,7 @@ void CGXDLMSMessageHandler::GetValues(std::vector<std::string>& values)
     std::stringstream sb;
     sb << '[';
     bool empty = true;
-    for(std::vector<std::pair<CGXDateTime, CGXDateTime> >::iterator it = m_ListeningWindow.begin(); it != m_ListeningWindow.end(); ++it)
+    for (std::vector<std::pair<CGXDateTime, CGXDateTime> >::iterator it = m_ListeningWindow.begin(); it != m_ListeningWindow.end(); ++it)
     {
         if (!empty)
         {
@@ -109,7 +109,7 @@ void CGXDLMSMessageHandler::GetValues(std::vector<std::string>& values)
 
     sb << '[';
     empty = true;
-    for(std::vector<std::string>::iterator it = m_AllowedSenders.begin(); it != m_AllowedSenders.end(); ++it)
+    for (std::vector<std::string>::iterator it = m_AllowedSenders.begin(); it != m_AllowedSenders.end(); ++it)
     {
         if (!empty)
         {
@@ -124,7 +124,7 @@ void CGXDLMSMessageHandler::GetValues(std::vector<std::string>& values)
     sb.str(std::string());
     sb << '[';
     empty = true;
-    for(std::vector<std::pair<std::string, std::pair<int, CGXDLMSScriptAction> > >::iterator it = m_SendersAndActions.begin(); it != m_SendersAndActions.end(); ++it)
+    for (std::vector<std::pair<std::string, std::pair<int, CGXDLMSScriptAction> > >::iterator it = m_SendersAndActions.begin(); it != m_SendersAndActions.end(); ++it)
     {
         if (!empty)
         {
@@ -233,7 +233,7 @@ int CGXDLMSMessageHandler::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
         m_ListeningWindow.clear();
         if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
-            for(std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
+            for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 CGXDLMSVariant tmp;
                 CGXDLMSClient::ChangeType(it->Arr[0], DLMS_DATA_TYPE_DATETIME, tmp);
@@ -250,10 +250,10 @@ int CGXDLMSMessageHandler::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
         m_AllowedSenders.clear();
         if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
-            for(std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
+            for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 std::string str;
-                str.append(reinterpret_cast< char const* >(it->byteArr), it->size);
+                str.append(reinterpret_cast<char const*>(it->byteArr), it->size);
                 m_AllowedSenders.push_back(str);
             }
         }
@@ -263,7 +263,7 @@ int CGXDLMSMessageHandler::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
         m_SendersAndActions.clear();
         if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
-            for(std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
+            for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 //std::string id = it->Arr[0].byteArr.ToString();
                 //Object[] tmp2 = (Object[]) tmp[1];

@@ -38,9 +38,9 @@
 
 char toLower(char ch)
 {
-    if(ch <='Z' && ch >='A')
+    if (ch <= 'Z' && ch >= 'A')
     {
-        return ch - ('Z'-'z');
+        return ch - ('Z' - 'z');
     }
     return ch;
 }

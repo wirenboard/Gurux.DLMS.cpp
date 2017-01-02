@@ -112,7 +112,7 @@ void CGXDLMSSecuritySetup::GetValues(std::vector<std::string>& values)
     std::string ln;
     GetLogicalName(ln);
     values.push_back(ln);
-    values.push_back(CGXDLMSConverter::ToString((DLMS_SECURITY_POLICY) m_SecurityPolicy));
+    values.push_back(CGXDLMSConverter::ToString((DLMS_SECURITY_POLICY)m_SecurityPolicy));
     values.push_back(CGXDLMSConverter::ToString(m_SecuritySuite));
     std::string str = m_ClientSystemTitle.ToHexString();
     values.push_back(str);
@@ -232,11 +232,11 @@ int CGXDLMSSecuritySetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     }
     else if (e.GetIndex() == 2)
     {
-        m_SecurityPolicy = (DLMS_SECURITY_POLICY) e.GetValue().ToInteger();
+        m_SecurityPolicy = (DLMS_SECURITY_POLICY)e.GetValue().ToInteger();
     }
     else if (e.GetIndex() == 3)
     {
-        m_SecuritySuite = (DLMS_SECURITY_SUITE) e.GetValue().ToInteger();
+        m_SecuritySuite = (DLMS_SECURITY_SUITE)e.GetValue().ToInteger();
     }
     else if (e.GetIndex() == 4)
     {

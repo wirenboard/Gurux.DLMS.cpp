@@ -183,7 +183,7 @@ void CGXDLMSMBusClient::GetValues(std::vector<std::string>& values)
     std::stringstream sb;
     sb << '[';
     bool empty = true;
-    for(std::vector<std::pair<std::string, std::string> >::iterator it = m_CaptureDefinition.begin(); it != m_CaptureDefinition.end(); ++it)
+    for (std::vector<std::pair<std::string, std::string> >::iterator it = m_CaptureDefinition.begin(); it != m_CaptureDefinition.end(); ++it)
     {
         if (!empty)
         {
@@ -410,7 +410,7 @@ int CGXDLMSMBusClient::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg&
     {
         m_CaptureDefinition.clear();
         CGXDLMSVariant tmp1, tmp2;
-        for(std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
+        for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
         {
             CGXDLMSClient::ChangeType((*it).Arr[0], DLMS_DATA_TYPE_OCTET_STRING, tmp1);
             CGXDLMSClient::ChangeType((*it).Arr[1], DLMS_DATA_TYPE_OCTET_STRING, tmp2);

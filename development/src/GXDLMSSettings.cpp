@@ -157,15 +157,15 @@ bool CGXDLMSSettings::CheckFrame(unsigned char frame)
     if ((m_SenderFrame & 0x1) == 0)
     {
         if ((frame & 0xE0) == ((m_ReceiverFrame + 0x20) & 0xE0)
-                && (frame & 0xE) == ((m_ReceiverFrame + 2) & 0xE))
+            && (frame & 0xE) == ((m_ReceiverFrame + 2) & 0xE))
         {
             m_ReceiverFrame = frame;
             return true;
         }
     }
     else if (frame == m_ReceiverFrame
-             || ((frame & 0xE0) == (m_ReceiverFrame & 0xE0)
-                 && (frame & 0xE) == ((m_ReceiverFrame + 2) & 0xE)))
+        || ((frame & 0xE0) == (m_ReceiverFrame & 0xE0)
+            && (frame & 0xE) == ((m_ReceiverFrame + 2) & 0xE)))
     {
         // If S-frame sent.
         m_ReceiverFrame = frame;
@@ -191,25 +191,25 @@ static unsigned char IncreaseReceiverSequence(unsigned char value)
 // Increased sender frame sequence.
 static unsigned char IncreaseSendSequence(unsigned char value)
 {
-    return (unsigned char) ((value & 0xF0) | ((value + 0x2) & 0xE));
+    return (unsigned char)((value & 0xF0) | ((value + 0x2) & 0xE));
 }
 
 unsigned char CGXDLMSSettings::GetNextSend()
 {
-    m_SenderFrame = IncreaseReceiverSequence(IncreaseSendSequence((unsigned char) m_SenderFrame));
-    return (unsigned char) m_SenderFrame;
+    m_SenderFrame = IncreaseReceiverSequence(IncreaseSendSequence((unsigned char)m_SenderFrame));
+    return (unsigned char)m_SenderFrame;
 }
 
 unsigned char CGXDLMSSettings::GetReceiverReady()
 {
-    m_SenderFrame = IncreaseReceiverSequence((unsigned char) (m_SenderFrame | 1));
-    return (unsigned char) (m_SenderFrame & 0xF1);
+    m_SenderFrame = IncreaseReceiverSequence((unsigned char)(m_SenderFrame | 1));
+    return (unsigned char)(m_SenderFrame & 0xF1);
 }
 
 unsigned char CGXDLMSSettings::GetKeepAlive()
 {
-    m_SenderFrame = (unsigned char) (m_SenderFrame | 1);
-    return (unsigned char) (m_SenderFrame & 0xF1);
+    m_SenderFrame = (unsigned char)(m_SenderFrame | 1);
+    return (unsigned char)(m_SenderFrame & 0xF1);
 }
 
 CGXDLMSLNSettings& CGXDLMSSettings::GetLnSettings()

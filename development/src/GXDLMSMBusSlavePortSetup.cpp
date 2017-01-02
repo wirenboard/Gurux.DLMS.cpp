@@ -229,15 +229,15 @@ int CGXDLMSMBusSlavePortSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueE
     }
     else if (e.GetIndex() == 2)
     {
-        m_DefaultBaud = (DLMS_BAUD_RATE) e.GetValue().ToInteger();
+        m_DefaultBaud = (DLMS_BAUD_RATE)e.GetValue().ToInteger();
     }
     else if (e.GetIndex() == 3)
     {
-        m_AvailableBaud = (DLMS_BAUD_RATE) e.GetValue().ToInteger();
+        m_AvailableBaud = (DLMS_BAUD_RATE)e.GetValue().ToInteger();
     }
     else if (e.GetIndex() == 4)
     {
-        m_AddressState = (DLMS_ADDRESS_STATE) e.GetValue().ToInteger();
+        m_AddressState = (DLMS_ADDRESS_STATE)e.GetValue().ToInteger();
     }
     else if (e.GetIndex() == 5)
     {

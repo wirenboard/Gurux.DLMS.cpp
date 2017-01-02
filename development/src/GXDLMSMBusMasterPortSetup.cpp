@@ -147,7 +147,7 @@ int CGXDLMSMBusMasterPortSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValue
     }
     else if (e.GetIndex() == 2)
     {
-        m_CommSpeed = (DLMS_BAUD_RATE) e.GetValue().ToInteger();
+        m_CommSpeed = (DLMS_BAUD_RATE)e.GetValue().ToInteger();
     }
     else
     {

@@ -207,11 +207,11 @@ int CGXDLMSDisconnectControl::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEv
     }
     else if (e.GetIndex() == 3)
     {
-        m_ControlState = (DLMS_CONTROL_STATE) e.GetValue().ToInteger();
+        m_ControlState = (DLMS_CONTROL_STATE)e.GetValue().ToInteger();
     }
     else if (e.GetIndex() == 4)
     {
-        m_ControlMode = (DLMS_CONTROL_MODE) e.GetValue().ToInteger();
+        m_ControlMode = (DLMS_CONTROL_MODE)e.GetValue().ToInteger();
     }
     else
     {

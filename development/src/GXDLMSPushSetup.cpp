@@ -108,7 +108,7 @@ void CGXDLMSPushSetup::GetValues(std::vector<std::string>& values)
     std::stringstream sb;
     sb << '[';
     bool empty = true;
-    for(std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> >::iterator it = m_PushObjectList.begin(); it != m_PushObjectList.end(); ++it)
+    for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> >::iterator it = m_PushObjectList.begin(); it != m_PushObjectList.end(); ++it)
     {
         if (!empty)
         {
@@ -133,7 +133,7 @@ void CGXDLMSPushSetup::GetValues(std::vector<std::string>& values)
     sb.str(std::string());
     sb << '[';
     empty = true;
-    for(std::vector<std::pair<CGXDateTime, CGXDateTime> >::iterator it = m_CommunicationWindow.begin(); it != m_CommunicationWindow.end(); ++it)
+    for (std::vector<std::pair<CGXDateTime, CGXDateTime> >::iterator it = m_CommunicationWindow.begin(); it != m_CommunicationWindow.end(); ++it)
     {
         if (!empty)
         {
@@ -252,7 +252,7 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
         e.SetByteArray(true);
         buff.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         GXHelpers::SetObjectCount(m_PushObjectList.size(), buff);
-        for(std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> >::iterator it = m_PushObjectList.begin(); it != m_PushObjectList.end(); ++it)
+        for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> >::iterator it = m_PushObjectList.begin(); it != m_PushObjectList.end(); ++it)
         {
             buff.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
             buff.SetUInt8(4);
@@ -317,7 +317,7 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
         e.SetByteArray(true);
         buff.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         GXHelpers::SetObjectCount(m_CommunicationWindow.size(), buff);
-        for(std::vector<std::pair< CGXDateTime, CGXDateTime> >::iterator it = m_CommunicationWindow.begin(); it != m_CommunicationWindow.end(); ++it)
+        for (std::vector<std::pair< CGXDateTime, CGXDateTime> >::iterator it = m_CommunicationWindow.begin(); it != m_CommunicationWindow.end(); ++it)
         {
             buff.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
             buff.SetUInt8(2);
@@ -367,9 +367,9 @@ int CGXDLMSPushSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
         m_PushObjectList.clear();
         if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
-            for(std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
+            for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
-                DLMS_OBJECT_TYPE type = (DLMS_OBJECT_TYPE) it->Arr[0].ToInteger();
+                DLMS_OBJECT_TYPE type = (DLMS_OBJECT_TYPE)it->Arr[0].ToInteger();
                 CGXDLMSClient::ChangeType(it->Arr[1], DLMS_DATA_TYPE_OCTET_STRING, ln);
                 CGXDLMSObject* obj = settings.GetObjects().FindByLN(type, ln.strVal);
                 if (obj == NULL)
@@ -385,11 +385,11 @@ int CGXDLMSPushSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
     {
         if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
-            SetService((DLMS_SERVICE_TYPE) e.GetValue().Arr[0].ToInteger());
+            SetService((DLMS_SERVICE_TYPE)e.GetValue().Arr[0].ToInteger());
             std::string str;
-            str.append(reinterpret_cast< char const* >(e.GetValue().Arr[1].byteArr), e.GetValue().Arr[1].size);
+            str.append(reinterpret_cast<char const*>(e.GetValue().Arr[1].byteArr), e.GetValue().Arr[1].size);
             SetDestination(str);
-            SetMessage((DLMS_MESSAGE_TYPE) e.GetValue().Arr[2].ToInteger());
+            SetMessage((DLMS_MESSAGE_TYPE)e.GetValue().Arr[2].ToInteger());
         }
     }
     else if (e.GetIndex() == 4)
@@ -398,7 +398,7 @@ int CGXDLMSPushSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
         if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
             int ret;
-            for(std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
+            for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 CGXDLMSVariant tmp;
                 if ((ret = CGXDLMSClient::ChangeType(it->Arr[0], DLMS_DATA_TYPE_DATETIME, tmp)) != 0)

@@ -35,14 +35,14 @@
 #include "../include/GXDLMSSNParameters.h"
 
 CGXDLMSSNParameters::CGXDLMSSNParameters(CGXDLMSSettings* settings,
-        DLMS_COMMAND command,
-        int count,
-        int commandType,
-        CGXByteBuffer* attributeDescriptor,
-        CGXByteBuffer* data)
+    DLMS_COMMAND command,
+    int count,
+    int commandType,
+    CGXByteBuffer* attributeDescriptor,
+    CGXByteBuffer* data)
 {
     m_Settings = settings;
-    m_BlockIndex = (unsigned short) settings->GetBlockIndex();
+    m_BlockIndex = (unsigned short)settings->GetBlockIndex();
     m_Command = command;
     m_Count = count;
     m_RequestType = commandType;

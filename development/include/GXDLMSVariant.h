@@ -77,7 +77,7 @@ struct dlmsVARIANT
     std::string strVal;
     std::basic_string<wchar_t> strUtfVal;
     std::vector<CGXDLMSVariant> Arr;
-} ;
+};
 
 class CGXDLMSVariant : public dlmsVARIANT
 {
@@ -113,7 +113,7 @@ public:
     CGXDLMSVariant(CGXByteBuffer& value);
     CGXDLMSVariant(const char* value);
 
-//Destructor.
+    //Destructor.
     ~CGXDLMSVariant();
 
 

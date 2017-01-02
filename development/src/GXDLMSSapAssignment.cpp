@@ -92,7 +92,7 @@ void CGXDLMSSapAssignment::GetValues(std::vector<std::string>& values)
     std::stringstream sb;
     sb << '[';
     bool empty = true;
-    for(std::map<int, std::string >::iterator it = m_SapAssignmentList.begin(); it != m_SapAssignmentList.end(); ++it)
+    for (std::map<int, std::string >::iterator it = m_SapAssignmentList.begin(); it != m_SapAssignmentList.end(); ++it)
     {
         if (!empty)
         {
@@ -165,14 +165,14 @@ int CGXDLMSSapAssignment::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
         {
             CGXDLMSVariant f, s;
             for (std::map<int, std::string >::iterator it = m_SapAssignmentList.begin();
-                    it != m_SapAssignmentList.end(); ++it)
+                it != m_SapAssignmentList.end(); ++it)
             {
                 data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
                 data.SetUInt8(2); //Count
                 f = it->first;
                 s = it->second;
                 if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, f)) != 0 ||
-                        (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, s)) != 0)
+                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, s)) != 0)
                 {
                     return ret;
                 }
@@ -197,7 +197,7 @@ int CGXDLMSSapAssignment::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     {
         m_SapAssignmentList.clear();
         for (std::vector<CGXDLMSVariant>::iterator item = e.GetValue().Arr.begin();
-                item != e.GetValue().Arr.end(); ++item)
+            item != e.GetValue().Arr.end(); ++item)
         {
             std::string str;
             if ((*item).Arr[1].vt == DLMS_DATA_TYPE_OCTET_STRING)

@@ -95,7 +95,7 @@ bool CGXStandardObisCodeCollection::EqualsInterface(CGXStandardObisCode item, in
     sprintf(type, "%d", ic);
 #endif
     std::vector< std::string > tmp = GXHelpers::Split(item.GetInterfaces(), ',');
-    for(std::vector< std::string >::iterator it = tmp.begin(); it != tmp.end(); ++it)
+    for (std::vector< std::string >::iterator it = tmp.begin(); it != tmp.end(); ++it)
     {
         if (*it == type)
         {
@@ -114,7 +114,7 @@ bool CGXStandardObisCodeCollection::EqualsMask(std::string obis, int ic)
     {
         std::vector< std::string > tmp = GXHelpers::Split(obis, ',');
         //for (std::string it : tmp)
-        for(std::vector< std::string >::iterator it = tmp.begin(); it != tmp.end(); ++it)
+        for (std::vector< std::string >::iterator it = tmp.begin(); it != tmp.end(); ++it)
         {
             if ((*it).find('-') != std::string::npos)
             {
@@ -424,7 +424,7 @@ bool CGXStandardObisCodeCollection::EqualsMask(std::string obisMask, std::string
 bool CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, CGXStandardObisCode& tmp)
 {
     char buff[6];
-    for(std::vector<CGXStandardObisCode>::iterator it = this->begin(); it != this->end(); ++it)
+    for (std::vector<CGXStandardObisCode>::iterator it = this->begin(); it != this->end(); ++it)
     {
         //Interface is tested first because it's faster.
         if (EqualsInterface(*it, IC) && EqualsObisCode((*it).GetOBIS(), pObisCode))
@@ -441,7 +441,7 @@ bool CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, CGXSt
                 {
                     tmp2[1] = desc;
                     std::string builder;
-                    for(std::vector< std::string >::iterator s = tmp2.begin(); s != tmp2.end(); ++s)
+                    for (std::vector< std::string >::iterator s = tmp2.begin(); s != tmp2.end(); ++s)
                     {
                         if (builder.size() != 0)
                         {

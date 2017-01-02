@@ -49,7 +49,7 @@ void CGXDLMSTcpUdpSetup::Init()
 /**
  Constructor.
 */
-CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup() :  CGXDLMSObject(DLMS_OBJECT_TYPE_TCP_UDP_SETUP, "0.0.25.0.0.255")
+CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_TCP_UDP_SETUP, "0.0.25.0.0.255")
 {
     Init();
 }

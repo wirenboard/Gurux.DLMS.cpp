@@ -85,7 +85,7 @@ void CGXDLMSSpecialDaysTable::GetValues(std::vector<std::string>& values)
     std::stringstream sb;
     sb << '[';
     bool empty = true;
-    for(std::vector<CGXDLMSSpecialDay>::iterator it = m_Entries.begin(); it != m_Entries.end(); ++it)
+    for (std::vector<CGXDLMSSpecialDay>::iterator it = m_Entries.begin(); it != m_Entries.end(); ++it)
     {
         if (!empty)
         {
@@ -160,8 +160,8 @@ int CGXDLMSSpecialDaysTable::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
             date = it->GetDate();
             id = it->GetDayId();
             if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, index)) != DLMS_ERROR_CODE_OK ||
-                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_DATETIME, date)) != DLMS_ERROR_CODE_OK ||
-                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, id)) != DLMS_ERROR_CODE_OK)
+                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_DATETIME, date)) != DLMS_ERROR_CODE_OK ||
+                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, id)) != DLMS_ERROR_CODE_OK)
             {
                 return ret;
             }

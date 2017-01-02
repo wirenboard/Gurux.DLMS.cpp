@@ -120,7 +120,7 @@ int CGXSecure::Secure(
     {
         CGXByteBuffer tmp;
         ret = cipher->Encrypt(DLMS_SECURITY_AUTHENTICATION,
-                              DLMS_COUNT_TYPE_TAG, ic, 0, secret, data, tmp);
+            DLMS_COUNT_TYPE_TAG, ic, 0, secret, data, tmp);
         if (ret == 0)
         {
             reply.SetUInt8(DLMS_SECURITY_AUTHENTICATION);

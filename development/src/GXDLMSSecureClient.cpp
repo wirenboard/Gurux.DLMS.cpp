@@ -35,13 +35,13 @@
 #include "../include/GXDLMSSecureClient.h"
 
 CGXDLMSSecureClient::CGXDLMSSecureClient(bool UseLogicalNameReferencing,
-        int clientAddress,
-        int serverAddress,
-        //Authentication type.
-        DLMS_AUTHENTICATION authentication,
-        //Password if authentication is used.
-        const char* password,
-        DLMS_INTERFACE_TYPE intefaceType) :
+    int clientAddress,
+    int serverAddress,
+    //Authentication type.
+    DLMS_AUTHENTICATION authentication,
+    //Password if authentication is used.
+    const char* password,
+    DLMS_INTERFACE_TYPE intefaceType) :
     CGXDLMSClient(
         UseLogicalNameReferencing,
         clientAddress,

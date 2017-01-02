@@ -114,12 +114,12 @@ void CGXDLMSRegister::SetValue(CGXDLMSVariant& value)
 // Scaler of COSEM Register object.
 double CGXDLMSRegister::GetScaler()
 {
-    return pow((float) 10, m_Scaler);
+    return pow((float)10, m_Scaler);
 }
 
 void CGXDLMSRegister::SetScaler(double value)
 {
-    m_Scaler = (unsigned char) log10(value);
+    m_Scaler = (unsigned char)log10(value);
 }
 
 // Unit of COSEM Register object.
@@ -136,7 +136,7 @@ void CGXDLMSRegister::SetUnit(unsigned char value)
 /*
  * Reset value.
  */
-void CGXDLMSRegister:: Reset()
+void CGXDLMSRegister::Reset()
 {
 
 }

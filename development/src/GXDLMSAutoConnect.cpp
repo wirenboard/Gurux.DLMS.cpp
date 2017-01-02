@@ -131,7 +131,7 @@ void CGXDLMSAutoConnect::GetValues(std::vector<std::string>& values)
     std::stringstream sb;
     sb << '[';
     bool empty = true;
-    for(std::vector<std::pair< CGXDateTime, CGXDateTime> >::iterator it = m_CallingWindow.begin(); it != m_CallingWindow.end(); ++it)
+    for (std::vector<std::pair< CGXDateTime, CGXDateTime> >::iterator it = m_CallingWindow.begin(); it != m_CallingWindow.end(); ++it)
     {
         if (!empty)
         {
@@ -151,7 +151,7 @@ void CGXDLMSAutoConnect::GetValues(std::vector<std::string>& values)
     sb.str(std::string());
     sb << '[';
     empty = true;
-    for(std::vector< std::string >::iterator it = m_Destinations.begin(); it != m_Destinations.end(); ++it)
+    for (std::vector< std::string >::iterator it = m_Destinations.begin(); it != m_Destinations.end(); ++it)
     {
         if (!empty)
         {
@@ -249,7 +249,7 @@ int CGXDLMSAutoConnect::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
     }
     if (e.GetIndex() == 2)
     {
-        e.SetValue((unsigned char) GetMode());
+        e.SetValue((unsigned char)GetMode());
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 3)
@@ -281,7 +281,7 @@ int CGXDLMSAutoConnect::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
                 s = it->first;
                 e = it->second;
                 if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, s)) != 0 || //start_time
-                        (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, e)) != 0) //end_time
+                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, e)) != 0) //end_time
                 {
                     return ret;
                 }
@@ -323,7 +323,7 @@ int CGXDLMSAutoConnect::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
     }
     else if (e.GetIndex() == 2)
     {
-        SetMode((AUTO_CONNECT_MODE) e.GetValue().ToInteger());
+        SetMode((AUTO_CONNECT_MODE)e.GetValue().ToInteger());
         return DLMS_ERROR_CODE_OK;
     }
     else if (e.GetIndex() == 3)

@@ -37,7 +37,7 @@
 
 const char* CGXDLMSConverter::GetErrorMessage(int error)
 {
-    switch(error)
+    switch (error)
     {
     case DLMS_ERROR_CODE_OK:
         return "OK";
@@ -132,7 +132,7 @@ const char* CGXDLMSConverter::GetErrorMessage(int error)
 }
 const char* CGXDLMSConverter::ToString(DLMS_BAUD_RATE value)
 {
-    switch(value)
+    switch (value)
     {
     case 0:
         return "Baudrate300";
@@ -172,7 +172,7 @@ const char* CGXDLMSConverter::ToString(DLMS_BAUD_RATE value)
 
 const char* CGXDLMSConverter::ToString(DLMS_CLOCK_STATUS value)
 {
-    switch(value)
+    switch (value)
     {
     case 0:
         return "None";
@@ -209,7 +209,7 @@ const char* CGXDLMSConverter::ToString(DLMS_CLOCK_STATUS value)
 
 const char* CGXDLMSConverter::ToString(DLMS_CLOCK_BASE value)
 {
-    switch(value)
+    switch (value)
     {
     case 0:
         return "None";
@@ -237,7 +237,7 @@ const char* CGXDLMSConverter::ToString(DLMS_CLOCK_BASE value)
 
 const char* CGXDLMSConverter::GetUnitAsString(int unit)
 {
-    switch(unit)
+    switch (unit)
     {
     case 0:
         return "None";
@@ -394,7 +394,7 @@ const char* CGXDLMSConverter::GetUnitAsString(int unit)
     case 51:
         return "ConductanceSiemens";
         break;
-    case 254 :
+    case 254:
         return "OtherUnit";
         break;
     case 255:
@@ -407,7 +407,7 @@ const char* CGXDLMSConverter::GetUnitAsString(int unit)
 
 const char* CGXDLMSConverter::ToString(DLMS_ADDRESS_STATE value)
 {
-    switch(value)
+    switch (value)
     {
     case 0:
         return "None";
@@ -424,7 +424,7 @@ const char* CGXDLMSConverter::ToString(DLMS_ADDRESS_STATE value)
 //Get Disconnect control control state as a std::string.
 const char* CGXDLMSConverter::ToString(DLMS_CONTROL_STATE value)
 {
-    switch(value)
+    switch (value)
     {
     case 0:
         return "Disconnected";
@@ -444,7 +444,7 @@ const char* CGXDLMSConverter::ToString(DLMS_CONTROL_STATE value)
 //Get Disconnect control control mode as a std::string.
 const char* CGXDLMSConverter::ToString(DLMS_CONTROL_MODE value)
 {
-    switch(value)
+    switch (value)
     {
     case 0:
         return "None";
@@ -476,7 +476,7 @@ const char* CGXDLMSConverter::ToString(DLMS_CONTROL_MODE value)
 //Get Security Setup security policy as a std::string.
 const char* CGXDLMSConverter::ToString(DLMS_SECURITY_POLICY value)
 {
-    switch(value)
+    switch (value)
     {
     case DLMS_SECURITY_POLICY_NOTHING:
         return "Nothing";
@@ -499,7 +499,7 @@ const char* CGXDLMSConverter::ToString(DLMS_SECURITY_POLICY value)
 //Get Security Setup security suite as a std::string.
 const char* CGXDLMSConverter::ToString(DLMS_SECURITY_SUITE value)
 {
-    switch(value)
+    switch (value)
     {
     case 0://DLMS_SECURITY_SUITE_AES_GCM_128
         return "AES_GCM_128";
@@ -512,7 +512,7 @@ const char* CGXDLMSConverter::ToString(DLMS_SECURITY_SUITE value)
 
 const char* CGXDLMSConverter::ToString(DLMS_DLMS_ASSOCIATION_STATUS value)
 {
-    switch(value)
+    switch (value)
     {
     case DLMS_DLMS_ASSOCIATION_STATUS_NON_ASSOCIATED:
         return "NonAssociated";
@@ -531,7 +531,7 @@ const char* CGXDLMSConverter::ToString(DLMS_DLMS_ASSOCIATION_STATUS value)
 
 const char* CGXDLMSConverter::ToString(DLMS_OPTICAL_PROTOCOL_MODE value)
 {
-    switch(value)
+    switch (value)
     {
     case DLMS_OPTICAL_PROTOCOL_MODE_DEFAULT:
         return "Default";
@@ -550,7 +550,7 @@ const char* CGXDLMSConverter::ToString(DLMS_OPTICAL_PROTOCOL_MODE value)
 
 const char* CGXDLMSConverter::ToString(DLMS_LOCAL_PORT_RESPONSE_TIME value)
 {
-    switch(value)
+    switch (value)
     {
     case DLMS_LOCAL_PORT_RESPONSE_TIME_20_MS:
         return "ms20";

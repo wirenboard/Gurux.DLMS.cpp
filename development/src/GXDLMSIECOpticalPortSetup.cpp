@@ -321,22 +321,22 @@ int CGXDLMSIECOpticalPortSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValue
     }
     else if (e.GetIndex() == 2)
     {
-        SetDefaultMode((DLMS_OPTICAL_PROTOCOL_MODE) e.GetValue().lVal);
+        SetDefaultMode((DLMS_OPTICAL_PROTOCOL_MODE)e.GetValue().lVal);
         return DLMS_ERROR_CODE_OK;
     }
     else if (e.GetIndex() == 3)
     {
-        SetDefaultBaudrate((DLMS_BAUD_RATE) e.GetValue().lVal);
+        SetDefaultBaudrate((DLMS_BAUD_RATE)e.GetValue().lVal);
         return DLMS_ERROR_CODE_OK;
     }
     else if (e.GetIndex() == 4)
     {
-        SetProposedBaudrate((DLMS_BAUD_RATE) e.GetValue().lVal);
+        SetProposedBaudrate((DLMS_BAUD_RATE)e.GetValue().lVal);
         return DLMS_ERROR_CODE_OK;
     }
     else if (e.GetIndex() == 5)
     {
-        SetResponseTime((DLMS_LOCAL_PORT_RESPONSE_TIME) e.GetValue().lVal);
+        SetResponseTime((DLMS_LOCAL_PORT_RESPONSE_TIME)e.GetValue().lVal);
         return DLMS_ERROR_CODE_OK;
     }
     else if (e.GetIndex() == 6)

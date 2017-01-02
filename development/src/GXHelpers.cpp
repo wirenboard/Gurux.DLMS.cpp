@@ -195,7 +195,7 @@ int GetDate(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 //Get UTC offset in minutes.
 static void GetUtcOffset(int& hours, int& minutes)
 {
-    time_t zero = 24*60*60L;
+    time_t zero = 24 * 60 * 60L;
     struct tm tm;
 
     // local time for Jan 2, 1900 00:00 UTC
@@ -207,7 +207,7 @@ static void GetUtcOffset(int& hours, int& minutes)
     hours = tm.tm_hour;
 
     //If the local time is the "day before" the UTC, subtract 24 hours from the hours to get the UTC offset
-    if(tm.tm_mday < 2 )
+    if (tm.tm_mday < 2)
     {
         hours -= 24;
     }
@@ -220,7 +220,7 @@ static time_t GetUtcTime(struct tm * timeptr)
     and then adds the appropriate number of seconds to make it UTC */
     int hours, minutes;
     GetUtcOffset(hours, minutes);
-    return mktime( timeptr ) + (hours * 3600) + (minutes * 60);
+    return mktime(timeptr) + (hours * 3600) + (minutes * 60);
 }
 
 /**
@@ -234,7 +234,7 @@ static time_t GetUtcTime(struct tm * timeptr)
 */
 int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 {
-    struct tm tm = {0};
+    struct tm tm = { 0 };
     unsigned short year;
     short deviation;
     int ret, ms, status;
@@ -308,11 +308,11 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     }
     status = ch;
     CGXDateTime dt;
-    dt.SetStatus((DLMS_CLOCK_STATUS) status);
+    dt.SetStatus((DLMS_CLOCK_STATUS)status);
     DATETIME_SKIPS skip = DATETIME_SKIPS_NONE;
     if (year < 1 || year == 0xFFFF)
     {
-        skip = (DATETIME_SKIPS) (skip | DATETIME_SKIPS_YEAR);
+        skip = (DATETIME_SKIPS)(skip | DATETIME_SKIPS_YEAR);
         tm.tm_year = 0;
     }
     else
@@ -322,13 +322,13 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     if (tm.tm_wday < 0 || tm.tm_wday > 7)
     {
         tm.tm_wday = 0;
-        skip = (DATETIME_SKIPS) (skip | DATETIME_SKIPS_DAYOFWEEK);
+        skip = (DATETIME_SKIPS)(skip | DATETIME_SKIPS_DAYOFWEEK);
     }
     dt.SetDaylightSavingsBegin(tm.tm_mon == 0xFE);
     dt.SetDaylightSavingsEnd(tm.tm_mon == 0xFD);
     if (tm.tm_mon < 1 || tm.tm_mon > 12)
     {
-        skip = (DATETIME_SKIPS) (skip | DATETIME_SKIPS_MONTH);
+        skip = (DATETIME_SKIPS)(skip | DATETIME_SKIPS_MONTH);
         tm.tm_mon = 0;
     }
     else
@@ -337,7 +337,7 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     }
     if (tm.tm_mday == -1 || tm.tm_mday == 0 || tm.tm_mday > 31)
     {
-        skip = (DATETIME_SKIPS) (skip | DATETIME_SKIPS_DAY);
+        skip = (DATETIME_SKIPS)(skip | DATETIME_SKIPS_DAY);
         tm.tm_mday = 1;
     }
     else if (tm.tm_mday < 0)
@@ -346,28 +346,28 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     }
     if (tm.tm_hour < 0 || tm.tm_hour > 24)
     {
-        skip = (DATETIME_SKIPS) (skip | DATETIME_SKIPS_HOUR);
+        skip = (DATETIME_SKIPS)(skip | DATETIME_SKIPS_HOUR);
         tm.tm_hour = 0;
     }
     if (tm.tm_min < 0 || tm.tm_min > 60)
     {
-        skip = (DATETIME_SKIPS) (skip | DATETIME_SKIPS_MINUTE);
+        skip = (DATETIME_SKIPS)(skip | DATETIME_SKIPS_MINUTE);
         tm.tm_min = 0;
     }
     if (tm.tm_sec < 0 || tm.tm_sec > 60)
     {
-        skip = (DATETIME_SKIPS) (skip | DATETIME_SKIPS_SECOND);
+        skip = (DATETIME_SKIPS)(skip | DATETIME_SKIPS_SECOND);
         tm.tm_sec = 0;
     }
     // If ms is Zero it's skipped.
     if (ms < 1 || ms > 1000)
     {
-        skip = (DATETIME_SKIPS) (skip | DATETIME_SKIPS_MS);
+        skip = (DATETIME_SKIPS)(skip | DATETIME_SKIPS_MS);
         ms = 0;
     }
     if (deviation != -32768)//0x8000
     {
-        tm.tm_min -= deviation;
+        tm.tm_min += deviation;
         time_t t = GetUtcTime(&tm);
         if (t == -1)
         {
@@ -610,7 +610,7 @@ int GetInt8(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         info.SetCompleate(false);
         return 0;
     }
-    if ((ret = buff.GetUInt8((unsigned char*) &val)) != 0)
+    if ((ret = buff.GetUInt8((unsigned char*)&val)) != 0)
     {
         return ret;
     }
@@ -713,17 +713,17 @@ void GXHelpers::SetObjectCount(unsigned long count, CGXByteBuffer& buff)
 {
     if (count < 0x80)
     {
-        buff.SetUInt8((unsigned char) count);
+        buff.SetUInt8((unsigned char)count);
     }
     else if (count < 0x100)
     {
         buff.SetUInt8(0x81);
-        buff.SetUInt8((unsigned char) count);
+        buff.SetUInt8((unsigned char)count);
     }
     else if (count < 0x10000)
     {
         buff.SetUInt8(0x82);
-        buff.SetUInt16((unsigned short) count);
+        buff.SetUInt16((unsigned short)count);
     }
     else
     {
@@ -737,7 +737,7 @@ std::vector< std::string > GXHelpers::Split(std::string& s, char separator)
     std::vector< std::string > items;
     int last = 0;
     int pos = -1;
-    while((pos = s.find(separator, pos + 1)) != -1)
+    while ((pos = s.find(separator, pos + 1)) != -1)
     {
         std::string str;
         str.append(s, last, pos - last);
@@ -759,7 +759,7 @@ std::vector< std::string > GXHelpers::Split(std::string& s, std::string separato
     std::vector< std::string > items;
     int last = 0;
     int pos = -1;
-    while((pos = s.find_first_of(separators, pos + 1)) != -1)
+    while ((pos = s.find_first_of(separators, pos + 1)) != -1)
     {
         if (!ignoreEmpty || pos - last != 0)
         {
@@ -792,13 +792,13 @@ void GXHelpers::Replace(std::string& str, std::string oldString, std::string new
 std::string& GXHelpers::ltrim(std::string& s)
 {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(),
-                                    std::not1(std::ptr_fun<int, int>(std::isspace))));
+        std::not1(std::ptr_fun<int, int>(std::isspace))));
     return s;
 }
 
 std::string GXHelpers::BytesToHex(unsigned char* pBytes, int count)
 {
-    const char hexArray[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+    const char hexArray[] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
     std::string hexChars(3 * count, 0);
     int tmp;
     for (int pos = 0; pos != count; ++pos)
@@ -850,7 +850,7 @@ int GetUtfString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMS
     {
 
         tmp = new wchar_t[len];
-        buff.Get((unsigned char*) tmp, 2 * len);
+        buff.Get((unsigned char*)tmp, 2 * len);
         value.strUtfVal.append(tmp, len);
     }
     else
@@ -890,7 +890,7 @@ int GetOctetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDL
             return 0;
         }
     }
-    value.size = (unsigned short) len;
+    value.size = (unsigned short)len;
     if (len == 0)
     {
         value.byteArr = NULL;
@@ -942,7 +942,7 @@ int GetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMSVar
     {
         tmp = new char[len + 1];
         tmp[len] = '\0';
-        if ((ret = buff.Get((unsigned char*) tmp, len)) != 0)
+        if ((ret = buff.Get((unsigned char*)tmp, len)) != 0)
         {
             delete tmp;
             return ret;
@@ -1044,7 +1044,7 @@ static int GetBitString(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& 
     {
         ++t;
     }
-    unsigned int byteCnt = (unsigned int) t;
+    unsigned int byteCnt = (unsigned int)t;
     // If there is not enough data available.
     if (buff.GetSize() - buff.GetPosition() < byteCnt)
     {
@@ -1118,7 +1118,7 @@ int GXHelpers::GetData(
         {
             return ret;
         }
-        info.SetType((DLMS_DATA_TYPE) ch);
+        info.SetType((DLMS_DATA_TYPE)ch);
     }
     if (info.GetType() == DLMS_DATA_TYPE_NONE)
     {
@@ -1440,19 +1440,6 @@ static int SetDateTime(CGXByteBuffer& buff, CGXDLMSVariant& value)
     return 0;
 }
 
-static unsigned char GetBCD(char ch)
-{
-    if (ch <= '0')
-    {
-        return ch - '0';
-    }
-    if (ch <= 'G')
-    {
-        return ch - 'A';
-    }
-    return ch - 'a';
-}
-
 /**
 * Convert BCD to DLMS bytes.
 *
@@ -1578,12 +1565,12 @@ int GXHelpers::SetLogicalName(const char* name, unsigned char ln[6])
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    ln[0] = (unsigned char) v1;
-    ln[1] = (unsigned char) v2;
-    ln[2] = (unsigned char) v3;
-    ln[3] = (unsigned char) v4;
-    ln[4] = (unsigned char) v5;
-    ln[5] = (unsigned char) v6;
+    ln[0] = (unsigned char)v1;
+    ln[1] = (unsigned char)v2;
+    ln[2] = (unsigned char)v3;
+    ln[3] = (unsigned char)v4;
+    ln[4] = (unsigned char)v5;
+    ln[5] = (unsigned char)v6;
     return DLMS_ERROR_CODE_OK;
 }
 
@@ -1679,7 +1666,7 @@ static int SetBitString(CGXByteBuffer& buff, CGXDLMSVariant& value)
 int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant& value)
 {
     if ((type == DLMS_DATA_TYPE_ARRAY || type == DLMS_DATA_TYPE_STRUCTURE)
-            && value.vt == DLMS_DATA_TYPE_OCTET_STRING)
+        && value.vt == DLMS_DATA_TYPE_OCTET_STRING)
     {
         // If byte array is added do not add type.
         buff.Set(value.byteArr, value.size);
@@ -1698,7 +1685,7 @@ int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant&
         buff.SetUInt8(value.boolVal != 0);
     }
     else if (type == DLMS_DATA_TYPE_INT8 || type == DLMS_DATA_TYPE_UINT8
-             || type == DLMS_DATA_TYPE_ENUM)
+        || type == DLMS_DATA_TYPE_ENUM)
     {
         buff.SetUInt8(value.bVal);
     }

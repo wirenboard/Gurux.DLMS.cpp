@@ -322,7 +322,7 @@ int CGXDLMSClock::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
     }
     if (e.GetIndex() == 4)
     {
-        e.SetValue((unsigned char) GetStatus());
+        e.SetValue((unsigned char)GetStatus());
         return 0;
     }
     if (e.GetIndex() == 5)
@@ -381,7 +381,7 @@ int CGXDLMSClock::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
     }
     else if (e.GetIndex() == 4)
     {
-        SetStatus((DLMS_CLOCK_STATUS) e.GetValue().ToInteger());
+        SetStatus((DLMS_CLOCK_STATUS)e.GetValue().ToInteger());
     }
     else if (e.GetIndex() == 5)
     {

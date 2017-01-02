@@ -532,7 +532,7 @@ public:
      * @return Server address.
      */
     static int  GetServerAddress(unsigned long logicalAddress,
-                                 unsigned long physicalAddress,
-                                 unsigned char addressSize = 0);
+        unsigned long physicalAddress,
+        unsigned char addressSize = 0);
 };
 #endif //GXDLMSCLIENT_H

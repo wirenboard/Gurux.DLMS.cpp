@@ -151,7 +151,7 @@ int CGXDLMSObject::GetDataType(int index, DLMS_DATA_TYPE& type)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    for(std::vector<CGXDLMSAttribute>::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
+    for (std::vector<CGXDLMSAttribute>::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
     {
         if ((*it).GetIndex() == index)
         {
@@ -165,7 +165,7 @@ int CGXDLMSObject::GetDataType(int index, DLMS_DATA_TYPE& type)
 
 int CGXDLMSObject::SetDataType(int index, DLMS_DATA_TYPE type)
 {
-    for(CGXAttributeCollection::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
+    for (CGXAttributeCollection::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
     {
         if ((*it).GetIndex() == index)
         {
@@ -186,7 +186,7 @@ DLMS_ACCESS_MODE CGXDLMSObject::GetAccess(int index)
     {
         return DLMS_ACCESS_MODE_READ;
     }
-    for(CGXAttributeCollection::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
+    for (CGXAttributeCollection::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
     {
         if ((*it).GetIndex() == index)
         {
@@ -199,7 +199,7 @@ DLMS_ACCESS_MODE CGXDLMSObject::GetAccess(int index)
 // Set attribute access.
 void CGXDLMSObject::SetAccess(int index, DLMS_ACCESS_MODE access)
 {
-    for(CGXAttributeCollection::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
+    for (CGXAttributeCollection::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
     {
         if ((*it).GetIndex() == index)
         {
@@ -214,7 +214,7 @@ void CGXDLMSObject::SetAccess(int index, DLMS_ACCESS_MODE access)
 
 DLMS_METHOD_ACCESS_MODE CGXDLMSObject::GetMethodAccess(int index)
 {
-    for(CGXAttributeCollection::iterator it = m_MethodAttributes.begin(); it != m_MethodAttributes.end(); ++it)
+    for (CGXAttributeCollection::iterator it = m_MethodAttributes.begin(); it != m_MethodAttributes.end(); ++it)
     {
         if ((*it).GetIndex() == index)
         {
@@ -226,7 +226,7 @@ DLMS_METHOD_ACCESS_MODE CGXDLMSObject::GetMethodAccess(int index)
 
 void CGXDLMSObject::SetMethodAccess(int index, DLMS_METHOD_ACCESS_MODE access)
 {
-    for(CGXAttributeCollection::iterator it = m_MethodAttributes.begin(); it != m_MethodAttributes.end(); ++it)
+    for (CGXAttributeCollection::iterator it = m_MethodAttributes.begin(); it != m_MethodAttributes.end(); ++it)
     {
         if ((*it).GetIndex() == index)
         {
@@ -241,7 +241,7 @@ void CGXDLMSObject::SetMethodAccess(int index, DLMS_METHOD_ACCESS_MODE access)
 
 int CGXDLMSObject::GetUIDataType(int index, DLMS_DATA_TYPE& type)
 {
-    for(CGXAttributeCollection::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
+    for (CGXAttributeCollection::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
     {
         if ((*it).GetIndex() == index)
         {
@@ -255,7 +255,7 @@ int CGXDLMSObject::GetUIDataType(int index, DLMS_DATA_TYPE& type)
 
 void CGXDLMSObject::SetUIDataType(int index, DLMS_DATA_TYPE type)
 {
-    for(CGXAttributeCollection::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
+    for (CGXAttributeCollection::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
     {
         if ((*it).GetIndex() == index)
         {
@@ -305,25 +305,25 @@ CGXAttributeCollection& CGXDLMSObject::GetMethodAttributes()
 //Get Object's attribute index.
 char CGXDLMSObject::GetAttributeIndex()
 {
-	return m_AttributeIndex;
+    return m_AttributeIndex;
 }
 
 //Set Object's attribute index.
 void CGXDLMSObject::SetAttributeIndex(char value)
 {
-	m_AttributeIndex = value;
+    m_AttributeIndex = value;
 }
 
 //Get Object's data index.
 unsigned short CGXDLMSObject::GetDataIndex()
 {
-	return m_DataIndex;
+    return m_DataIndex;
 }
 
 //Set Object's data index.
 void CGXDLMSObject::SetDataIndex(unsigned short value)
 {
-	m_DataIndex = value;
+    m_DataIndex = value;
 }
 */
 
