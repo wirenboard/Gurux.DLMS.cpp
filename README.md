@@ -19,7 +19,7 @@ Gurux.DLMS classes only parse the data.
 Before start
 =========================== 
 
-This is ALPHA version. If you find an issue, please report it here:
+If you find an issue, please report it here:
 http://www.gurux.fi/fi/project/issues/gurux.dlms.cpp
 
 We have made makefile for linux environment. You should go development folder and create lib and obj directories.
@@ -28,9 +28,8 @@ Then run make. gurux_dlms_cpp static library is made.
 For Client example you should also create bin and obj -directories.
 Change Host name, port and DLMS settings for example. Run make and you are ready to test.
 
-Server side functionality is added later in this spring.
-
-Simple example=========================== 
+Simple example
+=========================== 
 Before use you must set following device parameters. 
 Parameters are manufacturer spesific.
 

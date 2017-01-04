@@ -224,3 +224,6 @@ GuruxDLMSServerExample/VS/GuruxDLMSServerExample.VC.db
 GuruxDLMSServerExample/VS/GuruxDLMSServerExample.VC.VC.opendb
 *.opendb
 *.db
+GuruxDLMSClientExample/VS/GuruxDLMClientExample.VC.db
+*.db
+GuruxDLMSClientExample/VS/GuruxDLMClientExample.VC.db
