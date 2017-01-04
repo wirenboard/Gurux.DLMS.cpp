@@ -149,7 +149,7 @@ int CGXDLMSSpecialDaysTable::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         //Add count
-        GXHelpers::SetObjectCount(m_Entries.size(), data);
+        GXHelpers::SetObjectCount((unsigned long)m_Entries.size(), data);
         int ret;
         CGXDLMSVariant index, date, id;
         for (std::vector<CGXDLMSSpecialDay>::iterator it = m_Entries.begin(); it != m_Entries.end(); ++it)

@@ -312,7 +312,7 @@ void CGXByteBuffer::Set(CGXByteBuffer* data, unsigned long index, unsigned long 
 {
     if (data != NULL)
     {
-        if (count == 0xFFFFFFFF)
+        if (count == (unsigned long)-1)
         {
             count = data->m_Size - index;
         }
@@ -325,14 +325,14 @@ void CGXByteBuffer::AddString(const char* value)
 {
     if (value != NULL)
     {
-        int len = strlen(value);
+        unsigned long len = (unsigned long)strlen(value);
         CGXByteBuffer::Set(value, len);
     }
 }
 
 void CGXByteBuffer::AttachString(char* value)
 {
-    int len = strlen(value);
+    unsigned long len = (unsigned long)strlen(value);
     CGXByteBuffer::Set(value, len);
     free(value);
 }
@@ -366,7 +366,6 @@ int CGXByteBuffer::GetUInt8(unsigned long index, unsigned char* value)
 
 int CGXByteBuffer::GetUInt16(unsigned short* value)
 {
-
     if (m_Position + 2 > m_Size)
     {
         return DLMS_ERROR_CODE_OUTOFMEMORY;
@@ -378,7 +377,6 @@ int CGXByteBuffer::GetUInt16(unsigned short* value)
 
 int CGXByteBuffer::GetUInt32(unsigned long* value)
 {
-
     if (m_Position + 4 > m_Size)
     {
         return DLMS_ERROR_CODE_OUTOFMEMORY;

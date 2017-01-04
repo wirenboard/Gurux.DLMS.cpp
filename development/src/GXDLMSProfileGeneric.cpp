@@ -86,7 +86,7 @@ int CGXDLMSProfileGeneric::GetSelectedColumns(
         }
         else if (colStart != 1)
         {
-            colCount = m_CaptureObjects.size();
+            colCount = (int)m_CaptureObjects.size();
         }
         if (colStart != 1 || colCount != 0)
         {
@@ -110,7 +110,7 @@ int CGXDLMSProfileGeneric::GetSelectedColumns(
 }
 int CGXDLMSProfileGeneric::GetColumns(CGXByteBuffer& data)
 {
-    int cnt = m_CaptureObjects.size();
+    unsigned long cnt = (unsigned long)m_CaptureObjects.size();
     data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
     //Add count
     GXHelpers::SetObjectCount(cnt, data);
@@ -146,7 +146,7 @@ int CGXDLMSProfileGeneric::GetData(
     CGXByteBuffer& data)
 {
     data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-    GXHelpers::SetObjectCount(table.size(), data);
+    GXHelpers::SetObjectCount((unsigned long)table.size(), data);
     std::vector<DLMS_DATA_TYPE> types;
     DLMS_DATA_TYPE type;
     int ret;
@@ -164,11 +164,11 @@ int CGXDLMSProfileGeneric::GetData(
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         if (columns.size() == 0)
         {
-            GXHelpers::SetObjectCount((*row).size(), data);
+            GXHelpers::SetObjectCount((unsigned long)(*row).size(), data);
         }
         else
         {
-            GXHelpers::SetObjectCount(columns.size(), data);
+            GXHelpers::SetObjectCount((unsigned long)columns.size(), data);
         }
         int pos = -1;
         for (std::vector<CGXDLMSVariant>::iterator value = (*row).begin(); value != (*row).end(); ++value)
@@ -308,11 +308,11 @@ int CGXDLMSProfileGeneric::GetProfileGenericData(int selector, CGXDLMSVariant& p
         }
         if (count == 0)
         {
-            count = table.size();
+            count = (int)table.size();
         }
         if ((unsigned long)(start + count - 1) > table.size())
         {
-            count = table.size();
+            count = (int)table.size();
         }
 
         int colStart = 1;
@@ -327,7 +327,7 @@ int CGXDLMSProfileGeneric::GetProfileGenericData(int selector, CGXDLMSVariant& p
         }
         else if (colStart != 1)
         {
-            colCount = m_CaptureObjects.size();
+            colCount = (int)m_CaptureObjects.size();
         }
         if (colStart != 1 || colCount != 0)
         {
@@ -815,7 +815,7 @@ int CGXDLMSProfileGeneric::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
                 m_Buffer.push_back(row->Arr);
             }
         }
-        m_EntriesInUse = m_Buffer.size();
+        m_EntriesInUse = (unsigned long)m_Buffer.size();
     }
     else if (e.GetIndex() == 3)
     {

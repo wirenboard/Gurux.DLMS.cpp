@@ -182,7 +182,7 @@ int CGXReplyData::GetCount()
 {
     if (m_DataValue.vt == DLMS_DATA_TYPE_ARRAY)
     {
-        return m_DataValue.Arr.size();
+        return (int)m_DataValue.Arr.size();
     }
     return 0;
 }

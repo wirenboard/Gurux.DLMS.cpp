@@ -397,7 +397,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             }
             if (tmp2.GetSize() == 0)
             {
-                item->Add(pBuff, tmp.strVal.size());
+                item->Add(pBuff, (unsigned long)tmp.strVal.size());
             }
             else
             {
@@ -1210,7 +1210,7 @@ int CGXDLMSVariant::GetSize()
     if (this->vt == DLMS_DATA_TYPE_STRING ||
         this->vt == DLMS_DATA_TYPE_BIT_STRING)
     {
-        return strVal.size();
+        return (int)strVal.size();
     }
     if (this->vt == DLMS_DATA_TYPE_OCTET_STRING)
     {

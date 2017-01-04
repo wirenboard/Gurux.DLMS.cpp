@@ -155,7 +155,7 @@ int CGXDLMSSapAssignment::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     if (e.GetIndex() == 2)
     {
         e.SetByteArray(true);
-        int cnt = m_SapAssignmentList.size();
+        unsigned long cnt = (unsigned long)m_SapAssignmentList.size();
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         //Add count

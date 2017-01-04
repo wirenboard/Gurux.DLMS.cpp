@@ -291,22 +291,22 @@ int CGXDLMSIECOpticalPortSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValue
     }
     if (e.GetIndex() == 6)
     {
-        e.GetValue().Add(&m_DeviceAddress[0], m_DeviceAddress.size());
+        e.GetValue().Add(&m_DeviceAddress[0], (unsigned long)m_DeviceAddress.size());
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 7)
     {
-        e.GetValue().Add(&m_Password1[0], m_Password1.size());
+        e.GetValue().Add(&m_Password1[0], (unsigned long)m_Password1.size());
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 8)
     {
-        e.GetValue().Add(&m_Password2[0], m_Password2.size());
+        e.GetValue().Add(&m_Password2[0], (unsigned long)m_Password2.size());
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 9)
     {
-        e.GetValue().Add(&m_Password5[0], m_Password5.size());
+        e.GetValue().Add(&m_Password5[0], (int)m_Password5.size());
         return DLMS_ERROR_CODE_OK;
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;

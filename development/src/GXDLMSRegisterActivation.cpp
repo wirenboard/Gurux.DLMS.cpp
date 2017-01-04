@@ -198,7 +198,7 @@ int CGXDLMSRegisterActivation::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
         e.SetByteArray(true);
         int ret;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(m_RegisterAssignment.size(), data);
+        GXHelpers::SetObjectCount((unsigned long)m_RegisterAssignment.size(), data);
         CGXDLMSVariant id, ln;
         for (std::vector<CGXDLMSObjectDefinition>::iterator it = m_RegisterAssignment.begin(); it != m_RegisterAssignment.end(); ++it)
         {

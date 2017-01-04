@@ -537,11 +537,11 @@ bool CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, CGXSt
 #endif
             GXHelpers::Replace(desc, "$F", buff);
             //Increase value
-            int begin = desc.find("#$");
+            int begin = (int)desc.find("#$");
             if (begin != -1)
             {
-                int start = desc.find('(');
-                int end = desc.find(')');
+                int start = (int)desc.find('(');
+                int end = (int)desc.find(')');
                 char channel = desc[start + 1];
                 int ch = 0;
                 if (channel == 'A')
@@ -568,7 +568,7 @@ bool CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, CGXSt
                 {
                     ch = pObisCode[5];
                 }
-                int plus = desc.find('+');
+                int plus = (int)desc.find('+');
                 if (plus != -1)
                 {
                     int value;

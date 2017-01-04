@@ -249,7 +249,7 @@ int CGXDLMSPppSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     {
         e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(m_LCPOptions.size(), data);
+        GXHelpers::SetObjectCount((unsigned long)m_LCPOptions.size(), data);
         CGXDLMSVariant type, len;
         for (std::vector<CGXDLMSPppSetupLcpOption>::iterator it = m_LCPOptions.begin(); it != m_LCPOptions.end(); ++it)
         {
@@ -269,7 +269,7 @@ int CGXDLMSPppSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     {
         e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(m_IPCPOptions.size(), data);
+        GXHelpers::SetObjectCount((unsigned long)m_IPCPOptions.size(), data);
         CGXDLMSVariant type, len;
         for (std::vector<CGXDLMSPppSetupIPCPOption>::iterator it = m_IPCPOptions.begin(); it != m_IPCPOptions.end(); ++it)
         {

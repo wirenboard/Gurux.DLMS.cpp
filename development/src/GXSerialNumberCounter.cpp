@@ -76,7 +76,7 @@ int CGXSerialNumberCounter::FormatString(std::string& expression, std::string& v
 int CGXSerialNumberCounter::GetValues(std::string& expressions, std::vector<std::string>& values)
 {
     int last = 0, index = 0;
-    int count = expressions.size();
+    int count = (int)expressions.size();
     char ch;
     std::string tmp;
     for (int pos = 0; pos != count; ++pos)

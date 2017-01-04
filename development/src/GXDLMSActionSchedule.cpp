@@ -237,7 +237,7 @@ int CGXDLMSActionSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
         int ret;
         CGXByteBuffer bb;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(GetExecutionTime().size(), bb);
+        GXHelpers::SetObjectCount((unsigned long)GetExecutionTime().size(), bb);
         CGXDLMSVariant val;
         for (std::vector<CGXDateTime>::iterator it = m_ExecutionTime.begin(); it != m_ExecutionTime.end(); ++it)
         {

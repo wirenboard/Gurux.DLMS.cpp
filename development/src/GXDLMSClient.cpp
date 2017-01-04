@@ -329,7 +329,7 @@ int CGXDLMSClient::ParseLNObjects(CGXByteBuffer& buff, CGXDLMSObjectCollection& 
                     //Get access_selectors
                     if (value.Arr[3].Arr[0].Arr[pos].Arr[2].vt == DLMS_DATA_TYPE_ARRAY)
                     {
-                        int cnt2 = value.Arr[3].Arr[0].Arr[pos].Arr[2].Arr.size();
+                        int cnt2 = (unsigned long)value.Arr[3].Arr[0].Arr[pos].Arr[2].Arr.size();
                         for (int pos2 = 0; pos2 != cnt2; ++pos2)
                         {
                             //Get access_mode
@@ -1121,7 +1121,7 @@ int CGXDLMSClient::ReadList(
                 bb.Clear();
                 if (list.size() - pos < count)
                 {
-                    GXHelpers::SetObjectCount(list.size() - pos, bb);
+                    GXHelpers::SetObjectCount((unsigned long)(list.size() - pos), bb);
                 }
                 else
                 {
@@ -1146,7 +1146,7 @@ int CGXDLMSClient::ReadList(
             bb.SetUInt16(sn);
         }
         CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_READ_REQUEST,
-            list.size(), 3, &bb, NULL);
+            (unsigned long)list.size(), 3, &bb, NULL);
         ret = CGXDLMS::GetSnMessages(p, reply);
     }
     return ret;

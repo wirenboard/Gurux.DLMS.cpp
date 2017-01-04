@@ -219,7 +219,7 @@ int CGXDLMSRegisterMonitor::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEven
         e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         //Add count
-        GXHelpers::SetObjectCount(m_Thresholds.size(), data);
+        GXHelpers::SetObjectCount((unsigned long)m_Thresholds.size(), data);
         int ret;
         CGXDLMSVariant tmp;
         for (std::vector<CGXDLMSVariant>::iterator it = m_Thresholds.begin(); it != m_Thresholds.end(); ++it)
@@ -257,7 +257,7 @@ int CGXDLMSRegisterMonitor::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEven
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int ret;
         //Add count
-        GXHelpers::SetObjectCount(m_Actions.size(), data);
+        GXHelpers::SetObjectCount((unsigned long)m_Actions.size(), data);
         CGXDLMSVariant selector;
         for (std::vector<CGXDLMSActionSet>::iterator it = m_Actions.begin(); it != m_Actions.end(); ++it)
         {

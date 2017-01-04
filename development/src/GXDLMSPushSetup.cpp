@@ -251,7 +251,7 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
     {
         e.SetByteArray(true);
         buff.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(m_PushObjectList.size(), buff);
+        GXHelpers::SetObjectCount((unsigned long)m_PushObjectList.size(), buff);
         for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> >::iterator it = m_PushObjectList.begin(); it != m_PushObjectList.end(); ++it)
         {
             buff.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
@@ -316,7 +316,7 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
     {
         e.SetByteArray(true);
         buff.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(m_CommunicationWindow.size(), buff);
+        GXHelpers::SetObjectCount((unsigned long)m_CommunicationWindow.size(), buff);
         for (std::vector<std::pair< CGXDateTime, CGXDateTime> >::iterator it = m_CommunicationWindow.begin(); it != m_CommunicationWindow.end(); ++it)
         {
             buff.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);

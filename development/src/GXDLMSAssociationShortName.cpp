@@ -44,7 +44,7 @@ int CGXDLMSAssociationShortName::GetAccessRights(CGXDLMSObject* pObj, CGXByteBuf
     CGXDLMSVariant ln = pObj->GetShortName();
     GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, ln);
     data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-    GXHelpers::SetObjectCount(pObj->GetAttributes().size(), data);
+    GXHelpers::SetObjectCount((unsigned long)pObj->GetAttributes().size(), data);
     CGXDLMSVariant empty;
     CGXDLMSVariant index, access;
     for (std::vector<CGXDLMSAttribute>::iterator att = pObj->GetAttributes().begin(); att != pObj->GetAttributes().end(); ++att)
@@ -58,7 +58,7 @@ int CGXDLMSAssociationShortName::GetAccessRights(CGXDLMSObject* pObj, CGXByteBuf
         GXHelpers::SetData(data, DLMS_DATA_TYPE_NONE, empty);
     }
     data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-    GXHelpers::SetObjectCount(pObj->GetMethodAttributes().size(), data);
+    GXHelpers::SetObjectCount((unsigned long)pObj->GetMethodAttributes().size(), data);
     for (std::vector<CGXDLMSAttribute>::iterator it = pObj->GetMethodAttributes().begin(); it != pObj->GetMethodAttributes().end(); ++it)
     {
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE); //attribute_access_item
@@ -226,7 +226,7 @@ int CGXDLMSAssociationShortName::GetObjects(
         settings.SetCount((unsigned short)m_ObjectList.size());
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         //Add count
-        GXHelpers::SetObjectCount(m_ObjectList.size(), data);
+        GXHelpers::SetObjectCount((unsigned long)m_ObjectList.size(), data);
     }
     for (CGXDLMSObjectCollection::iterator it = m_ObjectList.begin(); it != m_ObjectList.end(); ++it)
     {
@@ -354,7 +354,7 @@ int CGXDLMSAssociationShortName::GetValue(CGXDLMSSettings& settings, CGXDLMSValu
         int ret;
         bool lnExists = m_ObjectList.FindBySN(GetShortName()) != NULL;
         //Add count
-        int cnt = m_ObjectList.size();
+        unsigned long cnt = (unsigned long)m_ObjectList.size();
         if (!lnExists)
         {
             ++cnt;

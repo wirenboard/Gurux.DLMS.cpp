@@ -196,7 +196,7 @@ int CGXDLMSNotify::GenerateDataNotificationMessages(
 {
     CGXByteBuffer buff;
     buff.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
-    GXHelpers::SetObjectCount(objects.size(), buff);
+    GXHelpers::SetObjectCount((unsigned long)objects.size(), buff);
     for (std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = objects.begin(); it != objects.end(); ++it)
     {
         AddData(it->first, it->second, buff);
@@ -215,7 +215,7 @@ int CGXDLMSNotify::GeneratePushSetupMessages(
     }
     CGXByteBuffer buff;
     buff.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
-    GXHelpers::SetObjectCount(push->GetPushObjectList().size(), buff);
+    GXHelpers::SetObjectCount((unsigned long)push->GetPushObjectList().size(), buff);
     for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> >::iterator it = push->GetPushObjectList().begin(); it != push->GetPushObjectList().end(); ++it)
     {
         AddData(it->first, it->second.GetAttributeIndex(), buff);

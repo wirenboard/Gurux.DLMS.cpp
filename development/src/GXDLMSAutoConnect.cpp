@@ -265,7 +265,7 @@ int CGXDLMSAutoConnect::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
     if (e.GetIndex() == 5)
     {
         e.SetByteArray(true);
-        int cnt = m_CallingWindow.size();
+        unsigned long cnt = (unsigned long)m_CallingWindow.size();
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int ret;
@@ -296,13 +296,13 @@ int CGXDLMSAutoConnect::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         int ret;
-        int cnt = m_Destinations.size();
+        unsigned long cnt = (unsigned long)m_Destinations.size();
         //Add count
         GXHelpers::SetObjectCount(cnt, data);
         for (std::vector< std::string >::iterator it = m_Destinations.begin(); it != m_Destinations.end(); ++it)
         {
             CGXDLMSVariant value;
-            e.GetValue().Add(&(*it)[0], it->size());
+            e.GetValue().Add(&(*it)[0], (int)it->size());
             if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, value)) != 0) //destination
             {
                 return ret;

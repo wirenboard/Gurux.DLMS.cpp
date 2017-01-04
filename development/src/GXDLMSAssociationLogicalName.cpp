@@ -67,7 +67,7 @@ int CGXDLMSAssociationLogicalName::GetAccessRights(CGXDLMSObject* pItem, CGXByte
     data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
     data.SetUInt8(2);
     data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-    GXHelpers::SetObjectCount(attributes.size(), data);
+    GXHelpers::SetObjectCount((unsigned long)attributes.size(), data);
     CGXDLMSVariant index, access, empty;
     for (CGXAttributeCollection::iterator it = attributes.begin(); it != attributes.end(); ++it)
     {
@@ -85,7 +85,7 @@ int CGXDLMSAssociationLogicalName::GetAccessRights(CGXDLMSObject* pItem, CGXByte
 
     data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
     CGXAttributeCollection& m = pItem->GetMethodAttributes();
-    GXHelpers::SetObjectCount(m.size(), data);
+    GXHelpers::SetObjectCount((unsigned long)m.size(), data);
     for (CGXAttributeCollection::iterator it = m.begin(); it != m.end(); ++it)
     {
         CGXDLMSVariant index = (*it).GetIndex();
@@ -112,7 +112,7 @@ int CGXDLMSAssociationLogicalName::GetObjects(
         settings.SetCount((unsigned short)m_ObjectList.size());
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         //Add count
-        GXHelpers::SetObjectCount(m_ObjectList.size(), data);
+        GXHelpers::SetObjectCount((unsigned long)m_ObjectList.size(), data);
     }
     for (CGXDLMSObjectCollection::iterator it = m_ObjectList.begin(); it != m_ObjectList.end(); ++it)
     {

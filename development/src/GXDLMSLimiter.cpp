@@ -451,7 +451,7 @@ int CGXDLMSLimiter::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         int ret;
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(m_EmergencyProfileGroupIDs.size(), data);
+        GXHelpers::SetObjectCount((unsigned long)m_EmergencyProfileGroupIDs.size(), data);
         CGXDLMSVariant tmp;
         for (std::vector<int>::iterator it = m_EmergencyProfileGroupIDs.begin(); it != m_EmergencyProfileGroupIDs.end(); ++it)
         {

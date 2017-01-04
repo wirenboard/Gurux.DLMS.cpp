@@ -384,14 +384,14 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     }
     if (e.GetIndex() == 2)
     {
-        e.GetValue().Add(&m_CalendarNameActive[0], m_CalendarNameActive.size());
+        e.GetValue().Add(&m_CalendarNameActive[0], (int)m_CalendarNameActive.size());
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 3)
     {
         e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        int cnt = m_SeasonProfileActive.size();
+        unsigned long cnt = (unsigned long)m_SeasonProfileActive.size();
         //Add count
         GXHelpers::SetObjectCount(cnt, data);
         CGXDLMSVariant tmp;
@@ -414,7 +414,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     {
         e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        int cnt = m_WeekProfileTableActive.size();
+        unsigned long cnt = (unsigned long)m_WeekProfileTableActive.size();
         //Add count
         GXHelpers::SetObjectCount(cnt, data);
         CGXDLMSVariant tmp;
@@ -446,7 +446,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     {
         e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        int cnt = m_DayProfileTableActive.size();
+        unsigned long cnt = (unsigned long)m_DayProfileTableActive.size();
         //Add count
         GXHelpers::SetObjectCount(cnt, data);
         for (std::vector<CGXDLMSDayProfile>::iterator it = m_DayProfileTableActive.begin(); it != m_DayProfileTableActive.end(); ++it)
@@ -458,7 +458,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
             data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
             //Add count
             std::vector<CGXDLMSDayProfileAction>& schedules = (*it).GetDaySchedules();
-            GXHelpers::SetObjectCount(schedules.size(), data);
+            GXHelpers::SetObjectCount((unsigned long)schedules.size(), data);
             CGXDLMSVariant time, ln, selector;
             for (std::vector<CGXDLMSDayProfileAction>::iterator action = schedules.begin(); action != schedules.end(); ++action)
             {
@@ -483,7 +483,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     {
         e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        int cnt = m_SeasonProfilePassive.size();
+        unsigned long cnt = (unsigned long)m_SeasonProfilePassive.size();
         //Add count
         GXHelpers::SetObjectCount(cnt, data);
         CGXDLMSVariant tmp;
@@ -506,7 +506,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     {
         e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        int cnt = m_WeekProfileTablePassive.size();
+        unsigned long cnt = (unsigned long)m_WeekProfileTablePassive.size();
         //Add count
         GXHelpers::SetObjectCount(cnt, data);
         CGXDLMSVariant tmp;
@@ -538,7 +538,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     {
         e.SetByteArray(true);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        int cnt = m_DayProfileTablePassive.size();
+        unsigned long cnt = (unsigned long)m_DayProfileTablePassive.size();
         //Add count
         GXHelpers::SetObjectCount(cnt, data);
         CGXDLMSVariant id, time, ln, selector;
@@ -550,7 +550,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
             GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, id);
             data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
             //Add count
-            GXHelpers::SetObjectCount((*it).GetDaySchedules().size(), data);
+            GXHelpers::SetObjectCount((unsigned long)(*it).GetDaySchedules().size(), data);
             for (std::vector<CGXDLMSDayProfileAction>::iterator action = (*it).GetDaySchedules().begin();
                 action != (*it).GetDaySchedules().end(); ++action)
             {

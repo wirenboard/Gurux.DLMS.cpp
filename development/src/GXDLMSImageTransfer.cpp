@@ -297,7 +297,7 @@ int CGXDLMSImageTransfer::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
         e.SetByteArray(true);
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(m_ImageActivateInfo.size(), data); //Count
+        GXHelpers::SetObjectCount((unsigned long)m_ImageActivateInfo.size(), data); //Count
         int ret;
         CGXDLMSVariant size, id, signature;
         for (std::vector<CGXDLMSImageActivateInfo>::iterator it = m_ImageActivateInfo.begin(); it != m_ImageActivateInfo.end(); ++it)

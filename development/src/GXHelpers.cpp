@@ -737,14 +737,14 @@ std::vector< std::string > GXHelpers::Split(std::string& s, char separator)
     std::vector< std::string > items;
     int last = 0;
     int pos = -1;
-    while ((pos = s.find(separator, pos + 1)) != -1)
+    while ((pos = (int)s.find(separator, pos + 1)) != -1)
     {
         std::string str;
         str.append(s, last, pos - last);
         items.push_back(str);
         last = pos + 1;
     }
-    int len = s.length();
+    int len = (int)s.length();
     if (last == 0 || last != len)
     {
         std::string str;
@@ -759,7 +759,7 @@ std::vector< std::string > GXHelpers::Split(std::string& s, std::string separato
     std::vector< std::string > items;
     int last = 0;
     int pos = -1;
-    while ((pos = s.find_first_of(separators, pos + 1)) != -1)
+    while ((pos = (int)s.find_first_of(separators, pos + 1)) != -1)
     {
         if (!ignoreEmpty || pos - last != 0)
         {
@@ -769,7 +769,7 @@ std::vector< std::string > GXHelpers::Split(std::string& s, std::string separato
         }
         last = pos + 1;
     }
-    int len = s.length();
+    int len = (int)s.length();
     if (!ignoreEmpty || len - last != 0)
     {
         std::string str;
@@ -782,8 +782,8 @@ std::vector< std::string > GXHelpers::Split(std::string& s, std::string separato
 void GXHelpers::Replace(std::string& str, std::string oldString, std::string newString)
 {
     int index;
-    int len = oldString.length();
-    while ((index = str.rfind(oldString)) != -1)
+    int len = (int)oldString.length();
+    while ((index = (int)str.rfind(oldString)) != -1)
     {
         str.replace(index, len, newString);
     }
@@ -1466,7 +1466,7 @@ static int SetBcd(CGXByteBuffer& buff, CGXDLMSVariant& value)
 static int SetArray(CGXByteBuffer& buff, CGXDLMSVariant& value)
 {
     int ret;
-    GXHelpers::SetObjectCount(value.Arr.size(), buff);
+    GXHelpers::SetObjectCount((unsigned long)value.Arr.size(), buff);
     for (std::vector<CGXDLMSVariant>::iterator it = value.Arr.begin(); it != value.Arr.end(); ++it)
     {
         if ((ret = GXHelpers::SetData(buff, it->vt, *it)) != 0)
@@ -1496,12 +1496,12 @@ static int SetOctetString(CGXByteBuffer& buff, CGXDLMSVariant& value)
         // If data is std::string.
         if (items.size() == 1)
         {
-            GXHelpers::SetObjectCount(value.strVal.size(), buff);
+            GXHelpers::SetObjectCount((unsigned long)value.strVal.size(), buff);
             buff.AddString(value.strVal.c_str());
         }
         else
         {
-            GXHelpers::SetObjectCount(items.size(), buff);
+            GXHelpers::SetObjectCount((unsigned long)items.size(), buff);
             for (std::vector< std::string >::iterator it = items.begin(); it != items.end(); ++it)
             {
 #if _MSC_VER > 1000
@@ -1542,7 +1542,7 @@ static int SetUtfString(CGXByteBuffer& buff, CGXDLMSVariant& value)
 {
     if (value.vt != DLMS_DATA_TYPE_NONE)
     {
-        GXHelpers::SetObjectCount(value.strVal.size(), buff);
+        GXHelpers::SetObjectCount((unsigned long)value.strVal.size(), buff);
         buff.AddString(value.strVal.c_str());
     }
     else
@@ -1586,7 +1586,7 @@ static int SetString(CGXByteBuffer& buff, CGXDLMSVariant& value)
 {
     if (value.vt != DLMS_DATA_TYPE_NONE)
     {
-        GXHelpers::SetObjectCount(value.strVal.size(), buff);
+        GXHelpers::SetObjectCount((unsigned long)value.strVal.size(), buff);
         buff.AddString(value.strVal.c_str());
     }
     else
@@ -1611,7 +1611,7 @@ static int SetBitString(CGXByteBuffer& buff, CGXDLMSVariant& value)
     if (value.vt == DLMS_DATA_TYPE_STRING)
     {
         CGXByteBuffer tmp;
-        GXHelpers::SetObjectCount(value.strVal.size(), buff);
+        GXHelpers::SetObjectCount((unsigned long)value.strVal.size(), buff);
         for (std::string::iterator it = value.strVal.begin(); it != value.strVal.end(); ++it)
         {
             if (*it == '1')
@@ -1812,7 +1812,7 @@ unsigned char GXHelpers::GetValue(char c)
 void GXHelpers::HexToBytes(std::string value, CGXByteBuffer& buffer)
 {
     buffer.Clear();
-    buffer.Capacity(value.length() / 2);
+    buffer.Capacity((unsigned long)(value.length() / 2));
     int lastValue = -1;
     int index = 0;
     for (std::string::iterator ch = value.begin(); ch != value.end(); ++ch)

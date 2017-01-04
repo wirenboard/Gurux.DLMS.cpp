@@ -148,7 +148,7 @@ int CGXDLMSScriptTable::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         //Add count
-        GXHelpers::SetObjectCount(m_Scripts.size(), data);
+        GXHelpers::SetObjectCount((unsigned long)m_Scripts.size(), data);
         int ret;
         CGXDLMSVariant id, type, oType, ln, index;
         //std::pair<int, CGXDLMSScriptAction>
@@ -164,7 +164,7 @@ int CGXDLMSScriptTable::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
             }
             data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
             //Count
-            GXHelpers::SetObjectCount(it->GetActions().size(), data);
+            GXHelpers::SetObjectCount((unsigned long)it->GetActions().size(), data);
             for (std::vector<CGXDLMSScriptAction>::iterator a = it->GetActions().begin(); a != it->GetActions().end(); ++a)
             {
                 data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);

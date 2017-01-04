@@ -239,7 +239,7 @@ int GetDateFormat(GXDLMS_DATE_FORMAT& format, char& separator)
     order.tm_year = 0;
     order.tm_mday = 1;
     order.tm_mon = 1;//Month is zero based.
-    ret = strftime(buff, 11, "%x", &order);
+    ret = (int)strftime(buff, 11, "%x", &order);
     if (ret > 0)
     {
         for (pos = 0; pos != ret; ++pos)
@@ -390,7 +390,7 @@ std::string CGXDateTime::ToString()
             break;
             default:
             {
-                ret = strftime(buff, 50, "%X", &m_Value);
+                ret = (int)strftime(buff, 50, "%X", &m_Value);
                 ba.SetUInt8(' ');
                 ba.Set(buff, ret);
                 return 0;
@@ -448,7 +448,7 @@ std::string CGXDateTime::ToString()
         return "";
     }
     std::string str;
-    ret = strftime(buff, 50, "%x %X", &m_Value);
+    ret = (int)strftime(buff, 50, "%x %X", &m_Value);
     str.append(buff, ret);
     return str;
 }

@@ -270,7 +270,7 @@ int CGXDLMSAutoAnswer::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg&
     {
         e.SetByteArray(true);
         int ret;
-        int cnt = m_ListeningWindow.size();
+        unsigned long cnt = (unsigned long)m_ListeningWindow.size();
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         //Add count

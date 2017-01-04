@@ -369,7 +369,7 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         e.SetByteArray(true);
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(m_MulticastIPAddress.size(), data);
+        GXHelpers::SetObjectCount((unsigned long)m_MulticastIPAddress.size(), data);
         int ret;
         CGXDLMSVariant tmp;
         for (std::vector<unsigned long>::iterator it = m_MulticastIPAddress.begin(); it != m_MulticastIPAddress.end(); ++it)
@@ -387,7 +387,7 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         e.SetByteArray(true);
         CGXByteBuffer bb;
         bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(m_IPOptions.size(), bb);
+        GXHelpers::SetObjectCount((unsigned long)m_IPOptions.size(), bb);
         int ret;
         CGXDLMSVariant type, len, data;
         for (std::vector<CGXDLMSIp4SetupIpOption>::iterator it = m_IPOptions.begin(); it != m_IPOptions.end(); ++it)

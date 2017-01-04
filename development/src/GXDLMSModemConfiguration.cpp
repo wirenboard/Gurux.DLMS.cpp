@@ -241,7 +241,7 @@ int CGXDLMSModemConfiguration::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         //Add count
         int ret;
-        int cnt = m_InitialisationStrings.size();
+        unsigned long cnt = (unsigned long)m_InitialisationStrings.size();
         GXHelpers::SetObjectCount(cnt, data);
         CGXDLMSVariant request, response, delay;
         for (std::vector<CGXDLMSModemInitialisation>::iterator it = m_InitialisationStrings.begin();
@@ -269,7 +269,7 @@ int CGXDLMSModemConfiguration::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         //Add count
         int ret;
-        int cnt = m_ModemProfile.size();
+        unsigned long cnt = (unsigned long)m_ModemProfile.size();
         GXHelpers::SetObjectCount(cnt, data);
         CGXDLMSVariant tmp;
         for (std::vector< std::string >::iterator it = m_ModemProfile.begin();

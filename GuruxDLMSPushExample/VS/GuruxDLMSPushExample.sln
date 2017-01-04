@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GuruxDLMSPushExample", "GuruxDLMSPushExample.vcxproj", "{B175447A-E56D-451A-A53F-59C0EF4A4BE6}"
 	ProjectSection(ProjectDependencies) = postProject
 		{9E063408-C11A-4C0C-BEAA-9D07E2E0A00A} = {9E063408-C11A-4C0C-BEAA-9D07E2E0A00A}
@@ -18,10 +20,12 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{B175447A-E56D-451A-A53F-59C0EF4A4BE6}.Debug|Win32.ActiveCfg = Debug|Win32
 		{B175447A-E56D-451A-A53F-59C0EF4A4BE6}.Debug|Win32.Build.0 = Debug|Win32
-		{B175447A-E56D-451A-A53F-59C0EF4A4BE6}.Debug|x64.ActiveCfg = Debug|Win32
+		{B175447A-E56D-451A-A53F-59C0EF4A4BE6}.Debug|x64.ActiveCfg = Debug|x64
+		{B175447A-E56D-451A-A53F-59C0EF4A4BE6}.Debug|x64.Build.0 = Debug|x64
 		{B175447A-E56D-451A-A53F-59C0EF4A4BE6}.Release|Win32.ActiveCfg = Release|Win32
 		{B175447A-E56D-451A-A53F-59C0EF4A4BE6}.Release|Win32.Build.0 = Release|Win32
-		{B175447A-E56D-451A-A53F-59C0EF4A4BE6}.Release|x64.ActiveCfg = Release|Win32
+		{B175447A-E56D-451A-A53F-59C0EF4A4BE6}.Release|x64.ActiveCfg = Release|x64
+		{B175447A-E56D-451A-A53F-59C0EF4A4BE6}.Release|x64.Build.0 = Release|x64
 		{9E063408-C11A-4C0C-BEAA-9D07E2E0A00A}.Debug|Win32.ActiveCfg = Debug|Win32
 		{9E063408-C11A-4C0C-BEAA-9D07E2E0A00A}.Debug|Win32.Build.0 = Debug|Win32
 		{9E063408-C11A-4C0C-BEAA-9D07E2E0A00A}.Debug|x64.ActiveCfg = Debug|x64
