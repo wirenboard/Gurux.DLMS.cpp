@@ -1053,11 +1053,14 @@ int CGXAPDU::ParsePDU(
             break;
         default:
             // Unknown tags.
-            if ((ret = buff.GetUInt8(&len)) != 0)
+            if (buff.GetPosition() < buff.GetSize())
             {
-                return ret;
+                if ((ret = buff.GetUInt8(&len)) != 0)
+                {
+                    return ret;
+                }
+                buff.SetPosition(buff.GetPosition() + len);
             }
-            buff.SetPosition(buff.GetPosition() + len);
             break;
         }
     }

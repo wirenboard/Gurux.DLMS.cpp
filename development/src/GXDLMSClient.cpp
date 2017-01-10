@@ -159,7 +159,7 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
     if (data.GetSize() != 3)
     {
         // Length.
-        data.SetUInt8(2, (unsigned char)(data.GetPosition() - 3));
+        data.SetUInt8(2, (unsigned char)(data.GetSize() - 3));
     }
     else
     {
