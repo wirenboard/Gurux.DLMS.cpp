@@ -35,6 +35,7 @@
 #include "../include/GXDLMSProfileGeneric.h"
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSObjectFactory.h"
+#include "../include/GXDLMSDemandRegister.h"
 
 CGXDLMSProfileGeneric::~CGXDLMSProfileGeneric()
 {
