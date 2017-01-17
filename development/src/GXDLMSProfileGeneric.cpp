@@ -769,7 +769,6 @@ int CGXDLMSProfileGeneric::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
             //Read capture objects first.
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
-        m_Buffer.clear();
         if (e.GetValue().vt != DLMS_DATA_TYPE_NONE)
         {
             std::vector<DLMS_DATA_TYPE> types;
@@ -806,6 +805,15 @@ int CGXDLMSProfileGeneric::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
                     if (item.first->GetObjectType() == DLMS_OBJECT_TYPE_REGISTER && item.second->GetAttributeIndex() == 2)
                     {
                         double scaler = ((CGXDLMSRegister*)item.first)->GetScaler();
+                        if (scaler != 1)
+                        {
+                            row->Arr[pos] = row->Arr[pos].ToDouble() * scaler;
+                        }
+                    }
+                    else if (item.first->GetObjectType() == DLMS_OBJECT_TYPE_DEMAND_REGISTER &&
+                        (item.second->GetAttributeIndex() == 2 || item.second->GetAttributeIndex() == 3))
+                    {
+                        double scaler = ((CGXDLMSDemandRegister*)item.first)->GetScaler();
                         if (scaler != 1)
                         {
                             row->Arr[pos] = row->Arr[pos].ToDouble() * scaler;
