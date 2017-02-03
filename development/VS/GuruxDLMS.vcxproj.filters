@@ -24,13 +24,7 @@
     <ClCompile Include="..\src\GXDLMSLimits.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\GXDLMSLNSettings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\GXDLMSObjectFactory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\GXDLMSSNSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\GXDLMSVariant.cpp">
@@ -308,13 +302,7 @@
     <ClInclude Include="..\include\GXDLMSLimits.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\GXDLMSLNSettings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\GXDLMSObjectFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\GXDLMSSNSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\GXDLMSVariant.h">

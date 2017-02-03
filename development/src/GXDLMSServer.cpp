@@ -132,21 +132,6 @@ void CGXDLMSServer::SetUseLogicalNameReferencing(bool value)
     m_Settings.SetUseLogicalNameReferencing(value);
 }
 
-/**
- * Gets Logical Name settings.
- *
- * @return Logical Name m_Settings.
- */
-CGXDLMSLNSettings& CGXDLMSServer::GetLNSettings()
-{
-    return m_Settings.GetLnSettings();
-}
-
-CGXDLMSSNSettings& CGXDLMSServer::GetSNSettings()
-{
-    return m_Settings.GetSnSettings();
-}
-
 int CGXDLMSServer::Initialize()
 {
     int ret;

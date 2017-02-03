@@ -554,7 +554,7 @@ int CGXDLMS::GetLNPdu(
     }
     else
     {
-        if (p.GetSettings()->GetLnSettings().GetGeneralBlockTransfer())
+        if ((p.GetSettings()->GetConformance() & DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER) != 0)
         {
             reply.SetUInt8(DLMS_COMMAND_GENERAL_BLOCK_TRANSFER);
             MultipleBlocks(p, reply, ciphering);
@@ -644,7 +644,7 @@ int CGXDLMS::GetLNPdu(
         // Add attribute descriptor.
         reply.Set(p.GetAttributeDescriptor());
         if (p.GetCommand() != DLMS_COMMAND_DATA_NOTIFICATION &&
-            !p.GetSettings()->GetLnSettings().GetGeneralBlockTransfer())
+            (p.GetSettings()->GetConformance() & DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER) == 0)
         {
             // If multiple blocks.
             if (p.IsMultipleBlocks())
@@ -1283,6 +1283,20 @@ int CGXDLMS::GetHDLCAddress(
     return DLMS_ERROR_CODE_OK;
 }
 
+static void GetServerAddress(int address, int& logical, int& physical)
+{
+    if (address < 0x4000)
+    {
+        logical = address >> 7;
+        physical = address & 0x7F;
+    }
+    else
+    {
+        logical = address >> 14;
+        physical = address & 0x3FFF;
+    }
+}
+
 int CGXDLMS::CheckHdlcAddress(
     bool server,
     CGXDLMSSettings& settings,
@@ -1364,7 +1378,16 @@ int CGXDLMS::CheckHdlcAddress(
         // Check that server addresses match.
         if (settings.GetServerAddress() != source)
         {
-            return DLMS_ERROR_CODE_FALSE;
+            //Check logical and physical address separately.
+            //This is done because some meters might send four bytes
+            //when only two bytes is needed.
+            int readLogical, readPhysical, logical, physical;
+            GetServerAddress(source, readLogical, readPhysical);
+            GetServerAddress(settings.GetServerAddress(), logical, physical);
+            if (readLogical != logical || readPhysical != physical)
+            {
+                return DLMS_ERROR_CODE_FALSE;
+            }
         }
     }
     return DLMS_ERROR_CODE_OK;

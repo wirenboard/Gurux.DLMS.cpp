@@ -61,7 +61,7 @@ int CGXCommunication::Close()
     if (m_hComPort != INVALID_HANDLE_VALUE || m_socket != -1)
     {
         if ((ret = m_Parser->DisconnectRequest(data)) != 0 ||
-                (ret = ReadDataBlock(data, reply)) != 0)
+            (ret = ReadDataBlock(data, reply)) != 0)
         {
             //Show error but continue close.
         }
@@ -105,7 +105,7 @@ int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
     add.sin_family = AF_INET;
     add.sin_addr.s_addr = inet_addr(pAddress);
     //If address is give as name
-    if(add.sin_addr.s_addr == INADDR_NONE)
+    if (add.sin_addr.s_addr == INADDR_NONE)
     {
         hostent *Hostent = gethostbyname(pAddress);
         if (Hostent == NULL)
@@ -298,9 +298,9 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
         if (reply.GetSize() > 5)
         {
             //Some optical strobes can return extra bytes.
-            for(pos = reply.GetSize() - 1; pos != lastReadIndex; --pos)
+            for (pos = reply.GetSize() - 1; pos != lastReadIndex; --pos)
             {
-                if(reply.GetData()[pos] == eop)
+                if (reply.GetData()[pos] == eop)
                 {
                     bFound = true;
                     break;
@@ -308,8 +308,7 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             }
             lastReadIndex = pos;
         }
-    }
-    while(!bFound);
+    } while (!bFound);
     return DLMS_ERROR_CODE_OK;
 }
 
@@ -324,7 +323,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
     //In Linux serial port name might be very long.
     char buff[50];
 #if defined(_WIN32) || defined(_WIN64)
-    DCB dcb = {0};
+    DCB dcb = { 0 };
     unsigned long sendSize = 0;
 #if _MSC_VER > 1000
     sprintf_s(buff, 50, "\\\\.\\%s", port);
@@ -333,8 +332,8 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
 #endif
     //Open serial port for read / write. Port can't share.
     m_hComPort = CreateFileA(buff,
-                             GENERIC_READ | GENERIC_WRITE, 0, NULL,
-                             OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+        GENERIC_READ | GENERIC_WRITE, 0, NULL,
+        OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
     if (m_hComPort == INVALID_HANDLE_VALUE)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
@@ -366,14 +365,14 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
     struct termios options;
     // read/write | not controlling term | don't wait for DCD line signal.
     m_hComPort = open(port, O_RDWR | O_NOCTTY | O_NONBLOCK);
-    if(m_hComPort == -1) // if open is unsuccessful.
+    if (m_hComPort == -1) // if open is unsuccessful.
     {
         printf("Failed to Open port.\r");
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     else
     {
-        if(!isatty(m_hComPort))
+        if (!isatty(m_hComPort))
         {
             printf("Failed to Open port. This is not a serial port.\r");
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
@@ -396,8 +395,8 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
             options.c_cflag &= ~CSIZE;
             options.c_cflag |= CS7;
             //Set Baud Rates
-            cfsetospeed (&options, B300);
-            cfsetispeed (&options, B300);
+            cfsetospeed(&options, B300);
+            cfsetispeed(&options, B300);
         }
         else
         {
@@ -433,11 +432,11 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
 #else
         strcpy(buff, "/?!\r\n");
 #endif
-        len = strlen(buff);
+        len = (int)strlen(buff);
         if (m_Trace)
         {
             printf("\r\n<-");
-            for(pos = 0; pos != len; ++pos)
+            for (pos = 0; pos != len; ++pos)
             {
                 printf("%.2X ", buff[pos]);
             }
@@ -539,16 +538,16 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
         buff[0] = 0x06;
         //Send Protocol control character
         buff[1] = '2';// "2" HDLC protocol procedure (Mode E)
-        buff[2] = (char) ch;
+        buff[2] = (char)ch;
         buff[3] = '2';
-        buff[4] = (char) 0x0D;
+        buff[4] = (char)0x0D;
         buff[5] = 0x0A;
         len = 6;
         reply.Clear();
         if (m_Trace)
         {
             printf("\r\n<-");
-            for(pos = 0; pos != len; ++pos)
+            for (pos = 0; pos != len; ++pos)
             {
                 printf("%.2X ", buff[pos]);
             }
@@ -583,7 +582,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
         {
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
-        printf("New baudrate %d\r\n", (int) dcb.BaudRate);
+        printf("New baudrate %d\r\n", (int)dcb.BaudRate);
         len = 6;
         if ((ret = Read('\n', reply)) != 0)
         {
@@ -601,10 +600,10 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
         //This sleep is in standard. Do not remove.
         usleep(1000000);
         // 8n1, see termios.h for more information
-        options.c_cflag=CS8|CREAD|CLOCAL;
+        options.c_cflag = CS8 | CREAD | CLOCAL;
         //Set Baud Rates
-        cfsetospeed (&options, baudRate);
-        cfsetispeed (&options, baudRate);
+        cfsetospeed(&options, baudRate);
+        cfsetispeed(&options, baudRate);
         if (tcsetattr(m_hComPort, TCSAFLUSH, &options) != 0)
         {
             printf("Failed to Open port. tcsetattr failed.\r");
@@ -624,16 +623,16 @@ int CGXCommunication::InitializeConnection()
     int ret = 0;
     //Get meter's send and receive buffers size.
     if ((ret = m_Parser->SNRMRequest(data)) != 0 ||
-            (ret = ReadDataBlock(data, reply)) != 0 ||
-            (ret = m_Parser->ParseUAResponse(reply.GetData())) != 0)
+        (ret = ReadDataBlock(data, reply)) != 0 ||
+        (ret = m_Parser->ParseUAResponse(reply.GetData())) != 0)
     {
         TRACE("SNRMRequest failed %d.\r\n", ret);
         return ret;
     }
     reply.Clear();
     if ((ret = m_Parser->AARQRequest(data)) != 0 ||
-            (ret = ReadDataBlock(data, reply)) != 0 ||
-            (ret = m_Parser->ParseAAREResponse(reply.GetData())) != 0)
+        (ret = ReadDataBlock(data, reply)) != 0 ||
+        (ret = m_Parser->ParseAAREResponse(reply.GetData())) != 0)
     {
         if (ret == DLMS_ERROR_CODE_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED)
         {
@@ -648,8 +647,8 @@ int CGXCommunication::InitializeConnection()
     if (m_Parser->IsAuthenticationRequired())
     {
         if ((ret = m_Parser->GetApplicationAssociationRequest(data)) != 0 ||
-                (ret = ReadDataBlock(data, reply)) != 0 ||
-                (ret = m_Parser->ParseApplicationAssociationResponse(reply.GetData())) != 0)
+            (ret = ReadDataBlock(data, reply)) != 0 ||
+            (ret = m_Parser->ParseApplicationAssociationResponse(reply.GetData())) != 0)
         {
             return ret;
         }
@@ -701,7 +700,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         }
 #endif
     }
-    else if ((ret = send(m_socket, (const char*) data.GetData(), len, 0)) == -1)
+    else if ((ret = send(m_socket, (const char*)data.GetData(), len, 0)) == -1)
     {
         //If error has occured
 #if defined(_WIN32) || defined(_WIN64)//If Windows
@@ -717,7 +716,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
     {
         if (m_hComPort != INVALID_HANDLE_VALUE)
         {
-            if(Read(0x7E, bb) != 0)
+            if (Read(0x7E, bb) != 0)
             {
                 return DLMS_ERROR_CODE_SEND_FAILED;
             }
@@ -725,7 +724,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         else
         {
             len = RECEIVE_BUFFER_SIZE;
-            if ((ret = recv(m_socket, (char*) m_Receivebuff, len, 0)) == -1)
+            if ((ret = recv(m_socket, (char*)m_Receivebuff, len, 0)) == -1)
             {
 #if defined(_WIN32) || defined(_WIN64)//If Windows
                 printf("recv failed %d\n", WSAGetLastError());
@@ -746,8 +745,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             tmp += " ";
         }
         tmp += GXHelpers::BytesToHex(m_Receivebuff, ret);
-    }
-    while ((ret = m_Parser->GetData(bb, reply)) == DLMS_ERROR_CODE_FALSE);
+    } while ((ret = m_Parser->GetData(bb, reply)) == DLMS_ERROR_CODE_FALSE);
     if (m_Trace)
     {
         printf("%s\r\n", tmp.c_str());
@@ -796,7 +794,7 @@ int CGXCommunication::ReadDataBlock(std::vector<CGXByteBuffer>& data, CGXReplyDa
     int ret;
     CGXByteBuffer bb;
     //Send data.
-    for(std::vector<CGXByteBuffer>::iterator it = data.begin(); it != data.end(); ++it)
+    for (std::vector<CGXByteBuffer>::iterator it = data.begin(); it != data.end(); ++it)
     {
         //Send data.
         if ((ret = ReadDLMSPacket(*it, reply)) != DLMS_ERROR_CODE_OK)
@@ -827,8 +825,8 @@ int CGXCommunication::GetObjects(CGXDLMSObjectCollection& objects)
     std::vector<CGXByteBuffer> data;
     CGXReplyData reply;
     if ((ret = m_Parser->GetObjectsRequest(data)) != 0 ||
-            (ret = ReadDataBlock(data, reply)) != 0 ||
-            (ret = m_Parser->ParseObjects(reply.GetData(), objects, false)) != 0)
+        (ret = ReadDataBlock(data, reply)) != 0 ||
+        (ret = m_Parser->ParseObjects(reply.GetData(), objects, false)) != 0)
     {
         TRACE("GetObjects failed %d.\r\n", ret);
         return ret;
@@ -845,8 +843,8 @@ int CGXCommunication::Read(CGXDLMSObject* pObject, int attributeIndex, std::stri
     CGXReplyData reply;
     //Read data from the meter.
     if ((ret = m_Parser->Read(pObject, attributeIndex, data)) != 0 ||
-            (ret = ReadDataBlock(data, reply)) != 0 ||
-            (ret = m_Parser->UpdateValue(*pObject, attributeIndex, reply.GetValue())) != 0)
+        (ret = ReadDataBlock(data, reply)) != 0 ||
+        (ret = m_Parser->UpdateValue(*pObject, attributeIndex, reply.GetValue())) != 0)
     {
         return ret;
     }
@@ -885,7 +883,7 @@ int CGXCommunication::ReadList(
         return ret;
     }
 
-    for(std::vector<CGXByteBuffer>::iterator it = data.begin(); it != data.end(); ++it)
+    for (std::vector<CGXByteBuffer>::iterator it = data.begin(); it != data.end(); ++it)
     {
         reply.Clear();
         if ((ret = ReadDataBlock(*it, reply)) != 0)
@@ -908,7 +906,7 @@ int CGXCommunication::Write(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSV
     CGXReplyData reply;
     //Get meter's send and receive buffers size.
     if ((ret = m_Parser->Write(pObject, attributeIndex, value, data)) != 0 ||
-            (ret = ReadDataBlock(data, reply)) != 0)
+        (ret = ReadDataBlock(data, reply)) != 0)
     {
         return ret;
     }
@@ -922,11 +920,20 @@ int CGXCommunication::Method(CGXDLMSObject* pObject, int attributeIndex, CGXDLMS
     CGXReplyData reply;
     //Get meter's send and receive buffers size.
     if ((ret = m_Parser->Method(pObject, attributeIndex, value, data)) != 0 ||
-            (ret = ReadDataBlock(data, reply)) != 0)
+        (ret = ReadDataBlock(data, reply)) != 0)
     {
         return ret;
     }
     return DLMS_ERROR_CODE_OK;
+}
+
+int CGXCommunication::ReadRowsByRange(
+    CGXDLMSProfileGeneric* pObject,
+    CGXDateTime& start,
+    CGXDateTime& end,
+    CGXDLMSVariant& rows)
+{
+    return ReadRowsByRange(pObject, &start.GetValue(), &end.GetValue(), rows);
 }
 
 int CGXCommunication::ReadRowsByRange(
@@ -940,8 +947,8 @@ int CGXCommunication::ReadRowsByRange(
     std::vector<CGXByteBuffer> data;
     CGXReplyData reply;
     if ((ret = m_Parser->ReadRowsByRange(pObject, start, end, data)) != 0 ||
-            (ret = ReadDataBlock(data, reply)) != 0 ||
-            (ret = m_Parser->UpdateValue(*pObject, 2, reply.GetValue())) != 0)
+        (ret = ReadDataBlock(data, reply)) != 0 ||
+        (ret = m_Parser->UpdateValue(*pObject, 2, reply.GetValue())) != 0)
     {
         return ret;
     }
@@ -964,8 +971,8 @@ int CGXCommunication::ReadRowsByEntry(
     std::vector<CGXByteBuffer> data;
     CGXReplyData reply;
     if ((ret = m_Parser->ReadRowsByEntry(pObject, index, count, data)) != 0 ||
-            (ret = ReadDataBlock(data, reply)) != 0 ||
-            (ret = m_Parser->UpdateValue(*pObject, 2, reply.GetValue())) != 0)
+        (ret = ReadDataBlock(data, reply)) != 0 ||
+        (ret = m_Parser->UpdateValue(*pObject, 2, reply.GetValue())) != 0)
     {
         return ret;
     }

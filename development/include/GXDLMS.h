@@ -35,8 +35,6 @@
 #ifndef GXDLMS_H
 #define GXDLMS_H
 
-#include "GXDLMSSNSettings.h"
-#include "GXDLMSLNSettings.h"
 #include "GXDLMSLimits.h"
 #include "GXDLMSObject.h"
 #include "GXDLMSObjectCollection.h"
@@ -85,7 +83,7 @@ private:
     //
     /////////////////////////////////////////////////////////////////////////////
     static int CheckWrapperAddress(CGXDLMSSettings& settings,
-                                   CGXByteBuffer& buff);
+        CGXByteBuffer& buff);
 
     /////////////////////////////////////////////////////////////////////////////
     // Get value from data.

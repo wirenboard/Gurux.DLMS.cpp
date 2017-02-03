@@ -49,7 +49,7 @@ static void WriteValue(std::string line)
 #if defined(_WIN32) || defined(_WIN64)//Windows
 int _tmain(int argc, _TCHAR* argv[])
 #else
-int main( int argc, char* argv[] )
+int main(int argc, char* argv[])
 #endif
 {
     {
@@ -68,28 +68,28 @@ int main( int argc, char* argv[] )
         //TODO: Client and Server addresses are manufacturer dependence. They should be standard values but they are not.
         //Below are some example values. Ask correct values from your meter manufacturer or http://www.gurux.org.
         /*
-        	//Iskra Serial port settings.
-        	CGXDLMSClient cl(true, 0xC9, 0x0223, DLMS_AUTHENTICATION_LOW, "12345678");
-        	//Landis+Gyr settings.
-        	CGXDLMSClient cl(false);
+            //Iskra Serial port settings.
+            CGXDLMSClient cl(true, 100, CGXDLMSClient::GetServerAddress(1, 17), DLMS_AUTHENTICATION_LOW, "12345678");
+            //Landis+Gyr settings.
+            CGXDLMSClient cl(false);
             //Kamstrup settings.
             CGXDLMSClient cl(true);
-        	//Actaris settings.
-        	CGXDLMSClient cl(true, 3, 0x00020023, DLMS_AUTHENTICATION_LOW, "ABCDEFGH");
-        	//Iskra TCP/IP settings.
-        	CGXDLMSClient cl(true, 100, 1, DLMS_AUTHENTICATION_LOW, "12345678", DLMS_INTERFACE_TYPE_WRAPPER);
+            //Actaris settings.
+            CGXDLMSClient cl(true, 1, CGXDLMSClient::GetServerAddress(1, 17), DLMS_AUTHENTICATION_LOW, "ABCDEFGH");
+            //Iskra TCP/IP settings.
+            CGXDLMSClient cl(true, 100, 1, DLMS_AUTHENTICATION_LOW, "12345678", DLMS_INTERFACE_TYPE_WRAPPER);
             CGXDLMSClient cl(true, 1, 1, DLMS_AUTHENTICATION_LOW, "12345678", DLMS_INTERFACE_TYPE_WRAPPER);
             //Note! New Iskra meters need also this.
             cl.SetServiceClass(DLMS_SERVICE_CLASS_CONFIRMED);
             //ZIV settings.
-        	CGXDLMSClient cl(true, 1, 1, DLMS_AUTHENTICATION_NONE, NULL, DLMS_INTERFACE_TYPE_WRAPPER);
+            CGXDLMSClient cl(true, 1, 1, DLMS_AUTHENTICATION_NONE, NULL, DLMS_INTERFACE_TYPE_WRAPPER);
         */
         //Remove trace file if exists.
         remove("trace.txt");
         remove("LogFile.txt");
         bool trace = true;
-        //Landis+Gyr settings.
-        CGXDLMSClient cl(false);
+        //Use Logical name.
+        CGXDLMSClient cl(true);
         CGXCommunication comm(&cl, 5000, trace);
         //Serial port settings.
         /*
@@ -100,8 +100,8 @@ int main( int argc, char* argv[] )
         }
 
         */
-        //TCP/IP settings.
-        if ((ret = comm.Connect("localhost", 4059)) != 0)
+        //TCP/IP settings. Default is Gurux example meter.
+        if ((ret = comm.Connect("localhost", 4061)) != 0)
         {
             TRACE("Connect failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
             return 1;
@@ -121,26 +121,33 @@ int main( int argc, char* argv[] )
         std::string str;
         std::string ln;
         std::vector<std::pair<CGXDLMSObject*, unsigned char> > list;
-        // Read scalers and units from the device.
-        for(std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)
+        if ((cl.GetConformance() & DLMS_CONFORMANCE_MULTIPLE_REFERENCES) != 0)
         {
-            if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_REGISTER ||
-                    (*it)->GetObjectType() == DLMS_OBJECT_TYPE_EXTENDED_REGISTER)
-            {
-                list.push_back(std::make_pair(*it, 3));
-            }
-            else if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_DEMAND_REGISTER)
-            {
-                list.push_back(std::make_pair(*it, 4));
-            }
-        }
-        if ((ret = comm.ReadList(list)) != 0)
-        {
-            //If readlist is not supported read in old way.
-            for(std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)
+            // Read scalers and units from the device.
+            for (std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)
             {
                 if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_REGISTER ||
-                        (*it)->GetObjectType() == DLMS_OBJECT_TYPE_EXTENDED_REGISTER)
+                    (*it)->GetObjectType() == DLMS_OBJECT_TYPE_EXTENDED_REGISTER)
+                {
+                    list.push_back(std::make_pair(*it, 3));
+                }
+                else if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_DEMAND_REGISTER)
+                {
+                    list.push_back(std::make_pair(*it, 4));
+                }
+            }
+            if ((ret = comm.ReadList(list)) != 0)
+            {
+                return ret;
+            }
+        }
+        else
+        {
+            //If readlist is not supported read one value at the time.
+            for (std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)
+            {
+                if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_REGISTER ||
+                    (*it)->GetObjectType() == DLMS_OBJECT_TYPE_EXTENDED_REGISTER)
                 {
                     (*it)->GetLogicalName(ln);
                     TRACE("%s\r\n", ln.c_str());
@@ -167,10 +174,10 @@ int main( int argc, char* argv[] )
         //Read columns.
         CGXDLMSObjectCollection profileGenerics;
         Objects.GetObjects(DLMS_OBJECT_TYPE_PROFILE_GENERIC, profileGenerics);
-        for(std::vector<CGXDLMSObject*>::iterator it = profileGenerics.begin(); it != profileGenerics.end(); ++it)
+        for (std::vector<CGXDLMSObject*>::iterator it = profileGenerics.begin(); it != profileGenerics.end(); ++it)
         {
             //Read Profile Generic columns first.
-            CGXDLMSProfileGeneric* pg = (CGXDLMSProfileGeneric*) *it;
+            CGXDLMSProfileGeneric* pg = (CGXDLMSProfileGeneric*)*it;
             if ((ret = comm.Read(pg, 3, value)) != 0)
             {
                 TRACE("Err! Failed to read columns: %s", CGXDLMSConverter::GetErrorMessage(ret));
@@ -181,12 +188,12 @@ int main( int argc, char* argv[] )
             //Update columns scalers.
             DLMS_OBJECT_TYPE ot;
             CGXDLMSObject* obj;
-            for(std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it2 = pg->GetCaptureObjects().begin(); it2 != pg->GetCaptureObjects().end(); ++it2)
+            for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it2 = pg->GetCaptureObjects().begin(); it2 != pg->GetCaptureObjects().end(); ++it2)
             {
                 ot = it2->first->GetObjectType();
                 if (ot == DLMS_OBJECT_TYPE_REGISTER ||
-                        ot == DLMS_OBJECT_TYPE_EXTENDED_REGISTER ||
-                        ot == DLMS_OBJECT_TYPE_DEMAND_REGISTER)
+                    ot == DLMS_OBJECT_TYPE_EXTENDED_REGISTER ||
+                    ot == DLMS_OBJECT_TYPE_DEMAND_REGISTER)
                 {
                     it2->first->GetLogicalName(ln);
                     obj = Objects.FindByLN(ot, ln);
@@ -194,20 +201,20 @@ int main( int argc, char* argv[] )
                     {
                         if (ot == DLMS_OBJECT_TYPE_REGISTER || ot == DLMS_OBJECT_TYPE_EXTENDED_REGISTER)
                         {
-                            ((CGXDLMSRegister*) it2->first)->SetScaler(((CGXDLMSRegister*) obj)->GetScaler());
-                            ((CGXDLMSRegister*) it2->first)->SetUnit(((CGXDLMSRegister*) obj)->GetUnit());
+                            ((CGXDLMSRegister*)it2->first)->SetScaler(((CGXDLMSRegister*)obj)->GetScaler());
+                            ((CGXDLMSRegister*)it2->first)->SetUnit(((CGXDLMSRegister*)obj)->GetUnit());
                         }
                         else if (ot == DLMS_OBJECT_TYPE_DEMAND_REGISTER)
                         {
-                            ((CGXDLMSDemandRegister*) it2->first)->SetScaler(((CGXDLMSDemandRegister*) obj)->GetScaler());
-                            ((CGXDLMSDemandRegister*) it2->first)->SetUnit(((CGXDLMSDemandRegister*) obj)->GetUnit());
+                            ((CGXDLMSDemandRegister*)it2->first)->SetScaler(((CGXDLMSDemandRegister*)obj)->GetScaler());
+                            ((CGXDLMSDemandRegister*)it2->first)->SetUnit(((CGXDLMSDemandRegister*)obj)->GetUnit());
                         }
                     }
                 }
             }
             WriteValue("Profile Generic " + (*it)->GetName().ToString() + " Columns:\r\n");
             std::string str;
-            for(std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it2 = pg->GetCaptureObjects().begin(); it2 != pg->GetCaptureObjects().end(); ++it2)
+            for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it2 = pg->GetCaptureObjects().begin(); it2 != pg->GetCaptureObjects().end(); ++it2)
             {
                 if (str.size() != 0)
                 {
@@ -221,7 +228,7 @@ int main( int argc, char* argv[] )
             WriteValue(str);
         }
 
-        for(std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)
+        for (std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)
         {
             // Profile generics are read later because they are special cases.
             // (There might be so lots of data and we so not want waste time to read all the data.)
@@ -246,7 +253,7 @@ int main( int argc, char* argv[] )
             WriteValue(buff);
             std::vector<int> attributes;
             (*it)->GetAttributeIndexToRead(attributes);
-            for(std::vector<int>::iterator pos = attributes.begin(); pos != attributes.end(); ++pos)
+            for (std::vector<int>::iterator pos = attributes.begin(); pos != attributes.end(); ++pos)
             {
                 value.clear();
                 if ((ret = comm.Read(*it, *pos, value)) != DLMS_ERROR_CODE_OK)
@@ -276,7 +283,7 @@ int main( int argc, char* argv[] )
         //Find profile generics and read them.
         CGXDLMSObjectCollection pgs;
         Objects.GetObjects(DLMS_OBJECT_TYPE_PROFILE_GENERIC, pgs);
-        for(std::vector<CGXDLMSObject*>::iterator it = pgs.begin(); it != pgs.end(); ++it)
+        for (std::vector<CGXDLMSObject*>::iterator it = pgs.begin(); it != pgs.end(); ++it)
         {
             char buff[200];
 #if _MSC_VER > 1000
@@ -316,13 +323,13 @@ int main( int argc, char* argv[] )
             str += "\r\n";
             WriteValue(str);
             //If there are no columns or rows.
-            if (((CGXDLMSProfileGeneric*) *it)->GetEntriesInUse() == 0 || ((CGXDLMSProfileGeneric*) *it)->GetCaptureObjects().size() == 0)
+            if (((CGXDLMSProfileGeneric*)*it)->GetEntriesInUse() == 0 || ((CGXDLMSProfileGeneric*)*it)->GetCaptureObjects().size() == 0)
             {
                 continue;
             }
             //Read first row from Profile Generic.
             CGXDLMSVariant rows;
-            if ((ret = comm.ReadRowsByEntry((CGXDLMSProfileGeneric*) *it, 1, 1, rows)) != 0)
+            if ((ret = comm.ReadRowsByEntry((CGXDLMSProfileGeneric*)*it, 1, 1, rows)) != 0)
             {
                 str = "Error! Failed to read first row:";
                 str += CGXDLMSConverter::GetErrorMessage(ret);

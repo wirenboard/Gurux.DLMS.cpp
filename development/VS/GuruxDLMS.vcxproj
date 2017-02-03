@@ -163,7 +163,6 @@
     <ClCompile Include="..\src\GXDLMSLimiter.cpp" />
     <ClCompile Include="..\src\GXDLMSLimits.cpp" />
     <ClCompile Include="..\src\GXDLMSLNParameters.cpp" />
-    <ClCompile Include="..\src\GXDLMSLNSettings.cpp" />
     <ClCompile Include="..\src\GXDLMSMacAddressSetup.cpp" />
     <ClCompile Include="..\src\GXDLMSMBusClient.cpp" />
     <ClCompile Include="..\src\GXDLMSMBusMasterPortSetup.cpp" />
@@ -199,7 +198,6 @@
     <ClCompile Include="..\src\GXDLMSServer.cpp" />
     <ClCompile Include="..\src\GXDLMSSettings.cpp" />
     <ClCompile Include="..\src\GXDLMSSNParameters.cpp" />
-    <ClCompile Include="..\src\GXDLMSSNSettings.cpp" />
     <ClCompile Include="..\src\GXDLMSSpecialDay.cpp" />
     <ClCompile Include="..\src\GXDLMSSpecialDaysTable.cpp" />
     <ClCompile Include="..\src\GXDLMSTcpUdpSetup.cpp" />
@@ -260,7 +258,6 @@
     <ClInclude Include="..\include\GXDLMSLimiter.h" />
     <ClInclude Include="..\include\GXDLMSLimits.h" />
     <ClInclude Include="..\include\GXDLMSLNParameters.h" />
-    <ClInclude Include="..\include\GXDLMSLNSettings.h" />
     <ClInclude Include="..\include\GXDLMSLongTransaction.h" />
     <ClInclude Include="..\include\GXDLMSMacAddressSetup.h" />
     <ClInclude Include="..\include\GXDLMSMBusClient.h" />
@@ -297,7 +294,6 @@
     <ClInclude Include="..\include\GXDLMSServer.h" />
     <ClInclude Include="..\include\GXDLMSSettings.h" />
     <ClInclude Include="..\include\GXDLMSSNParameters.h" />
-    <ClInclude Include="..\include\GXDLMSSNSettings.h" />
     <ClInclude Include="..\include\GXDLMSSpecialDay.h" />
     <ClInclude Include="..\include\GXDLMSSpecialDaysTable.h" />
     <ClInclude Include="..\include\GXDLMSTcpUdpSetup.h" />

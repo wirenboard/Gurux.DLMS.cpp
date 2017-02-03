@@ -37,8 +37,6 @@
 
 #include "enums.h"
 #include "GXBytebuffer.h"
-#include "GXDLMSLNSettings.h"
-#include "GXDLMSSNSettings.h"
 #include "GXDLMSLimits.h"
 #include "GXDLMSObjectCollection.h"
 #include "GXCipher.h"
@@ -142,12 +140,6 @@ class CGXDLMSSettings
     // Information from the connection size that server can handle.
     CGXDLMSLimits m_Limits;
 
-    // Logical name Settings.
-    CGXDLMSLNSettings m_LNSettings;
-
-    // Short name Settings.
-    CGXDLMSSNSettings m_SNSettings;
-
     // Block packet index.
     unsigned long m_BlockIndex;
 
@@ -159,73 +151,77 @@ class CGXDLMSSettings
      */
     CGXCipher* m_Cipher;
 
+    /**
+    * Proposed conformance block. Server uses this. Client asks this funtionality.
+    */
+    DLMS_CONFORMANCE m_ProposedConformance;
+
+    /**
+    * Server tells what functionality is available and client will know it.
+    */
+    DLMS_CONFORMANCE m_Conformance;
+
 public:
-// Constructor.
+    // Constructor.
     CGXDLMSSettings(bool isServer);
 
     //Destructor.
     ~CGXDLMSSettings();
 
-// Client to Server challenge.
+    // Client to Server challenge.
     CGXByteBuffer& GetCtoSChallenge();
 
-// Client to Server challenge.
+    // Client to Server challenge.
     void SetCtoSChallenge(CGXByteBuffer& value);
 
-// Get server to Client challenge.
+    // Get server to Client challenge.
     CGXByteBuffer& GetStoCChallenge();
 
-// Set server to Client challenge.
+    // Set server to Client challenge.
     void SetStoCChallenge(CGXByteBuffer value);
 
-// Gets used authentication.
+    // Gets used authentication.
     DLMS_AUTHENTICATION GetAuthentication();
 
-//Sets Used authentication.
+    //Sets Used authentication.
     void SetAuthentication(DLMS_AUTHENTICATION value);
 
-//Gets password.
+    //Gets password.
     CGXByteBuffer& GetPassword();
 
-// Sets password.
+    // Sets password.
     void SetPassword(CGXByteBuffer& value);
 
-// Used DLMS version number.
+    // Used DLMS version number.
     unsigned char GetDlmsVersionNumber();
 
-// Used DLMS version number.
+    // Used DLMS version number.
     void SetDlmsVersionNumber(unsigned char value);
 
-// Reset frame sequence.
+    // Reset frame sequence.
     void ResetFrameSequence();
 
     bool CheckFrame(unsigned char frame);
 
-// Generates I-frame.
+    // Generates I-frame.
     unsigned char GetNextSend();
 
-// Generates Receiver Ready S-frame.
+    // Generates Receiver Ready S-frame.
     unsigned char GetReceiverReady();
 
-// Generates Keep Alive S-frame.
+    // Generates Keep Alive S-frame.
     unsigned char GetKeepAlive();
 
-// Gets Logical Name Settings.
-    CGXDLMSLNSettings& GetLnSettings();
-
-// Short name Settings.
-    CGXDLMSSNSettings& GetSnSettings();
-
-// Gets current block index.
+    // Gets current block index.
     unsigned long GetBlockIndex();
 
-// Sets current block index.
+    // Sets current block index.
     void SetBlockIndex(unsigned long value);
 
-// Resets block index to default value.
+    // Resets block index to default value.
     void ResetBlockIndex();
 
-// Increases block index.
+    // Increases block index.
     void IncreaseBlockIndex();
 
     //Is acting as server or client.
@@ -234,64 +230,64 @@ public:
     // Information from the frame size that server can handle.
     CGXDLMSLimits& GetLimits();
 
-// Used interface.
+    // Used interface.
     DLMS_INTERFACE_TYPE GetInterfaceType();
 
-// Used interface.
+    // Used interface.
     void SetInterfaceType(DLMS_INTERFACE_TYPE value);
 
-// Gets client address.
+    // Gets client address.
     unsigned long GetClientAddress();
 
-// Sets client address.
+    // Sets client address.
     void SetClientAddress(unsigned long value);
 
-// Server address.
+    // Server address.
     unsigned long GetServerAddress();
 
-// Server address.
+    // Server address.
     void SetServerAddress(unsigned long value);
 
-// DLMS version number.
+    // DLMS version number.
     unsigned char GetDLMSVersion();
 
-// DLMS version number.
+    // DLMS version number.
     void SetDLMSVersion(unsigned char value);
 
-// Maximum PDU size.
+    // Maximum PDU size.
     unsigned short GetMaxPduSize();
 
-// Maximum PDU size.
+    // Maximum PDU size.
     int SetMaxReceivePDUSize(unsigned short value);
 
-// Maximum server PDU size.
+    // Maximum server PDU size.
     unsigned short GetMaxServerPDUSize();
 
-// Maximum server PDU size.
+    // Maximum server PDU size.
     int SetMaxServerPDUSize(unsigned short value);
 
-// Is Logical Name Referencing used.
+    // Is Logical Name Referencing used.
     bool GetUseLogicalNameReferencing();
 
-// Is Logical Name Referencing used.
+    // Is Logical Name Referencing used.
     void SetUseLogicalNameReferencing(bool value);
 
-// Used priority.
+    // Used priority.
     DLMS_PRIORITY GetPriority();
 
-// Used priority.
+    // Used priority.
     void SetPriority(DLMS_PRIORITY value);
 
-// Used service class.
+    // Used service class.
     DLMS_SERVICE_CLASS GetServiceClass();
 
-// Used service class.
+    // Used service class.
     void SetServiceClass(DLMS_SERVICE_CLASS value);
 
-// Invoke ID.
+    // Invoke ID.
     int GetInvokeID();
 
-// Invoke ID.
+    // Invoke ID.
     void SetInvokeID(int value);
 
     /**
@@ -305,16 +301,16 @@ public:
      */
     int SetLongInvokeID(unsigned long value);
 
-// Collection of the objects.
+    // Collection of the objects.
     CGXDLMSObjectCollection& GetObjects();
 
-// Get Is custom challenges used.
+    // Get Is custom challenges used.
     bool IsCustomChallenges();
 
-// Set is custom challenges used.
+    // Set is custom challenges used.
     void SetUseCustomChallenge(bool value);
 
-//Get is connection made for the server.
+    //Get is connection made for the server.
     bool IsConnected();
 
     //Set is connection made for the server.
@@ -373,6 +369,48 @@ public:
      *            Long data index
      */
     void SetIndex(unsigned short value);
+
+    /**
+    * Functionality what client is ask from the meter meter updates this value
+    * and tells what it can offer. When connection is made client tells what
+    * kind of services it want's to use. Meter returns functionality what it
+    * can offer.
+    *
+    * @return Functionality.
+    */
+    DLMS_CONFORMANCE GetConformance();
+
+    /**
+    * Functionality what client is ask from the meter meter updates this value
+    * and tells what it can offer. When connection is made client tells what
+    * kind of services it want's to use. Meter returns functionality what it
+    * can offer.
+    *
+    * @param value
+    *            Functionality.
+    */
+    void SetConformance(DLMS_CONFORMANCE value);
+
+    /**
+    * Functionality what client is ask from the meter meter updates this value
+    * and tells what it can offer. When connection is made client tells what
+    * kind of services it want's to use. Meter returns functionality what it
+    * can offer.
+    *
+    * @return Functionality.
+    */
+    DLMS_CONFORMANCE GetProposedConformance();
+
+    /**
+    * Functionality what client is ask from the meter meter updates this value
+    * and tells what it can offer. When connection is made client tells what
+    * kind of services it want's to use. Meter returns functionality what it
+    * can offer.
+    *
+    * @param value
+    *            Functionality.
+    */
+    void SetProposedConformance(DLMS_CONFORMANCE value);
 };
 
 #endif //GXDLMSSETTINGS_H

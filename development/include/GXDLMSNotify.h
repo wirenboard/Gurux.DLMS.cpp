@@ -80,20 +80,9 @@ public:
          *            Object type.
          */
     CGXDLMSNotify(bool useLogicalNameReferencing,
-                  int clientAddress,
-                  int serverAddress,
-                  DLMS_INTERFACE_TYPE interfaceType);
-
-    /**
-     * @return Is General block transfer supported.
-     */
-    bool GetGeneralBlockTransfer();
-
-    /**
-     * @param value
-     *            Is General block transfer supported.
-     */
-    void SetGeneralBlockTransfer(bool value);
+        int clientAddress,
+        int serverAddress,
+        DLMS_INTERFACE_TYPE interfaceType);
 
     /**
      * @return Get list of meter's objects.

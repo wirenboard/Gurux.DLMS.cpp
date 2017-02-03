@@ -193,7 +193,7 @@ int GetDate(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 }
 
 //Get UTC offset in minutes.
-static void GetUtcOffset(int& hours, int& minutes)
+void GXHelpers::GetUtcOffset(int& hours, int& minutes)
 {
     time_t zero = 24 * 60 * 60L;
     struct tm tm;
@@ -219,7 +219,7 @@ static time_t GetUtcTime(struct tm * timeptr)
     /* gets the epoch time relative to the local time zone,
     and then adds the appropriate number of seconds to make it UTC */
     int hours, minutes;
-    GetUtcOffset(hours, minutes);
+    GXHelpers::GetUtcOffset(hours, minutes);
     return mktime(timeptr) + (hours * 3600) + (minutes * 60);
 }
 
@@ -1680,49 +1680,44 @@ int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant&
     {
         return 0;
     }
-    if (type == DLMS_DATA_TYPE_BOOLEAN)
+    switch (type)
     {
+    case DLMS_DATA_TYPE_BOOLEAN:
         buff.SetUInt8(value.boolVal != 0);
-    }
-    else if (type == DLMS_DATA_TYPE_INT8 || type == DLMS_DATA_TYPE_UINT8
-        || type == DLMS_DATA_TYPE_ENUM)
-    {
+        break;
+    case DLMS_DATA_TYPE_INT8:
+    case DLMS_DATA_TYPE_UINT8:
+    case DLMS_DATA_TYPE_ENUM:
         buff.SetUInt8(value.bVal);
-    }
-    else if (type == DLMS_DATA_TYPE_INT16 || type == DLMS_DATA_TYPE_UINT16)
-    {
+        break;
+    case DLMS_DATA_TYPE_INT16:
+    case DLMS_DATA_TYPE_UINT16:
         buff.SetUInt16(value.iVal);
-    }
-    else if (type == DLMS_DATA_TYPE_INT32 || type == DLMS_DATA_TYPE_UINT32)
-    {
+        break;
+    case DLMS_DATA_TYPE_INT32:
+    case DLMS_DATA_TYPE_UINT32:
         buff.SetUInt32(value.lVal);
-    }
-    else if (type == DLMS_DATA_TYPE_INT64 || type == DLMS_DATA_TYPE_UINT64)
-    {
+        break;
+    case DLMS_DATA_TYPE_INT64:
+    case DLMS_DATA_TYPE_UINT64:
         buff.SetUInt64(value.llVal);
-    }
-    else if (type == DLMS_DATA_TYPE_FLOAT32)
-    {
+        break;
+    case DLMS_DATA_TYPE_FLOAT32:
         buff.SetFloat(value.fltVal);
-    }
-    else if (type == DLMS_DATA_TYPE_FLOAT64)
-    {
+        break;
+    case DLMS_DATA_TYPE_FLOAT64:
         buff.SetDouble(value.dblVal);
-    }
-    else if (type == DLMS_DATA_TYPE_BIT_STRING)
-    {
+        break;
+    case DLMS_DATA_TYPE_BIT_STRING:
         return SetBitString(buff, value);
-    }
-    else if (type == DLMS_DATA_TYPE_STRING)
-    {
+        break;
+    case DLMS_DATA_TYPE_STRING:
         return SetString(buff, value);
-    }
-    else if (type == DLMS_DATA_TYPE_STRING_UTF8)
-    {
+        break;
+    case DLMS_DATA_TYPE_STRING_UTF8:
         return SetUtfString(buff, value);
-    }
-    else if (type == DLMS_DATA_TYPE_OCTET_STRING)
-    {
+        break;
+    case DLMS_DATA_TYPE_OCTET_STRING:
         if (value.vt == DLMS_DATA_TYPE_DATE)
         {
             // Add size
@@ -1745,35 +1740,28 @@ int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant&
         {
             return SetOctetString(buff, value);
         }
-    }
-    else if (type == DLMS_DATA_TYPE_ARRAY || type == DLMS_DATA_TYPE_STRUCTURE)
-    {
+        break;
+    case DLMS_DATA_TYPE_ARRAY:
+    case DLMS_DATA_TYPE_STRUCTURE:
         return SetArray(buff, value);
-    }
-    else if (type == DLMS_DATA_TYPE_BINARY_CODED_DESIMAL)
-    {
+        break;
+    case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
         return SetBcd(buff, value);
-    }
-    else if (type == DLMS_DATA_TYPE_COMPACT_ARRAY)
-    {
+        break;
+    case DLMS_DATA_TYPE_COMPACT_ARRAY:
         assert(0);
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
-    else if (type == DLMS_DATA_TYPE_DATETIME)
-    {
+        break;
+    case DLMS_DATA_TYPE_DATETIME:
         return SetDateTime(buff, value);
-    }
-    else if (type == DLMS_DATA_TYPE_DATE)
-    {
+        break;
+    case DLMS_DATA_TYPE_DATE:
         return SetDate(buff, value);
-    }
-    else if (type == DLMS_DATA_TYPE_TIME)
-    {
+        break;
+    case DLMS_DATA_TYPE_TIME:
         return SetTime(buff, value);
-    }
-    else
-    {
-        assert(0);
+        break;
+    default:
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     return 0;
@@ -1800,15 +1788,6 @@ unsigned char GXHelpers::GetValue(char c)
     return value;
 }
 
-/**
-     * Convert std::string to byte array.
-     *
-     * @param value
-     *            Hex std::string.
-     * @param buffer
-     *            byte array.
-     * @return Occurred error.
-     */
 void GXHelpers::HexToBytes(std::string value, CGXByteBuffer& buffer)
 {
     buffer.Clear();

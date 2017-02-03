@@ -75,6 +75,7 @@ class CGXCommunication
 {
     static const unsigned int RECEIVE_BUFFER_SIZE = 200;
     int m_WaitTime;
+    int Read(unsigned char eop, CGXByteBuffer& reply);
 public:
     CGXDLMSClient* m_Parser;
     int m_socket;
@@ -94,7 +95,6 @@ public:
 
     int Close();
     int Connect(const char* pAddress, unsigned short port = 4059);
-    int Read(unsigned char eop, CGXByteBuffer& reply);
 
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
     int GXGetCommState(HANDLE hWnd, LPDCB DCB);
@@ -152,6 +152,13 @@ public:
         CGXDLMSObject* pObject,
         int ActionIndex,
         CGXDLMSVariant& value);
+
+
+    int ReadRowsByRange(
+        CGXDLMSProfileGeneric* pObject,
+        CGXDateTime& start,
+        CGXDateTime& end,
+        CGXDLMSVariant& rows);
 
     int ReadRowsByRange(
         CGXDLMSProfileGeneric* pObject,

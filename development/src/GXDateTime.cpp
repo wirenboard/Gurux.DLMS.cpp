@@ -43,7 +43,9 @@
 // Constructor.
 CGXDateTime::CGXDateTime()
 {
-    m_Deviation = (short)0x8000;
+    int hours, minutes;
+    GXHelpers::GetUtcOffset(hours, minutes);
+    m_Deviation = -(hours * 60 + minutes);
     m_Skip = DATETIME_SKIPS_NONE;
     memset(&m_Value, 0xFF, sizeof(m_Value));
     m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
@@ -53,7 +55,10 @@ CGXDateTime::CGXDateTime()
 // Constructor.
 CGXDateTime::CGXDateTime(struct tm value)
 {
-    m_Deviation = (short)0x8000;
+
+    int hours, minutes;
+    GXHelpers::GetUtcOffset(hours, minutes);
+    m_Deviation = -(hours * 60 + minutes);
     m_Value = value;
     m_Skip = DATETIME_SKIPS_NONE;
     m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
@@ -475,4 +480,29 @@ DLMS_CLOCK_STATUS CGXDateTime::GetStatus()
 void CGXDateTime::SetStatus(DLMS_CLOCK_STATUS value)
 {
     m_Status = value;
+}
+
+void CGXDateTime::ResetTime()
+{
+    m_Value.tm_hour = m_Value.tm_min = m_Value.tm_sec = 0;
+}
+
+int CGXDateTime::AddDays(int days)
+{
+    m_Value.tm_mday += days;
+    if ((int)mktime(&m_Value) == -1)
+    {
+        return DLMS_ERROR_CODE_INVALID_DATE_TIME;
+    }
+    return DLMS_ERROR_CODE_OK;
+}
+
+int CGXDateTime::AddHours(int hours)
+{
+    m_Value.tm_hour += hours;
+    if ((int)mktime(&m_Value) == -1)
+    {
+        return DLMS_ERROR_CODE_INVALID_DATE_TIME;
+    }
+    return DLMS_ERROR_CODE_OK;
 }

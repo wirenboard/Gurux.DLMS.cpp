@@ -61,8 +61,8 @@ const unsigned char HDLC_FRAME_START_END = 0x7E;
 const char AARQ_TAG = 0x60;
 const char AARE_TAG = 0x61;
 
-const unsigned char LLC_SEND_BYTES[3] = {0xE6, 0xE6, 0x00};
-const unsigned char LLC_REPLY_BYTES[3] = {0xE6, 0xE7, 0x00};
+const unsigned char LLC_SEND_BYTES[3] = { 0xE6, 0xE6, 0x00 };
+const unsigned char LLC_REPLY_BYTES[3] = { 0xE6, 0xE7, 0x00 };
 
 
 enum DLMS_ASSOCIATION_RESULT
@@ -80,8 +80,8 @@ typedef enum
     DLMS_SOURCE_DIAGNOSTIC_NOT_SUPPORTED = 2,
     DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_MECHANISM_NAME_NOT_RECOGNISED = 11,
     DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_MECHANISM_NAME_REQUIRED = 12,
-    DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_FAILURE =13,
-    DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_REQUIRED =14,
+    DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_FAILURE = 13,
+    DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_REQUIRED = 14,
 } DLMS_SOURCE_DIAGNOSTIC;
 
 /**
@@ -1035,7 +1035,7 @@ typedef enum
 typedef enum
 {
     DLMS_DATA_TYPE_NONE = 0,
-    DLMS_DATA_TYPE_BOOLEAN  = 3,
+    DLMS_DATA_TYPE_BOOLEAN = 3,
     DLMS_DATA_TYPE_BIT_STRING = 4,
     DLMS_DATA_TYPE_INT32 = 5,
     DLMS_DATA_TYPE_UINT32 = 6,
@@ -1593,4 +1593,109 @@ typedef enum
      */
     DLMS_VARIABLE_ACCESS_SPECIFICATION_WRITE_DATA_BLOCK_ACCESS = 7
 } DLMS_VARIABLE_ACCESS_SPECIFICATION;
+
+/*
+* Enumerates all conformance bits.
+*/
+typedef enum
+{
+    /*
+    * Reserved zero conformance bit.
+    */
+    DLMS_CONFORMANCE_RESERVED_ZERO = 0x800000,
+
+    /*
+    * General protection conformance bit.
+    */
+    DLMS_CONFORMANCE_GENERAL_PROTECTION = 0x400000,
+
+    /*
+    * General block transfer conformance bit.
+    */
+    DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER = 0x200000,
+    /*
+    * Read conformance bit.
+    */
+    DLMS_CONFORMANCE_READ = 0x100000,
+    /*
+    * Write conformance bit.
+    */
+    DLMS_CONFORMANCE_WRITE = 0x80000,
+    /*
+    * Un confirmed write conformance bit.
+    */
+    DLMS_CONFORMANCE_UN_CONFIRMED_WRITE = 0x40000,
+    /**
+    * Reserved six conformance bit.
+    */
+    DLMS_CONFORMANCE_RESERVED_SIX = 0x20000,
+    /*
+    * Reserved seven conformance bit.
+    */
+    DLMS_CONFORMANCE_RESERVED_SEVEN = 0x10000,
+    /*
+    * Attribute 0 supported with set conformance bit.
+    */
+    DLMS_CONFORMANCE_ATTRIBUTE_0_SUPPORTED_WITH_SET = 0x8000,
+    /*
+    * Priority mgmt supported conformance bit.
+    */
+    DLMS_CONFORMANCE_PRIORITY_MGMT_SUPPORTED = 0x4000,
+    /*
+    * Attribute 0 supported with get conformance bit.
+    */
+    DLMS_CONFORMANCE_ATTRIBUTE_0_SUPPORTED_WITH_GET = 0x2000,
+    /*
+    * Block transfer with get or read conformance bit.
+    */
+    DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_GET_OR_READ = 0x1000,
+    /*
+    * Block transfer with set or write conformance bit.
+    */
+    DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_SET_OR_WRITE = 0x800,
+    /**
+    * Block transfer with action conformance bit.
+    */
+    DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_ACTION = 0x400,
+    /*
+    * multiple references conformance bit.
+    */
+    DLMS_CONFORMANCE_MULTIPLE_REFERENCES = 0x200,
+    /*
+    * Information report conformance bit.
+    */
+    DLMS_CONFORMANCE_INFORMATION_REPORT = 0x100,
+    /*
+    * Data notification conformance bit.
+    */
+    DLMS_CONFORMANCE_DATA_NOTIFICATION = 0x80,
+    /*
+    * Access conformance bit.
+    */
+    DLMS_CONFORMANCE_ACCESS = 0x40,
+    /*
+    * Parameterized access conformance bit.
+    */
+    DLMS_CONFORMANCE_PARAMETERIZED_ACCESS = 0x20,
+    /*
+    * Get conformance bit.
+    */
+    DLMS_CONFORMANCE_GET = 0x10,
+    /*
+    * Set conformance bit.
+    */
+    DLMS_CONFORMANCE_SET = 0x8,
+    /*
+    * Selective access conformance bit.
+    */
+    DLMS_CONFORMANCE_SELECTIVE_ACCESS = 0x4,
+    /*
+    * Event notification conformance bit.
+    */
+    DLMS_CONFORMANCE_EVENT_NOTIFICATION = 0x2,
+    /*
+    * Action conformance bit.
+    */
+    DLMS_CONFORMANCE_ACTION = 0x1
+}DLMS_CONFORMANCE;
 #endif //ENUMS_H

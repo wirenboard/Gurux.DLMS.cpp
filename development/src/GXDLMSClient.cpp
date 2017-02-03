@@ -65,6 +65,14 @@ CGXDLMSClient::~CGXDLMSClient()
 {
 }
 
+DLMS_CONFORMANCE CGXDLMSClient::GetConformance() {
+    return (DLMS_CONFORMANCE)m_Settings.GetConformance();
+}
+
+void CGXDLMSClient::SetConformance(DLMS_CONFORMANCE value) {
+    m_Settings.SetConformance(value);
+}
+
 bool CGXDLMSClient::GetUseLogicalNameReferencing()
 {
     return m_Settings.GetUseLogicalNameReferencing();
@@ -119,7 +127,7 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
     // Length is updated later.
     data.SetUInt8(0);
     // If custom HDLC parameters are used.
-    if (CGXDLMSLimits::DEFAULT_MAX_INFO_TX == GetLimits().GetMaxInfoTX().ToInteger())
+    if (CGXDLMSLimits::DEFAULT_MAX_INFO_TX != GetLimits().GetMaxInfoTX().ToInteger())
     {
         data.SetUInt8(HDLC_INFO_MAX_INFO_TX);
         data.SetUInt8(GetLimits().GetMaxInfoTX().GetSize());
@@ -1433,6 +1441,15 @@ int CGXDLMSClient::ReadRowsByEntry(
     return Read(name, DLMS_OBJECT_TYPE_PROFILE_GENERIC, 2, &buff, reply);
 }
 
+int CGXDLMSClient::ReadRowsByRange(
+    CGXDLMSProfileGeneric* pObject,
+    CGXDateTime& start,
+    CGXDateTime& end,
+    std::vector<CGXByteBuffer>& reply)
+{
+    return ReadRowsByRange(pObject, &start.GetValue(), &end.GetValue(), reply);
+}
+
 
 int CGXDLMSClient::ReadRowsByRange(
     CGXDLMSProfileGeneric* pg,
@@ -1452,18 +1469,9 @@ int CGXDLMSClient::ReadRowsByRange(
     std::vector<CGXByteBuffer>& reply)
 {
     int ret;
+    unsigned char LN[] = { 0, 0, 1, 0, 0, 255 };
     CGXDLMSVariant name = pg->GetName();
     m_Settings.ResetBlockIndex();
-    CGXDLMSObject* sort = pg->GetSortObject();
-    if (sort == NULL && pg->GetCaptureObjects().size() != 0)
-    {
-        sort = pg->GetCaptureObjects().at(0).first;
-    }
-    // If sort object is not found or it is not clock object read all.
-    if (sort == NULL || sort->GetObjectType() != DLMS_OBJECT_TYPE_CLOCK)
-    {
-        return Read(name, pg->GetObjectType(), 2, reply);
-    }
     CGXByteBuffer buff(51);
     // Add AccessSelector value.
     buff.SetUInt8(0x01);
@@ -1476,33 +1484,31 @@ int CGXDLMSClient::ReadRowsByRange(
     // Add item count
     buff.SetUInt8(0x04);
     // CI
-    CGXDLMSVariant tmp = sort->GetObjectType();
+    CGXDLMSVariant tmp = DLMS_OBJECT_TYPE_CLOCK;
     GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT16, tmp);
     // LN
-    CGXDLMSVariant ln;
-    if ((ret = CGXDLMSObject::GetLogicalName(sort, ln)) != 0)
-    {
-        return ret;
-    }
+    CGXDLMSVariant ln(LN, 6, DLMS_DATA_TYPE_OCTET_STRING);
     GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, ln);
     // Add attribute index.
     tmp = 2;
     GXHelpers::SetData(buff, DLMS_DATA_TYPE_INT8, tmp);
     // Add version
-    tmp = sort->GetVersion();
+    tmp = 0;
     if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT16, tmp)) != 0)
     {
         return ret;
     }
     // Add start time
     tmp = *start;
-    if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_DATETIME, tmp)) != 0)
+    tmp.dateTime.SetSkip((DATETIME_SKIPS)(tmp.dateTime.GetSkip() | DATETIME_SKIPS_MS));
+    if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
     {
         return ret;
     }
     // Add end time
     tmp = *end;
-    if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_DATETIME, tmp)) != 0)
+    tmp.dateTime.SetSkip((DATETIME_SKIPS)(tmp.dateTime.GetSkip() | DATETIME_SKIPS_MS));
+    if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
     {
         return ret;
     }

@@ -408,20 +408,6 @@ public:
         bool value);
 
     /**
-     * Gets Logical Name settings.
-     *
-     * @return Logical Name m_Settings.
-     */
-    CGXDLMSLNSettings& GetLNSettings();
-
-    /**
-     * Gets Short Name m_Settings.
-     *
-     * @return Short Name m_Settings.
-     */
-    CGXDLMSSNSettings& GetSNSettings();
-
-    /**
      * Initialize server. This must call after server objects are set.
      */
     int Initialize();

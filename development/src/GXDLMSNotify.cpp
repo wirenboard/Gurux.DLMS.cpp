@@ -55,27 +55,6 @@ CGXDLMSNotify::CGXDLMSNotify(bool useLogicalNameReferencing,
     m_Settings.SetInterfaceType(interfaceType);
 }
 
-bool CGXDLMSNotify::GetGeneralBlockTransfer()
-{
-    if (m_Settings.GetUseLogicalNameReferencing())
-    {
-        return m_Settings.GetLnSettings().GetGeneralBlockTransfer();
-    }
-    return m_Settings.GetSnSettings().GetGeneralBlockTransfer();
-}
-
-void CGXDLMSNotify::SetGeneralBlockTransfer(bool value)
-{
-    if (m_Settings.GetUseLogicalNameReferencing())
-    {
-        m_Settings.GetLnSettings().SetGeneralBlockTransfer(value);
-    }
-    else
-    {
-        m_Settings.GetSnSettings().SetGeneralBlockTransfer(value);
-    }
-}
-
 CGXDLMSObjectCollection& CGXDLMSNotify::GetObjects()
 {
     return m_Settings.GetObjects();

@@ -73,17 +73,26 @@ public:
     {
         int dataSize;
         char tmp[25];
-#if _MSC_VER > 1000
-        dataSize = sprintf_s(tmp, 25, "%d.%d.%d.%d.%d.%d", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]) + 1;
-#else
-        dataSize = sprintf(tmp, "%d.%d.%d.%d.%d.%d", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]) + 1;
-#endif
-        if (dataSize > 25)
+        //If Script Action target is not set it is null
+        if (buff == NULL)
         {
-            assert(0);
+            ln.clear();
+            ln.append("0.0.0.0.0.0");
         }
-        ln.clear();
-        ln.append(tmp, dataSize - 1);
+        else
+        {
+#if _MSC_VER > 1000
+            dataSize = sprintf_s(tmp, 25, "%d.%d.%d.%d.%d.%d", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]) + 1;
+#else
+            dataSize = sprintf(tmp, "%d.%d.%d.%d.%d.%d", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]) + 1;
+#endif
+            if (dataSize > 25)
+            {
+                assert(0);
+            }
+            ln.clear();
+            ln.append(tmp, dataSize - 1);
+        }
     }
 
     static void GetLogicalName(CGXByteBuffer& buff, std::string& ln)
@@ -129,12 +138,12 @@ public:
         */
     static unsigned char GetObjectCountSizeInBytes(unsigned long count);
 
-/////////////////////////////////////////////////////////////////////////////
-// Set item count.
-/////////////////////////////////////////////////////////////////////////////
-// count : Item count.
-// buff : Byte buffer.
-/////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
+    // Set item count.
+    /////////////////////////////////////////////////////////////////////////////
+    // count : Item count.
+    // buff : Byte buffer.
+    /////////////////////////////////////////////////////////////////////////////
     static void SetObjectCount(unsigned long count, CGXByteBuffer& buff);
 
     static std::vector< std::string > Split(std::string& s, char separator);
@@ -143,24 +152,24 @@ public:
 
     static void Replace(std::string& str, std::string oldString, std::string newString);
 
-/////////////////////////////////////////////////////////////////////////////
-// Trim from start.
-/////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
+    // Trim from start.
+    /////////////////////////////////////////////////////////////////////////////
     static std::string &ltrim(std::string& s);
 
-/////////////////////////////////////////////////////////////////////////////
-// Trim from end.
-/////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
+    // Trim from end.
+    /////////////////////////////////////////////////////////////////////////////
     static inline std::string &rtrim(std::string& s)
     {
         s.erase(std::find_if(s.rbegin(), s.rend(),
-                             std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+            std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
         return s;
     }
 
-/////////////////////////////////////////////////////////////////////////////
-// Trim from both ends
-/////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
+    // Trim from both ends
+    /////////////////////////////////////////////////////////////////////////////
     static inline std::string &trim(std::string& s)
     {
         return ltrim(rtrim(s));
@@ -187,5 +196,8 @@ public:
     static bool GetBits(unsigned char& tmp, unsigned char BitMask);
 
     static inline bool StringCompare(const char* c1, const char* c2);
+
+    //Get UTC offset in minutes.
+    static void GetUtcOffset(int& hours, int& minutes);
 };
 #endif //GXHELPERS_H

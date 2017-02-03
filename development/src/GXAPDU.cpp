@@ -183,14 +183,10 @@ int GetInitiateRequest(
     data.SetUInt8(0x04);
     // encoding the number of unused bits in the bit string
     data.SetUInt8(0x00);
-    if (settings.GetUseLogicalNameReferencing())
-    {
-        data.Set(settings.GetLnSettings().m_ConformanceBlock, 3);
-    }
-    else
-    {
-        data.Set(settings.GetSnSettings().m_ConformanceBlock, 3);
-    }
+    //Add conformance block.
+    CGXByteBuffer bb(4);
+    bb.SetUInt32((unsigned long)settings.GetConformance());
+    data.Set(&bb, 1, 3);
     data.SetUInt16(settings.GetMaxPduSize());
     return 0;
 }
@@ -440,34 +436,22 @@ int ParseUserInformation(
     {
         return ret;
     }
-    if (settings.GetUseLogicalNameReferencing())
+    unsigned long v;
+    unsigned char tmp[3];
+    CGXByteBuffer bb(4);
+    data.Get(tmp, 3);
+    bb.SetUInt8(0);
+    bb.Set(tmp, 3);
+    bb.GetUInt32(&v);
+    if (settings.IsServer())
     {
-        if (settings.IsServer())
-        {
-            // Skip settings what client asks.
-            // All server settings are always returned.
-            unsigned char tmp[3];
-            data.Get(tmp, 3);
-        }
-        else
-        {
-            data.Get(settings.GetLnSettings().m_ConformanceBlock, 3);
-        }
+        settings.SetProposedConformance((DLMS_CONFORMANCE)v);
     }
     else
     {
-        if (settings.IsServer())
-        {
-            // Skip settings what client asks.
-            // All server settings are always returned.
-            unsigned char tmp[3];
-            data.Get(tmp, 3);
-        }
-        else
-        {
-            data.Get(settings.GetSnSettings().m_ConformanceBlock, 3);
-        }
+        settings.SetConformance((DLMS_CONFORMANCE)v);
     }
+
     if (settings.IsServer())
     {
         if ((ret = data.GetUInt16(&pduSize)) != 0)
@@ -752,15 +736,9 @@ int GetUserInformation(
     data.SetUInt8(0x04);
     // encoding the number of unused bits in the bit string
     data.SetUInt8(0x00);
-    if (settings.GetUseLogicalNameReferencing())
-    {
-        data.Set(settings.GetLnSettings().m_ConformanceBlock, 3);
-    }
-    else
-    {
-        data.Set(settings.GetSnSettings().m_ConformanceBlock, 3);
-
-    }
+    CGXByteBuffer bb(4);
+    bb.SetUInt32((unsigned long)settings.GetConformance());
+    data.Set(&bb, 1, 3);
     data.SetUInt16(settings.GetMaxPduSize());
     // VAA Name VAA name (0x0007 for LN referencing and 0xFA00 for SN)
     if (settings.GetUseLogicalNameReferencing())

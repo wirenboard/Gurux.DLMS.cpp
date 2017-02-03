@@ -39,6 +39,7 @@
 #include "GXStandardObisCodeCollection.h"
 #include "GXDLMSProfileGeneric.h"
 #include "GXSecure.h"
+#include "GXDateTime.h"
 
 class CGXDLMSClient
 {
@@ -167,9 +168,9 @@ public:
     * reply
     *            Received data.
     * @see GXDLMSClient#aarqRequest
-    * @see GXDLMSClient#getUseLogicalNameReferencing
-    * @see GXDLMSClient#getLNSettings
-    * @see GXDLMSClient#getSNSettings
+    * @see GXDLMSClient#GetUseLogicalNameReferencing
+    * @see GXDLMSClient#GetLNSettings
+    * @see GXDLMSClient#GetSNSettings
     */
     int ParseAAREResponse(
         CGXByteBuffer& data);
@@ -466,6 +467,25 @@ public:
         std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns,
         std::vector<CGXByteBuffer>& reply);
 
+
+    /**
+    * Read rows by range. Use this method to read Profile Generic table between
+    * dates.
+    *
+    * @param pg
+    *            Profile generic object to read.
+    * @param start
+    *            Start time.
+    * @param end
+    *            End time.
+    * @return Generated read message.
+    */
+    int ReadRowsByRange(
+        CGXDLMSProfileGeneric* pObject,
+        CGXDateTime& start,
+        CGXDateTime& end,
+        std::vector<CGXByteBuffer>& reply);
+
     /**
      * Read rows by range. Use this method to read Profile Generic table between
      * dates.
@@ -503,6 +523,28 @@ public:
         std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns,
         std::vector<CGXByteBuffer>& reply);
 
+
+    /**
+    * Functionality what client is ask from the meter meter updates this value
+    * and tells what it can offer. When connection is made client tells what
+    * kind of services it want's to use. Meter returns functionality what it
+    * can offer.
+    *
+    * @return Functionality.
+    */
+    DLMS_CONFORMANCE GetConformance();
+
+    /**
+    * Functionality what client is ask from the meter meter updates this value
+    * and tells what it can offer. When connection is made client tells what
+    * kind of services it want's to use. Meter returns functionality what it
+    * can offer.
+    *
+    * @param value
+    *            Functionality.
+    */
+    void SetConformance(DLMS_CONFORMANCE value);
+
     /**
      * Converts meter serial number to server address. Default formula is used.
      * All meters do not use standard formula or support serial number
@@ -515,7 +557,6 @@ public:
      *            Set to NULL if standard formula is used.
      * @return Server address.
      */
-
     static int GetServerAddress(
         unsigned long serialNumber,
         const char* formula = NULL);
