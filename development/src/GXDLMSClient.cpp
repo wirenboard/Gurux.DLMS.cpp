@@ -964,6 +964,7 @@ int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets)
     int ret;
     CGXByteBuffer reply;
     packets.clear();
+    m_Settings.SetMaxReceivePDUSize(0xFFFF);
     // If connection is not established, there is no need to send DisconnectRequest.
     if (!m_Settings.IsConnected())
     {

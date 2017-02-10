@@ -918,7 +918,15 @@ int CGXDLMSServer::GetRequestNextDataBlock(CGXByteBuffer& data)
                         }
                         value = (*arg)->GetValue();
                         // Add data.
-                        CGXDLMS::AppendData((*arg)->GetTarget(), (*arg)->GetIndex(), bb, value);
+                        if ((*arg)->IsByteArray() && value.vt == DLMS_DATA_TYPE_OCTET_STRING)
+                        {
+                            // If byte array is added do not add type.
+                            bb.Set(value.byteArr, value.GetSize());
+                        }
+                        else if ((ret = CGXDLMS::AppendData((*arg)->GetTarget(), (*arg)->GetIndex(), bb, value)) != 0)
+                        {
+                            return DLMS_ERROR_CODE_HARDWARE_FAULT;
+                        }
                     }
                     moreData = m_Settings.GetIndex() != m_Settings.GetCount();
                 }
@@ -1024,7 +1032,15 @@ int CGXDLMSServer::GetRequestWithList(CGXByteBuffer& data)
         }
         CGXDLMSVariant& value = (*it)->GetValue();
         bb.SetUInt8((*it)->GetError());
-        CGXDLMS::AppendData((*it)->GetTarget(), (*it)->GetIndex(), bb, value);
+        if ((*it)->IsByteArray() && value.vt == DLMS_DATA_TYPE_OCTET_STRING)
+        {
+            // If byte array is added do not add type.
+            bb.Set(value.byteArr, value.GetSize());
+        }
+        else if ((ret = CGXDLMS::AppendData((*it)->GetTarget(), (*it)->GetIndex(), bb, value)) != 0)
+        {
+            return DLMS_ERROR_CODE_HARDWARE_FAULT;
+        }
         if (m_Settings.GetIndex() != m_Settings.GetCount())
         {
             CGXByteBuffer empty;
@@ -1176,7 +1192,7 @@ int GetReadData(CGXDLMSSettings& settings,
                 data.SetUInt8(DLMS_SINGLE_READ_RESPONSE_DATA);
             }
             // If action.
-            if ((*e)->IsAction())
+            if ((*e)->IsAction() || ((*e)->IsByteArray() && value.vt == DLMS_DATA_TYPE_OCTET_STRING))
             {
                 GXHelpers::SetData(data, value.vt, value);
             }
