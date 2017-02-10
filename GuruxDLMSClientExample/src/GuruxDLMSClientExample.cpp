@@ -121,6 +121,8 @@ int main(int argc, char* argv[])
         std::string str;
         std::string ln;
         std::vector<std::pair<CGXDLMSObject*, unsigned char> > list;
+        /*
+        This is comment for now. This causes problems with some meters.
         if ((cl.GetConformance() & DLMS_CONFORMANCE_MULTIPLE_REFERENCES) != 0)
         {
             // Read scalers and units from the device.
@@ -141,7 +143,7 @@ int main(int argc, char* argv[])
                 return ret;
             }
         }
-        else
+        else*/
         {
             //If readlist is not supported read one value at the time.
             for (std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)
@@ -343,7 +345,10 @@ int main(int argc, char* argv[])
                 //Show rows.
                 WriteValue(rows.ToString());
             }
-            if ((ret = comm.ReadRowsByRange((CGXDLMSProfileGeneric*)(*it), &CGXDateTime::Now().GetValue(), &CGXDateTime::Now().GetValue(), rows)) != 0)
+            CGXDateTime start = CGXDateTime::Now();
+            start.ResetTime();
+            CGXDateTime end = CGXDateTime::Now();
+            if ((ret = comm.ReadRowsByRange((CGXDLMSProfileGeneric*)(*it), start, end, rows)) != 0)
             {
                 str = "Error! Failed to read last day:";
                 str += CGXDLMSConverter::GetErrorMessage(ret);
