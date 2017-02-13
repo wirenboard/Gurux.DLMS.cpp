@@ -490,7 +490,8 @@ void CGXDLMSProfileGeneric::SetSortObjectDataIndex(int value)
 */
 void CGXDLMSProfileGeneric::Reset()
 {
-    //TODO:
+    m_Buffer.erase(m_Buffer.begin(), m_Buffer.end());
+    m_EntriesInUse = 0;
 }
 
 /**

@@ -82,15 +82,18 @@ CGXDLMSClient::~CGXDLMSClient()
 {
 }
 
-DLMS_CONFORMANCE CGXDLMSClient::GetNegotiatedConformance() {
+DLMS_CONFORMANCE CGXDLMSClient::GetNegotiatedConformance()
+{
     return (DLMS_CONFORMANCE)m_Settings.GetNegotiatedConformance();
 }
 
-DLMS_CONFORMANCE CGXDLMSClient::GetConformance() {
+DLMS_CONFORMANCE CGXDLMSClient::GetConformance()
+{
     return (DLMS_CONFORMANCE)m_Settings.GetProposedConformance();
 }
 
-void CGXDLMSClient::SetConformance(DLMS_CONFORMANCE value) {
+void CGXDLMSClient::SetConformance(DLMS_CONFORMANCE value)
+{
     m_Settings.SetProposedConformance(value);
 }
 
@@ -1435,6 +1438,11 @@ int CGXDLMSClient::ReadRowsByEntry(
     std::vector<CGXByteBuffer>& reply)
 {
     CGXByteBuffer buff(19);
+    if (pg == NULL)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    pg->Reset();
     // Add AccessSelector value
     buff.SetUInt8(0x02);
     // Add enum tag.
@@ -1493,9 +1501,14 @@ int CGXDLMSClient::ReadRowsByRange(
 {
     int ret;
     unsigned char LN[] = { 0, 0, 1, 0, 0, 255 };
-    CGXDLMSVariant name = pg->GetName();
-    m_Settings.ResetBlockIndex();
     CGXByteBuffer buff(51);
+    CGXDLMSVariant name = pg->GetName();
+    if (pg == NULL || start == NULL || end == NULL)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    pg->Reset();
+    m_Settings.ResetBlockIndex();
     // Add AccessSelector value.
     buff.SetUInt8(0x01);
     // Add enum tag.
