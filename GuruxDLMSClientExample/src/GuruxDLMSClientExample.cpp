@@ -328,38 +328,47 @@ int main(int argc, char* argv[])
             {
                 continue;
             }
-            //Read first row from Profile Generic.
+            //All meters are not supporting parameterized read.
             CGXDLMSVariant rows;
-            if ((ret = comm.ReadRowsByEntry((CGXDLMSProfileGeneric*)*it, 1, 1, rows)) != 0)
+            if ((cl.GetConformance() & (DLMS_CONFORMANCE_PARAMETERIZED_ACCESS | DLMS_CONFORMANCE_SELECTIVE_ACCESS)) != 0)
             {
-                str = "Error! Failed to read first row:";
-                str += CGXDLMSConverter::GetErrorMessage(ret);
-                str += "\r\n";
-                WriteValue(str);
-                //Continue reading.
+                //Read first row from Profile Generic.
+                if ((ret = comm.ReadRowsByEntry((CGXDLMSProfileGeneric*)*it, 1, 1, rows)) != 0)
+                {
+                    str = "Error! Failed to read first row:";
+                    str += CGXDLMSConverter::GetErrorMessage(ret);
+                    str += "\r\n";
+                    WriteValue(str);
+                    //Continue reading.
+                }
+                else
+                {
+                    //////////////////////////////////////////////////////////////////////////////
+                    //Show rows.
+                    WriteValue(rows.ToString());
+                }
             }
-            else
+
+            //All meters are not supporting parameterized read.
+            if ((cl.GetConformance() & (DLMS_CONFORMANCE_PARAMETERIZED_ACCESS | DLMS_CONFORMANCE_SELECTIVE_ACCESS)) != 0)
             {
-                //////////////////////////////////////////////////////////////////////////////
-                //Show rows.
-                WriteValue(rows.ToString());
-            }
-            CGXDateTime start = CGXDateTime::Now();
-            start.ResetTime();
-            CGXDateTime end = CGXDateTime::Now();
-            if ((ret = comm.ReadRowsByRange((CGXDLMSProfileGeneric*)(*it), start, end, rows)) != 0)
-            {
-                str = "Error! Failed to read last day:";
-                str += CGXDLMSConverter::GetErrorMessage(ret);
-                str += "\r\n";
-                WriteValue(str);
-                //Continue reading.
-            }
-            else
-            {
-                //////////////////////////////////////////////////////////////////////////////
-                //Show rows.
-                WriteValue(rows.ToString());
+                CGXDateTime start = CGXDateTime::Now();
+                start.ResetTime();
+                CGXDateTime end = CGXDateTime::Now();
+                if ((ret = comm.ReadRowsByRange((CGXDLMSProfileGeneric*)(*it), start, end, rows)) != 0)
+                {
+                    str = "Error! Failed to read last day:";
+                    str += CGXDLMSConverter::GetErrorMessage(ret);
+                    str += "\r\n";
+                    WriteValue(str);
+                    //Continue reading.
+                }
+                else
+                {
+                    //////////////////////////////////////////////////////////////////////////////
+                    //Show rows.
+                    WriteValue(rows.ToString());
+                }
             }
         }
         //Close connection.
