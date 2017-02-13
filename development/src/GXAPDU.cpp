@@ -185,7 +185,7 @@ int GetInitiateRequest(
     data.SetUInt8(0x00);
     //Add conformance block.
     CGXByteBuffer bb(4);
-    bb.SetUInt32((unsigned long)settings.GetConformance());
+    bb.SetUInt32((unsigned long)settings.GetProposedConformance());
     data.Set(&bb, 1, 3);
     data.SetUInt16(settings.GetMaxPduSize());
     return 0;
@@ -445,11 +445,11 @@ int ParseUserInformation(
     bb.GetUInt32(&v);
     if (settings.IsServer())
     {
-        settings.SetProposedConformance((DLMS_CONFORMANCE)v);
+        settings.SetNegotiatedConformance((DLMS_CONFORMANCE)(v & settings.GetProposedConformance()));
     }
     else
     {
-        settings.SetConformance((DLMS_CONFORMANCE)v);
+        settings.SetNegotiatedConformance((DLMS_CONFORMANCE)v);
     }
 
     if (settings.IsServer())
@@ -737,7 +737,7 @@ int GetUserInformation(
     // encoding the number of unused bits in the bit string
     data.SetUInt8(0x00);
     CGXByteBuffer bb(4);
-    bb.SetUInt32((unsigned long)settings.GetConformance());
+    bb.SetUInt32((unsigned long)settings.GetNegotiatedConformance());
     data.Set(&bb, 1, 3);
     data.SetUInt16(settings.GetMaxPduSize());
     // VAA Name VAA name (0x0007 for LN referencing and 0xFA00 for SN)

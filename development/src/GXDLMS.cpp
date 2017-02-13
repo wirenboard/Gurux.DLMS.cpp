@@ -554,7 +554,7 @@ int CGXDLMS::GetLNPdu(
     }
     else
     {
-        if ((p.GetSettings()->GetConformance() & DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER) != 0)
+        if ((p.GetSettings()->GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER) != 0)
         {
             reply.SetUInt8(DLMS_COMMAND_GENERAL_BLOCK_TRANSFER);
             MultipleBlocks(p, reply, ciphering);
@@ -644,7 +644,7 @@ int CGXDLMS::GetLNPdu(
         // Add attribute descriptor.
         reply.Set(p.GetAttributeDescriptor());
         if (p.GetCommand() != DLMS_COMMAND_DATA_NOTIFICATION &&
-            (p.GetSettings()->GetConformance() & DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER) == 0)
+            (p.GetSettings()->GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER) == 0)
         {
             // If multiple blocks.
             if (p.IsMultipleBlocks())

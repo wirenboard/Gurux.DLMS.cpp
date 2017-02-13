@@ -59,18 +59,39 @@ CGXDLMSClient::CGXDLMSClient(bool UseLogicalNameReferencing,
     m_Settings.SetInterfaceType(intefaceType);
     m_Settings.SetAuthentication(authentication);
     m_Settings.GetPassword().AddString(password);
+    if (UseLogicalNameReferencing)
+    {
+        SetConformance((DLMS_CONFORMANCE)(DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_ACTION |
+            DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_SET_OR_WRITE |
+            DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_GET_OR_READ |
+            DLMS_CONFORMANCE_SET | DLMS_CONFORMANCE_SELECTIVE_ACCESS |
+            DLMS_CONFORMANCE_ACTION | DLMS_CONFORMANCE_MULTIPLE_REFERENCES |
+            DLMS_CONFORMANCE_GET | DLMS_CONFORMANCE_GENERAL_PROTECTION));
+    }
+    else
+    {
+        SetConformance((DLMS_CONFORMANCE)(DLMS_CONFORMANCE_INFORMATION_REPORT |
+            DLMS_CONFORMANCE_READ | DLMS_CONFORMANCE_UN_CONFIRMED_WRITE |
+            DLMS_CONFORMANCE_WRITE | DLMS_CONFORMANCE_PARAMETERIZED_ACCESS |
+            DLMS_CONFORMANCE_MULTIPLE_REFERENCES |
+            DLMS_CONFORMANCE_GENERAL_PROTECTION));
+    }
 }
 
 CGXDLMSClient::~CGXDLMSClient()
 {
 }
 
+DLMS_CONFORMANCE CGXDLMSClient::GetNegotiatedConformance() {
+    return (DLMS_CONFORMANCE)m_Settings.GetNegotiatedConformance();
+}
+
 DLMS_CONFORMANCE CGXDLMSClient::GetConformance() {
-    return (DLMS_CONFORMANCE)m_Settings.GetConformance();
+    return (DLMS_CONFORMANCE)m_Settings.GetProposedConformance();
 }
 
 void CGXDLMSClient::SetConformance(DLMS_CONFORMANCE value) {
-    m_Settings.SetConformance(value);
+    m_Settings.SetProposedConformance(value);
 }
 
 bool CGXDLMSClient::GetUseLogicalNameReferencing()
@@ -648,6 +669,7 @@ int CGXDLMSClient::AARQRequest(std::vector<CGXByteBuffer>& packets)
 {
     CGXByteBuffer buff(20);
     m_Settings.ResetBlockIndex();
+    m_Settings.SetNegotiatedConformance((DLMS_CONFORMANCE)0);
     packets.clear();
     int ret = CGXDLMS::CheckInit(m_Settings);
     if (ret != 0)

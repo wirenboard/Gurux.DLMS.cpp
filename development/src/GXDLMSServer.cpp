@@ -49,6 +49,23 @@ CGXDLMSServer::CGXDLMSServer(bool logicalNameReferencing,
 {
     m_Settings.SetUseLogicalNameReferencing(logicalNameReferencing);
     m_Settings.SetInterfaceType(type);
+    if (GetUseLogicalNameReferencing())
+    {
+        SetConformance((DLMS_CONFORMANCE)(DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_ACTION |
+            DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_SET_OR_WRITE |
+            DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_GET_OR_READ |
+            DLMS_CONFORMANCE_SET | DLMS_CONFORMANCE_SELECTIVE_ACCESS |
+            DLMS_CONFORMANCE_ACTION | DLMS_CONFORMANCE_MULTIPLE_REFERENCES |
+            DLMS_CONFORMANCE_GET | DLMS_CONFORMANCE_GENERAL_PROTECTION));
+    }
+    else
+    {
+        SetConformance((DLMS_CONFORMANCE)(DLMS_CONFORMANCE_INFORMATION_REPORT |
+            DLMS_CONFORMANCE_READ | DLMS_CONFORMANCE_UN_CONFIRMED_WRITE |
+            DLMS_CONFORMANCE_WRITE | DLMS_CONFORMANCE_PARAMETERIZED_ACCESS |
+            DLMS_CONFORMANCE_MULTIPLE_REFERENCES |
+            DLMS_CONFORMANCE_GENERAL_PROTECTION));
+    }
     Reset();
 }
 
@@ -1194,7 +1211,7 @@ int GetReadData(CGXDLMSSettings& settings,
             // If action.
             if ((*e)->IsAction() || ((*e)->IsByteArray() && value.vt == DLMS_DATA_TYPE_OCTET_STRING))
             {
-                GXHelpers::SetData(data, value.vt, value);
+                data.Set(value.byteArr, value.size);
             }
             else
             {
@@ -1952,4 +1969,24 @@ int CGXDLMSServer::HandleRequest(
     ret = HandleCommand(connectionInfo, m_Info.GetCommand(), m_Info.GetData(), reply);
     m_Info.Clear();
     return ret;
+}
+
+/**
+* Server will tell what functionality is available for the client.
+* @return Available functionality.
+*/
+DLMS_CONFORMANCE CGXDLMSServer::GetConformance()
+{
+    return m_Settings.GetProposedConformance();
+}
+
+/**
+* Server will tell what functionality is available for the client.
+*
+* @param value
+*            Available functionality.
+*/
+void CGXDLMSServer::SetConformance(DLMS_CONFORMANCE value)
+{
+    m_Settings.SetProposedConformance(value);
 }

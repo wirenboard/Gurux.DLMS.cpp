@@ -121,8 +121,6 @@ int main(int argc, char* argv[])
         std::string str;
         std::string ln;
         std::vector<std::pair<CGXDLMSObject*, unsigned char> > list;
-        /*
-        This is comment for now. This causes problems with some meters.
         if ((cl.GetConformance() & DLMS_CONFORMANCE_MULTIPLE_REFERENCES) != 0)
         {
             // Read scalers and units from the device.
@@ -140,10 +138,11 @@ int main(int argc, char* argv[])
             }
             if ((ret = comm.ReadList(list)) != 0)
             {
-                return ret;
+                TRACE("Err! Failed to read register: %s", CGXDLMSConverter::GetErrorMessage(ret));
+                cl.SetConformance((DLMS_CONFORMANCE)(cl.GetConformance() & ~DLMS_CONFORMANCE_MULTIPLE_REFERENCES));
             }
         }
-        else*/
+        if ((cl.GetConformance() & DLMS_CONFORMANCE_MULTIPLE_REFERENCES) == 0)
         {
             //If readlist is not supported read one value at the time.
             for (std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)

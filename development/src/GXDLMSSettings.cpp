@@ -55,6 +55,7 @@ CGXDLMSSettings::CGXDLMSSettings(bool isServer)
     m_SourceSystemTitle.Clear();
     m_Index = 0;
     m_Count = 0;
+    m_ProposedConformance = m_NegotiatedConformance = (DLMS_CONFORMANCE)0;
 }
 
 //Destructor.
@@ -481,55 +482,21 @@ void CGXDLMSSettings::SetIndex(unsigned short value)
     m_Index = value;
 }
 
-/**
-* Functionality what client is ask from the meter meter updates this value
-* and tells what it can offer. When connection is made client tells what
-* kind of services it want's to use. Meter returns functionality what it
-* can offer.
-*
-* @return Functionality.
-*/
-DLMS_CONFORMANCE CGXDLMSSettings::GetConformance()
+DLMS_CONFORMANCE CGXDLMSSettings::GetNegotiatedConformance()
 {
-    return m_Conformance;
+    return m_NegotiatedConformance;
 }
 
-/**
-* Functionality what client is ask from the meter meter updates this value
-* and tells what it can offer. When connection is made client tells what
-* kind of services it want's to use. Meter returns functionality what it
-* can offer.
-*
-* @param value
-*            Functionality.
-*/
-void CGXDLMSSettings::SetConformance(DLMS_CONFORMANCE value)
+void CGXDLMSSettings::SetNegotiatedConformance(DLMS_CONFORMANCE value)
 {
-    m_Conformance = value;
+    m_NegotiatedConformance = value;
 }
 
-/**
-* Functionality what client is ask from the meter meter updates this value
-* and tells what it can offer. When connection is made client tells what
-* kind of services it want's to use. Meter returns functionality what it
-* can offer.
-*
-* @return Functionality.
-*/
 DLMS_CONFORMANCE CGXDLMSSettings::GetProposedConformance()
 {
     return m_ProposedConformance;
 }
 
-/**
-* Functionality what client is ask from the meter meter updates this value
-* and tells what it can offer. When connection is made client tells what
-* kind of services it want's to use. Meter returns functionality what it
-* can offer.
-*
-* @param value
-*            Functionality.
-*/
 void CGXDLMSSettings::SetProposedConformance(DLMS_CONFORMANCE value)
 {
     m_ProposedConformance = value;

@@ -203,7 +203,7 @@ private:
 
 protected:
     /**
-     * Server m_Settings.
+     * Server Settings.
      */
     CGXDLMSSettings m_Settings;
 
@@ -476,5 +476,19 @@ public:
     * @param sn
     */
     int FindSNObject(int sn, CGXSNInfo& i);
+
+    /**
+    * Server will tell what functionality is available for the client.
+    * @return Available functionality.
+    */
+    DLMS_CONFORMANCE GetConformance();
+
+    /**
+    * Server will tell what functionality is available for the client.
+    *
+    * @param value
+    *            Available functionality.
+    */
+    void SetConformance(DLMS_CONFORMANCE value);
 };
 #endif //GXDLMSSERVER_H

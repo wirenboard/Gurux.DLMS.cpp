@@ -152,14 +152,14 @@ class CGXDLMSSettings
     CGXCipher* m_Cipher;
 
     /**
-    * Proposed conformance block. Server uses this. Client asks this funtionality.
+    * Proposed conformance block. Client asks this funtionality.
     */
     DLMS_CONFORMANCE m_ProposedConformance;
 
     /**
     * Server tells what functionality is available and client will know it.
     */
-    DLMS_CONFORMANCE m_Conformance;
+    DLMS_CONFORMANCE m_NegotiatedConformance;
 
 public:
     // Constructor.
@@ -371,41 +371,27 @@ public:
     void SetIndex(unsigned short value);
 
     /**
-    * Functionality what client is ask from the meter meter updates this value
-    * and tells what it can offer. When connection is made client tells what
-    * kind of services it want's to use. Meter returns functionality what it
-    * can offer.
-    *
-    * @return Functionality.
+    * Server will tell what functionality is available. Client will know what functionality server offers.
+    * @return Available functionality.
     */
-    DLMS_CONFORMANCE GetConformance();
+    DLMS_CONFORMANCE GetNegotiatedConformance();
 
     /**
-    * Functionality what client is ask from the meter meter updates this value
-    * and tells what it can offer. When connection is made client tells what
-    * kind of services it want's to use. Meter returns functionality what it
-    * can offer.
+    * Server will tell what functionality is available. Client will know what functionality server offers from this value.
     *
     * @param value
-    *            Functionality.
+    *            Available functionality.
     */
-    void SetConformance(DLMS_CONFORMANCE value);
+    void SetNegotiatedConformance(DLMS_CONFORMANCE value);
 
     /**
-    * Functionality what client is ask from the meter meter updates this value
-    * and tells what it can offer. When connection is made client tells what
-    * kind of services it want's to use. Meter returns functionality what it
-    * can offer.
-    *
+    * Client proposes this functionality. Server checks what it can offer from Conformance and updates it to proposed conformance.
     * @return Functionality.
     */
     DLMS_CONFORMANCE GetProposedConformance();
 
     /**
-    * Functionality what client is ask from the meter meter updates this value
-    * and tells what it can offer. When connection is made client tells what
-    * kind of services it want's to use. Meter returns functionality what it
-    * can offer.
+    * Client proposes this functionality. Server checks what it can offer from Conformance and updates it to proposed conformance.
     *
     * @param value
     *            Functionality.

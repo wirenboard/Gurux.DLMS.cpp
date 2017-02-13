@@ -525,23 +525,23 @@ public:
 
 
     /**
-    * Functionality what client is ask from the meter meter updates this value
-    * and tells what it can offer. When connection is made client tells what
-    * kind of services it want's to use. Meter returns functionality what it
-    * can offer.
+    *  Client will know what functionality server offers.
     *
     * @return Functionality.
+    */
+    DLMS_CONFORMANCE GetNegotiatedConformance();
+
+    /**
+    * Proposed functionality for the server.
+    * @return Proposed functionality.
     */
     DLMS_CONFORMANCE GetConformance();
 
     /**
-    * Functionality what client is ask from the meter meter updates this value
-    * and tells what it can offer. When connection is made client tells what
-    * kind of services it want's to use. Meter returns functionality what it
-    * can offer.
+    * Proposed functionality for the server.
     *
     * @param value
-    *            Functionality.
+    *            Proposed functionality.
     */
     void SetConformance(DLMS_CONFORMANCE value);
 
