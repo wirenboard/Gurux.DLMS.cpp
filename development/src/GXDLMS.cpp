@@ -1168,6 +1168,10 @@ int CGXDLMS::GetHdlcData(
 
     if ((frame & HDLC_FRAME_TYPE_U_FRAME) == HDLC_FRAME_TYPE_U_FRAME)
     {
+        if (frame == 0x97)
+        {
+            reply.SetPosition(packetStartID + frameLen - 1);
+        }
         // Get Eop if there is no data.
         if (reply.GetPosition() == packetStartID + frameLen + 1)
         {
@@ -1915,6 +1919,10 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
         if (settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC && data.GetData().GetSize() != 0)
         {
             reply.SetPosition(reply.GetPosition() + 3);
+        }
+        if (data.GetCommand() == DLMS_COMMAND_REJECTED)
+        {
+            return DLMS_ERROR_CODE_REJECTED;
         }
         return DLMS_ERROR_CODE_OK;
     }

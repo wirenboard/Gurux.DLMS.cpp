@@ -751,6 +751,15 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         printf("%s\r\n", tmp.c_str());
     }
     GXHelpers::Write("trace.txt", tmp);
+    if (ret == DLMS_ERROR_CODE_REJECTED)
+    {
+#if defined(_WIN32) || defined(_WIN64)//Windows
+        Sleep(1000);
+#else
+        usleep(1000000);
+#endif
+        ret = ReadDLMSPacket(data, reply);
+    }
     return ret;
 }
 
