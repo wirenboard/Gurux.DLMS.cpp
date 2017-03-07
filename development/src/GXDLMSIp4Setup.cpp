@@ -110,7 +110,10 @@ std::vector<CGXDLMSIp4SetupIpOption>& CGXDLMSIp4Setup::GetIPOptions()
 void CGXDLMSIp4Setup::SetIPOptions(std::vector<CGXDLMSIp4SetupIpOption>& value)
 {
     m_IPOptions.clear();
-    m_IPOptions.insert(m_IPOptions.end(), value.begin(), value.end());
+    for (std::vector<CGXDLMSIp4SetupIpOption>::iterator it = value.begin(); it != value.end(); ++it)
+    {
+        m_IPOptions.push_back(*it);
+    }
 }
 
 unsigned long CGXDLMSIp4Setup::GetSubnetMask()

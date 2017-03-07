@@ -1698,4 +1698,50 @@ typedef enum
     */
     DLMS_CONFORMANCE_ACTION = 0x1
 }DLMS_CONFORMANCE;
+
+typedef enum
+{
+    /**
+    If this option is present, the device shall be allowed to send security,
+    compartmentation, handling restrictions and TCC (closed user group)
+    parameters within its IP Datagrams. The value of the IP-Option-
+    Length Field must be 11, and the IP-Option-Data shall contain the
+    value of the Security, Compartments, Handling Restrictions and
+    Transmission Control Code values, as specified in STD0005 / RFC791.
+    */
+    IP_OPTION_TYPE_DLMS_SECURITY = 0x82,
+    /**
+    If this option is present, the device shall supply routing information to be
+    used by the gateways in forwarding the datagram to the destination, and to
+    record the route information.
+    The IP-Option-length and IP-Option-Data values are specified in STD0005 / RFC 791.
+    */
+    IP_OPTION_TYPE_LOOSE_SOURCE_AND_RECORD_ROUTE = 0x83,
+    /**
+    If this option is present, the device shall supply routing information to be
+    used by the gateways in forwarding the datagram to the destination, and to
+    record the route information.
+    The IP-Option-length and IP-Option-Data values are specified in STD0005 / RFC 791.
+    */
+    IP_OPTION_TYPE_STRICT_SOURCE_AND_RECORD_ROUTE = 0x89,
+    /**
+    If this option is present, the device shall as well:
+    send originated IP Datagrams with that option, providing means
+    to record the route of these Datagrams;
+    as a router, send routed IP Datagrams with the route option
+    adjusted according to this option.
+    The IP-Option-length and IP-Option-Data values are specified in
+    STD0005 / RFC 791.
+    */
+    IP_OPTION_TYPE_RECORD_ROUTE = 0x07,
+    /**
+    If this option is present, the device shall as well:
+    send originated IP Datagrams with that option, providing means
+    to time-stamp the datagram in the route to its destination;
+    as a router, send routed IP Datagrams with the time-stamp option
+    adjusted according to this option.
+    The IP-Option-length and IP-Option-Data values are specified in STD0005 / RFC 791.
+    */
+    IP_OPTION_TYPE_INTERNET_TIMESTAMP = 0x44
+}IP_OPTION_TYPE;
 #endif //ENUMS_H
