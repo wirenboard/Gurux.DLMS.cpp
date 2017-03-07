@@ -83,7 +83,7 @@ CGXByteBuffer& CGXDLMSSettings::GetStoCChallenge()
     return m_StoCChallenge;
 }
 
-void CGXDLMSSettings::SetStoCChallenge(CGXByteBuffer value)
+void CGXDLMSSettings::SetStoCChallenge(CGXByteBuffer& value)
 {
     if (!m_CustomChallenges || m_StoCChallenge.GetSize() == 0)
     {

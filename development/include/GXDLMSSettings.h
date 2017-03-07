@@ -178,7 +178,7 @@ public:
     CGXByteBuffer& GetStoCChallenge();
 
     // Set server to Client challenge.
-    void SetStoCChallenge(CGXByteBuffer value);
+    void SetStoCChallenge(CGXByteBuffer& value);
 
     // Gets used authentication.
     DLMS_AUTHENTICATION GetAuthentication();
