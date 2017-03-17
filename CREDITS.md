@@ -8,3 +8,6 @@ Credits
 
 - GXDLMSImageTransfer attribute 7 is not return DLMS_ERROR_CODE_OK.
     * [Roman Moravcik](https://github.com/rmoravcik)
+
+- Makefile changes.
+    * [Fabio Bonelli](https://github.com/bfabio)

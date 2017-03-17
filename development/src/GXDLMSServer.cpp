@@ -626,7 +626,7 @@ int CGXDLMSServer::HandleSetRequest(
             {
                 m_Transaction = new CGXDLMSLongTransaction(list, DLMS_COMMAND_GET_REQUEST, data);
             }
-            Write(list);
+            PreWrite(list);
             if (e->GetError() != 0)
             {
                 p.SetStatus(e->GetError());
@@ -634,6 +634,7 @@ int CGXDLMSServer::HandleSetRequest(
             else if (!e->GetHandled() && !p.IsMultipleBlocks())
             {
                 obj->SetValue(m_Settings, *e);
+                PostWrite(list);
             }
         }
     }
@@ -696,10 +697,11 @@ int CGXDLMSServer::HanleSetRequestWithDataBlock(CGXByteBuffer& data, CGXDLMSLNPa
                 }
             }
             target->SetValue(value);
-            Write(m_Transaction->GetTargets());
+            PreWrite(m_Transaction->GetTargets());
             if (!target->GetHandled() && !p.IsMultipleBlocks())
             {
                 target->GetTarget()->SetValue(m_Settings, *target);
+                PostWrite(m_Transaction->GetTargets());
             }
             if (m_Transaction != NULL)
             {
@@ -846,13 +848,14 @@ int CGXDLMSServer::GetRequestNormal(CGXByteBuffer& data)
 
             CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(obj, attributeIndex, selector, parameters);
             arr.push_back(e);
-            Read(arr);
+            PreRead(arr);
             if (!e->GetHandled())
             {
                 if ((ret = obj->GetValue(m_Settings, *e)) != 0)
                 {
                     status = DLMS_ERROR_CODE_HARDWARE_FAULT;
                 }
+                PostRead(arr);
             }
             if (status == 0)
             {
@@ -924,7 +927,7 @@ int CGXDLMSServer::GetRequestNextDataBlock(CGXByteBuffer& data)
                         {
                             std::vector<CGXDLMSValueEventArg*> arr;
                             arr.push_back(*arg);
-                            Read(arr);
+                            PreRead(arr);
                         }
                         else
                         {
@@ -932,6 +935,9 @@ int CGXDLMSServer::GetRequestNextDataBlock(CGXByteBuffer& data)
                             {
                                 return ret;
                             }
+                            std::vector<CGXDLMSValueEventArg*> arr;
+                            arr.push_back(*arg);
+                            PostRead(arr);
                         }
                         value = (*arg)->GetValue();
                         // Add data.
@@ -1039,7 +1045,7 @@ int CGXDLMSServer::GetRequestWithList(CGXByteBuffer& data)
             }
         }
     }
-    Read(list);
+    PreRead(list);
     pos = 0;
     for (std::vector<CGXDLMSValueEventArg*>::iterator it = list.begin(); it != list.end(); ++it)
     {
@@ -1065,6 +1071,7 @@ int CGXDLMSServer::GetRequestWithList(CGXByteBuffer& data)
         }
         ++pos;
     }
+    PostRead(list);
     CGXDLMSLNParameters p(&m_Settings, DLMS_COMMAND_GET_RESPONSE, 3, NULL, &bb, 0xFF);
     return CGXDLMS::GetLNPdu(p, m_ReplyData);
 }
@@ -1337,17 +1344,25 @@ int CGXDLMSServer::HandleReadBlockNumberAccess(
         }
         if (reads.size() != 0)
         {
-            Read(reads);
+            PreRead(reads);
         }
 
         if (actions.size() != 0)
         {
-            Action(actions);
+            PreAction(actions);
         }
         DLMS_SINGLE_READ_RESPONSE requestType;
         std::vector<CGXDLMSValueEventArg*>& list = m_Transaction->GetTargets();
         CGXByteBuffer& data2 = m_Transaction->GetData();
         ret = GetReadData(m_Settings, list, data2, requestType);
+        if (reads.size() != 0)
+        {
+            PostRead(reads);
+        }
+        if (actions.size() != 0)
+        {
+            PostAction(actions);
+        }
     }
     m_Settings.IncreaseBlockIndex();
     CGXByteBuffer& tmp = m_Transaction->GetData();
@@ -1487,6 +1502,8 @@ int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
     unsigned long cnt = 0xFF;
     DLMS_VARIABLE_ACCESS_SPECIFICATION type;
     CGXDLMSValueEventCollection list;
+    std::vector<CGXDLMSValueEventArg*> reads;
+    std::vector<CGXDLMSValueEventArg*> actions;
     // If get next frame.
     if (data.GetSize() == 0)
     {
@@ -1509,8 +1526,6 @@ int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
             return ret;
         }
         CGXSNInfo info;
-        std::vector<CGXDLMSValueEventArg*> reads;
-        std::vector<CGXDLMSValueEventArg*> actions;
         for (unsigned long pos = 0; pos != cnt; ++pos)
         {
             if ((ret = data.GetUInt8(&ch)) != 0)
@@ -1534,15 +1549,23 @@ int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
         }
         if (reads.size() != 0)
         {
-            Read(reads);
+            PreRead(reads);
         }
         if (actions.size() != 0)
         {
-            Action(actions);
+            PreAction(actions);
         }
     }
     DLMS_SINGLE_READ_RESPONSE requestType;
     ret = GetReadData(m_Settings, list, bb, requestType);
+    if (reads.size() != 0)
+    {
+        PostRead(reads);
+    }
+    if (actions.size() != 0)
+    {
+        PostAction(actions);
+    }
     CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_READ_RESPONSE, cnt,
         requestType, NULL, &bb);
     CGXDLMS::GetSNPdu(p, m_ReplyData);
@@ -1664,7 +1687,7 @@ int CGXDLMSServer::HandleWriteRequest(CGXByteBuffer& data)
                 e->SetValue(value);
                 CGXDLMSValueEventCollection arr;
                 arr.push_back(e);
-                Write(arr);
+                PreWrite(arr);
                 if (e->GetError() != 0)
                 {
                     results.SetUInt8(pos, e->GetError());
@@ -1672,6 +1695,7 @@ int CGXDLMSServer::HandleWriteRequest(CGXByteBuffer& data)
                 else if (!e->GetHandled())
                 {
                     target.GetItem()->SetValue(m_Settings, *e);
+                    PostWrite(arr);
                 }
             }
         }
@@ -1834,13 +1858,14 @@ int CGXDLMSServer::HandleMethodRequest(
             CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(obj, id, 0, parameters);
             CGXDLMSValueEventCollection arr;
             arr.push_back(e);
-            Action(arr);
+            PreAction(arr);
             if (!e->GetHandled())
             {
                 if ((ret = obj->Invoke(m_Settings, *e)) != 0)
                 {
                     return ret;
                 }
+                PostAction(arr);
             }
             CGXDLMSVariant& actionReply = e->GetValue();
             // Set default action reply if not given.

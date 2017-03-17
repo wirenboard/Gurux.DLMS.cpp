@@ -686,7 +686,7 @@ CGXDLMSObject* CGXDLMSBase::FindObject(
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-void CGXDLMSBase::Read(std::vector<CGXDLMSValueEventArg*>& args)
+void CGXDLMSBase::PreRead(std::vector<CGXDLMSValueEventArg*>& args)
 {
     CGXDLMSVariant value;
     CGXDLMSObject* pObj;
@@ -786,10 +786,14 @@ void CGXDLMSBase::Read(std::vector<CGXDLMSValueEventArg*>& args)
     }
 }
 
+void CGXDLMSBase::PostRead(std::vector<CGXDLMSValueEventArg*>& args)
+{
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-void CGXDLMSBase::Write(std::vector<CGXDLMSValueEventArg*>& args)
+void CGXDLMSBase::PreWrite(std::vector<CGXDLMSValueEventArg*>& args)
 {
     std::string ln;
     for (std::vector<CGXDLMSValueEventArg*>::iterator it = args.begin(); it != args.end(); ++it)
@@ -803,9 +807,25 @@ void CGXDLMSBase::Write(std::vector<CGXDLMSValueEventArg*>& args)
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-void CGXDLMSBase::Action(std::vector<CGXDLMSValueEventArg*>& args)
+void CGXDLMSBase::PostWrite(std::vector<CGXDLMSValueEventArg*>& args)
 {
 }
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+void CGXDLMSBase::PreAction(std::vector<CGXDLMSValueEventArg*>& args)
+{
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+void CGXDLMSBase::PostAction(std::vector<CGXDLMSValueEventArg*>& args)
+{
+}
+
 
 bool CGXDLMSBase::IsTarget(
     unsigned long int serverAddress,

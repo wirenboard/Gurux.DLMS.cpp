@@ -94,13 +94,22 @@ public:
         int sn,
         std::string& ln);
 
-    void Read(
+    void PreRead(
         std::vector<CGXDLMSValueEventArg*>& args);
 
-    void Write(
+    void PreWrite(
         std::vector<CGXDLMSValueEventArg*>& args);
 
-    void Action(
+    void PreAction(
+        std::vector<CGXDLMSValueEventArg*>& args);
+
+    void PostRead(
+        std::vector<CGXDLMSValueEventArg*>& args);
+
+    void PostWrite(
+        std::vector<CGXDLMSValueEventArg*>& args);
+
+    void PostAction(
         std::vector<CGXDLMSValueEventArg*>& args);
 
     bool IsTarget(

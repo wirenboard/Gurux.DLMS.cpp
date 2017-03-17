@@ -266,7 +266,7 @@ protected:
      * @param args
      *            Handled read requests.
      */
-    virtual void Read(
+    virtual void PreRead(
         std::vector<CGXDLMSValueEventArg*>& args) = 0;
 
     /**
@@ -275,7 +275,7 @@ protected:
      * @param args
      *            Handled write requests.
      */
-    virtual void Write(
+    virtual void PreWrite(
         std::vector<CGXDLMSValueEventArg*>& args) = 0;
 
     /**
@@ -303,7 +303,34 @@ protected:
      * @param args
      *            Handled action requests.
      */
-    virtual void Action(
+    virtual void PreAction(
+        std::vector<CGXDLMSValueEventArg*>& args) = 0;
+
+    /**
+    * Read selected item(s).
+    *
+    * @param args
+    *            Handled read requests.
+    */
+    virtual void PostRead(
+        std::vector<CGXDLMSValueEventArg*>& args) = 0;
+
+    /**
+    * Write selected item(s).
+    *
+    * @param args
+    *            Handled write requests.
+    */
+    virtual void PostWrite(
+        std::vector<CGXDLMSValueEventArg*>& args) = 0;
+
+    /**
+    * Action is occurred.
+    *
+    * @param args
+    *            Handled action requests.
+    */
+    virtual void PostAction(
         std::vector<CGXDLMSValueEventArg*>& args) = 0;
 public:
     /**
