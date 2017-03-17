@@ -36,6 +36,8 @@
 
 typedef enum
 {
+    //Meter is not accept frame.
+    DLMS_ERROR_CODE_UNACCEPTABLE_FRAME = -3,
     //Meter rejects send packet.
     DLMS_ERROR_CODE_REJECTED = -2,
     DLMS_ERROR_CODE_FALSE = -1,

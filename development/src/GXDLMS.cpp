@@ -1168,10 +1168,6 @@ int CGXDLMS::GetHdlcData(
 
     if ((frame & HDLC_FRAME_TYPE_U_FRAME) == HDLC_FRAME_TYPE_U_FRAME)
     {
-        if (frame == 0x97)
-        {
-            reply.SetPosition(packetStartID + frameLen - 1);
-        }
         // Get Eop if there is no data.
         if (reply.GetPosition() == packetStartID + frameLen + 1)
         {
@@ -1180,6 +1176,10 @@ int CGXDLMS::GetHdlcData(
             {
                 return ret;
             }
+        }
+        if (frame == 0x97)
+        {
+            return DLMS_ERROR_CODE_UNACCEPTABLE_FRAME;
         }
         data.SetCommand((DLMS_COMMAND)frame);
     }

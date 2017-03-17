@@ -61,7 +61,7 @@ CGXDLMSClient::CGXDLMSClient(bool UseLogicalNameReferencing,
     m_Settings.GetPassword().AddString(password);
     if (UseLogicalNameReferencing)
     {
-        SetConformance((DLMS_CONFORMANCE)(DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_ACTION |
+        SetProposedConformance((DLMS_CONFORMANCE)(DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_ACTION |
             DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_SET_OR_WRITE |
             DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_GET_OR_READ |
             DLMS_CONFORMANCE_SET | DLMS_CONFORMANCE_SELECTIVE_ACCESS |
@@ -70,7 +70,7 @@ CGXDLMSClient::CGXDLMSClient(bool UseLogicalNameReferencing,
     }
     else
     {
-        SetConformance((DLMS_CONFORMANCE)(DLMS_CONFORMANCE_INFORMATION_REPORT |
+        SetProposedConformance((DLMS_CONFORMANCE)(DLMS_CONFORMANCE_INFORMATION_REPORT |
             DLMS_CONFORMANCE_READ | DLMS_CONFORMANCE_UN_CONFIRMED_WRITE |
             DLMS_CONFORMANCE_WRITE | DLMS_CONFORMANCE_PARAMETERIZED_ACCESS |
             DLMS_CONFORMANCE_MULTIPLE_REFERENCES |
@@ -87,12 +87,18 @@ DLMS_CONFORMANCE CGXDLMSClient::GetNegotiatedConformance()
     return (DLMS_CONFORMANCE)m_Settings.GetNegotiatedConformance();
 }
 
-DLMS_CONFORMANCE CGXDLMSClient::GetConformance()
+void CGXDLMSClient::SetNegotiatedConformance(DLMS_CONFORMANCE value)
+{
+    m_Settings.SetNegotiatedConformance(value);
+}
+
+
+DLMS_CONFORMANCE CGXDLMSClient::GetProposedConformance()
 {
     return (DLMS_CONFORMANCE)m_Settings.GetProposedConformance();
 }
 
-void CGXDLMSClient::SetConformance(DLMS_CONFORMANCE value)
+void CGXDLMSClient::SetProposedConformance(DLMS_CONFORMANCE value)
 {
     m_Settings.SetProposedConformance(value);
 }

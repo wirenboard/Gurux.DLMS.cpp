@@ -45,7 +45,7 @@ CGXDLMSSettings::CGXDLMSSettings(bool isServer)
     m_InvokeID = 1;
     m_LongInvokeID = 1;
     m_Priority = DLMS_PRIORITY_HIGH;
-    m_ServiceClass = DLMS_SERVICE_CLASS_UN_CONFIRMED;
+    m_ServiceClass = DLMS_SERVICE_CLASS_CONFIRMED;
     m_ClientAddress = 0;
     m_ServerAddress = 0;
     m_InterfaceType = DLMS_INTERFACE_TYPE_HDLC;

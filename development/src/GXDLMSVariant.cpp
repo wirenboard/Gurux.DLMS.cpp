@@ -271,7 +271,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
         if (type == DLMS_DATA_TYPE_INT8)
         {
 #if _MSC_VER > 1000
-            sscanf_s(tmp.strVal.c_str(), "%c", &item->cVal);
+            sscanf_s(tmp.strVal.c_str(), "%c", &item->cVal, 1);
 #else
             sscanf(tmp.strVal.c_str(), "%c", &item->cVal);
 #endif

@@ -709,7 +709,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         printf("send failed %d\n", errno);
 #endif
         return DLMS_ERROR_CODE_SEND_FAILED;
-    }
+        }
     // Loop until whole DLMS packet is received.
     tmp = "";
     do
@@ -745,22 +745,22 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             tmp += " ";
         }
         tmp += GXHelpers::BytesToHex(m_Receivebuff, ret);
-    } while ((ret = m_Parser->GetData(bb, reply)) == DLMS_ERROR_CODE_FALSE);
-    if (m_Trace)
-    {
-        printf("%s\r\n", tmp.c_str());
-    }
-    GXHelpers::Write("trace.txt", tmp);
-    if (ret == DLMS_ERROR_CODE_REJECTED)
-    {
+        } while ((ret = m_Parser->GetData(bb, reply)) == DLMS_ERROR_CODE_FALSE);
+        if (m_Trace)
+        {
+            printf("%s\r\n", tmp.c_str());
+        }
+        GXHelpers::Write("trace.txt", tmp);
+        if (ret == DLMS_ERROR_CODE_REJECTED)
+        {
 #if defined(_WIN32) || defined(_WIN64)//Windows
-        Sleep(1000);
+            Sleep(1000);
 #else
-        usleep(1000000);
+            usleep(1000000);
 #endif
-        ret = ReadDLMSPacket(data, reply);
-    }
-    return ret;
+            ret = ReadDLMSPacket(data, reply);
+        }
+        return ret;
 }
 
 int CGXCommunication::ReadDataBlock(CGXByteBuffer& data, CGXReplyData& reply)

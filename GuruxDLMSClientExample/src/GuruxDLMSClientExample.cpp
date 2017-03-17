@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
         std::string str;
         std::string ln;
         std::vector<std::pair<CGXDLMSObject*, unsigned char> > list;
-        if ((cl.GetConformance() & DLMS_CONFORMANCE_MULTIPLE_REFERENCES) != 0)
+        if ((cl.GetNegotiatedConformance() & DLMS_CONFORMANCE_MULTIPLE_REFERENCES) != 0)
         {
             // Read scalers and units from the device.
             for (std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)
@@ -139,10 +139,10 @@ int main(int argc, char* argv[])
             if ((ret = comm.ReadList(list)) != 0)
             {
                 TRACE("Err! Failed to read register: %s", CGXDLMSConverter::GetErrorMessage(ret));
-                cl.SetConformance((DLMS_CONFORMANCE)(cl.GetConformance() & ~DLMS_CONFORMANCE_MULTIPLE_REFERENCES));
+                cl.SetNegotiatedConformance((DLMS_CONFORMANCE)(cl.GetNegotiatedConformance() & ~DLMS_CONFORMANCE_MULTIPLE_REFERENCES));
             }
         }
-        if ((cl.GetConformance() & DLMS_CONFORMANCE_MULTIPLE_REFERENCES) == 0)
+        if ((cl.GetNegotiatedConformance() & DLMS_CONFORMANCE_MULTIPLE_REFERENCES) == 0)
         {
             //If readlist is not supported read one value at the time.
             for (std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)
@@ -330,7 +330,7 @@ int main(int argc, char* argv[])
             }
             //All meters are not supporting parameterized read.
             CGXDLMSVariant rows;
-            if ((cl.GetConformance() & (DLMS_CONFORMANCE_PARAMETERIZED_ACCESS | DLMS_CONFORMANCE_SELECTIVE_ACCESS)) != 0)
+            if ((cl.GetNegotiatedConformance() & (DLMS_CONFORMANCE_PARAMETERIZED_ACCESS | DLMS_CONFORMANCE_SELECTIVE_ACCESS)) != 0)
             {
                 //Read first row from Profile Generic.
                 if ((ret = comm.ReadRowsByEntry((CGXDLMSProfileGeneric*)*it, 1, 1, rows)) != 0)
@@ -350,7 +350,7 @@ int main(int argc, char* argv[])
             }
 
             //All meters are not supporting parameterized read.
-            if ((cl.GetConformance() & (DLMS_CONFORMANCE_PARAMETERIZED_ACCESS | DLMS_CONFORMANCE_SELECTIVE_ACCESS)) != 0)
+            if ((cl.GetNegotiatedConformance() & (DLMS_CONFORMANCE_PARAMETERIZED_ACCESS | DLMS_CONFORMANCE_SELECTIVE_ACCESS)) != 0)
             {
                 CGXDateTime start = CGXDateTime::Now();
                 start.ResetTime();

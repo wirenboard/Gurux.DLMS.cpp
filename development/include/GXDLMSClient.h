@@ -532,10 +532,18 @@ public:
     DLMS_CONFORMANCE GetNegotiatedConformance();
 
     /**
+    * Negotiated functionality for the server. Client can set this if meter report error value.
+    *
+    * @param value
+    *            Proposed functionality.
+    */
+    void SetNegotiatedConformance(DLMS_CONFORMANCE value);
+
+    /**
     * Proposed functionality for the server.
     * @return Proposed functionality.
     */
-    DLMS_CONFORMANCE GetConformance();
+    DLMS_CONFORMANCE GetProposedConformance();
 
     /**
     * Proposed functionality for the server.
@@ -543,7 +551,7 @@ public:
     * @param value
     *            Proposed functionality.
     */
-    void SetConformance(DLMS_CONFORMANCE value);
+    void SetProposedConformance(DLMS_CONFORMANCE value);
 
     /**
      * Converts meter serial number to server address. Default formula is used.
