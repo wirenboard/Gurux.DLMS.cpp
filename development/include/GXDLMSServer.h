@@ -332,6 +332,33 @@ protected:
     */
     virtual void PostAction(
         std::vector<CGXDLMSValueEventArg*>& args) = 0;
+
+    /**
+    * Get selected value(s). This is called when example profile generic
+    * request current value.
+    *
+    * @param type
+    *            Update type.
+    * @param args
+    *            Value event arguments.
+    */
+    virtual void PreGet(
+        DLMS_UPDATE_TYPE type,
+        std::vector<CGXDLMSValueEventArg*>& args) = 0;
+
+    /**
+    * Get selected value(s). This is called when example profile generic
+    * request current value.
+    *
+    * @param type
+    *            Update type.
+    * @param args
+    *            Value event arguments.
+    */
+    virtual void PostGet(
+        DLMS_UPDATE_TYPE type,
+        std::vector<CGXDLMSValueEventArg*>& args) = 0;
+
 public:
     /**
      * @return Client to Server challenge.

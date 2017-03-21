@@ -125,7 +125,8 @@ public:
     * Accepted connection is made for the server. All initialization is done
     * here.
     */
-    void Connected(CGXDLMSConnectionEventArgs& connectionInfo);
+    void Connected(
+        CGXDLMSConnectionEventArgs& connectionInfo);
 
     /**
      * Client has try to made invalid connection. Password is incorrect.
@@ -133,9 +134,37 @@ public:
      * @param connectionInfo
      *            Connection information.
      */
-    void InvalidConnection(CGXDLMSConnectionEventArgs& connectionInfo);
+    void InvalidConnection(
+        CGXDLMSConnectionEventArgs& connectionInfo);
     /**
      * Server has close the connection. All clean up is made here.
      */
-    void Disconnected(CGXDLMSConnectionEventArgs& connectionInfo);
+    void Disconnected(
+        CGXDLMSConnectionEventArgs& connectionInfo);
+
+    /**
+    * Get selected value(s). This is called when example profile generic
+    * request current value.
+    *
+    * @param type
+    *            Update type.
+    * @param args
+    *            Value event arguments.
+    */
+    void PreGet(
+        DLMS_UPDATE_TYPE type,
+        std::vector<CGXDLMSValueEventArg*>& args);
+
+    /**
+    * Get selected value(s). This is called when example profile generic
+    * request current value.
+    *
+    * @param type
+    *            Update type.
+    * @param args
+    *            Value event arguments.
+    */
+    void PostGet(
+        DLMS_UPDATE_TYPE type,
+        std::vector<CGXDLMSValueEventArg*>& args);
 };

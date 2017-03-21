@@ -1053,3 +1053,17 @@ void CGXDLMSBase::Disconnected(
 {
     printf("Disconnected.\r\n");
 }
+
+void CGXDLMSBase::PreGet(
+    DLMS_UPDATE_TYPE type,
+    std::vector<CGXDLMSValueEventArg*>& args)
+{
+
+}
+
+void CGXDLMSBase::PostGet(
+    DLMS_UPDATE_TYPE type,
+    std::vector<CGXDLMSValueEventArg*>& args)
+{
+
+}
