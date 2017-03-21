@@ -88,6 +88,20 @@ private:
     */
     bool m_SkipMaxPduSize;
 
+    /**
+    * Row to PDU is used with Profile Generic to tell how many rows are fit to
+    * one PDU.
+    */
+    unsigned short m_RowToPdu;
+    /**
+    * Rows begin index.
+    */
+    unsigned short m_RowBeginIndex;
+    /**
+    * Rows end index.
+    */
+    unsigned short m_RowEndIndex;
+
 public:
     /**
     * @return Target DLMS object.
@@ -232,5 +246,39 @@ public:
      *            Is value max PDU size skipped.
      */
     void SetSkipMaxPduSize(bool value);
+
+
+    /**
+    * @return How many rows are read to one PDU.
+    */
+    unsigned short GetRowToPdu();
+
+    /**
+    * @param value
+    *            How many rows are read to one PDU.
+    */
+    void SetRowToPdu(unsigned short value);
+
+    /**
+    * @return Rows end index.
+    */
+    unsigned int GetRowEndIndex();
+
+    /**
+    * @param value
+    *            Rows end index.
+    */
+    void SetRowEndIndex(unsigned int value);
+
+    /**
+    * @return Rows begin index.
+    */
+    unsigned int GetRowBeginIndex();
+
+    /**
+    * @param value
+    *            Rows begin index.
+    */
+    void SetRowBeginIndex(unsigned int value);
 };
 #endif //GXDLMSVALUEEVENTARGS_H

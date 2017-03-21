@@ -199,5 +199,15 @@ public:
 
     //Get UTC offset in minutes.
     static void GetUtcOffset(int& hours, int& minutes);
+
+    /**
+    * Get data type in bytes.
+    *
+    * @param type
+    *            Data type.
+    * @return Size of data type in bytes.
+    */
+    static int GetDataTypeSize(DLMS_DATA_TYPE type);
+
 };
 #endif //GXHELPERS_H

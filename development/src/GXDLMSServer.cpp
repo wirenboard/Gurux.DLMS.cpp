@@ -847,10 +847,43 @@ int CGXDLMSServer::GetRequestNormal(CGXByteBuffer& data)
             }
 
             CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(obj, attributeIndex, selector, parameters);
+            if (obj->GetObjectType() == DLMS_OBJECT_TYPE_PROFILE_GENERIC && attributeIndex == 2) {
+                DLMS_DATA_TYPE dt;
+                int rowsize = 0;
+                CGXDLMSProfileGeneric* pg = (CGXDLMSProfileGeneric*)obj;
+                // Count how many rows we can fit to one PDU.
+                for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it = pg->GetCaptureObjects().begin();
+                    it != pg->GetCaptureObjects().end(); ++it) {
+                    it->first->GetDataType(it->second->GetAttributeIndex(), dt);
+                    if (dt == DLMS_DATA_TYPE_OCTET_STRING) {
+                        it->first->GetUIDataType(it->second->GetAttributeIndex(), dt);
+                        if (dt == DLMS_DATA_TYPE_DATETIME) {
+                            rowsize += GXHelpers::GetDataTypeSize(DLMS_DATA_TYPE_DATETIME);
+                        }
+                        else if (dt == DLMS_DATA_TYPE_DATE) {
+                            rowsize += GXHelpers::GetDataTypeSize(DLMS_DATA_TYPE_DATE);
+                        }
+                        else if (dt == DLMS_DATA_TYPE_TIME) {
+                            rowsize +=
+                                GXHelpers::GetDataTypeSize(DLMS_DATA_TYPE_TIME);
+                        }
+                    }
+                    else if (dt == DLMS_DATA_TYPE_NONE) {
+                        rowsize += 2;
+                    }
+                    else {
+                        rowsize += GXHelpers::GetDataTypeSize(dt);
+                    }
+                }
+                if (rowsize != 0) {
+                    e->SetRowToPdu(m_Settings.GetMaxPduSize() / rowsize);
+                }
+            }
             arr.push_back(e);
             PreRead(arr);
             if (!e->GetHandled())
             {
+                m_Settings.SetCount(e->GetRowEndIndex() - e->GetRowBeginIndex());
                 if ((ret = obj->GetValue(m_Settings, *e)) != 0)
                 {
                     status = DLMS_ERROR_CODE_HARDWARE_FAULT;
@@ -923,13 +956,8 @@ int CGXDLMSServer::GetRequestNextDataBlock(CGXByteBuffer& data)
                     for (std::vector<CGXDLMSValueEventArg*>::iterator arg = m_Transaction->GetTargets().begin();
                         arg != m_Transaction->GetTargets().end(); ++arg)
                     {
-                        if ((*arg)->GetHandled())
-                        {
-                            std::vector<CGXDLMSValueEventArg*> arr;
-                            arr.push_back(*arg);
-                            PreRead(arr);
-                        }
-                        else
+                        PreRead(m_Transaction->GetTargets());
+                        if (!(*arg)->GetHandled())
                         {
                             if ((ret = (*arg)->GetTarget()->GetValue(m_Settings, *(*arg))) != 0)
                             {

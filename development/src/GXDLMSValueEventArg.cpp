@@ -106,6 +106,9 @@ CGXDLMSValueEventArg::CGXDLMSValueEventArg(
     m_Error = DLMS_ERROR_CODE_OK;
     m_ByteArray = false;
     m_SkipMaxPduSize = false;
+    m_RowToPdu = 0;
+    m_RowBeginIndex = 0;
+    m_RowEndIndex = 0;
 }
 
 CGXDLMSValueEventArg::CGXDLMSValueEventArg(
@@ -122,6 +125,9 @@ CGXDLMSValueEventArg::CGXDLMSValueEventArg(
     m_Error = DLMS_ERROR_CODE_OK;
     m_ByteArray = false;
     m_SkipMaxPduSize = false;
+    m_RowToPdu = 0;
+    m_RowBeginIndex = 0;
+    m_RowEndIndex = 0;
 }
 
 DLMS_ERROR_CODE CGXDLMSValueEventArg::GetError()
@@ -162,4 +168,29 @@ bool CGXDLMSValueEventArg::GetSkipMaxPduSize()
 void CGXDLMSValueEventArg::SetSkipMaxPduSize(bool value)
 {
     m_SkipMaxPduSize = value;
+}
+
+unsigned short CGXDLMSValueEventArg::GetRowToPdu()
+{
+    return m_RowToPdu;
+}
+
+void CGXDLMSValueEventArg::SetRowToPdu(unsigned short value) {
+    m_RowToPdu = value;
+}
+
+unsigned int CGXDLMSValueEventArg::GetRowEndIndex() {
+    return m_RowEndIndex;
+}
+
+void CGXDLMSValueEventArg::SetRowEndIndex(unsigned int value) {
+    m_RowEndIndex = value;
+}
+
+unsigned int CGXDLMSValueEventArg::GetRowBeginIndex() {
+    return m_RowBeginIndex;
+}
+
+void CGXDLMSValueEventArg::SetRowBeginIndex(unsigned int value) {
+    m_RowBeginIndex = value;
 }

@@ -126,8 +126,22 @@ public:
     int AddHours(int hours);
 
     /**
+    * Add minutes to current time.
+    */
+    int AddMinutes(int minutes);
+
+    /**
+    * Add seconds to current time.
+    */
+    int AddSeconds(int seconds);
+    /**
     * Add days to current time.
     */
     int AddDays(int hours);
+
+    /**
+    * Compare current time to another time.
+    */
+    int CompareTo(CGXDateTime& antherDate);
 };
 #endif //GXDATETIME_H

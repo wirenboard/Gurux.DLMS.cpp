@@ -142,12 +142,22 @@ int CGXDLMSProfileGeneric::GetColumns(CGXByteBuffer& data)
 }
 
 int CGXDLMSProfileGeneric::GetData(
+    CGXDLMSSettings& settings,
+    CGXDLMSValueEventArg& e,
     std::vector< std::vector<CGXDLMSVariant> >& table,
     std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns,
     CGXByteBuffer& data)
 {
-    data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-    GXHelpers::SetObjectCount((unsigned long)table.size(), data);
+    if (settings.GetIndex() == 0) {
+        data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
+        if (e.GetRowEndIndex() != 0) {
+            GXHelpers::SetObjectCount(e.GetRowEndIndex(), data);
+        }
+        else {
+            GXHelpers::SetObjectCount((unsigned long)table.size(), data);
+        }
+    }
+
     std::vector<DLMS_DATA_TYPE> types;
     DLMS_DATA_TYPE type;
     int ret;
@@ -190,6 +200,7 @@ int CGXDLMSProfileGeneric::GetData(
                 }
             }
         }
+        settings.SetIndex(settings.GetIndex() + 1);
     }
     return DLMS_ERROR_CODE_OK;
 }
@@ -256,28 +267,29 @@ int CGXDLMSProfileGeneric::GetSelectedColumns(
     return 0;
 }
 
-int CGXDLMSProfileGeneric::GetProfileGenericData(int selector, CGXDLMSVariant& parameters, CGXByteBuffer& reply)
+int CGXDLMSProfileGeneric::GetProfileGenericData(
+    CGXDLMSSettings& settings, CGXDLMSValueEventArg& e, CGXByteBuffer& reply)
 {
     std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> > columns;
     //If all data is read.
-    if (selector == 0 || parameters.vt == DLMS_DATA_TYPE_NONE)
+    if (e.GetSelector() == 0 || e.GetParameters().vt == DLMS_DATA_TYPE_NONE || e.GetRowEndIndex() != 0)
     {
-        return GetData(GetBuffer(), columns, reply);
+        return GetData(settings, e, GetBuffer(), columns, reply);
     }
     std::vector< std::vector<CGXDLMSVariant> >& table = GetBuffer();
     std::vector< std::vector<CGXDLMSVariant> > items;
-    if (selector == 1) //Read by range
+    if (e.GetSelector() == 1) //Read by range
     {
         int ret;
         CGXDLMSVariant value;
-        if ((ret = CGXDLMSClient::ChangeType(parameters.Arr[1], DLMS_DATA_TYPE_DATETIME, value)) != 0)
+        if ((ret = CGXDLMSClient::ChangeType(e.GetParameters().Arr[1], DLMS_DATA_TYPE_DATETIME, value)) != 0)
         {
             return ret;
         }
         struct tm tmp = value.dateTime.GetValue();
         time_t start = mktime(&tmp);
         value.Clear();
-        if ((ret = CGXDLMSClient::ChangeType(parameters.Arr[2], DLMS_DATA_TYPE_DATETIME, value)) != 0)
+        if ((ret = CGXDLMSClient::ChangeType(e.GetParameters().Arr[2], DLMS_DATA_TYPE_DATETIME, value)) != 0)
         {
             return ret;
         }
@@ -285,9 +297,9 @@ int CGXDLMSProfileGeneric::GetProfileGenericData(int selector, CGXDLMSVariant& p
         time_t end = mktime(&tmp);
         value.Clear();
 
-        if (parameters.Arr.size() > 3)
+        if (e.GetParameters().Arr.size() > 3)
         {
-            ret = GetSelectedColumns(parameters.Arr[3].Arr, columns);
+            ret = GetSelectedColumns(e.GetParameters().Arr[3].Arr, columns);
         }
         for (std::vector< std::vector<CGXDLMSVariant> >::iterator row = table.begin(); row != table.end(); ++row)
         {
@@ -299,10 +311,10 @@ int CGXDLMSProfileGeneric::GetProfileGenericData(int selector, CGXDLMSVariant& p
             }
         }
     }
-    else if (selector == 2) //Read by entry.
+    else if (e.GetSelector() == 2) //Read by entry.
     {
-        int start = parameters.Arr[0].ToInteger();
-        int count = parameters.Arr[1].ToInteger();
+        int start = e.GetParameters().Arr[0].ToInteger();
+        int count = e.GetParameters().Arr[1].ToInteger();
         if (start == 0)
         {
             start = 1;
@@ -318,13 +330,13 @@ int CGXDLMSProfileGeneric::GetProfileGenericData(int selector, CGXDLMSVariant& p
 
         int colStart = 1;
         int colCount = 0;
-        if (parameters.Arr.size() > 2)
+        if (e.GetParameters().Arr.size() > 2)
         {
-            colStart = parameters.Arr[2].ToInteger();
+            colStart = e.GetParameters().Arr[2].ToInteger();
         }
-        if (parameters.Arr.size() > 3)
+        if (e.GetParameters().Arr.size() > 3)
         {
-            colCount = parameters.Arr[3].ToInteger();
+            colCount = e.GetParameters().Arr[3].ToInteger();
         }
         else if (colStart != 1)
         {
@@ -350,7 +362,7 @@ int CGXDLMSProfileGeneric::GetProfileGenericData(int selector, CGXDLMSVariant& p
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return GetData(items, columns, reply);
+    return GetData(settings, e, items, columns, reply);
 }
 
 /**
@@ -671,7 +683,7 @@ int CGXDLMSProfileGeneric::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     else if (e.GetIndex() == 2)
     {
         CGXByteBuffer tmp;
-        int ret = GetProfileGenericData(e.GetSelector(), e.GetParameters(), tmp);
+        int ret = GetProfileGenericData(settings, e, tmp);
         e.SetByteArray(true);
         e.SetValue(tmp);
         return ret;

@@ -1849,3 +1849,64 @@ bool GXHelpers::StringCompare(const char* c1, const char* c2)
 {
     return strcmp(c1, c2) == 0;
 }
+
+int GXHelpers::GetDataTypeSize(DLMS_DATA_TYPE type)
+{
+    int size = -1;
+    switch (type) {
+    case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
+        size = 1;
+        break;
+    case DLMS_DATA_TYPE_BOOLEAN:
+        size = 1;
+        break;
+    case DLMS_DATA_TYPE_DATE:
+        size = 5;
+        break;
+    case DLMS_DATA_TYPE_DATETIME:
+        size = 12;
+        break;
+    case DLMS_DATA_TYPE_ENUM:
+        size = 1;
+        break;
+    case DLMS_DATA_TYPE_FLOAT32:
+        size = 4;
+        break;
+    case DLMS_DATA_TYPE_FLOAT64:
+        size = 8;
+        break;
+    case DLMS_DATA_TYPE_INT16:
+        size = 2;
+        break;
+    case DLMS_DATA_TYPE_INT32:
+        size = 4;
+        break;
+    case DLMS_DATA_TYPE_INT64:
+        size = 8;
+        break;
+    case DLMS_DATA_TYPE_INT8:
+        size = 1;
+        break;
+    case DLMS_DATA_TYPE_NONE:
+        size = 0;
+        break;
+    case DLMS_DATA_TYPE_TIME:
+        size = 4;
+        break;
+    case DLMS_DATA_TYPE_UINT16:
+        size = 2;
+        break;
+    case DLMS_DATA_TYPE_UINT32:
+        size = 4;
+        break;
+    case DLMS_DATA_TYPE_UINT64:
+        size = 8;
+        break;
+    case DLMS_DATA_TYPE_UINT8:
+        size = 1;
+        break;
+    default:
+        break;
+    }
+    return size;
+}

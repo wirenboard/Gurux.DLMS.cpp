@@ -506,3 +506,38 @@ int CGXDateTime::AddHours(int hours)
     }
     return DLMS_ERROR_CODE_OK;
 }
+
+int CGXDateTime::AddMinutes(int minutes)
+{
+    m_Value.tm_min += minutes;
+    if ((int)mktime(&m_Value) == -1)
+    {
+        return DLMS_ERROR_CODE_INVALID_DATE_TIME;
+    }
+    return DLMS_ERROR_CODE_OK;
+}
+
+int CGXDateTime::AddSeconds(int seconds)
+{
+    m_Value.tm_sec += seconds;
+    if ((int)mktime(&m_Value) == -1)
+    {
+        return DLMS_ERROR_CODE_INVALID_DATE_TIME;
+    }
+    return DLMS_ERROR_CODE_OK;
+}
+
+int CGXDateTime::CompareTo(CGXDateTime& antherDate)
+{
+    time_t time1 = mktime(&m_Value);
+    time_t time2 = mktime(&antherDate.GetValue());
+    if (time1 < time2)
+    {
+        return -1;
+    }
+    if (time1 > time2)
+    {
+        return 1;
+    }
+    return 0;
+}

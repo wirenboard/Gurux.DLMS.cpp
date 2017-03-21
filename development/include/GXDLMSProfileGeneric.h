@@ -88,6 +88,8 @@ private:
 
     int GetColumns(CGXByteBuffer& data);
     int GetData(
+        CGXDLMSSettings& settings,
+        CGXDLMSValueEventArg& e,
         std::vector< std::vector<CGXDLMSVariant> >& table,
         std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns,
         CGXByteBuffer& data);
@@ -101,8 +103,8 @@ private:
         int dataIndex);
 
     int GetProfileGenericData(
-        int selector,
-        CGXDLMSVariant& parameters,
+        CGXDLMSSettings& settings,
+        CGXDLMSValueEventArg& e,
         CGXByteBuffer& reply);
 
     /**

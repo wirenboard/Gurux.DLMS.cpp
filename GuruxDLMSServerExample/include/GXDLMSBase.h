@@ -68,6 +68,7 @@ public:
         m_ServerSocket = -1;
         m_ReceiverThread = -1;
 #endif
+        SetMaxReceivePDUSize(1024);
     }
 
 

@@ -32,7 +32,7 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-
+#include <stdio.h>
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
 #include <tchar.h>
 #include <conio.h>
@@ -82,6 +82,7 @@
 #include "../../development/include/GXDLMSPushSetup.h"
 
 using namespace std;
+static char* DATAFILE = "data.csv";
 
 void ListenerThread(void* pVoid)
 {
@@ -603,6 +604,22 @@ int CGXDLMSBase::Init(int port)
     profileGeneric->GetCaptureObjects().push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*>(pRegister, capture));
     GetItems().push_back(profileGeneric);
 
+    // Create 10 000 rows for profile generic file.
+    // In example profile generic we have two columns.
+    // Date time and integer value.
+    int rowCount = 10000;
+    CGXDateTime tm = CGXDateTime::Now();
+    tm.AddMinutes(-tm.GetValue().tm_min);
+    tm.AddSeconds(-tm.GetValue().tm_sec);
+    tm.AddHours(-(rowCount - 1));
+
+    FILE* f = fopen(DATAFILE, "w");
+    for (int pos = 0; pos != rowCount; ++pos) {
+        fprintf(f, "%s;%d\n", tm.ToString().c_str(), pos + 1);
+        tm.AddHours(1);
+    }
+    fclose(f);
+
     ///////////////////////////////////////////////////////////////////////
     //Add Auto connect object.
     AddAutoConnect(GetItems());
@@ -665,13 +682,6 @@ int CGXDLMSBase::Init(int port)
     {
         return ret;
     }
-
-    //Add rows after Initialize.
-    std::vector<CGXDLMSVariant> row;
-    CGXDateTime tmp = CGXDateTime::Now();
-    row.push_back(tmp);
-    row.push_back(10);
-    profileGeneric->GetBuffer().push_back(row);
     return DLMS_ERROR_CODE_OK;
 }
 
@@ -682,6 +692,142 @@ CGXDLMSObject* CGXDLMSBase::FindObject(
 {
     return NULL;
 }
+
+/**
+* Return data using start and end indexes.
+*
+* @param p
+*            ProfileGeneric
+* @param index
+* @param count
+* @return Add data Rows
+*/
+void GetProfileGenericDataByEntry(CGXDLMSProfileGeneric* p, long index, long count)
+{
+    int len, month = 0, day = 0, year = 0, hour = 0, minute = 0, second = 0, value = 0;
+    // Clear old data. It's already serialized.
+    p->GetBuffer().clear();
+    FILE* f = fopen(DATAFILE, "r");
+    if (f != NULL)
+    {
+        while ((len = fscanf(f, "%d/%d/%d %d:%d:%d;%d", &month, &day, &year, &hour, &minute, &second, &value)) != -1)
+        {
+            // Skip row
+            if (index > 0) {
+                --index;
+            }
+            else if (len == 7)
+            {
+                CGXDateTime tm(2000 + year, month, day, hour, minute, second, 0, 0x8000);
+                std::vector<CGXDLMSVariant> row;
+                row.push_back(tm);
+                row.push_back(value);
+                p->GetBuffer().push_back(row);
+            }
+            if (p->GetBuffer().size() == count) {
+                break;
+            }
+        }
+        fclose(f);
+    }
+}
+
+/**
+* Find start index and row count using start and end date time.
+*
+* @param start
+*            Start time.
+* @param end
+*            End time
+* @param index
+*            Start index.
+* @param count
+*            Item count.
+*/
+void GetProfileGenericDataByRange(CGXDLMSValueEventArg* e)
+{
+    int len, month = 0, day = 0, year = 0, hour = 0, minute = 0, second = 0, value = 0;
+    CGXDLMSVariant start, end;
+    CGXByteBuffer bb;
+    bb.Set(e->GetParameters().Arr[0].byteArr, e->GetParameters().Arr[0].size);
+    CGXDLMSClient::ChangeType(bb, DLMS_DATA_TYPE_DATETIME, start);
+    bb.Clear();
+    bb.Set(e->GetParameters().Arr[1].byteArr, e->GetParameters().Arr[0].size);
+    CGXDLMSClient::ChangeType(bb, DLMS_DATA_TYPE_DATETIME, end);
+    FILE* f = fopen(DATAFILE, "r");
+    if (f != NULL)
+    {
+        while ((len = fscanf(f, "%d/%d/%d %d:%d:%d;%d", &month, &day, &year, &hour, &minute, &second, &value)) != -1)
+        {
+            CGXDateTime tm(2000 + year, month, day, hour, minute, second, 0, 0x8000);
+            if (tm.CompareTo(end.dateTime) > 0) {
+                // If all data is read.
+                break;
+            }
+            if (tm.CompareTo(start.dateTime) < 0) {
+                // If we have not find first item.
+                e->SetRowBeginIndex(e->GetRowBeginIndex() + 1);
+            }
+            e->SetRowEndIndex(e->GetRowEndIndex() + 1);
+        }
+        fclose(f);
+    }
+    /*
+    try {
+        reader = new BufferedReader(new FileReader(dataFile));
+        String line;
+        SimpleDateFormat df = new SimpleDateFormat();
+        while ((line = reader.readLine()) != null) {
+            String[] values = line.split("[;]", -1);
+            Date tm = df.parse(values[0]);
+            if (tm.compareTo(end.getCalendar().getTime()) > 0) {
+                // If all data is read.
+                break;
+            }
+            if (tm.compareTo(start.getCalendar().getTime()) < 0) {
+                // If we have not find first item.
+                e.setRowBeginIndex(e.getRowBeginIndex() + 1);
+            }
+            e.setRowEndIndex(e.getRowEndIndex() + 1);
+        }
+        reader.close();
+    }
+    catch (Exception ex) {
+        if (reader != null) {
+            try {
+                reader.close();
+            }
+            catch (Exception e1) {
+            }
+        }
+        throw new RuntimeException(ex.getMessage());
+    }
+    */
+}
+
+/**
+* Get row count.
+*
+* @return
+*/
+int GetProfileGenericDataCount() {
+    int rows = 0;
+    int ch;
+    FILE* f = fopen(DATAFILE, "r");
+    if (f != NULL)
+    {
+        while ((ch = fgetc(f)) != EOF)
+        {
+            if (ch == '\n')
+            {
+                ++rows;
+            }
+        }
+        fclose(f);
+    }
+    return rows;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -707,23 +853,50 @@ void CGXDLMSBase::PreRead(std::vector<CGXDLMSValueEventArg*>& args)
         type = pObj->GetObjectType();
         if (type == DLMS_OBJECT_TYPE_PROFILE_GENERIC && index == 2)
         {
-            CGXDLMSProfileGeneric* pg = (CGXDLMSProfileGeneric*)pObj;
-            std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> > columns;
-            if ((ret = pg->GetSelectedColumns((*it)->GetSelector(), (*it)->GetParameters(), columns)) != 0)
-            {
-                continue;
+            CGXDLMSProfileGeneric* p = (CGXDLMSProfileGeneric*)pObj;
+
+            // If buffer is read and we want to save memory.
+            if (index == 6) {
+                // If client wants to know EntriesInUse.
+                p->SetEntriesInUse(GetProfileGenericDataCount());
             }
-            //Show columns.
-            for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it = columns.begin();
-                it != columns.end(); ++it)
+            else if (index == 2)
             {
-                it->first->GetLogicalName(ln);
-                printf("%s : %s, ", CGXDLMSClient::ObjectTypeToString(it->first->GetObjectType()).c_str(), ln.c_str());
+                // Read rows from file.
+                // If reading first time.
+                if ((*it)->GetRowEndIndex() == 0) {
+                    if ((*it)->GetSelector() == 0) {
+                        (*it)->SetRowEndIndex(GetProfileGenericDataCount());
+                    }
+                    else if ((*it)->GetSelector() == 1) {
+                        // Read by entry.
+                        GetProfileGenericDataByRange((*it));
+                    }
+                    else if ((*it)->GetSelector() == 2) {
+                        // Read by range.
+                        unsigned int begin = (*it)->GetParameters().Arr[0].ulVal;
+                        (*it)->SetRowBeginIndex(begin);
+                        (*it)->SetRowEndIndex(begin + (*it)->GetParameters().Arr[1].ulVal);
+                        // If client wants to read more data what we have.
+                        int cnt = GetProfileGenericDataCount();
+                        if ((*it)->GetRowEndIndex() - (*it)->GetRowBeginIndex() > cnt - (*it)->GetRowBeginIndex())
+                        {
+                            (*it)->SetRowEndIndex(cnt - (*it)->GetRowBeginIndex());
+                            if ((*it)->GetRowEndIndex() < 0) {
+                                (*it)->SetRowEndIndex(0);
+                            }
+                        }
+                    }
+                }
+                long count = (*it)->GetRowEndIndex() - (*it)->GetRowBeginIndex();
+                // Read only rows that can fit to one PDU.
+                if ((*it)->GetRowEndIndex() - (*it)->GetRowBeginIndex() > (*it)->GetRowToPdu()) {
+                    count = (*it)->GetRowToPdu();
+                }
+                GetProfileGenericDataByEntry(p, (*it)->GetRowBeginIndex(), count);
+                (*it)->SetRowBeginIndex((*it)->GetRowBeginIndex() + count);
             }
-            if (columns.size() != 0)
-            {
-                printf("\r\n");
-            }
+            continue;
         }
         //Framework will handle Association objects automatically.
         if (type == DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME ||
