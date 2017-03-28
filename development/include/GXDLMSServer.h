@@ -46,6 +46,9 @@
 
 class CGXDLMSServer
 {
+    friend class CGXDLMSProfileGeneric;
+    friend class CGXDLMSValueEventArg;
+
 private:
     CGXReplyData m_Info;
     /**
@@ -298,6 +301,28 @@ protected:
     virtual void Disconnected(CGXDLMSConnectionEventArgs& connectionInfo) = 0;
 
     /**
+    * Get attribute access mode.
+    *
+    * @param arg
+    *            Value event argument.
+    * @return Access mode.
+    * @throws Exception
+    *             Server handler occurred exceptions.
+    */
+    virtual DLMS_ACCESS_MODE GetAttributeAccess(CGXDLMSValueEventArg* arg) = 0;
+
+    /**
+    * Get method access mode.
+    *
+    * @param arg
+    *            Value event argument.
+    * @return Method access mode.
+    * @throws Exception
+    *             Server handler occurred exceptions.
+    */
+    virtual DLMS_METHOD_ACCESS_MODE GetMethodAccess(CGXDLMSValueEventArg* arg) = 0;
+
+    /**
      * Action is occurred.
      *
      * @param args
@@ -337,26 +362,20 @@ protected:
     * Get selected value(s). This is called when example profile generic
     * request current value.
     *
-    * @param type
-    *            Update type.
     * @param args
     *            Value event arguments.
     */
     virtual void PreGet(
-        DLMS_UPDATE_TYPE type,
         std::vector<CGXDLMSValueEventArg*>& args) = 0;
 
     /**
     * Get selected value(s). This is called when example profile generic
     * request current value.
     *
-    * @param type
-    *            Update type.
     * @param args
     *            Value event arguments.
     */
     virtual void PostGet(
-        DLMS_UPDATE_TYPE type,
         std::vector<CGXDLMSValueEventArg*>& args) = 0;
 
 public:

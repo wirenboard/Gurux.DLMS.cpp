@@ -40,9 +40,17 @@
 #include "GXDLMSVariant.h"
 
 class CGXDLMSObject;
+class CGXDLMSServer;
+class CGXDLMSClient;
+class CGXDLMSNotify;
+class CGXDLMSSettings;
 
 class CGXDLMSValueEventArg
 {
+    friend class CGXDLMSClient;
+    friend class CGXDLMSServer;
+    friend class CGXDLMSNotify;
+    friend class CGXDLMSProfileGeneric;
 private:
     /**
     * CGXDLMSVariant value.
@@ -102,6 +110,58 @@ private:
     */
     unsigned short m_RowEndIndex;
 
+    /**
+    * DLMS settings.
+    */
+    CGXDLMSSettings* m_Settings;
+
+    /**
+    * DLMS server.
+    */
+    CGXDLMSServer* m_Server;
+
+    void Init(
+        CGXDLMSServer* server,
+        CGXDLMSObject* target,
+        int index,
+        int selector);
+
+    /**
+    * Constructor.
+    *
+    * @param target
+    *            Event target.
+    * @param index
+    *            Event index.
+    */
+    CGXDLMSValueEventArg(
+        CGXDLMSServer* server,
+        CGXDLMSObject* target,
+        int index);
+
+    /**
+    * Constructor.
+    *
+    * @param target
+    *            Event target.
+    * @param index
+    *            Event index.
+    * @param selector
+    *            Optional read event selector.
+    * @param parameters
+    *            Optional parameters.
+    */
+    CGXDLMSValueEventArg(
+        CGXDLMSServer* server,
+        CGXDLMSObject* target,
+        int index,
+        int selector,
+        CGXDLMSVariant& parameters);
+
+    /**
+    * DLMS server.
+    */
+    CGXDLMSServer* GetServer();
 public:
     /**
     * @return Target DLMS object.
@@ -280,5 +340,10 @@ public:
     *            Rows begin index.
     */
     void SetRowBeginIndex(unsigned int value);
+
+    /**
+    * DLMS settings.
+    */
+    CGXDLMSSettings* GetSettings();
 };
 #endif //GXDLMSVALUEEVENTARGS_H

@@ -33,7 +33,8 @@
 //---------------------------------------------------------------------------
 
 #include "../include/GXDLMSValueEventArg.h"
-
+#include "../include/GXDLMSSettings.h"
+#include "../include/GXDLMSServer.h"
 
 CGXDLMSObject* CGXDLMSValueEventArg::GetTarget()
 {
@@ -95,14 +96,18 @@ void CGXDLMSValueEventArg::SetParameters(CGXDLMSVariant& value)
     m_Parameters = value;
 }
 
-CGXDLMSValueEventArg::CGXDLMSValueEventArg(
+void CGXDLMSValueEventArg::Init(
+    CGXDLMSServer* server,
     CGXDLMSObject* target,
-    int index)
+    int index,
+    int selector)
 {
+    m_Server = server;
+    m_Settings = &server->GetSettings();
     m_Handled = false;
     SetTarget(target);
     SetIndex(index);
-    m_Selector = 0;
+    m_Selector = selector;
     m_Error = DLMS_ERROR_CODE_OK;
     m_ByteArray = false;
     m_SkipMaxPduSize = false;
@@ -112,22 +117,39 @@ CGXDLMSValueEventArg::CGXDLMSValueEventArg(
 }
 
 CGXDLMSValueEventArg::CGXDLMSValueEventArg(
+    CGXDLMSServer* server,
+    CGXDLMSObject* target,
+    int index)
+{
+    Init(server, target, index, 0);
+}
+
+CGXDLMSValueEventArg::CGXDLMSValueEventArg(
+    CGXDLMSServer* server,
     CGXDLMSObject* target,
     int index,
     int selector,
     CGXDLMSVariant& parameters)
 {
-    m_Handled = false;
-    SetTarget(target);
-    SetIndex(index);
-    m_Selector = selector;
+    Init(server, target, index, selector);
     m_Parameters = parameters;
-    m_Error = DLMS_ERROR_CODE_OK;
-    m_ByteArray = false;
-    m_SkipMaxPduSize = false;
-    m_RowToPdu = 0;
-    m_RowBeginIndex = 0;
-    m_RowEndIndex = 0;
+}
+
+CGXDLMSValueEventArg::CGXDLMSValueEventArg(
+    CGXDLMSObject* target,
+    int index)
+{
+    Init(NULL, target, index, 0);
+}
+
+CGXDLMSValueEventArg::CGXDLMSValueEventArg(
+    CGXDLMSObject* target,
+    int index,
+    int selector,
+    CGXDLMSVariant& parameters)
+{
+    Init(NULL, target, index, selector);
+    m_Parameters = parameters;
 }
 
 DLMS_ERROR_CODE CGXDLMSValueEventArg::GetError()
@@ -193,4 +215,15 @@ unsigned int CGXDLMSValueEventArg::GetRowBeginIndex() {
 
 void CGXDLMSValueEventArg::SetRowBeginIndex(unsigned int value) {
     m_RowBeginIndex = value;
+}
+
+CGXDLMSSettings* CGXDLMSValueEventArg::GetSettings()
+{
+    return m_Settings;
+}
+
+
+CGXDLMSServer* CGXDLMSValueEventArg::GetServer()
+{
+    return m_Server;
 }

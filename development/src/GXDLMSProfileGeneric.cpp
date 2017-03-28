@@ -36,6 +36,7 @@
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSObjectFactory.h"
 #include "../include/GXDLMSDemandRegister.h"
+#include "../include/GXDLMSServer.h"
 
 CGXDLMSProfileGeneric::~CGXDLMSProfileGeneric()
 {
@@ -45,6 +46,7 @@ CGXDLMSProfileGeneric::~CGXDLMSProfileGeneric()
         delete it->second;
     }
     m_CaptureObjects.clear();
+    m_Buffer.clear();
 }
 
 void CGXDLMSProfileGeneric::Init()
@@ -435,9 +437,6 @@ void CGXDLMSProfileGeneric::SetSortMethod(GX_SORT_METHOD value)
     m_SortMethod = value;
 }
 
-/**
- Column that is used for sorting.
-*/
 CGXDLMSObject* CGXDLMSProfileGeneric::GetSortObject()
 {
     return m_SortObject;
@@ -447,9 +446,6 @@ void CGXDLMSProfileGeneric::SetSortObject(CGXDLMSObject* value)
     m_SortObject = value;
 }
 
-/**
- Entries (rows) in Use.
-*/
 unsigned long CGXDLMSProfileGeneric::GetEntriesInUse()
 {
     return m_EntriesInUse;
@@ -460,9 +456,6 @@ void CGXDLMSProfileGeneric::SetEntriesInUse(unsigned long value)
     m_EntriesInUse = value;
 }
 
-/**
- Maximum Entries (rows) count.
-*/
 unsigned long CGXDLMSProfileGeneric::GetProfileEntries()
 {
     return m_ProfileEntries;
@@ -473,9 +466,6 @@ void CGXDLMSProfileGeneric::SetProfileEntries(unsigned long value)
     m_ProfileEntries = value;
 }
 
-/**
-Attribute index of sort object.
-*/
 int CGXDLMSProfileGeneric::GetSortObjectAttributeIndex()
 {
     return m_SortObjectAttributeIndex;
@@ -485,34 +475,68 @@ void CGXDLMSProfileGeneric::SetSortObjectAttributeIndex(int value)
     m_SortObjectAttributeIndex = value;
 }
 
-/**
- Data index of sort object.
-*/
 int CGXDLMSProfileGeneric::GetSortObjectDataIndex()
 {
     return m_SortObjectDataIndex;
 }
+
 void CGXDLMSProfileGeneric::SetSortObjectDataIndex(int value)
 {
     m_SortObjectDataIndex = value;
 }
 
-/**
- Clears the buffer.
-*/
 void CGXDLMSProfileGeneric::Reset()
 {
     m_Buffer.erase(m_Buffer.begin(), m_Buffer.end());
     m_EntriesInUse = 0;
 }
 
-/**
- Copies the values of the objects to capture
- into the buffer by reading capture objects.
+/*
+* Copies the values of the objects to capture into the buffer by reading
+* capture objects.
 */
-void CGXDLMSProfileGeneric::Capture()
+int CGXDLMSProfileGeneric::Capture(CGXDLMSServer* server)
 {
-    //TODO:
+    std::vector<CGXDLMSVariant> values;
+    int ret;
+    CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(server, this, 2);
+    CGXDLMSValueEventCollection args;
+    args.push_back(e);
+    server->PreGet(args);
+    if (!e->GetHandled())
+    {
+        for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it = m_CaptureObjects.begin();
+            it != m_CaptureObjects.end(); ++it)
+        {
+            CGXDLMSValueEventArg tmp(server, it->first, it->second->GetAttributeIndex());
+            if ((ret = it->first->GetValue(server->GetSettings(), tmp)) != 0)
+            {
+                return ret;
+            }
+            values.push_back(tmp.GetValue());
+        }
+        // Remove first items if buffer is full.
+        if (GetProfileEntries() == GetBuffer().size())
+        {
+            m_Buffer.pop_back();
+        }
+        m_Buffer.push_back(values);
+        m_EntriesInUse = (unsigned long)m_Buffer.size();
+    }
+    server->PostGet(args);
+    return 0;
+}
+
+int CGXDLMSProfileGeneric::Reset(CGXDLMSClient& client, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant value = (unsigned char)0;
+    return client.Method(this, 1, value, reply);
+}
+
+int CGXDLMSProfileGeneric::Capture(CGXDLMSClient& client, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant value = (unsigned char)0;
+    return client.Method(this, 2, value, reply);
 }
 
 void CGXDLMSProfileGeneric::GetValues(std::vector<std::string>& values)
@@ -663,6 +687,24 @@ int CGXDLMSProfileGeneric::GetDataType(int index, DLMS_DATA_TYPE& type)
         return DLMS_ERROR_CODE_OK;
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
+}
+
+
+int CGXDLMSProfileGeneric::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
+{
+    if (e.GetIndex() == 1) {
+        // Reset.
+        Reset();
+    }
+    else if (e.GetIndex() == 2) {
+        // Capture.
+        Capture(e.GetServer());
+    }
+    else
+    {
+        e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+    }
+    return 0;
 }
 
 /*

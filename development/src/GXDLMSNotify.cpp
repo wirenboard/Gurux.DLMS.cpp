@@ -127,7 +127,7 @@ int CGXDLMSNotify::AddData(
 {
     int ret;
     DLMS_DATA_TYPE dt;
-    CGXDLMSValueEventArg e(obj, index);
+    CGXDLMSValueEventArg e(NULL, obj, index);
     if ((ret = obj->GetValue(m_Settings, e)) != 0)
     {
         return ret;
@@ -247,7 +247,7 @@ int CGXDLMSNotify::ParsePush(std::vector<CGXDLMSVariant>& data, std::vector<std:
                 }
             }
         }
-        CGXDLMSValueEventArg e(obj, index);
+        CGXDLMSValueEventArg e(NULL, obj, index);
         e.SetValue(value);
         obj->SetValue(m_Settings, e);
     }

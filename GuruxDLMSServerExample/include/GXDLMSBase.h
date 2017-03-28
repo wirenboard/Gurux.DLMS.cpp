@@ -122,6 +122,28 @@ public:
         CGXByteBuffer& password);
 
     /**
+    * Get attribute access mode.
+    *
+    * @param arg
+    *            Value event argument.
+    * @return Access mode.
+    * @throws Exception
+    *             Server handler occurred exceptions.
+    */
+    DLMS_ACCESS_MODE GetAttributeAccess(CGXDLMSValueEventArg* arg);
+
+    /**
+    * Get method access mode.
+    *
+    * @param arg
+    *            Value event argument.
+    * @return Method access mode.
+    * @throws Exception
+    *             Server handler occurred exceptions.
+    */
+    DLMS_METHOD_ACCESS_MODE GetMethodAccess(CGXDLMSValueEventArg* arg);
+
+    /**
     * Accepted connection is made for the server. All initialization is done
     * here.
     */
@@ -152,7 +174,6 @@ public:
     *            Value event arguments.
     */
     void PreGet(
-        DLMS_UPDATE_TYPE type,
         std::vector<CGXDLMSValueEventArg*>& args);
 
     /**
@@ -165,6 +186,5 @@ public:
     *            Value event arguments.
     */
     void PostGet(
-        DLMS_UPDATE_TYPE type,
         std::vector<CGXDLMSValueEventArg*>& args);
 };

@@ -69,6 +69,8 @@ enum GX_SORT_METHOD
     DLMS_SORT_METHOD_FAREST_FROM_ZERO = 6
 };
 
+class CGXDLMSServer;
+
 class CGXDLMSProfileGeneric : public CGXDLMSObject
 {
 private:
@@ -213,11 +215,11 @@ public:
     */
     void Reset();
 
-    /**
-     Copies the values of the objects to capture
-     into the buffer by reading capture objects.
+    /*
+    * Copies the values of the objects to capture into the buffer by reading
+    * capture objects.
     */
-    void Capture();
+    int Capture(CGXDLMSServer* server);
 
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
@@ -232,6 +234,8 @@ public:
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
+    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+
     /*
     * Returns value of given attribute.
     */
@@ -241,5 +245,28 @@ public:
      * Set value of given attribute.
      */
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+
+    /**
+    * Clears the buffer.
+    *
+    * @param client
+    *            DLMS client.
+    * @param reply
+    *            Action bytes.
+    * @return Result code.
+    */
+    int Reset(CGXDLMSClient& client, std::vector<CGXByteBuffer>& reply);
+
+    /**
+    * Copies the values of the objects to capture into the buffer by reading
+    * each capture object.
+    *
+    * @param client
+    *            DLMS client.
+    * @param reply
+    *            Action bytes.
+    * @return Result code.
+    */
+    int Capture(CGXDLMSClient& client, std::vector<CGXByteBuffer>& reply);
 };
 #endif //GXDLMSPROFILEGENERIC_H

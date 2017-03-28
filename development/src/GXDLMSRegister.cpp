@@ -138,7 +138,7 @@ void CGXDLMSRegister::SetUnit(unsigned char value)
  */
 void CGXDLMSRegister::Reset()
 {
-
+    m_Value.Clear();
 }
 
 // Returns amount of attributes.

@@ -80,6 +80,8 @@
 #include "../../development/include/GXDLMSActionSet.h"
 #include "../../development/include/GXDLMSIp4Setup.h"
 #include "../../development/include/GXDLMSPushSetup.h"
+#include "../../development/include/GXDLMSAssociationLogicalName.h"
+#include "../../development/include/GXDLMSAssociationShortName.h"
 
 using namespace std;
 static char* DATAFILE = "data.csv";
@@ -96,9 +98,11 @@ void ListenerThread(void* pVoid)
 #if defined(_WIN32) || defined(_WIN64)//If Windows
     int len;
     int AddrLen = sizeof(add);
+    SOCKET socket;
 #else //If Linux
     socklen_t len;
     socklen_t AddrLen = sizeof(add);
+    int socket;
 #endif
     struct sockaddr_in client;
     memset(&client, 0, sizeof(client));
@@ -108,7 +112,7 @@ void ListenerThread(void* pVoid)
     {
         len = sizeof(client);
         senderInfo.clear();
-        int socket = accept(server->GetSocket(), (struct sockaddr*)&client, &len);
+        socket = accept(server->GetSocket(), (struct sockaddr*)&client, &len);
         if (server->IsConnected())
         {
             if ((ret = getpeername(socket, (sockaddr*)&add, &AddrLen)) == -1)
@@ -591,8 +595,6 @@ int CGXDLMSBase::Init(int port)
     CGXDLMSProfileGeneric* profileGeneric = new CGXDLMSProfileGeneric("1.0.99.1.0.255");
     //Set capture period to 60 second.
     profileGeneric->SetCapturePeriod(60);
-    //Maximum row count.
-    profileGeneric->SetProfileEntries(100);
     profileGeneric->SetSortMethod(DLMS_SORT_METHOD_FIFO);
     profileGeneric->SetSortObject(pClock);
     //Add colums.
@@ -619,6 +621,9 @@ int CGXDLMSBase::Init(int port)
         tm.AddHours(1);
     }
     fclose(f);
+    //Maximum row count.
+    profileGeneric->SetEntriesInUse(rowCount);
+    profileGeneric->SetProfileEntries(rowCount);
 
     ///////////////////////////////////////////////////////////////////////
     //Add Auto connect object.
@@ -718,6 +723,9 @@ void GetProfileGenericDataByEntry(CGXDLMSProfileGeneric* p, long index, long cou
             }
             else if (len == 7)
             {
+                if (p->GetBuffer().size() == count) {
+                    break;
+                }
                 CGXDateTime tm(2000 + year, month, day, hour, minute, second, 0, 0x8000);
                 std::vector<CGXDLMSVariant> row;
                 row.push_back(tm);
@@ -749,10 +757,10 @@ void GetProfileGenericDataByRange(CGXDLMSValueEventArg* e)
     int len, month = 0, day = 0, year = 0, hour = 0, minute = 0, second = 0, value = 0;
     CGXDLMSVariant start, end;
     CGXByteBuffer bb;
-    bb.Set(e->GetParameters().Arr[0].byteArr, e->GetParameters().Arr[0].size);
+    bb.Set(e->GetParameters().Arr[1].byteArr, e->GetParameters().Arr[1].size);
     CGXDLMSClient::ChangeType(bb, DLMS_DATA_TYPE_DATETIME, start);
     bb.Clear();
-    bb.Set(e->GetParameters().Arr[1].byteArr, e->GetParameters().Arr[0].size);
+    bb.Set(e->GetParameters().Arr[2].byteArr, e->GetParameters().Arr[2].size);
     CGXDLMSClient::ChangeType(bb, DLMS_DATA_TYPE_DATETIME, end);
     FILE* f = fopen(DATAFILE, "r");
     if (f != NULL)
@@ -772,37 +780,6 @@ void GetProfileGenericDataByRange(CGXDLMSValueEventArg* e)
         }
         fclose(f);
     }
-    /*
-    try {
-        reader = new BufferedReader(new FileReader(dataFile));
-        String line;
-        SimpleDateFormat df = new SimpleDateFormat();
-        while ((line = reader.readLine()) != null) {
-            String[] values = line.split("[;]", -1);
-            Date tm = df.parse(values[0]);
-            if (tm.compareTo(end.getCalendar().getTime()) > 0) {
-                // If all data is read.
-                break;
-            }
-            if (tm.compareTo(start.getCalendar().getTime()) < 0) {
-                // If we have not find first item.
-                e.setRowBeginIndex(e.getRowBeginIndex() + 1);
-            }
-            e.setRowEndIndex(e.getRowEndIndex() + 1);
-        }
-        reader.close();
-    }
-    catch (Exception ex) {
-        if (reader != null) {
-            try {
-                reader.close();
-            }
-            catch (Exception e1) {
-            }
-        }
-        throw new RuntimeException(ex.getMessage());
-    }
-    */
 }
 
 /**
@@ -992,11 +969,39 @@ void CGXDLMSBase::PreAction(std::vector<CGXDLMSValueEventArg*>& args)
 {
 }
 
+void HandleProfileGenericActions(CGXDLMSValueEventArg* it)
+{
+    CGXDLMSProfileGeneric* pg = (CGXDLMSProfileGeneric*)it->GetTarget();
+    if (it->GetIndex() == 1) {
+        // Profile generic clear is called. Clear data.
+        FILE* f = fopen(DATAFILE, "w");
+        fclose(f);
+    }
+    else if (it->GetIndex() == 2) {
+        // Profile generic Capture is called.
+        FILE* f = fopen(DATAFILE, "a");
+        for (int pos = pg->GetBuffer().size() - 1; pos != pg->GetBuffer().size(); ++pos)
+        {
+            CGXDateTime tm = pg->GetBuffer().at(0).at(0).dateTime;
+            int value = pg->GetBuffer().at(0).at(1).ToInteger();
+            fprintf(f, "%s;%d\n", tm.ToString().c_str(), value);
+        }
+        fclose(f);
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 void CGXDLMSBase::PostAction(std::vector<CGXDLMSValueEventArg*>& args)
 {
+    for (std::vector<CGXDLMSValueEventArg*>::iterator it = args.begin(); it != args.end(); ++it)
+    {
+        if ((*it)->GetTarget()->GetObjectType() == DLMS_OBJECT_TYPE_PROFILE_GENERIC)
+        {
+            HandleProfileGenericActions(*it);
+        }
+    }
 }
 
 
@@ -1011,23 +1016,86 @@ DLMS_SOURCE_DIAGNOSTIC CGXDLMSBase::ValidateAuthentication(
     DLMS_AUTHENTICATION authentication,
     CGXByteBuffer& password)
 {
-    char EXPECTED_PASSWORD[] = "Gurux";
     if (authentication == DLMS_AUTHENTICATION_NONE)
     {
         //Uncomment this if authentication is always required.
         //return DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_MECHANISM_NAME_REQUIRED;
     }
-    //Check Low Level security..
+
     if (authentication == DLMS_AUTHENTICATION_LOW)
     {
-        if (password.GetSize() != strlen(EXPECTED_PASSWORD) &&
-            memcmp(EXPECTED_PASSWORD, password.GetData(), strlen(EXPECTED_PASSWORD)) != 0)
+        CGXByteBuffer expected;
+        std::string name = "0.0.40.0.0.255";
+        if (GetUseLogicalNameReferencing())
         {
-            return DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_FAILURE;
+            CGXDLMSAssociationLogicalName* ln =
+                (CGXDLMSAssociationLogicalName*)GetItems().FindByLN(
+                    DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME, name);
+            expected = ln->GetSecret();
         }
+        else
+        {
+            CGXDLMSAssociationShortName* sn =
+                (CGXDLMSAssociationShortName*)GetItems().FindByLN(
+                    DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME, name);
+            expected = sn->GetSecret();
+        }
+        if (expected.Compare(password.GetData(), password.GetSize()))
+        {
+            return DLMS_SOURCE_DIAGNOSTIC_NONE;
+        }
+        return DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_FAILURE;
     }
-    //High Level security is checked later.
+    // Other authentication levels are check on phase two.
     return DLMS_SOURCE_DIAGNOSTIC_NONE;
+}
+
+DLMS_ACCESS_MODE CGXDLMSBase::GetAttributeAccess(CGXDLMSValueEventArg* arg)
+{
+    // Only read is allowed
+    if (arg->GetSettings()->GetAuthentication() == DLMS_AUTHENTICATION_NONE)
+    {
+        return DLMS_ACCESS_MODE_READ;
+    }
+    // Only clock write is allowed.
+    if (arg->GetSettings()->GetAuthentication() == DLMS_AUTHENTICATION_LOW)
+    {
+        if (arg->GetTarget()->GetObjectType() == DLMS_OBJECT_TYPE_CLOCK)
+        {
+            return DLMS_ACCESS_MODE_READ_WRITE;
+        }
+        return DLMS_ACCESS_MODE_READ;
+    }
+    // All writes are allowed.
+    return DLMS_ACCESS_MODE_READ_WRITE;
+}
+
+/**
+* Get method access mode.
+*
+* @param arg
+*            Value event argument.
+* @return Method access mode.
+* @throws Exception
+*             Server handler occurred exceptions.
+*/
+DLMS_METHOD_ACCESS_MODE CGXDLMSBase::GetMethodAccess(CGXDLMSValueEventArg* arg)
+{
+    // Methods are not allowed.
+    if (arg->GetSettings()->GetAuthentication() == DLMS_AUTHENTICATION_NONE)
+    {
+        return DLMS_METHOD_ACCESS_MODE_NONE;
+    }
+    // Only clock methods are allowed.
+    if (arg->GetSettings()->GetAuthentication() == DLMS_AUTHENTICATION_LOW)
+    {
+        if (arg->GetTarget()->GetObjectType() == DLMS_OBJECT_TYPE_CLOCK)
+        {
+            return DLMS_METHOD_ACCESS_MODE_ACCESS;
+        }
+        return DLMS_METHOD_ACCESS_MODE_NONE;
+    }
+    return DLMS_METHOD_ACCESS_MODE_ACCESS;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1055,14 +1123,27 @@ void CGXDLMSBase::Disconnected(
 }
 
 void CGXDLMSBase::PreGet(
-    DLMS_UPDATE_TYPE type,
     std::vector<CGXDLMSValueEventArg*>& args)
 {
-
+    for (std::vector<CGXDLMSValueEventArg*>::iterator it = args.begin(); it != args.end(); ++it)
+    {
+        if ((*it)->GetTarget()->GetObjectType() == DLMS_OBJECT_TYPE_PROFILE_GENERIC)
+        {
+            CGXDLMSProfileGeneric* pg = (CGXDLMSProfileGeneric*)(*it)->GetTarget();
+            pg->GetBuffer().clear();
+            int cnt = GetProfileGenericDataCount() + 1;
+            // Update last average value.
+            CGXDateTime tm = CGXDateTime::Now();
+            std::vector<CGXDLMSVariant> row;
+            row.push_back(tm);
+            row.push_back(cnt);
+            pg->GetBuffer().push_back(row);
+            (*it)->SetHandled(true);
+        }
+    }
 }
 
 void CGXDLMSBase::PostGet(
-    DLMS_UPDATE_TYPE type,
     std::vector<CGXDLMSValueEventArg*>& args)
 {
 

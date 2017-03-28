@@ -1744,22 +1744,4 @@ typedef enum
     */
     IP_OPTION_TYPE_INTERNET_TIMESTAMP = 0x44
 }IP_OPTION_TYPE;
-
-typedef enum
-{
-    /**
-    * Profile generic.
-    */
-    DLMS_UPDATE_TYPE_PROFILE_GENERIC,
-    /**
-    * Scheduler.
-    */
-    DLMS_UPDATE_TYPE_SCHEDULER,
-    /**
-    * Notifier.
-    */
-    DLMS_UPDATE_TYPE_NOTIFY
-}
-DLMS_UPDATE_TYPE;
-
 #endif //ENUMS_H

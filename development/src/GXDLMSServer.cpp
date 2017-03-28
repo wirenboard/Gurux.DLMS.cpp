@@ -590,7 +590,11 @@ int CGXDLMSServer::HandleSetRequest(
     }
     else
     {
-        DLMS_ACCESS_MODE am = obj->GetAccess(index);
+        CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(this, obj, index);
+        e->SetValue(value);
+        CGXDLMSValueEventCollection list;
+        list.push_back(e);
+        DLMS_ACCESS_MODE am = GetAttributeAccess(e);
         // If write is denied.
         if (am != DLMS_ACCESS_MODE_WRITE && am != DLMS_ACCESS_MODE_READ_WRITE)
         {
@@ -618,10 +622,6 @@ int CGXDLMSServer::HandleSetRequest(
                     }
                 }
             }
-            CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(obj, index);
-            e->SetValue(value);
-            CGXDLMSValueEventCollection list;
-            list.push_back(e);
             if (p.IsMultipleBlocks())
             {
                 m_Transaction = new CGXDLMSLongTransaction(list, DLMS_COMMAND_GET_REQUEST, data);
@@ -819,34 +819,34 @@ int CGXDLMSServer::GetRequestNormal(CGXByteBuffer& data)
     }
     else
     {
-        if (obj->GetAccess(attributeIndex) == DLMS_ACCESS_MODE_NONE)
+        // Access selection
+        unsigned char selection, selector = 0;
+        if ((ret = data.GetUInt8(&selection)) != 0)
+        {
+            return ret;
+        }
+        CGXDLMSVariant parameters;
+        if (selection != 0)
+        {
+            if ((ret = data.GetUInt8(&selector)) != 0)
+            {
+                return ret;
+            }
+            CGXDataInfo i;
+            if ((ret = GXHelpers::GetData(data, i, parameters)) != 0)
+            {
+                return ret;
+            }
+        }
+        CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(this, obj, attributeIndex, selector, parameters);
+        arr.push_back(e);
+        if (GetAttributeAccess(e) == DLMS_ACCESS_MODE_NONE)
         {
             // Read Write denied.
             status = DLMS_ERROR_CODE_READ_WRITE_DENIED;
         }
         else
         {
-            // Access selection
-            unsigned char selection, selector = 0;
-            if ((ret = data.GetUInt8(&selection)) != 0)
-            {
-                return ret;
-            }
-            CGXDLMSVariant parameters;
-            if (selection != 0)
-            {
-                if ((ret = data.GetUInt8(&selector)) != 0)
-                {
-                    return ret;
-                }
-                CGXDataInfo i;
-                if ((ret = GXHelpers::GetData(data, i, parameters)) != 0)
-                {
-                    return ret;
-                }
-            }
-
-            CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(obj, attributeIndex, selector, parameters);
             if (obj->GetObjectType() == DLMS_OBJECT_TYPE_PROFILE_GENERIC && attributeIndex == 2) {
                 DLMS_DATA_TYPE dt;
                 int rowsize = 0;
@@ -879,7 +879,6 @@ int CGXDLMSServer::GetRequestNormal(CGXByteBuffer& data)
                     e->SetRowToPdu(m_Settings.GetMaxPduSize() / rowsize);
                 }
             }
-            arr.push_back(e);
             PreRead(arr);
             if (!e->GetHandled())
             {
@@ -911,6 +910,11 @@ int CGXDLMSServer::GetRequestNormal(CGXByteBuffer& data)
     if (m_Settings.GetCount() != m_Settings.GetIndex()
         || bb.GetSize() != bb.GetPosition())
     {
+        if (m_Transaction != NULL)
+        {
+            delete m_Transaction;
+            m_Transaction = NULL;
+        }
         m_Transaction = new CGXDLMSLongTransaction(arr, DLMS_COMMAND_GET_REQUEST, bb);
     }
     return ret;
@@ -979,11 +983,11 @@ int CGXDLMSServer::GetRequestNextDataBlock(CGXByteBuffer& data)
                             return DLMS_ERROR_CODE_HARDWARE_FAULT;
                         }
                     }
-                    moreData = m_Settings.GetIndex() != m_Settings.GetCount();
                 }
             }
             p.SetMultipleBlocks(true);
             ret = CGXDLMS::GetLNPdu(p, m_ReplyData);
+            moreData = m_Settings.GetIndex() != m_Settings.GetCount();
             if (moreData || bb.GetSize() - bb.GetPosition() != 0)
             {
                 m_Transaction->SetData(bb);
@@ -1034,42 +1038,37 @@ int CGXDLMSServer::GetRequestWithList(CGXByteBuffer& data)
         if (obj == NULL)
         {
             // Access Error : Device reports a undefined object.
-            CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(obj, attributeIndex);
+            CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(this, obj, attributeIndex);
             e->SetError(DLMS_ERROR_CODE_UNDEFINED_OBJECT);
             list.push_back(e);
         }
         else
         {
-            if (obj->GetAccess(attributeIndex) == DLMS_ACCESS_MODE_NONE)
+            // AccessSelection
+            unsigned char selection, selector = 0;
+            CGXDLMSVariant parameters;
+            if ((ret = data.GetUInt8(&selection)) != 0)
             {
-                // Read Write denied.
-                CGXDLMSValueEventArg *arg = new CGXDLMSValueEventArg(obj, attributeIndex);
-                arg->SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
-                list.push_back(arg);
+                return ret;
             }
-            else
+            if (selection != 0)
             {
-                // AccessSelection
-                unsigned char selection, selector = 0;
-                CGXDLMSVariant parameters;
-                if ((ret = data.GetUInt8(&selection)) != 0)
+                if ((ret = data.GetUInt8(&selector)) != 0)
                 {
                     return ret;
                 }
-                if (selection != 0)
+                CGXDataInfo i;
+                if ((ret = GXHelpers::GetData(data, i, parameters)) != 0)
                 {
-                    if ((ret = data.GetUInt8(&selector)) != 0)
-                    {
-                        return ret;
-                    }
-                    CGXDataInfo i;
-                    if ((ret = GXHelpers::GetData(data, i, parameters)) != 0)
-                    {
-                        return ret;
-                    }
+                    return ret;
                 }
-                CGXDLMSValueEventArg *arg = new CGXDLMSValueEventArg(obj, attributeIndex, selector, parameters);
-                list.push_back(arg);
+            }
+            CGXDLMSValueEventArg *arg = new CGXDLMSValueEventArg(this, obj, attributeIndex, selector, parameters);
+            list.push_back(arg);
+            if (GetAttributeAccess(arg) == DLMS_ACCESS_MODE_NONE)
+            {
+                // Read Write denied.
+                arg->SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
             }
         }
     }
@@ -1094,6 +1093,11 @@ int CGXDLMSServer::GetRequestWithList(CGXByteBuffer& data)
         }
         if (m_Settings.GetIndex() != m_Settings.GetCount())
         {
+            if (m_Transaction != NULL)
+            {
+                delete m_Transaction;
+                m_Transaction = NULL;
+            }
             CGXByteBuffer empty;
             m_Transaction = new CGXDLMSLongTransaction(list, DLMS_COMMAND_GET_REQUEST, empty);
         }
@@ -1286,7 +1290,7 @@ int CGXDLMSServer::HandleRead(
     {
         return ret;
     }
-    CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(i.GetItem(), i.GetIndex());
+    CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(this, i.GetItem(), i.GetIndex());
     e->SetAction(i.IsAction());
     list.push_back(e);
     if (type == DLMS_VARIABLE_ACCESS_SPECIFICATION_PARAMETERISED_ACCESS)
@@ -1314,7 +1318,7 @@ int CGXDLMSServer::HandleRead(
         return 0;
     }
 
-    if (i.GetItem()->GetAccess(i.GetIndex()) == DLMS_ACCESS_MODE_NONE)
+    if (GetAttributeAccess(e) == DLMS_ACCESS_MODE_NONE)
     {
         e->SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
     }
@@ -1703,7 +1707,12 @@ int CGXDLMSServer::HandleWriteRequest(CGXByteBuffer& data)
                 }
             }
             di.Clear();
-            DLMS_ACCESS_MODE am = target.GetItem()->GetAccess(target.GetIndex());
+            CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(this, target.GetItem(), target.GetIndex());
+            e->SetValue(value);
+            CGXDLMSValueEventCollection arr;
+            arr.push_back(e);
+            PreWrite(arr);
+            DLMS_ACCESS_MODE am = GetAttributeAccess(e);
             // If write is denied.
             if (am != DLMS_ACCESS_MODE_WRITE && am != DLMS_ACCESS_MODE_READ_WRITE)
             {
@@ -1711,11 +1720,6 @@ int CGXDLMSServer::HandleWriteRequest(CGXByteBuffer& data)
             }
             else
             {
-                CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(target.GetItem(), target.GetIndex());
-                e->SetValue(value);
-                CGXDLMSValueEventCollection arr;
-                arr.push_back(e);
-                PreWrite(arr);
                 if (e->GetError() != 0)
                 {
                     results.SetUInt8(pos, e->GetError());
@@ -1787,6 +1791,7 @@ int CGXDLMSServer::HandleCommand(
         m_Settings.SetConnected(false);
         Disconnected(connectionInfo);
         frame = DLMS_COMMAND_UA;
+        Reset(true);
         break;
     case DLMS_COMMAND_NONE:
         //Get next frame.
@@ -1877,15 +1882,15 @@ int CGXDLMSServer::HandleMethodRequest(
     }
     else
     {
-        if (obj->GetMethodAccess(id) == DLMS_METHOD_ACCESS_MODE_NONE)
+        CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(this, obj, id, 0, parameters);
+        CGXDLMSValueEventCollection arr;
+        arr.push_back(e);
+        if (GetMethodAccess(e) == DLMS_METHOD_ACCESS_MODE_NONE)
         {
             error = DLMS_ERROR_CODE_READ_WRITE_DENIED;
         }
         else
         {
-            CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(obj, id, 0, parameters);
-            CGXDLMSValueEventCollection arr;
-            arr.push_back(e);
             PreAction(arr);
             if (!e->GetHandled())
             {

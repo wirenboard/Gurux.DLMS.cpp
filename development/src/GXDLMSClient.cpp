@@ -465,7 +465,7 @@ int CGXDLMSClient::UpdateValue(CGXDLMSObject& target, int attributeIndex, CGXDLM
             }
         }
     }
-    CGXDLMSValueEventArg e(&target, attributeIndex);
+    CGXDLMSValueEventArg e(NULL, &target, attributeIndex);
     e.SetValue(value);
     return target.SetValue(m_Settings, e);
 }
@@ -504,7 +504,7 @@ int CGXDLMSClient::UpdateValues(std::vector< std::pair<CGXDLMSObject*, int> >& l
             {
                 return ret;
             }
-            CGXDLMSValueEventArg e(it->first, it->second);
+            CGXDLMSValueEventArg e(NULL, it->first, it->second);
             e.SetValue(value);
             it->first->SetValue(m_Settings, e);
             info.Clear();
@@ -1221,7 +1221,7 @@ int CGXDLMSClient::UpdateValues(
             {
                 return ret;
             }
-            CGXDLMSValueEventArg e(it->first, it->second);
+            CGXDLMSValueEventArg e(NULL, it->first, it->second);
             e.SetValue(value);
             it->first->SetValue(m_Settings, e);
             info.Clear();
