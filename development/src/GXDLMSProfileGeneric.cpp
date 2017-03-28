@@ -153,7 +153,7 @@ int CGXDLMSProfileGeneric::GetData(
     if (settings.GetIndex() == 0) {
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         if (e.GetRowEndIndex() != 0) {
-            GXHelpers::SetObjectCount(e.GetRowEndIndex(), data);
+            GXHelpers::SetObjectCount(e.GetRowEndIndex() - e.GetRowBeginIndex(), data);
         }
         else {
             GXHelpers::SetObjectCount((unsigned long)table.size(), data);
@@ -203,6 +203,10 @@ int CGXDLMSProfileGeneric::GetData(
             }
         }
         settings.SetIndex(settings.GetIndex() + 1);
+    }
+    if (e.GetRowEndIndex() != 0)
+    {
+        e.SetRowBeginIndex(e.GetRowBeginIndex() + table.size());
     }
     return DLMS_ERROR_CODE_OK;
 }

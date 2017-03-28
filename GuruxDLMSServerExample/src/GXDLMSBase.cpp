@@ -84,7 +84,7 @@
 #include "../../development/include/GXDLMSAssociationShortName.h"
 
 using namespace std;
-static char* DATAFILE = "data.csv";
+static const char* DATAFILE = "data.csv";
 
 void ListenerThread(void* pVoid)
 {
@@ -828,10 +828,9 @@ void CGXDLMSBase::PreRead(std::vector<CGXDLMSValueEventArg*>& args)
         pObj = (*it)->GetTarget();
         //Get target type.
         type = pObj->GetObjectType();
-        if (type == DLMS_OBJECT_TYPE_PROFILE_GENERIC && index == 2)
+        if (type == DLMS_OBJECT_TYPE_PROFILE_GENERIC)
         {
             CGXDLMSProfileGeneric* p = (CGXDLMSProfileGeneric*)pObj;
-
             // If buffer is read and we want to save memory.
             if (index == 6) {
                 // If client wants to know EntriesInUse.
@@ -871,7 +870,6 @@ void CGXDLMSBase::PreRead(std::vector<CGXDLMSValueEventArg*>& args)
                     count = (*it)->GetRowToPdu();
                 }
                 GetProfileGenericDataByEntry(p, (*it)->GetRowBeginIndex(), count);
-                (*it)->SetRowBeginIndex((*it)->GetRowBeginIndex() + count);
             }
             continue;
         }
