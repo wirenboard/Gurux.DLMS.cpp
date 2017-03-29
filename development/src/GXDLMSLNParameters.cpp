@@ -50,7 +50,7 @@ CGXDLMSLNParameters::CGXDLMSLNParameters(
     m_Data = data;
     m_Time = NULL;
     m_Status = status;
-    m_MultipleBlocks = settings->GetCount() != 0;
+    m_MultipleBlocks = settings->GetCount() != settings->GetIndex();
     m_LastBlock = settings->GetCount() == settings->GetIndex();
 }
 

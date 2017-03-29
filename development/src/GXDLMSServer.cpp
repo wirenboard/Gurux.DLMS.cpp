@@ -906,6 +906,7 @@ int CGXDLMSServer::GetRequestNormal(CGXByteBuffer& data)
         }
     }
     CGXDLMSLNParameters p(&m_Settings, DLMS_COMMAND_GET_RESPONSE, 1, NULL, &bb, status);
+
     ret = CGXDLMS::GetLNPdu(p, m_ReplyData);
     if (m_Settings.GetCount() != m_Settings.GetIndex()
         || bb.GetSize() != bb.GetPosition())

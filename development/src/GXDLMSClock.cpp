@@ -257,7 +257,7 @@ int CGXDLMSClock::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     else if (index == 2)
     {
-        type = DLMS_DATA_TYPE_DATETIME;
+        type = DLMS_DATA_TYPE_OCTET_STRING;
     }
     else if (index == 3)
     {
@@ -269,11 +269,11 @@ int CGXDLMSClock::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     else if (index == 5)
     {
-        type = DLMS_DATA_TYPE_DATETIME;
+        type = DLMS_DATA_TYPE_OCTET_STRING;
     }
     else if (index == 6)
     {
-        type = DLMS_DATA_TYPE_DATETIME;
+        type = DLMS_DATA_TYPE_OCTET_STRING;
     }
     else if (index == 7)
     {

@@ -361,7 +361,7 @@ int CGXDLMSActivityCalendar::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     if (index == 10)
     {
-        type = DLMS_DATA_TYPE_DATETIME;
+        type = DLMS_DATA_TYPE_OCTET_STRING;
         return DLMS_ERROR_CODE_OK;
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;

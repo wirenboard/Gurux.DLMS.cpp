@@ -527,12 +527,12 @@ void MultipleBlocks(
     if (p.IsMultipleBlocks())
     {
         // Add command type and invoke and priority.
-        p.SetLastBlock(!(2 + reply.GetSize() + len > p.GetSettings()->GetMaxPduSize()));
+        p.SetLastBlock(!(8 + reply.GetSize() + len > p.GetSettings()->GetMaxPduSize()));
     }
     if (p.IsLastBlock())
     {
         // Add command type and invoke and priority.
-        p.SetLastBlock(!(2 + reply.GetSize() + len > p.GetSettings()->GetMaxPduSize()));
+        p.SetLastBlock(!(8 + reply.GetSize() + len > p.GetSettings()->GetMaxPduSize()));
     }
 }
 

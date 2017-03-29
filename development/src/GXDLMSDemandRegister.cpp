@@ -325,12 +325,12 @@ int CGXDLMSDemandRegister::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     if (index == 6)
     {
-        type = DLMS_DATA_TYPE_DATETIME;
+        type = DLMS_DATA_TYPE_OCTET_STRING;
         return DLMS_ERROR_CODE_OK;
     }
     if (index == 7)
     {
-        type = DLMS_DATA_TYPE_DATETIME;
+        type = DLMS_DATA_TYPE_OCTET_STRING;
         return DLMS_ERROR_CODE_OK;
     }
     if (index == 8)
