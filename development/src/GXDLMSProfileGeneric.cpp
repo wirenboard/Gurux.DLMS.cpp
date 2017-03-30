@@ -206,7 +206,7 @@ int CGXDLMSProfileGeneric::GetData(
     }
     if (e.GetRowEndIndex() != 0)
     {
-        e.SetRowBeginIndex(e.GetRowBeginIndex() + table.size());
+        e.SetRowBeginIndex(e.GetRowBeginIndex() + (unsigned short)table.size());
     }
     return DLMS_ERROR_CODE_OK;
 }

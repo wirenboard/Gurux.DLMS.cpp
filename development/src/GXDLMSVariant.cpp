@@ -185,22 +185,14 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
         }
         if (tmp.vt == DLMS_DATA_TYPE_FLOAT32)
         {
-#if _MSC_VER > 1000
-            sprintf_s(buff, 250, "%f", tmp.fltVal);
-#else
-            sprintf(buff, "%f", tmp.fltVal);
-#endif
+            snprintf(buff, 250, "%f", tmp.fltVal);
             item->strVal = buff;
             item->vt = type;
             return DLMS_ERROR_CODE_OK;
         }
         if (tmp.vt == DLMS_DATA_TYPE_FLOAT64)
         {
-#if _MSC_VER > 1000
-            sprintf_s(buff, 250, "%lf", tmp.dblVal);
-#else
-            sprintf(buff, "%lf", tmp.dblVal);
-#endif
+            snprintf(buff, 250, "%lf", tmp.dblVal);
             item->strVal = buff;
             item->vt = type;
             return DLMS_ERROR_CODE_OK;
@@ -394,7 +386,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
                     tmp2.SetUInt8(val);
                     pBuff = ++ch;
                 }
-            }
+                }
             if (tmp2.GetSize() == 0)
             {
                 item->Add(pBuff, (unsigned long)tmp.strVal.size());
@@ -410,12 +402,12 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
                     tmp2.SetUInt8(val);
                 }
                 item->Add(tmp2.GetData(), item->size);
-            }
+                }
             item->vt = type;
             return DLMS_ERROR_CODE_OK;
-        }
+            }
         return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
-    }
+            }
     int fromSize = tmp.GetSize();
     int toSize = GetSize(type);
     //If we try to change bigger valut to smaller check that value is not too big.
@@ -443,7 +435,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
     }
     item->vt = type;
     return DLMS_ERROR_CODE_OK;
-}
+        }
 
 void CGXDLMSVariant::Clear()
 {
@@ -1365,10 +1357,10 @@ int CGXDLMSVariant::ToInteger()
             assert(0);
         }
         return val;
-    }
+        }
     assert(0);
     return 0;
-}
+    }
 
 double CGXDLMSVariant::ToDouble()
 {

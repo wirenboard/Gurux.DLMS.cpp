@@ -780,6 +780,47 @@ int CGXDLMSServer::HandleSetRequest(CGXByteBuffer& data)
     return CGXDLMS::GetLNPdu(p, m_ReplyData);
 }
 
+unsigned short CGXDLMSServer::GetRowsToPdu(CGXDLMSProfileGeneric* pg)
+{
+    DLMS_DATA_TYPE dt;
+    int rowsize = 0;
+    // Count how many rows we can fit to one PDU.
+    for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it = pg->GetCaptureObjects().begin();
+        it != pg->GetCaptureObjects().end(); ++it)
+    {
+        it->first->GetDataType(it->second->GetAttributeIndex(), dt);
+        if (dt == DLMS_DATA_TYPE_OCTET_STRING)
+        {
+            it->first->GetUIDataType(it->second->GetAttributeIndex(), dt);
+            if (dt == DLMS_DATA_TYPE_DATETIME)
+            {
+                rowsize += GXHelpers::GetDataTypeSize(DLMS_DATA_TYPE_DATETIME);
+            }
+            else if (dt == DLMS_DATA_TYPE_DATE)
+            {
+                rowsize += GXHelpers::GetDataTypeSize(DLMS_DATA_TYPE_DATE);
+            }
+            else if (dt == DLMS_DATA_TYPE_TIME)
+            {
+                rowsize += GXHelpers::GetDataTypeSize(DLMS_DATA_TYPE_TIME);
+            }
+        }
+        else if (dt == DLMS_DATA_TYPE_NONE)
+        {
+            rowsize += 2;
+        }
+        else
+        {
+            rowsize += GXHelpers::GetDataTypeSize(dt);
+        }
+    }
+    if (rowsize != 0)
+    {
+        return m_Settings.GetMaxPduSize() / rowsize;
+    }
+    return 0;
+}
+
 int CGXDLMSServer::GetRequestNormal(CGXByteBuffer& data)
 {
     CGXByteBuffer bb;
@@ -847,37 +888,9 @@ int CGXDLMSServer::GetRequestNormal(CGXByteBuffer& data)
         }
         else
         {
-            if (obj->GetObjectType() == DLMS_OBJECT_TYPE_PROFILE_GENERIC && attributeIndex == 2) {
-                DLMS_DATA_TYPE dt;
-                int rowsize = 0;
-                CGXDLMSProfileGeneric* pg = (CGXDLMSProfileGeneric*)obj;
-                // Count how many rows we can fit to one PDU.
-                for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it = pg->GetCaptureObjects().begin();
-                    it != pg->GetCaptureObjects().end(); ++it) {
-                    it->first->GetDataType(it->second->GetAttributeIndex(), dt);
-                    if (dt == DLMS_DATA_TYPE_OCTET_STRING) {
-                        it->first->GetUIDataType(it->second->GetAttributeIndex(), dt);
-                        if (dt == DLMS_DATA_TYPE_DATETIME) {
-                            rowsize += GXHelpers::GetDataTypeSize(DLMS_DATA_TYPE_DATETIME);
-                        }
-                        else if (dt == DLMS_DATA_TYPE_DATE) {
-                            rowsize += GXHelpers::GetDataTypeSize(DLMS_DATA_TYPE_DATE);
-                        }
-                        else if (dt == DLMS_DATA_TYPE_TIME) {
-                            rowsize +=
-                                GXHelpers::GetDataTypeSize(DLMS_DATA_TYPE_TIME);
-                        }
-                    }
-                    else if (dt == DLMS_DATA_TYPE_NONE) {
-                        rowsize += 2;
-                    }
-                    else {
-                        rowsize += GXHelpers::GetDataTypeSize(dt);
-                    }
-                }
-                if (rowsize != 0) {
-                    e->SetRowToPdu(m_Settings.GetMaxPduSize() / rowsize);
-                }
+            if (obj->GetObjectType() == DLMS_OBJECT_TYPE_PROFILE_GENERIC && attributeIndex == 2)
+            {
+                e->SetRowToPdu(GetRowsToPdu((CGXDLMSProfileGeneric*)obj));
             }
             PreRead(arr);
             if (!e->GetHandled())
@@ -1325,6 +1338,10 @@ int CGXDLMSServer::HandleRead(
     }
     else
     {
+        if (e->GetTarget()->GetObjectType() == DLMS_OBJECT_TYPE_PROFILE_GENERIC && e->GetIndex() == 2)
+        {
+            e->SetRowToPdu(GetRowsToPdu((CGXDLMSProfileGeneric*)e->GetTarget()));
+        }
         if (e->IsAction())
         {
             actions.push_back(e);

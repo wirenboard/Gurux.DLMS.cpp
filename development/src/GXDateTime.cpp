@@ -55,7 +55,6 @@ CGXDateTime::CGXDateTime()
 // Constructor.
 CGXDateTime::CGXDateTime(struct tm value)
 {
-
     int hours, minutes;
     GXHelpers::GetUtcOffset(hours, minutes);
     m_Deviation = -(hours * 60 + minutes);
@@ -67,7 +66,9 @@ CGXDateTime::CGXDateTime(struct tm value)
 
 CGXDateTime::CGXDateTime(int year, int month, int day, int hour, int minute, int second, int millisecond)
 {
-    Init(year, month, day, hour, minute, second, millisecond, 0x8000);
+    int hours, minutes;
+    GXHelpers::GetUtcOffset(hours, minutes);
+    Init(year, month, day, hour, minute, second, millisecond, -(hours * 60 + minutes));
 }
 
 // Constructor.

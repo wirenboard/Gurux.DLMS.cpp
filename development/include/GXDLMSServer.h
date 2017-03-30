@@ -44,6 +44,7 @@
 #include "GXDLMSLNParameters.h"
 #include "GXDLMSConnectionEventArgs.h"
 
+class CGXDLMSProfileGeneric;
 class CGXDLMSServer
 {
     friend class CGXDLMSProfileGeneric;
@@ -203,6 +204,15 @@ private:
     int HandleMethodRequest(
         CGXByteBuffer& data,
         CGXDLMSConnectionEventArgs& connectionInfo);
+
+    /**
+    * Count how many rows can fit to one PDU.
+    *
+    * @param pg
+    *            Read profile generic.
+    * @return Rows to fit one PDU.
+    */
+    unsigned short GetRowsToPdu(CGXDLMSProfileGeneric* pg);
 
 protected:
     /**

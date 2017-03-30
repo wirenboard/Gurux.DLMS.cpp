@@ -712,31 +712,34 @@ void GetProfileGenericDataByEntry(CGXDLMSProfileGeneric* p, long index, long cou
     int len, month = 0, day = 0, year = 0, hour = 0, minute = 0, second = 0, value = 0;
     // Clear old data. It's already serialized.
     p->GetBuffer().clear();
-    FILE* f = fopen(DATAFILE, "r");
-    if (f != NULL)
+    if (count != 0)
     {
-        while ((len = fscanf(f, "%d/%d/%d %d:%d:%d;%d", &month, &day, &year, &hour, &minute, &second, &value)) != -1)
+        FILE* f = fopen(DATAFILE, "r");
+        if (f != NULL)
         {
-            // Skip row
-            if (index > 0) {
-                --index;
-            }
-            else if (len == 7)
+            while ((len = fscanf(f, "%d/%d/%d %d:%d:%d;%d", &month, &day, &year, &hour, &minute, &second, &value)) != -1)
             {
+                // Skip row
+                if (index > 0) {
+                    --index;
+                }
+                else if (len == 7)
+                {
+                    if (p->GetBuffer().size() == count) {
+                        break;
+                    }
+                    CGXDateTime tm(2000 + year, month, day, hour, minute, second, 0, 0x8000);
+                    std::vector<CGXDLMSVariant> row;
+                    row.push_back(tm);
+                    row.push_back(value);
+                    p->GetBuffer().push_back(row);
+                }
                 if (p->GetBuffer().size() == count) {
                     break;
                 }
-                CGXDateTime tm(2000 + year, month, day, hour, minute, second, 0, 0x8000);
-                std::vector<CGXDLMSVariant> row;
-                row.push_back(tm);
-                row.push_back(value);
-                p->GetBuffer().push_back(row);
             }
-            if (p->GetBuffer().size() == count) {
-                break;
-            }
+            fclose(f);
         }
-        fclose(f);
     }
 }
 
