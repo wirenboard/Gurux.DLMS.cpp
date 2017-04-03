@@ -41,7 +41,7 @@ class CGXDLMSRegister : public CGXDLMSObject
     void Init();
 protected:
     CGXDLMSVariant m_Value;
-    char m_Scaler;
+    signed char m_Scaler;
     unsigned char m_Unit;
 
     //SN Constructor.

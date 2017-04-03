@@ -41,7 +41,7 @@ class CGXDLMSDemandRegister : public CGXDLMSObject
 {
     CGXDLMSVariant m_CurrentAvarageValue;
     CGXDLMSVariant m_LastAvarageValue;
-    char m_Scaler;
+    signed char m_Scaler;
     unsigned char m_Unit;
     CGXDLMSVariant m_Status;
     CGXDateTime m_CaptureTime;

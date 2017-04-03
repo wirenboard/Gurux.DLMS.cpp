@@ -109,7 +109,7 @@ double CGXDLMSDemandRegister::GetScaler()
 
 void CGXDLMSDemandRegister::SetScaler(double value)
 {
-    m_Scaler = (unsigned char)log10(value);
+    m_Scaler = (signed char)log10(value);
 }
 
 // Unit of COSEM Register object.
