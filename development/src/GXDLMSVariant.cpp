@@ -386,7 +386,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
                     tmp2.SetUInt8(val);
                     pBuff = ++ch;
                 }
-                }
+            }
             if (tmp2.GetSize() == 0)
             {
                 item->Add(pBuff, (unsigned long)tmp.strVal.size());
@@ -402,12 +402,12 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
                     tmp2.SetUInt8(val);
                 }
                 item->Add(tmp2.GetData(), item->size);
-                }
+            }
             item->vt = type;
             return DLMS_ERROR_CODE_OK;
-            }
+        }
         return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
-            }
+    }
     int fromSize = tmp.GetSize();
     int toSize = GetSize(type);
     //If we try to change bigger valut to smaller check that value is not too big.
@@ -435,7 +435,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
     }
     item->vt = type;
     return DLMS_ERROR_CODE_OK;
-        }
+}
 
 void CGXDLMSVariant::Clear()
 {
@@ -1357,10 +1357,10 @@ int CGXDLMSVariant::ToInteger()
             assert(0);
         }
         return val;
-        }
+    }
     assert(0);
     return 0;
-    }
+}
 
 double CGXDLMSVariant::ToDouble()
 {
@@ -1477,6 +1477,14 @@ int CGXDLMSVariant::GetBytes(CGXByteBuffer& value)
     else if (vt == DLMS_DATA_TYPE_STRING)
     {
         value.AddString(strVal.c_str());
+    }
+    else if (vt == DLMS_DATA_TYPE_FLOAT32)
+    {
+        value.SetFloat(fltVal);
+    }
+    else if (vt == DLMS_DATA_TYPE_FLOAT64)
+    {
+        value.SetDouble(dblVal);
     }
     else
     {
