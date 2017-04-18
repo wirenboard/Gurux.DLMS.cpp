@@ -119,8 +119,6 @@ public:
      *            Received data.
      * @param forComplete
      *            Is frame complete.
-     * @param err
-     *            Received error ID.
      */
     CGXReplyData(
         DLMS_DATA_REQUEST_TYPES more,

@@ -767,7 +767,7 @@ int CGXDLMSAssociationLogicalName::SetValue(CGXDLMSSettings& settings, CGXDLMSVa
     {
         if (e.GetValue().vt == DLMS_DATA_TYPE_STRUCTURE)
         {
-            m_XDLMSContextInfo.SetConformance(e.GetValue().Arr[0].ToString());
+            m_XDLMSContextInfo.SetConformance((DLMS_CONFORMANCE)e.GetValue().Arr[0].ToInteger());
             m_XDLMSContextInfo.SetMaxReceivePduSize(e.GetValue().Arr[1].ToInteger());
             m_XDLMSContextInfo.SetMaxSendPpuSize(e.GetValue().Arr[2].ToInteger());
             m_XDLMSContextInfo.SetDlmsVersionNumber(e.GetValue().Arr[3].ToInteger());

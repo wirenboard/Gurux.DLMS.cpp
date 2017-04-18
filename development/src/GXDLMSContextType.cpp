@@ -36,11 +36,11 @@
 #include "../include/GXDLMSVariant.h"
 #include "../include/GXHelpers.h"
 
-std::string CGXDLMSContextType::GetConformance()
+DLMS_CONFORMANCE CGXDLMSContextType::GetConformance()
 {
     return m_Conformance;
 }
-void CGXDLMSContextType::SetConformance(std::string value)
+void CGXDLMSContextType::SetConformance(DLMS_CONFORMANCE value)
 {
     m_Conformance = value;
 }
@@ -93,7 +93,7 @@ void CGXDLMSContextType::SetCypheringInfo(CGXByteBuffer& value)
 std::string CGXDLMSContextType::ToString()
 {
     CGXByteBuffer bb;
-    bb.AddString(m_Conformance.c_str());
+    bb.AddIntAsString(m_Conformance);
     bb.SetInt8(' ');
     bb.AddIntAsString(m_MaxReceivePduSize);
     bb.SetInt8(' ');

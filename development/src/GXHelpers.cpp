@@ -110,7 +110,7 @@ static int GetArray(CGXByteBuffer& buff, CGXDataInfo& info, int index, CGXDLMSVa
 int GetTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 {
     int ret;
-    unsigned char ch, hour, minute, second, ms;
+    unsigned char hour, minute, second, ms;
     if (buff.GetSize() - buff.GetPosition() < 4)
     {
         // If there is not enough data available.
@@ -118,26 +118,22 @@ int GetTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         return 0;
     }
     // Get time.
-    if ((ret = buff.GetUInt8(&ch)) != 0)
+    if ((ret = buff.GetUInt8(&hour)) != 0)
     {
         return ret;
     }
-    hour = ch;
-    if ((ret = buff.GetUInt8(&ch)) != 0)
+    if ((ret = buff.GetUInt8(&minute)) != 0)
     {
         return ret;
     }
-    minute = ch;
-    if ((ret = buff.GetUInt8(&ch)) != 0)
+    if ((ret = buff.GetUInt8(&second)) != 0)
     {
         return ret;
     }
-    second = ch;
-    if ((ret = buff.GetUInt8(&ch)) != 0)
+    if ((ret = buff.GetUInt8(&ms)) != 0)
     {
         return ret;
     }
-    ms = ch;
     CGXTime dt(hour, minute, second, ms);
     value = dt;
     return 0;

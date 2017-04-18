@@ -119,6 +119,13 @@ private:
         CGXDLMSSettings& settings,
         CGXReplyData& reply,
         int index);
+
+    static int HandledGloRequest(CGXDLMSSettings& settings,
+        CGXReplyData& data);
+
+    static int HandledGloResponse(
+        CGXDLMSSettings& settings,
+        CGXReplyData& data, int index);
 public:
 
     /////////////////////////////////////////////////////////////////////////////
@@ -175,7 +182,6 @@ public:
         CGXDLMSSettings& settings,
         CGXByteBuffer& data,
         CGXByteBuffer& reply);
-
 
     /**
     * Get next logical name PDU.

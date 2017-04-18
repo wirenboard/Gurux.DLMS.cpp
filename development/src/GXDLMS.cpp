@@ -1166,7 +1166,7 @@ int CGXDLMS::GetHdlcData(
         data.SetPacketLength(reply.GetPosition() + 1);
     }
 
-    if ((frame & HDLC_FRAME_TYPE_U_FRAME) == HDLC_FRAME_TYPE_U_FRAME)
+    if (frame != 0x13 && (frame & HDLC_FRAME_TYPE_U_FRAME) == HDLC_FRAME_TYPE_U_FRAME)
     {
         // Get Eop if there is no data.
         if (reply.GetPosition() == packetStartID + frameLen + 1)
@@ -1183,7 +1183,7 @@ int CGXDLMS::GetHdlcData(
         }
         data.SetCommand((DLMS_COMMAND)frame);
     }
-    else if ((frame & HDLC_FRAME_TYPE_S_FRAME) == HDLC_FRAME_TYPE_S_FRAME)
+    else if (frame != 0x13 && (frame & HDLC_FRAME_TYPE_S_FRAME) == HDLC_FRAME_TYPE_S_FRAME)
     {
         // If S-frame
         int tmp = (frame >> 2) & 0x3;
@@ -1660,6 +1660,65 @@ int CGXDLMS::HandleGbt(CGXDLMSSettings& settings, CGXReplyData& data)
     return ret;
 }
 
+int CGXDLMS::HandledGloRequest(CGXDLMSSettings& settings,
+    CGXReplyData& data)
+{
+    if (settings.GetCipher() == NULL)
+    {
+        //Secure connection is not supported.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    DLMS_SECURITY security;
+    //If all frames are read.
+    if ((data.GetMoreData() & DLMS_DATA_REQUEST_TYPES_FRAME) == 0)
+    {
+        int ret;
+        unsigned char ch;
+        data.GetData().SetPosition(data.GetData().GetPosition() - 1);
+        if ((ret = settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(), data.GetData(), security)) != 0)
+        {
+            return ret;
+        }
+        // Get command.
+        data.GetData().GetUInt8(&ch);
+        data.SetCommand((DLMS_COMMAND)ch);
+    }
+    else
+    {
+        data.GetData().SetPosition(data.GetData().GetPosition() - 1);
+    }
+    return 0;
+}
+
+int CGXDLMS::HandledGloResponse(
+    CGXDLMSSettings& settings,
+    CGXReplyData& data, int index)
+{
+    if (settings.GetCipher() == NULL)
+    {
+        //Secure connection is not supported.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    //If all frames are read.
+    if ((data.GetMoreData() & DLMS_DATA_REQUEST_TYPES_FRAME) == 0)
+    {
+        DLMS_SECURITY security;
+        data.GetData().SetPosition(data.GetData().GetPosition() - 1);
+        CGXByteBuffer bb;
+        CGXByteBuffer& tmp = data.GetData();
+        bb.Set(&tmp, data.GetData().GetPosition(), data.GetData().GetSize() - data.GetData().GetPosition());
+        data.GetData().SetPosition(index);
+        data.GetData().SetSize(index);
+        settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(), bb, security);
+        data.GetData().Set(&bb);
+        data.SetCommand(DLMS_COMMAND_NONE);
+        GetPdu(settings, data);
+        data.SetCipherIndex(data.GetData().GetSize());
+    }
+    return 0;
+}
+
+
 int CGXDLMS::GetPdu(
     CGXDLMSSettings& settings,
     CGXReplyData& data)
@@ -1804,6 +1863,16 @@ int CGXDLMS::GetPdu(
                 data.SetCipherIndex((unsigned short)data.GetData().GetSize());
             }
             break;
+        case DLMS_COMMAND_GLO_GENERAL_CIPHERING:
+            if (settings.IsServer())
+            {
+                HandledGloRequest(settings, data);
+            }
+            else
+            {
+                HandledGloResponse(settings, data, index);
+            }
+            break;
         case DLMS_COMMAND_DATA_NOTIFICATION:
             ret = HandleDataNotification(settings, data);
             // Client handles this.
@@ -1908,13 +1977,13 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     // If all data is not read yet.
-    if (!data.IsComplete())
+    if (!data.IsComplete())\
     {
         return DLMS_ERROR_CODE_FALSE;
     }
     GetDataFromFrame(reply, data);
     // If keepalive or get next frame request.
-    if ((frame & 0x1) != 0)
+    if (frame != 0x13 && (frame & 0x1) != 0)
     {
         if (settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC && data.GetData().GetSize() != 0)
         {

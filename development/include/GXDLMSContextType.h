@@ -41,7 +41,7 @@
 class CGXDLMSContextType
 {
 private:
-    std::string m_Conformance;
+    DLMS_CONFORMANCE m_Conformance;
     int m_MaxReceivePduSize;
     int m_MaxSendPpuSize;
     int m_DlmsVersionNumber;
@@ -49,8 +49,20 @@ private:
     CGXByteBuffer m_CypheringInfo;
 
 public:
-    std::string GetConformance();
-    void SetConformance(std::string value);
+
+    /**
+    * Server will tell what functionality is available for the client.
+    * @return Available functionality.
+    */
+    DLMS_CONFORMANCE GetConformance();
+
+    /**
+    * Server will tell what functionality is available for the client.
+    *
+    * @param value
+    *            Available functionality.
+    */
+    void SetConformance(DLMS_CONFORMANCE value);
 
     int GetMaxPduSize();
     void SetMaxReceivePduSize(int value);
