@@ -785,7 +785,7 @@ int CGXDLMS::GetLnMessages(
                 ret = GetHdlcFrame(*p.GetSettings(), frame, &reply, tmp);
                 if (ret == 0 && reply.GetPosition() != reply.GetSize())
                 {
-                    if (p.GetSettings()->IsServer)
+                    if (p.GetSettings()->IsServer())
                     {
                         frame = 0;
                     }
@@ -1023,7 +1023,7 @@ int CGXDLMS::GetSnMessages(
                 ret = GetHdlcFrame(*p.GetSettings(), frame, &data, reply);
                 if (data.GetPosition() != data.GetSize())
                 {
-                    if (p.GetSettings()->IsServer)
+                    if (p.GetSettings()->IsServer())
                     {
                         frame = 0;
                     }
@@ -1733,7 +1733,7 @@ int CGXDLMS::HandledGloResponse(
         data.GetData().Set(&bb);
         data.SetCommand(DLMS_COMMAND_NONE);
         GetPdu(settings, data);
-        data.SetCipherIndex(data.GetData().GetSize());
+        data.SetCipherIndex((unsigned short)data.GetData().GetSize());
     }
     return 0;
 }
