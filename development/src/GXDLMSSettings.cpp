@@ -195,10 +195,17 @@ static unsigned char IncreaseSendSequence(unsigned char value)
     return (unsigned char)((value & 0xF0) | ((value + 0x2) & 0xE));
 }
 
-unsigned char CGXDLMSSettings::GetNextSend()
+unsigned char CGXDLMSSettings::GetNextSend(unsigned char first)
 {
-    m_SenderFrame = IncreaseReceiverSequence(IncreaseSendSequence((unsigned char)m_SenderFrame));
-    return (unsigned char)m_SenderFrame;
+    if (first)
+    {
+        m_SenderFrame = IncreaseReceiverSequence(IncreaseSendSequence(m_SenderFrame));
+    }
+    else
+    {
+        m_SenderFrame = IncreaseSendSequence(m_SenderFrame);
+    }
+    return m_SenderFrame;
 }
 
 unsigned char CGXDLMSSettings::GetReceiverReady()

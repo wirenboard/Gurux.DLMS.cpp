@@ -204,7 +204,7 @@ public:
     bool CheckFrame(unsigned char frame);
 
     // Generates I-frame.
-    unsigned char GetNextSend();
+    unsigned char GetNextSend(unsigned char first);
 
     // Generates Receiver Ready S-frame.
     unsigned char GetReceiverReady();

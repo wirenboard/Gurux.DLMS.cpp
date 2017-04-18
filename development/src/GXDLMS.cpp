@@ -323,15 +323,15 @@ int CGXDLMS::GetHdlcFrame(
     }
     else if (data->GetSize() - data->GetPosition() <= frameSize)
     {
-        // Is last packet.
-        reply.SetUInt8(0xA0);
         len = data->GetSize() - data->GetPosition();
+        // Is last packet.
+        reply.SetUInt8(0xA0 | (len >> 8) & 0x7);
     }
     else
     {
-        // More data to left.
-        reply.SetUInt8(0xA8);
         len = frameSize;
+        // More data to left.
+        reply.SetUInt8(0xA8 | (len >> 8) & 0x7);
     }
     // Frame len.
     if (len == 0)
@@ -352,7 +352,7 @@ int CGXDLMS::GetHdlcFrame(
     // Add frame ID.
     if (frame == 0)
     {
-        reply.SetUInt8(settings.GetNextSend());
+        reply.SetUInt8(settings.GetNextSend(1));
     }
     else
     {
@@ -783,7 +783,17 @@ int CGXDLMS::GetLnMessages(
             else
             {
                 ret = GetHdlcFrame(*p.GetSettings(), frame, &reply, tmp);
-                frame = 0;
+                if (ret == 0 && reply.GetPosition() != reply.GetSize())
+                {
+                    if (p.GetSettings()->IsServer)
+                    {
+                        frame = 0;
+                    }
+                    else
+                    {
+                        frame = p.GetSettings()->GetNextSend(0);
+                    }
+                }
             }
             if (ret != 0)
             {
@@ -996,7 +1006,7 @@ int CGXDLMS::GetSnMessages(
     }
     else if (p.GetCommand() == DLMS_COMMAND_NONE)
     {
-        frame = p.GetSettings()->GetNextSend();
+        frame = p.GetSettings()->GetNextSend(1);
     }
     do
     {
@@ -1011,7 +1021,17 @@ int CGXDLMS::GetSnMessages(
             else
             {
                 ret = GetHdlcFrame(*p.GetSettings(), frame, &data, reply);
-                frame = 0;
+                if (data.GetPosition() != data.GetSize())
+                {
+                    if (p.GetSettings()->IsServer)
+                    {
+                        frame = 0;
+                    }
+                    else
+                    {
+                        frame = p.GetSettings()->GetNextSend(0);
+                    }
+                }
             }
             if (ret != 0)
             {
