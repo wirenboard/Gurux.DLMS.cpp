@@ -73,7 +73,6 @@ class CGXDateTime
     bool m_DaylightSavingsEnd;
     DLMS_CLOCK_STATUS m_Status;
     void Init(int year, int month, int day, int hour, int minute, int second, int millisecond, int devitation);
-    unsigned char DaysInMonth(int year, short month);
 public:
     // Constructor.
     CGXDateTime();
@@ -143,5 +142,22 @@ public:
     * Compare current time to another time.
     */
     int CompareTo(CGXDateTime& antherDate);
+
+    /**
+    * Get amount of days in given month.
+    */
+    static unsigned char DaysInMonth(int year, short month);
+
+
+    /**
+    * Get difference between given time and run time in ms.
+    *
+    * @param start
+    *            Start date time.
+    * @param to
+    *            Compared time.
+    * @return Difference in milliseconds.
+    */
+    static long GetDifference(struct tm& start, CGXDateTime& to);
 };
 #endif //GXDATETIME_H

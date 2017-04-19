@@ -542,3 +542,105 @@ int CGXDateTime::CompareTo(CGXDateTime& antherDate)
     }
     return 0;
 }
+
+long CGXDateTime::GetDifference(struct tm& start, CGXDateTime& to)
+{
+    long diff = 0;
+    // Compare seconds.
+    if ((to.GetSkip() & DATETIME_SKIPS_SECOND) != 0)
+    {
+        if (start.tm_sec < to.m_Value.tm_sec)
+        {
+            diff += (to.m_Value.tm_sec - start.tm_sec) * 1000L;
+        }
+        else
+        {
+            diff -= (start.tm_sec - to.m_Value.tm_sec) * 1000L;
+        }
+    }
+    else if (diff < 0)
+    {
+        diff = 60000 + diff;
+    }
+    // Compare minutes.
+    if ((to.GetSkip() & DATETIME_SKIPS_MINUTE) != 0)
+    {
+        if (start.tm_min < to.m_Value.tm_min)
+        {
+            diff += (to.m_Value.tm_min - start.tm_min) * 60000L;
+        }
+        else
+        {
+            diff -= (start.tm_min - to.m_Value.tm_min) * 60000L;
+        }
+    }
+    else if (diff < 0)
+    {
+        diff = 60 * 60000 + diff;
+    }
+    // Compare hours.
+    if ((to.GetSkip() & DATETIME_SKIPS_HOUR) != 0)
+    {
+        if (start.tm_hour < to.m_Value.tm_hour)
+        {
+            diff += (to.m_Value.tm_hour - start.tm_hour) * 60 * 60000L;
+        }
+        else
+        {
+            diff -= (start.tm_hour - to.m_Value.tm_hour) * 60 * 60000L;
+        }
+    }
+    else if (diff < 0)
+    {
+        diff = 60 * 60000 + diff;
+    }
+    // Compare days.
+    if ((to.GetSkip() & DATETIME_SKIPS_DAY) != 0)
+    {
+        if (start.tm_mday < to.m_Value.tm_mday)
+        {
+            diff += (to.m_Value.tm_mday - start.tm_mday) * 24 * 60 * 60000;
+        }
+        else if (start.tm_mday != to.m_Value.tm_mday)
+        {
+            if ((to.GetSkip() & DATETIME_SKIPS_DAY) == 0)
+            {
+                diff += (to.m_Value.tm_mday - start.tm_mday) * 24 * 60 * 60000L;
+            }
+            else {
+                diff = ((DaysInMonth(start.tm_year,
+                    start.tm_mon)
+                    - start.tm_mday
+                    + to.m_Value.tm_mday) * 24
+                    * 60 * 60000L) + diff;
+            }
+        }
+    }
+    else if (diff < 0)
+    {
+        diff = 24 * 60 * 60000 + diff;
+    }
+    // Compare months.
+    if ((to.GetSkip() & DATETIME_SKIPS_MONTH) != 0)
+    {
+        if (start.tm_mon < to.m_Value.tm_mon)
+        {
+            for (int m = start.tm_mon; m != to.m_Value.tm_mon; ++m)
+            {
+                diff += DaysInMonth(start.tm_year, m) * 24 * 60 * 60000L;
+            }
+        }
+        else
+        {
+            for (int m = to.m_Value.tm_mon; m != start.tm_mon; ++m)
+            {
+                diff += -DaysInMonth(start.tm_year, m) * 24 * 60 * 60000L;
+            }
+        }
+    }
+    else if (diff < 0)
+    {
+        diff = DaysInMonth(start.tm_year, start.tm_mon) * 24 * 60 * 60000L + diff;
+    }
+    return diff;
+}

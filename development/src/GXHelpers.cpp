@@ -338,7 +338,7 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     }
     else if (tm.tm_mday < 0)
     {
-        //TODO: day = cal.GetActualMaximum(Calendar.DATE) + day + 3;
+        tm.tm_mday = CGXDateTime::DaysInMonth(year, tm.tm_mon + 1) + tm.tm_mday + 3;
     }
     if (tm.tm_hour < 0 || tm.tm_hour > 24)
     {

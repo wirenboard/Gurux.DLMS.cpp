@@ -46,19 +46,34 @@ public:
     // Constructor.
     CGXDate() : CGXDateTime()
     {
+        SetSkip((DATETIME_SKIPS)(DATETIME_SKIPS_HOUR | DATETIME_SKIPS_MINUTE | DATETIME_SKIPS_SECOND | DATETIME_SKIPS_MS));
     };
 
     // Constructor.
     CGXDate(struct tm value) : CGXDateTime(value)
     {
-
+        SetSkip((DATETIME_SKIPS)(DATETIME_SKIPS_HOUR | DATETIME_SKIPS_MINUTE | DATETIME_SKIPS_SECOND | DATETIME_SKIPS_MS));
     }
 
     // Constructor.
     CGXDate(int year, int month, int day) :
         CGXDateTime(year, month, day, -1, -1, -1, -1)
     {
+        SetSkip((DATETIME_SKIPS)(DATETIME_SKIPS_HOUR | DATETIME_SKIPS_MINUTE | DATETIME_SKIPS_SECOND | DATETIME_SKIPS_MS));
+    }
 
+    /**
+    * Constructor.
+    *
+    * @param forvalue
+    *            Date value.
+    */
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    CGXDate(CGXDateTime& value) : CGXDateTime(value.GetValue())
+    {
+        SetSkip((DATETIME_SKIPS)(value.GetSkip() | DATETIME_SKIPS_HOUR | DATETIME_SKIPS_MINUTE | DATETIME_SKIPS_SECOND | DATETIME_SKIPS_MS));
     }
 };
 #endif //GXDATE_H

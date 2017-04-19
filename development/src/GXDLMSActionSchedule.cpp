@@ -238,14 +238,18 @@ int CGXDLMSActionSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
         CGXByteBuffer bb;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         GXHelpers::SetObjectCount((unsigned long)GetExecutionTime().size(), bb);
-        CGXDLMSVariant val;
+        CGXDLMSVariant val1, val2;
         for (std::vector<CGXDateTime>::iterator it = m_ExecutionTime.begin(); it != m_ExecutionTime.end(); ++it)
         {
             data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
-            data.SetUInt8(2); //Count
-            val = *it;
-            if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_TIME, val)) != 0 || //Time
-                (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_DATE, val)) != 0) //Date
+            //Count
+            data.SetUInt8(2);
+            CGXTime t(*it);
+            CGXDate d(*it);
+            val1 = t;
+            val2 = d;
+            if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_OCTET_STRING, val1)) != 0 ||
+                (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_OCTET_STRING, val2)) != 0)
             {
                 return ret;
             }
