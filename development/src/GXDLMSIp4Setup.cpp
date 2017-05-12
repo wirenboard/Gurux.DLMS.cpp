@@ -339,17 +339,17 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
             return ret;
         }
         e.SetValue(tmp);
-        return DLMS_ERROR_CODE_OK;
     }
     else if (e.GetIndex() == 2)
     {
-        e.SetValue(m_DataLinkLayerReference);
+        CGXDLMSVariant tmp;
+        GXHelpers::SetLogicalName(m_DataLinkLayerReference.c_str(), tmp);
+        e.SetValue(tmp);
     }
     else if (e.GetIndex() == 3)
     {
         if (m_IPAddress.size() == 0)
         {
-            e.SetValue(0);
             return 0;
         }
         struct sockaddr_in add;
@@ -365,7 +365,6 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
             add.sin_addr = *(in_addr*)(void*)Hostent->h_addr_list[0];
         };
         e.SetValue((unsigned long)add.sin_addr.s_addr);
-        return DLMS_ERROR_CODE_OK;
     }
     else if (e.GetIndex() == 4)
     {
@@ -451,9 +450,8 @@ int CGXDLMSIp4Setup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         }
         else
         {
-            CGXDLMSVariant tmp;
-            CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_OCTET_STRING, tmp);
-            m_DataLinkLayerReference = tmp.ToString();
+            m_DataLinkLayerReference.clear();
+            GXHelpers::GetLogicalName(e.GetValue().byteArr, m_DataLinkLayerReference);
         }
     }
     else if (e.GetIndex() == 3)
@@ -461,8 +459,11 @@ int CGXDLMSIp4Setup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         long tmp = e.GetValue().ToInteger();
         CGXByteBuffer bb;
         bb.AddIntAsString(tmp & 0xFF);
+        bb.SetInt8('.');
         bb.AddIntAsString((tmp >> 8) & 0xFF);
+        bb.SetInt8('.');
         bb.AddIntAsString((tmp >> 16) & 0xFF);
+        bb.SetInt8('.');
         bb.AddIntAsString((tmp >> 24) & 0xFF);
         m_IPAddress = bb.ToString();
     }
@@ -488,7 +489,7 @@ int CGXDLMSIp4Setup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
                 item.SetType((IP_OPTION_TYPE)it->Arr[0].ToInteger());
                 item.SetLength(it->Arr[1].ToInteger());
                 CGXByteBuffer tmp;
-                tmp.Set(it->Arr[0].byteArr, it->Arr[0].size);
+                tmp.Set(it->Arr[2].byteArr, it->Arr[2].size);
                 item.SetData(tmp);
                 m_IPOptions.push_back(item);
             }

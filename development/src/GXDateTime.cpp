@@ -40,11 +40,43 @@
 #include <vector>
 #include <assert.h>
 
+//Get UTC offset in minutes.
+void GetUtcOffset(int& hours, int& minutes)
+{
+    time_t zero = 24 * 60 * 60L;
+    struct tm tm;
+
+    // local time for Jan 2, 1900 00:00 UTC
+#if _MSC_VER > 1000
+    localtime_s(&tm, &zero);
+#else
+    tm = *localtime(&zero);
+#endif
+    hours = tm.tm_hour;
+
+    //If the local time is the "day before" the UTC, subtract 24 hours from the hours to get the UTC offset
+    if (tm.tm_mday < 2)
+    {
+        hours -= 24;
+    }
+    minutes = tm.tm_min;
+}
+
+static time_t GetUtcTime(struct tm * timeptr)
+{
+    /* gets the epoch time relative to the local time zone,
+    and then adds the appropriate number of seconds to make it UTC */
+    int hours, minutes;
+    GetUtcOffset(hours, minutes);
+    return mktime(timeptr) + (hours * 3600) + (minutes * 60);
+}
+
+
 // Constructor.
 CGXDateTime::CGXDateTime()
 {
     int hours, minutes;
-    GXHelpers::GetUtcOffset(hours, minutes);
+    GetUtcOffset(hours, minutes);
     m_Deviation = -(hours * 60 + minutes);
     m_Skip = DATETIME_SKIPS_NONE;
     memset(&m_Value, 0xFF, sizeof(m_Value));
@@ -56,7 +88,7 @@ CGXDateTime::CGXDateTime()
 CGXDateTime::CGXDateTime(struct tm value)
 {
     int hours, minutes;
-    GXHelpers::GetUtcOffset(hours, minutes);
+    GetUtcOffset(hours, minutes);
     m_Deviation = -(hours * 60 + minutes);
     m_Value = value;
     m_Skip = DATETIME_SKIPS_NONE;
@@ -67,7 +99,7 @@ CGXDateTime::CGXDateTime(struct tm value)
 CGXDateTime::CGXDateTime(int year, int month, int day, int hour, int minute, int second, int millisecond)
 {
     int hours, minutes;
-    GXHelpers::GetUtcOffset(hours, minutes);
+    GetUtcOffset(hours, minutes);
     Init(year, month, day, hour, minute, second, millisecond, -(hours * 60 + minutes));
 }
 
@@ -541,6 +573,25 @@ int CGXDateTime::CompareTo(CGXDateTime& antherDate)
         return 1;
     }
     return 0;
+}
+
+int CGXDateTime::ToLocalTime(struct tm& localTime)
+{
+    localTime = m_Value;
+    if (m_Deviation != -32768)//0x8000
+    {
+        localTime.tm_min += m_Deviation;
+        time_t t = GetUtcTime(&localTime);
+        if (t == -1)
+        {
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+#if _MSC_VER > 1000
+        localtime_s(&localTime, &t);
+#else
+        localTime = *localtime(&t);
+#endif
+    }
 }
 
 long CGXDateTime::GetDifference(struct tm& start, CGXDateTime& to)

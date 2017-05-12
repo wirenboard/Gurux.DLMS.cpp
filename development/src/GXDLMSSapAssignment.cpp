@@ -164,13 +164,16 @@ int CGXDLMSSapAssignment::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
         if (cnt != 0)
         {
             CGXDLMSVariant f, s;
+            CGXByteBuffer bb;
             for (std::map<int, std::string >::iterator it = m_SapAssignmentList.begin();
                 it != m_SapAssignmentList.end(); ++it)
             {
                 data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
                 data.SetUInt8(2); //Count
                 f = it->first;
-                s = it->second;
+                bb.Clear();
+                bb.AddString(it->second);
+                s = bb;
                 if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, f)) != 0 ||
                     (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, s)) != 0)
                 {

@@ -370,39 +370,9 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
         }
         if (type == DLMS_DATA_TYPE_OCTET_STRING)
         {
-            char* pBuff = (char*)tmp.strVal.c_str();
-            char* ch;
-            int val = 0;
             CGXByteBuffer tmp2;
-            while ((ch = strchr(pBuff, '.')) != NULL)
-            {
-                *ch = '\0';
-#if _MSC_VER > 1000
-                if (sscanf_s(pBuff, "%d", &val) == 1)
-#else
-                if (sscanf(pBuff, "%d", &val) == 1)
-#endif
-                {
-                    tmp2.SetUInt8(val);
-                    pBuff = ++ch;
-                }
-            }
-            if (tmp2.GetSize() == 0)
-            {
-                item->Add(pBuff, (unsigned long)tmp.strVal.size());
-            }
-            else
-            {
-#if _MSC_VER > 1000
-                if (sscanf_s(pBuff, "%d", &val) == 1)
-#else
-                if (sscanf(pBuff, "%d", &val) == 1)
-#endif
-                {
-                    tmp2.SetUInt8(val);
-                }
-                item->Add(tmp2.GetData(), item->size);
-            }
+            GXHelpers::HexToBytes(tmp.strVal, tmp2);
+            item->Add(tmp2.GetData(), tmp2.GetSize());
             item->vt = type;
             return DLMS_ERROR_CODE_OK;
         }
@@ -453,6 +423,7 @@ void CGXDLMSVariant::Clear()
     }
     vt = DLMS_DATA_TYPE_NONE;
     this->byteArr = NULL;
+    size = 0;
 }
 
 CGXDLMSVariant::CGXDLMSVariant()

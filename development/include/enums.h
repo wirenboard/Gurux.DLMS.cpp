@@ -279,27 +279,27 @@ typedef enum
     /**
      Size of execution_time = 1. Wildcard in date allowed.
     */
-    DLMS_SINGLE_ACTION_SCHEDULE_TYPE1 = 0,
+    DLMS_SINGLE_ACTION_SCHEDULE_TYPE1 = 1,
     /**
      Size of execution_time = n.
      All time values are the same, wildcards in date not allowed.
     */
-    DLMS_SINGLE_ACTION_SCHEDULE_TYPE2 = 1,
+    DLMS_SINGLE_ACTION_SCHEDULE_TYPE2 = 2,
     /**
      Size of execution_time = n.
      All time values are the same, wildcards in date are allowed,
     */
-    DLMS_SINGLE_ACTION_SCHEDULE_TYPE3 = 2,
+    DLMS_SINGLE_ACTION_SCHEDULE_TYPE3 = 3,
     /**
      Size of execution_time = n.
      Time values may be different, wildcards in date not allowed,
     */
-    DLMS_SINGLE_ACTION_SCHEDULE_TYPE4 = 3,
+    DLMS_SINGLE_ACTION_SCHEDULE_TYPE4 = 4,
     /**
      Size of execution_time = n.
      Time values may be different, wildcards in date are allowed
     */
-    DLMS_SINGLE_ACTION_SCHEDULE_TYPE5 = 4
+    DLMS_SINGLE_ACTION_SCHEDULE_TYPE5 = 5
 } DLMS_SINGLE_ACTION_SCHEDULE_TYPE;
 
 typedef enum
@@ -726,7 +726,17 @@ typedef enum
     /**
      * High authentication is used. Password is hashed with GMAC.
      */
-    DLMS_AUTHENTICATION_HIGH_GMAC
+    DLMS_AUTHENTICATION_HIGH_GMAC,
+
+    /**
+    * High authentication is used. Password is hashed with SHA-256.
+    */
+    DLMS_AUTHENTICATION_HIGH_HLS_SHA256,
+
+    /**
+    * High authentication is used. Password is hashed with ECDSA.
+    */
+    DLMS_AUTHENTICATION_HIGH_ECDSA
 } DLMS_AUTHENTICATION;
 
 /**
@@ -1744,4 +1754,29 @@ typedef enum
     */
     IP_OPTION_TYPE_INTERNET_TIMESTAMP = 0x44
 }IP_OPTION_TYPE;
+
+// Enumerates Set response types.
+typedef enum
+{
+    /*
+    * Normal set response.
+    */
+    DLMS_SET_RESPONSE_TYPE_NORMAL = 1,
+    /*
+    * Set response in data blocks.
+    */
+    DLMS_SET_RESPONSE_TYPE_DATA_BLOCK = 2,
+    /*
+    * Set response in last data block.
+    */
+    DLMS_SET_RESPONSE_TYPE_LAST_DATA_BLOCK = 3,
+    /*
+    * Set response in last data block with list.
+    */
+    DLMS_SET_RESPONSE_TYPE_LAST_DATA_BLOCK_WITH_LIST = 4,
+    /*
+    * Set with list response.
+    */
+    DLMS_SET_RESPONSE_TYPE_WITH_LIST = 5
+}DLMS_SET_RESPONSE_TYPE;
 #endif //ENUMS_H

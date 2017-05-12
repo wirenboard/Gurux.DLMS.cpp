@@ -40,7 +40,7 @@
 
 class CGXDLMSRegisterMonitor : public CGXDLMSObject
 {
-    std::vector<CGXDLMSActionSet> m_Actions;
+    std::vector<CGXDLMSActionSet*> m_Actions;
     CGXDLMSMonitoredValue m_MonitoredValue;
     std::vector<CGXDLMSVariant> m_Thresholds;
 
@@ -79,9 +79,7 @@ public:
 
     void SetMonitoredValue(CGXDLMSMonitoredValue& value);
 
-    std::vector<CGXDLMSActionSet>& GetActions();
-
-    void SetActions(std::vector<CGXDLMSActionSet>& value);
+    std::vector<CGXDLMSActionSet*>& GetActions();
 
     // Returns amount of attributes.
     int GetAttributeCount();

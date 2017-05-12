@@ -242,7 +242,9 @@ int CGXDLMSPppSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     if (e.GetIndex() == 2)
     {
-        e.SetValue(m_PHYReference);
+        CGXDLMSVariant tmp;
+        GXHelpers::SetLogicalName(m_PHYReference.c_str(), tmp);
+        e.SetValue(tmp);
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 3)
@@ -318,9 +320,7 @@ int CGXDLMSPppSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         }
         else
         {
-            CGXDLMSVariant tmp;
-            CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_OCTET_STRING, tmp);
-            m_PHYReference = tmp.ToString();
+            GXHelpers::GetLogicalName(e.GetValue().byteArr, m_PHYReference);
         }
     }
     else if (e.GetIndex() == 3)

@@ -47,13 +47,18 @@ class CGXDLMSScript
     /**
      * Script actions.
      */
-    std::vector<CGXDLMSScriptAction> m_Actions;
+    std::vector<CGXDLMSScriptAction*> m_Actions;
 
 public:
     /**
      * Constructor.
      */
     CGXDLMSScript();
+
+    /**
+    * Destructor.
+    */
+    ~CGXDLMSScript();
 
     /**
      * @return Script identifier.
@@ -69,6 +74,6 @@ public:
     /**
      * @return Script actions.
      */
-    std::vector<CGXDLMSScriptAction>& GetActions();
+    std::vector<CGXDLMSScriptAction*>& GetActions();
 };
 #endif //GXDLMSSCRIPT_H

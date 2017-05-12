@@ -202,10 +202,10 @@ int CGXDLMSRegisterActivation::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
         CGXDLMSVariant id, ln;
         for (std::vector<CGXDLMSObjectDefinition>::iterator it = m_RegisterAssignment.begin(); it != m_RegisterAssignment.end(); ++it)
         {
+            GXHelpers::SetLogicalName(it->GetLogicalName().c_str(), ln);
             data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
             data.SetUInt8(2);
             id = it->GetClassId();
-            ln = it->GetLogicalName();
             if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, id)) != 0 ||
                 (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0)
             {
@@ -217,8 +217,29 @@ int CGXDLMSRegisterActivation::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
     }
     if (e.GetIndex() == 3)
     {
+        int ret;
         e.SetByteArray(true);
-        //TODO: e.SetValue(m_MaskList);
+        data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
+        CGXDLMSVariant tmp;
+        GXHelpers::SetObjectCount((unsigned long)m_MaskList.size(), data);
+        for (std::vector<std::pair<CGXByteBuffer, CGXByteBuffer > >::iterator it = m_MaskList.begin(); it != m_MaskList.end(); ++it)
+        {
+            data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+            data.SetUInt8(2);
+            tmp = it->first;
+            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+            {
+                return ret;
+            }
+            data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
+            GXHelpers::SetObjectCount((unsigned long)it->second.GetSize(), data);
+            for (int pos = 0; pos != it->second.GetSize(); ++pos)
+            {
+                data.SetUInt8(DLMS_DATA_TYPE_UINT8);
+                data.SetUInt8(it->second.GetData()[pos]);
+            }
+        }
+        e.SetValue(data);
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 4)
@@ -262,14 +283,17 @@ int CGXDLMSRegisterActivation::SetValue(CGXDLMSSettings& settings, CGXDLMSValueE
             {
                 CGXByteBuffer key, arr;
                 key.Set(it->Arr[0].byteArr, it->Arr[0].size);
-                arr.Set(it->Arr[1].byteArr, it->Arr[1].size);
+                for (std::vector<CGXDLMSVariant>::iterator v = it->Arr[1].Arr.begin(); v != it->Arr[1].Arr.end(); ++v)
+                {
+                    arr.SetUInt8(v->ToInteger());
+                }
                 m_MaskList.push_back(std::pair<CGXByteBuffer, CGXByteBuffer>(key, arr));
             }
         }
     }
     else if (e.GetIndex() == 4)
     {
-        m_ActiveMask.Set(&e.GetValue().byteArr, e.GetValue().size);
+        m_ActiveMask.Set(e.GetValue().byteArr, e.GetValue().size);
     }
     else
     {

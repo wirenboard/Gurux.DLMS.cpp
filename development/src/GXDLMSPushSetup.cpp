@@ -363,18 +363,19 @@ int CGXDLMSPushSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
     }
     else if (e.GetIndex() == 2)
     {
-        CGXDLMSVariant ln;
+        std::string ln;
         m_PushObjectList.clear();
         if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
             for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 DLMS_OBJECT_TYPE type = (DLMS_OBJECT_TYPE)it->Arr[0].ToInteger();
-                CGXDLMSClient::ChangeType(it->Arr[1], DLMS_DATA_TYPE_OCTET_STRING, ln);
-                CGXDLMSObject* obj = settings.GetObjects().FindByLN(type, ln.strVal);
+                GXHelpers::GetLogicalName(it->Arr[1].byteArr, ln);
+                CGXDLMSObject* obj = settings.GetObjects().FindByLN(type, ln);
                 if (obj == NULL)
                 {
                     obj = CGXDLMSObjectFactory::CreateObject(type);
+                    CGXDLMSObject::SetLogicalName(obj, it->Arr[1]);
                 }
                 CGXDLMSCaptureObject co(it->Arr[2].ToInteger(), it->Arr[3].ToInteger());
                 m_PushObjectList.push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject>(obj, co));
@@ -383,7 +384,7 @@ int CGXDLMSPushSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
     }
     else if (e.GetIndex() == 3)
     {
-        if (e.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
+        if (e.GetValue().vt == DLMS_DATA_TYPE_STRUCTURE)
         {
             SetService((DLMS_SERVICE_TYPE)e.GetValue().Arr[0].ToInteger());
             std::string str;

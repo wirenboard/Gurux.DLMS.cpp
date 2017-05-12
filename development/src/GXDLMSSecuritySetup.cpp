@@ -202,11 +202,13 @@ int CGXDLMSSecuritySetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     }
     else if (e.GetIndex() == 2)
     {
-        e.SetValue(m_SecurityPolicy);
+        CGXDLMSVariant tmp = m_SecurityPolicy;
+        e.SetValue(tmp);
     }
     else if (e.GetIndex() == 3)
     {
-        e.SetValue(m_SecuritySuite);
+        CGXDLMSVariant tmp = m_SecuritySuite;
+        e.SetValue(tmp);
     }
     else if (e.GetIndex() == 4)
     {

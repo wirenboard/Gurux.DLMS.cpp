@@ -689,8 +689,7 @@ int CGXDLMS::GetLNPdu(
 
                 if (totalLength > p.GetSettings()->GetMaxPduSize())
                 {
-                    len = p.GetSettings()->GetMaxPduSize() - reply.GetSize()
-                        - p.GetData()->GetPosition();
+                    len = p.GetSettings()->GetMaxPduSize() - reply.GetSize();
                     if (ciphering)
                     {
                         len -= CIPHERING_HEADER_SIZE;
@@ -1560,21 +1559,21 @@ int CGXDLMS::HandleSetResponse(
     CGXDLMSSettings& settings,
     CGXReplyData& data)
 {
-    unsigned char ch;
+    unsigned char ch, type, invokeId;
     int ret;
-    if ((ret = data.GetData().GetUInt8(&ch)) != 0)
+    if ((ret = data.GetData().GetUInt8(&type)) != 0)
     {
         return ret;
     }
-    //SetResponseNormal
-    if (ch == 1)
+    //Invoke ID and priority.
+    if ((ret = data.GetData().GetUInt8(&invokeId)) != 0)
     {
-        //Invoke ID and priority.
-        if ((ret = data.GetData().GetUInt8(&ch)) != 0)
-        {
-            return ret;
-        }
+        return ret;
+    }
 
+    // SetResponseNormal
+    if (type == DLMS_SET_RESPONSE_TYPE_NORMAL)
+    {
         if ((ret = data.GetData().GetUInt8(&ch)) != 0)
         {
             return ret;
@@ -1583,6 +1582,19 @@ int CGXDLMS::HandleSetResponse(
         {
             return ch;
         }
+    }
+    else if (type == DLMS_SET_RESPONSE_TYPE_DATA_BLOCK || type == DLMS_SET_RESPONSE_TYPE_LAST_DATA_BLOCK)
+    {
+        unsigned long  tmp;
+        if ((ret = data.GetData().GetUInt32(&tmp)) != 0)
+        {
+            return ret;
+        }
+    }
+    else
+    {
+        //Invalid data type.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     return DLMS_ERROR_CODE_OK;
 }
@@ -2007,7 +2019,9 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
     {
         if (settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC && data.GetData().GetSize() != 0)
         {
-            reply.SetPosition(reply.GetPosition() + 3);
+            if (reply.GetPosition() != reply.GetSize()) {
+                reply.SetPosition(reply.GetPosition() + 3);
+            }
         }
         if (data.GetCommand() == DLMS_COMMAND_REJECTED)
         {

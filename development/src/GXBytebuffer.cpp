@@ -330,6 +330,11 @@ void CGXByteBuffer::AddString(const char* value)
     }
 }
 
+void CGXByteBuffer::AddString(const std::string& value)
+{
+    CGXByteBuffer::Set(value.c_str(), value.length());
+}
+
 void CGXByteBuffer::AttachString(char* value)
 {
     unsigned long len = (unsigned long)strlen(value);

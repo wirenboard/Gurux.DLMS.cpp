@@ -52,15 +52,11 @@ public:
     */
     ~CGXDLMSActionSet()
     {
-//        m_ActionUp.m_LogicalName.clear();
-//        m_ActionDown.m_LogicalName.clear();
     }
 
     CGXDLMSActionItem& GetActionUp();
-    void SetActionUp(CGXDLMSActionItem& value);
 
-    CGXDLMSActionItem GetActionDown();
-    void SetActionDown(CGXDLMSActionItem value);
+    CGXDLMSActionItem& GetActionDown();
 
     std::string ToString();
 };

@@ -163,14 +163,20 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
     case DLMS_OBJECT_TYPE_PUSH_SETUP:
         return new CGXDLMSPushSetup();
     default:
-        return new CGXDLMSCustomObject(type);
+#ifdef _DEBUG
+        printf("Unknown object: %d\r\n", type);
+#endif //_DEBUG
+        return NULL;
     }
 }
 
 CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type, std::string ln)
 {
     CGXDLMSObject* pObj = CreateObject(type);
-    GXHelpers::SetLogicalName(ln.c_str(), pObj->m_LN);
+    if (pObj != NULL)
+    {
+        GXHelpers::SetLogicalName(ln.c_str(), pObj->m_LN);
+    }
     return pObj;
 }
 

@@ -391,6 +391,22 @@ public:
         std::vector<CGXByteBuffer>& reply);
 
     /**
+    * Generates a write message.
+    *
+    * @param pObject
+    *            COSEM object to write.
+    * @param index
+    *            Attribute index where data is write.
+    * @param reply
+    *            Generated write message(s).
+    * Returns error status.
+    */
+    int Write(
+        CGXDLMSObject* pObject,
+        int index,
+        std::vector<CGXByteBuffer>& reply);
+
+    /**
     * Generate Method (Action) request.
     *
     * @param item

@@ -49,7 +49,8 @@ class CGXDLMSServer
 {
     friend class CGXDLMSProfileGeneric;
     friend class CGXDLMSValueEventArg;
-
+    friend class CGXDLMSAssociationLogicalName;
+    friend class CGXDLMSAssociationShortName;
 private:
     CGXReplyData m_Info;
     /**
@@ -214,6 +215,13 @@ private:
     */
     unsigned short GetRowsToPdu(CGXDLMSProfileGeneric* pg);
 
+    /**
+    * Update short names.
+    *
+    * @param force
+    *            Force update.
+    */
+    int UpdateShortNames(bool force);
 protected:
     /**
      * Server Settings.
@@ -387,6 +395,11 @@ protected:
     */
     virtual void PostGet(
         std::vector<CGXDLMSValueEventArg*>& args) = 0;
+
+    /**
+    * Update short names.
+    */
+    int UpdateShortNames();
 
 public:
     /**

@@ -188,37 +188,6 @@ int GetDate(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     return 0;
 }
 
-//Get UTC offset in minutes.
-void GXHelpers::GetUtcOffset(int& hours, int& minutes)
-{
-    time_t zero = 24 * 60 * 60L;
-    struct tm tm;
-
-    // local time for Jan 2, 1900 00:00 UTC
-#if _MSC_VER > 1000
-    localtime_s(&tm, &zero);
-#else
-    tm = *localtime(&zero);
-#endif
-    hours = tm.tm_hour;
-
-    //If the local time is the "day before" the UTC, subtract 24 hours from the hours to get the UTC offset
-    if (tm.tm_mday < 2)
-    {
-        hours -= 24;
-    }
-    minutes = tm.tm_min;
-}
-
-static time_t GetUtcTime(struct tm * timeptr)
-{
-    /* gets the epoch time relative to the local time zone,
-    and then adds the appropriate number of seconds to make it UTC */
-    int hours, minutes;
-    GXHelpers::GetUtcOffset(hours, minutes);
-    return mktime(timeptr) + (hours * 3600) + (minutes * 60);
-}
-
 /**
 * Get date and time from DLMS data.
 *
@@ -361,20 +330,7 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         skip = (DATETIME_SKIPS)(skip | DATETIME_SKIPS_MS);
         ms = 0;
     }
-    if (deviation != -32768)//0x8000
-    {
-        tm.tm_min += deviation;
-        time_t t = GetUtcTime(&tm);
-        if (t == -1)
-        {
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-#if _MSC_VER > 1000
-        localtime_s(&tm, &t);
-#else
-        tm = *localtime(&t);
-#endif
-    }
+    tm.tm_isdst = (status & DLMS_CLOCK_STATUS_DAYLIGHT_SAVE_ACTIVE) != 0;
     dt.SetValue(tm);
     dt.SetDeviation(deviation);
     dt.SetSkip(skip);
@@ -794,6 +750,11 @@ std::string& GXHelpers::ltrim(std::string& s)
 
 std::string GXHelpers::BytesToHex(unsigned char* pBytes, int count)
 {
+    return BytesToHex(pBytes, count, ' ');
+}
+
+std::string GXHelpers::BytesToHex(unsigned char* pBytes, int count, char separator)
+{
     const char hexArray[] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
     std::string hexChars(3 * count, 0);
     int tmp;
@@ -802,9 +763,9 @@ std::string GXHelpers::BytesToHex(unsigned char* pBytes, int count)
         tmp = pBytes[pos] & 0xFF;
         hexChars[pos * 3] = hexArray[tmp >> 4];
         hexChars[pos * 3 + 1] = hexArray[tmp & 0x0F];
-        hexChars[pos * 3 + 2] = ' ';
+        hexChars[pos * 3 + 2] = separator;
     }
-    //Remove last white space.
+    //Remove last separator.
     if (count != 0)
     {
         hexChars.resize(hexChars.size() - 1);
@@ -812,13 +773,13 @@ std::string GXHelpers::BytesToHex(unsigned char* pBytes, int count)
     return hexChars;
 }
 /**
-* Get UTF std::string value from DLMS data.
+* Get UTF string value from DLMS data.
 *
 * buff
 *            Received DLMS data.
 * info
 *            Data info.
-* Returns  parsed UTF std::string value.
+* Returns  parsed UTF string value.
 */
 int GetUtfString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMSVariant& value)
 {
@@ -857,13 +818,13 @@ int GetUtfString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMS
 }
 
 /**
-    * Get octect std::string value from DLMS data.
+    * Get octect string value from DLMS data.
     *
     * buff
     *            Received DLMS data.
     * info
     *            Data info.
-    * Returns  parsed octet std::string value.
+    * Returns  parsed octet string value.
     */
 int GetOctetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMSVariant& value)
 {
@@ -904,13 +865,13 @@ int GetOctetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDL
 }
 
 /**
-    * Get std::string value from DLMS data.
+    * Get string value from DLMS data.
     *
     * buff
     *            Received DLMS data.
     * info
     *            Data info.
-    * Returns  parsed std::string value.
+    * Returns  parsed string value.
     */
 int GetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMSVariant& value)
 {
@@ -1019,11 +980,11 @@ static void ToBitString(CGXByteBuffer& sb, unsigned char value, int count)
 }
 
 /**
-* Get bit std::string value from DLMS data.
+* Get bit string value from DLMS data.
 *
 * buff : Received DLMS data.
 * info : Data info.
-* Returns parsed bit std::string value.
+* Returns parsed bit string value.
 */
 static int GetBitString(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 {
@@ -1474,7 +1435,7 @@ static int SetArray(CGXByteBuffer& buff, CGXDLMSVariant& value)
 }
 
 /**
-    * Convert Octet std::string to DLMS bytes.
+    * Convert Octetstring to DLMS bytes.
     *
     * buff
     *            Byte buffer where data is write.
@@ -1483,31 +1444,12 @@ static int SetArray(CGXByteBuffer& buff, CGXDLMSVariant& value)
     */
 static int SetOctetString(CGXByteBuffer& buff, CGXDLMSVariant& value)
 {
-    int val;
-    // Example Logical name is octet std::string, so do not change to
-    // std::string...
     if (value.vt == DLMS_DATA_TYPE_STRING)
     {
-        std::vector< std::string > items = GXHelpers::Split(value.strVal, '.');
-        // If data is std::string.
-        if (items.size() == 1)
-        {
-            GXHelpers::SetObjectCount((unsigned long)value.strVal.size(), buff);
-            buff.AddString(value.strVal.c_str());
-        }
-        else
-        {
-            GXHelpers::SetObjectCount((unsigned long)items.size(), buff);
-            for (std::vector< std::string >::iterator it = items.begin(); it != items.end(); ++it)
-            {
-#if _MSC_VER > 1000
-                sscanf_s(it->c_str(), "%d", &val);
-#else
-                sscanf(it->c_str(), "%d", &val);
-#endif
-                buff.SetUInt8(val);
-            }
-        }
+        CGXByteBuffer bb;
+        GXHelpers::HexToBytes(value.strVal, bb);
+        GXHelpers::SetObjectCount(bb.GetSize(), buff);
+        buff.Set(bb.GetData(), bb.GetSize());
     }
     else if (value.vt == DLMS_DATA_TYPE_OCTET_STRING)
     {
@@ -1527,7 +1469,7 @@ static int SetOctetString(CGXByteBuffer& buff, CGXDLMSVariant& value)
 }
 
 /**
-* Convert UTC std::string to DLMS bytes.
+* Convert UTC string to DLMS bytes.
 *
 * buff
 *            Byte buffer where data is write.
@@ -1546,6 +1488,18 @@ static int SetUtfString(CGXByteBuffer& buff, CGXDLMSVariant& value)
         buff.SetUInt8(0);
     }
     return 0;
+}
+
+int GXHelpers::SetLogicalName(const char* name, CGXDLMSVariant& value)
+{
+    unsigned char ln[6];
+    int ret = SetLogicalName(name, ln);
+    if (ret == 0)
+    {
+        value.Clear();
+        value.Add(ln, 6);
+    }
+    return ret;
 }
 
 int GXHelpers::SetLogicalName(const char* name, unsigned char ln[6])
@@ -1571,7 +1525,7 @@ int GXHelpers::SetLogicalName(const char* name, unsigned char ln[6])
 }
 
 /**
-* Convert ASCII std::string to DLMS bytes.
+* Convert ASCII string to DLMS bytes.
 *
 * buff
 *            Byte buffer where data is write.
@@ -1588,12 +1542,12 @@ static int SetString(CGXByteBuffer& buff, CGXDLMSVariant& value)
     else
     {
         buff.SetUInt8(0);
-    }
+}
     return 0;
 }
 
 /**
-* Convert Bit std::string to DLMS bytes.
+* Convert Bit string to DLMS bytes.
 *
 * buff
 *            Byte buffer where data is write.
@@ -1653,7 +1607,7 @@ static int SetBitString(CGXByteBuffer& buff, CGXDLMSVariant& value)
     }
     else
     {
-        //BitString must give as std::string.
+        //BitString must give as string.
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     return DLMS_ERROR_CODE_OK;

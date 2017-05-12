@@ -59,7 +59,6 @@ public:
     CGXDate(int year, int month, int day) :
         CGXDateTime(year, month, day, -1, -1, -1, -1)
     {
-        SetSkip((DATETIME_SKIPS)(DATETIME_SKIPS_HOUR | DATETIME_SKIPS_MINUTE | DATETIME_SKIPS_SECOND | DATETIME_SKIPS_MS));
     }
 
     /**

@@ -238,7 +238,7 @@ void CGXDLMSClock::GetAttributeIndexToRead(std::vector<int>& attributes)
 
 int CGXDLMSClock::GetUIDataType(int index, DLMS_DATA_TYPE& type)
 {
-    if (index == 2)
+    if (index == 2 || index == 5 || index == 6)
     {
         type = DLMS_DATA_TYPE_DATETIME;
     }

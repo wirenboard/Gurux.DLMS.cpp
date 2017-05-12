@@ -35,7 +35,7 @@
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSObjectFactory.h"
 #include "../include/GXDLMSAssociationLogicalName.h"
-
+#include "../include/GXDLMSServer.h"
 
 void CGXDLMSAssociationLogicalName::Init()
 {
@@ -60,20 +60,31 @@ void CGXDLMSAssociationLogicalName::UpdateAccessRights(CGXDLMSObject* pObj, CGXD
     }
 }
 
-int CGXDLMSAssociationLogicalName::GetAccessRights(CGXDLMSObject* pItem, CGXByteBuffer& data)
+int CGXDLMSAssociationLogicalName::GetAccessRights(CGXDLMSObject* pItem, CGXDLMSServer* server, CGXByteBuffer& data)
 {
     int ret;
-    CGXAttributeCollection& attributes = pItem->GetAttributes();
+    int cnt = pItem->GetAttributeCount();
     data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
     data.SetUInt8(2);
     data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-    GXHelpers::SetObjectCount((unsigned long)attributes.size(), data);
+    GXHelpers::SetObjectCount(cnt, data);
+    CGXDLMSValueEventArg e(server, pItem, 0);
+
     CGXDLMSVariant index, access, empty;
-    for (CGXAttributeCollection::iterator it = attributes.begin(); it != attributes.end(); ++it)
+    for (int pos = 0; pos != cnt; ++pos)
     {
-        index = (*it).GetIndex();
-        access = (*it).GetAccess();
-        data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE); //attribute_access_item
+        e.SetIndex(pos + 1);
+        index = pos + 1;
+        if (server != NULL)
+        {
+            access = server->GetAttributeAccess(&e);
+        }
+        else
+        {
+            access = DLMS_ACCESS_MODE_READ_WRITE;
+        }
+        //attribute_access_item
+        data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(3);
         if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_INT8, index)) != 0 ||
             (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_ENUM, access)) != 0 ||
@@ -82,15 +93,23 @@ int CGXDLMSAssociationLogicalName::GetAccessRights(CGXDLMSObject* pItem, CGXByte
             return ret;
         }
     }
-
+    cnt = pItem->GetMethodCount();
     data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-    CGXAttributeCollection& m = pItem->GetMethodAttributes();
-    GXHelpers::SetObjectCount((unsigned long)m.size(), data);
-    for (CGXAttributeCollection::iterator it = m.begin(); it != m.end(); ++it)
+    GXHelpers::SetObjectCount(cnt, data);
+    for (int pos = 0; pos != cnt; ++pos)
     {
-        CGXDLMSVariant index = (*it).GetIndex();
-        CGXDLMSVariant access = (*it).GetMethodAccess();
-        data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE); //attribute_access_item
+        e.SetIndex(pos + 1);
+        index = pos + 1;
+        if (server != NULL)
+        {
+            access = server->GetMethodAccess(&e);
+        }
+        else
+        {
+            access = DLMS_METHOD_ACCESS_MODE_ACCESS;
+        }
+        //attribute_access_item
+        data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(2);
         GXHelpers::SetData(data, DLMS_DATA_TYPE_INT8, index);
         GXHelpers::SetData(data, DLMS_DATA_TYPE_ENUM, access);
@@ -128,15 +147,18 @@ int CGXDLMSAssociationLogicalName::GetObjects(
             CGXDLMSVariant ln((*it)->m_LN, 6, DLMS_DATA_TYPE_OCTET_STRING);
             GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln);//LN
             //Access rights.
-            if ((ret = GetAccessRights(*it, data)) != 0)
+            if ((ret = GetAccessRights(*it, e.GetServer(), data)) != 0)
             {
                 return ret;
             };
-            settings.SetIndex(settings.GetIndex() + 1);
-            //If PDU is full.
-            if (!e.GetSkipMaxPduSize() && data.GetSize() >= settings.GetMaxPduSize())
+            if (settings.IsServer())
             {
-                break;
+                settings.SetIndex(settings.GetIndex() + 1);
+                //If PDU is full.
+                if (!e.GetSkipMaxPduSize() && data.GetSize() >= settings.GetMaxPduSize())
+                {
+                    break;
+                }
             }
         }
     }
@@ -554,7 +576,9 @@ int CGXDLMSAssociationLogicalName::GetValue(CGXDLMSSettings& settings, CGXDLMSVa
     }
     if (e.GetIndex() == 9)
     {
-        e.SetValue(m_SecuritySetupReference);
+        CGXDLMSVariant tmp;
+        GXHelpers::SetLogicalName(m_SecuritySetupReference.c_str(), tmp);
+        e.SetValue(tmp);
         return DLMS_ERROR_CODE_OK;
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
@@ -581,10 +605,16 @@ int CGXDLMSAssociationLogicalName::SetValue(CGXDLMSSettings& settings, CGXDLMSVa
                 if (pObj == NULL)
                 {
                     pObj = CGXDLMSObjectFactory::CreateObject(type, ln);
-                    pObj->SetVersion(version);
+                    if (pObj != NULL)
+                    {
+                        pObj->SetVersion(version);
+                    }
                 }
-                UpdateAccessRights(pObj, (*it).Arr[3]);
-                m_ObjectList.push_back(pObj);
+                if (pObj != NULL)
+                {
+                    UpdateAccessRights(pObj, (*it).Arr[3]);
+                    m_ObjectList.push_back(pObj);
+                }
             }
         }
     }
@@ -962,7 +992,7 @@ int CGXDLMSAssociationLogicalName::SetValue(CGXDLMSSettings& settings, CGXDLMSVa
     }
     else if (e.GetIndex() == 9)
     {
-        m_SecuritySetupReference = e.GetValue().ToString();
+        GXHelpers::GetLogicalName(e.GetValue().byteArr, m_SecuritySetupReference);
     }
     else
     {

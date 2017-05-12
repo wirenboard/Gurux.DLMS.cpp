@@ -923,6 +923,21 @@ int CGXCommunication::Write(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSV
     return DLMS_ERROR_CODE_OK;
 }
 
+//Write selected object.
+int CGXCommunication::Write(CGXDLMSObject* pObject, int attributeIndex)
+{
+    int ret;
+    std::vector<CGXByteBuffer> data;
+    CGXReplyData reply;
+    //Get meter's send and receive buffers size.
+    if ((ret = m_Parser->Write(pObject, attributeIndex, data)) != 0 ||
+        (ret = ReadDataBlock(data, reply)) != 0)
+    {
+        return ret;
+    }
+    return DLMS_ERROR_CODE_OK;
+}
+
 int CGXCommunication::Method(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& value)
 {
     int ret;

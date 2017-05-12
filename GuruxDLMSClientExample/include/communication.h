@@ -147,6 +147,11 @@ public:
         int attributeIndex,
         CGXDLMSVariant& value);
 
+    //Write selected object.
+    int Write(
+        CGXDLMSObject* pObject,
+        int attributeIndex);
+
     //Call action of selected object.
     int Method(
         CGXDLMSObject* pObject,

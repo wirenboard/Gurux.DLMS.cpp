@@ -83,6 +83,7 @@ void CGXDLMSSchedule::GetValues(std::vector<std::string>& values)
     std::string ln;
     GetLogicalName(ln);
     values.push_back(ln);
+    values.push_back("");
     //TODO: values.push_back(m_Entries.ToString());
 }
 

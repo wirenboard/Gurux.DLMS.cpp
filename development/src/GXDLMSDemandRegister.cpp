@@ -305,12 +305,12 @@ int CGXDLMSDemandRegister::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     if (index == 2)
     {
-        type = DLMS_DATA_TYPE_NONE;
+        type = m_CurrentAvarageValue.vt;
         return DLMS_ERROR_CODE_OK;
     }
     if (index == 3)
     {
-        type = DLMS_DATA_TYPE_NONE;
+        type = m_LastAvarageValue.vt;
         return DLMS_ERROR_CODE_OK;
     }
     if (index == 4)
@@ -320,7 +320,7 @@ int CGXDLMSDemandRegister::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     if (index == 5)
     {
-        type = DLMS_DATA_TYPE_NONE;
+        type = m_Status.vt;
         return DLMS_ERROR_CODE_OK;
     }
     if (index == 6)
@@ -444,11 +444,15 @@ int CGXDLMSDemandRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     else if (e.GetIndex() == 6)
     {
-        SetCaptureTime(e.GetValue().dateTime);
+        CGXDLMSVariant tmp;
+        CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_DATETIME, tmp);
+        SetCaptureTime(tmp.dateTime);
     }
     else if (e.GetIndex() == 7)
     {
-        SetStartTimeCurrent(e.GetValue().dateTime);
+        CGXDLMSVariant tmp;
+        CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_DATETIME, tmp);
+        SetStartTimeCurrent(tmp.dateTime);
     }
     else if (e.GetIndex() == 8)
     {

@@ -107,15 +107,10 @@ public:
 #define TRACE1(var) printf(var)
 #define TRACE(var, fmt) printf(var, fmt)
 
-    static inline void SetBits(unsigned char& byte, unsigned char BitMask, bool val)
-    {
-        unsigned char Mask = 0xFF ^ BitMask;
-        byte &= Mask;
-        if (val != false)
-        {
-            byte |= BitMask;
-        }
-    }
+    /////////////////////////////////////////////////////////////////////////////
+    //Set logical name from std::string.
+    /////////////////////////////////////////////////////////////////////////////
+    static int SetLogicalName(const char* name, CGXDLMSVariant& value);
 
     /////////////////////////////////////////////////////////////////////////////
     //Set logical name from std::string.
@@ -177,6 +172,7 @@ public:
 
     static std::string BytesToHex(unsigned char* pBytes, int count);
 
+    static std::string BytesToHex(unsigned char* pBytes, int count, char separator);
 
     /**
      * Convert std::string to byte array.
@@ -196,9 +192,6 @@ public:
     static bool GetBits(unsigned char& tmp, unsigned char BitMask);
 
     static inline bool StringCompare(const char* c1, const char* c2);
-
-    //Get UTC offset in minutes.
-    static void GetUtcOffset(int& hours, int& minutes);
 
     /**
     * Get data type in bytes.

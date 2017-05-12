@@ -40,7 +40,7 @@
 
 class CGXDLMSSpecialDaysTable : public CGXDLMSObject
 {
-    std::vector<CGXDLMSSpecialDay> m_Entries;
+    std::vector<CGXDLMSSpecialDay*> m_Entries;
 public:
     //Constructor.
     CGXDLMSSpecialDaysTable();
@@ -51,9 +51,9 @@ public:
     //LN Constructor.
     CGXDLMSSpecialDaysTable(std::string ln);
 
-    std::vector<CGXDLMSSpecialDay>& GetEntries();
+    ~CGXDLMSSpecialDaysTable();
 
-    void SetValue(std::vector<CGXDLMSSpecialDay>& value);
+    std::vector<CGXDLMSSpecialDay*>& GetEntries();
 
     // Returns amount of attributes.
     int GetAttributeCount();

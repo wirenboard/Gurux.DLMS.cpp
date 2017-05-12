@@ -344,7 +344,9 @@ int CGXDLMSMBusClient::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg&
     }
     else if (e.GetIndex() == 2)
     {
-        e.SetValue(m_MBusPortReference);
+        CGXDLMSVariant tmp;
+        GXHelpers::SetLogicalName(m_MBusPortReference.c_str(), tmp);
+        e.SetValue(tmp);
     }
     else if (e.GetIndex() == 3)
     {
@@ -402,9 +404,8 @@ int CGXDLMSMBusClient::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg&
     }
     else if (e.GetIndex() == 2)
     {
-        CGXDLMSVariant tmp;
-        CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_OCTET_STRING, tmp);
-        m_MBusPortReference = tmp.ToString();
+        m_MBusPortReference.clear();
+        GXHelpers::GetLogicalName(e.GetValue().byteArr, m_MBusPortReference);
     }
     else if (e.GetIndex() == 3)
     {

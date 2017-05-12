@@ -151,7 +151,6 @@ void CGXDLMSServer::SetUseLogicalNameReferencing(bool value)
 
 int CGXDLMSServer::Initialize()
 {
-    int ret;
     CGXDLMSObject* associationObject = NULL;
     m_Initialized = true;
     std::string ln;
@@ -214,33 +213,46 @@ int CGXDLMSServer::Initialize()
         }
     }
     // Arrange items by Short Name.
-    short sn = 0xA0;
+
     if (!m_Settings.GetUseLogicalNameReferencing())
     {
-        unsigned char offset, count;
+        UpdateShortNames(false);
+    }
+    return 0;
+}
 
-        for (CGXDLMSObjectCollection::iterator it = m_Settings.GetObjects().begin();
-            it != m_Settings.GetObjects().end(); ++it)
+
+int CGXDLMSServer::UpdateShortNames()
+{
+    return UpdateShortNames(true);
+}
+
+int CGXDLMSServer::UpdateShortNames(bool force)
+{
+    int ret;
+    short sn = 0xA0;
+    unsigned char offset, count;
+    for (CGXDLMSObjectCollection::iterator it = m_Settings.GetObjects().begin();
+        it != m_Settings.GetObjects().end(); ++it)
+    {
+        // Generate Short Name if not given.
+        if (force || (*it)->GetShortName() == 0)
         {
-            // Generate Short Name if not given.
-            if ((*it)->GetShortName() == 0)
+            (*it)->SetShortName(sn);
+            // Add method index addresses.
+            if ((ret = CGXDLMS::GetActionInfo((*it)->GetObjectType(), offset, count)) != 0)
             {
-                (*it)->SetShortName(sn);
-                // Add method index addresses.
-                if ((ret = CGXDLMS::GetActionInfo((*it)->GetObjectType(), offset, count)) != 0)
-                {
-                    return ret;
-                }
-                if (count != 0)
-                {
-                    sn += offset + (8 * count);
-                }
-                else
-                {
-                    // If there are no methods.
-                    // Add attribute index addresses.
-                    sn += 8 * (*it)->GetAttributeCount();
-                }
+                return ret;
+            }
+            if (count != 0)
+            {
+                sn += offset + (8 * count);
+            }
+            else
+            {
+                // If there are no methods.
+                // Add attribute index addresses.
+                sn += 8 * (*it)->GetAttributeCount();
             }
         }
     }
@@ -662,6 +674,7 @@ int CGXDLMSServer::HanleSetRequestWithDataBlock(CGXByteBuffer& data, CGXDLMSLNPa
     }
     else
     {
+        m_Settings.IncreaseBlockIndex();
         if ((ret = GXHelpers::GetObjectCount(data, size)) != 0)
         {
             return ret;
@@ -1010,6 +1023,7 @@ int CGXDLMSServer::GetRequestNextDataBlock(CGXByteBuffer& data)
             {
                 delete m_Transaction;
                 m_Transaction = NULL;
+                m_Settings.ResetBlockIndex();
             }
         }
     }

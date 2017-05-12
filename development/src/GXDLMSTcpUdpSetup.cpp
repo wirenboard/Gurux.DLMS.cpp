@@ -229,27 +229,33 @@ int CGXDLMSTcpUdpSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
     }
     if (e.GetIndex() == 2)
     {
-        e.SetValue(GetPort());
+        CGXDLMSVariant tmp = GetPort();
+        e.SetValue(tmp);
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 3)
     {
-        e.SetValue(GetIPReference());
+        CGXDLMSVariant tmp;
+        GXHelpers::SetLogicalName(m_IPReference.c_str(), tmp);
+        e.SetValue(tmp);
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 4)
     {
-        e.SetValue(GetMaximumSegmentSize());
+        CGXDLMSVariant tmp = GetMaximumSegmentSize();
+        e.SetValue(tmp);
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 5)
     {
-        e.SetValue(GetMaximumSimultaneousConnections());
+        CGXDLMSVariant tmp = GetMaximumSimultaneousConnections();
+        e.SetValue(tmp);
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 6)
     {
-        e.SetValue(GetInactivityTimeout());
+        CGXDLMSVariant tmp = GetInactivityTimeout();
+        e.SetValue(tmp);
         return DLMS_ERROR_CODE_OK;
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
@@ -277,7 +283,7 @@ int CGXDLMSTcpUdpSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
         {
             if (e.GetValue().vt == DLMS_DATA_TYPE_OCTET_STRING)
             {
-                SetIPReference(e.GetValue().ToString());
+                GXHelpers::GetLogicalName(e.GetValue().byteArr, m_IPReference);
             }
             else
             {

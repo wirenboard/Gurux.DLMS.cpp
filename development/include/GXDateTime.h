@@ -159,5 +159,9 @@ public:
     * @return Difference in milliseconds.
     */
     static long GetDifference(struct tm& start, CGXDateTime& to);
+
+    //Convert value to local time.
+    int ToLocalTime(struct tm& localTime);
+
 };
 #endif //GXDATETIME_H

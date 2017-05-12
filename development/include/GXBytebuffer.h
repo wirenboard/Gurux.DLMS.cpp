@@ -110,6 +110,9 @@ public:
 
     void Set(CGXByteBuffer* data, unsigned long index = 0, unsigned long count = -1);
 
+    //Add string to byte buffer.
+    void AddString(const std::string& value);
+
     void AddString(const char* value);
 
     void AttachString(char* value);

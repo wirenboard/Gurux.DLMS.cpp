@@ -43,18 +43,10 @@ CGXDLMSActionItem& CGXDLMSActionSet::GetActionUp()
 {
     return m_ActionUp;
 }
-void CGXDLMSActionSet::SetActionUp(CGXDLMSActionItem& value)
-{
-    m_ActionUp = value;
-}
 
-CGXDLMSActionItem CGXDLMSActionSet::GetActionDown()
+CGXDLMSActionItem& CGXDLMSActionSet::GetActionDown()
 {
     return m_ActionDown;
-}
-void CGXDLMSActionSet::SetActionDown(CGXDLMSActionItem value)
-{
-    m_ActionDown = value;
 }
 
 std::string CGXDLMSActionSet::ToString()

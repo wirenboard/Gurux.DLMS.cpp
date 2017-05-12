@@ -170,7 +170,9 @@ int CGXDLMSGPRSSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
     }
     if (e.GetIndex() == 2)
     {
-        e.SetValue(m_APN);
+        CGXByteBuffer bb;
+        bb.AddString(m_APN);
+        e.SetValue(bb);
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 3)
@@ -200,6 +202,7 @@ int CGXDLMSGPRSSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
         {
             return ret;
         }
+        data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(5);
         precedence = m_RequestedQualityOfService.GetPrecedence();
         delay = m_RequestedQualityOfService.GetDelay();
@@ -236,15 +239,9 @@ int CGXDLMSGPRSSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
         }
         else
         {
-            CGXDLMSVariant tmp;
-            int ret;
-            if ((ret = CGXDLMSClient::ChangeType(e.GetValue(), DLMS_DATA_TYPE_STRING, tmp)) != 0)
-            {
-                return ret;
-            }
-            m_APN = tmp.strVal;
+            m_APN.clear();
+            m_APN.append(e.GetValue().byteArr, e.GetValue().byteArr + e.GetValue().GetSize());
         }
-        e.SetValue(m_APN);
     }
     else if (e.GetIndex() == 3)
     {

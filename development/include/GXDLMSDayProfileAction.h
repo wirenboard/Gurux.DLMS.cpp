@@ -35,12 +35,12 @@
 #ifndef GXDLMSDAYPROFILEACTION_H
 #define GXDLMSDAYPROFILEACTION_H
 
-#include "GXDateTime.h"
+#include "GXTime.h"
 
 //Activity Calendar's Day Profile Action is defined on the standard.
 class CGXDLMSDayProfileAction
 {
-    CGXDateTime m_StartTime;
+    CGXTime m_StartTime;
     std::string m_ScriptLogicalName;
     int m_ScriptSelector;
 public:
@@ -52,13 +52,13 @@ public:
     /**
      Constructor.
     */
-    CGXDLMSDayProfileAction(CGXDateTime startTime, std::string scriptLogicalName, int scriptSelector);
+    CGXDLMSDayProfileAction(CGXTime& startTime, std::string scriptLogicalName, int scriptSelector);
 
     /**
      Defines the time when the script is to be executed.
     */
-    CGXDateTime& GetStartTime();
-    void SetStartTime(CGXDateTime& value);
+    CGXTime& GetStartTime();
+    void SetStartTime(CGXTime& value);
 
     /**
      Defines the logical name of the "Script table" object;

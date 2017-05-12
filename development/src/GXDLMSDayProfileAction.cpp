@@ -48,7 +48,7 @@ CGXDLMSDayProfileAction::CGXDLMSDayProfileAction()
 /**
  Constructor.
 */
-CGXDLMSDayProfileAction::CGXDLMSDayProfileAction(CGXDateTime startTime, std::string scriptLogicalName, int scriptSelector)
+CGXDLMSDayProfileAction::CGXDLMSDayProfileAction(CGXTime& startTime, std::string scriptLogicalName, int scriptSelector)
 {
     SetStartTime(startTime);
     SetScriptLogicalName(scriptLogicalName);
@@ -58,11 +58,11 @@ CGXDLMSDayProfileAction::CGXDLMSDayProfileAction(CGXDateTime startTime, std::str
 /**
  Defines the time when the script is to be executed.
 */
-CGXDateTime& CGXDLMSDayProfileAction::GetStartTime()
+CGXTime& CGXDLMSDayProfileAction::GetStartTime()
 {
     return m_StartTime;
 }
-void CGXDLMSDayProfileAction::SetStartTime(CGXDateTime& value)
+void CGXDLMSDayProfileAction::SetStartTime(CGXTime& value)
 {
     m_StartTime = value;
 }
@@ -90,7 +90,6 @@ void CGXDLMSDayProfileAction::SetScriptSelector(int value)
 {
     m_ScriptSelector = value;
 }
-
 
 std::string CGXDLMSDayProfileAction::ToString()
 {

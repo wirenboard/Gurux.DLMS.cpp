@@ -76,7 +76,7 @@ public:
 
     static bool IsLogicalNameEmpty(unsigned char* pLN)
     {
-        const unsigned char EmptyLN[] = {0, 0, 0, 0, 0, 0};
+        const unsigned char EmptyLN[] = { 0, 0, 0, 0, 0, 0 };
         return memcmp(pLN, EmptyLN, 6) == 0;
     }
 
@@ -147,7 +147,7 @@ public:
     virtual int GetAttributeCount()
     {
         assert(0);
-        return 0;
+        return 1;
     }
 
     // Returns amount of methods.

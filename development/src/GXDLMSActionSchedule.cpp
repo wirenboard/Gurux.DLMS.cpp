@@ -216,7 +216,8 @@ int CGXDLMSActionSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
         int ret;
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(2);
-        CGXDLMSVariant ln = m_ExecutedScriptLogicalName;
+        CGXDLMSVariant ln;
+        GXHelpers::SetLogicalName(m_ExecutedScriptLogicalName.c_str(), ln);
         CGXDLMSVariant ss = m_ExecutedScriptSelector;
         if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0 ||
             (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, ss)) != 0)
@@ -235,9 +236,8 @@ int CGXDLMSActionSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     {
         e.SetByteArray(true);
         int ret;
-        CGXByteBuffer bb;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount((unsigned long)GetExecutionTime().size(), bb);
+        GXHelpers::SetObjectCount((unsigned long)GetExecutionTime().size(), data);
         CGXDLMSVariant val1, val2;
         for (std::vector<CGXDateTime>::iterator it = m_ExecutionTime.begin(); it != m_ExecutionTime.end(); ++it)
         {
@@ -248,13 +248,13 @@ int CGXDLMSActionSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
             CGXDate d(*it);
             val1 = t;
             val2 = d;
-            if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_OCTET_STRING, val1)) != 0 ||
-                (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_OCTET_STRING, val2)) != 0)
+            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, val1)) != 0 ||
+                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, val2)) != 0)
             {
                 return ret;
             }
         }
-        e.SetValue(bb);
+        e.SetValue(data);
         return DLMS_ERROR_CODE_OK;
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
@@ -269,7 +269,7 @@ int CGXDLMSActionSchedule::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     else if (e.GetIndex() == 2)
     {
-        SetExecutedScriptLogicalName(e.GetValue().Arr[0].ToString());
+        GXHelpers::GetLogicalName(e.GetValue().Arr[0].byteArr, m_ExecutedScriptLogicalName);
         SetExecutedScriptSelector(e.GetValue().Arr[1].ToInteger());
         return DLMS_ERROR_CODE_OK;
     }
@@ -280,21 +280,27 @@ int CGXDLMSActionSchedule::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     else if (e.GetIndex() == 4)
     {
+        int ret;
         m_ExecutionTime.clear();
+        CGXDLMSVariant time, date;
         for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin();
             it != e.GetValue().Arr.end(); ++it)
         {
-            CGXDLMSVariant time, date;
-            CGXDLMSClient::ChangeType((*it).Arr[0], DLMS_DATA_TYPE_TIME, time);
-            CGXDLMSClient::ChangeType((*it).Arr[1], DLMS_DATA_TYPE_DATE, date);
+            if ((ret = CGXDLMSClient::ChangeType((*it).Arr[0], DLMS_DATA_TYPE_TIME, time)) != 0 ||
+                (ret = CGXDLMSClient::ChangeType((*it).Arr[1], DLMS_DATA_TYPE_DATE, date)) != 0)
+            {
+                return ret;
+            }
+            time.dateTime.SetSkip((DATETIME_SKIPS)(time.dateTime.GetSkip() & ~(DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY | DATETIME_SKIPS_DAYOFWEEK)));
+            date.dateTime.SetSkip((DATETIME_SKIPS)(date.dateTime.GetSkip() & ~(DATETIME_SKIPS_HOUR | DATETIME_SKIPS_MINUTE | DATETIME_SKIPS_SECOND | DATETIME_SKIPS_MS)));
             struct tm val = time.dateTime.GetValue();
             struct tm val2 = date.dateTime.GetValue();
             val2.tm_hour = val.tm_hour;
             val2.tm_min = val.tm_min;
             val2.tm_sec = val.tm_sec;
-            date.dateTime.SetValue(val2);
-            date.dateTime.SetSkip((DATETIME_SKIPS)(time.dateTime.GetSkip() | date.dateTime.GetSkip()));
-            m_ExecutionTime.push_back(date.dateTime);
+            CGXDateTime tmp(val2);
+            tmp.SetSkip((DATETIME_SKIPS)(time.dateTime.GetSkip() | date.dateTime.GetSkip()));
+            m_ExecutionTime.push_back(tmp);
         }
         return DLMS_ERROR_CODE_OK;
     }

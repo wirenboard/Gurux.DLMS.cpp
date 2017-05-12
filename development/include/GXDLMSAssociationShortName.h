@@ -45,7 +45,7 @@ class CGXDLMSAssociationShortName : public CGXDLMSObject
     CGXByteBuffer m_LlsSecret;
     CGXByteBuffer m_HlsSecret;
 
-    int GetAccessRights(CGXDLMSObject* pObj, CGXByteBuffer& data);
+    int GetAccessRights(CGXDLMSObject* pObj, CGXDLMSServer* server, CGXByteBuffer& data);
     void UpdateAccessRights(CGXDLMSVariant& buff);
 
 public:
