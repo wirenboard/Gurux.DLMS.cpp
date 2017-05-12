@@ -504,7 +504,7 @@ int CGXDLMSActivityCalendar::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     if (e.GetIndex() == 2)
     {
         CGXDLMSVariant tmp;
-        tmp.Add(m_CalendarNameActive.c_str(), m_CalendarNameActive.size());
+        tmp.Add(m_CalendarNameActive.c_str(), (int)m_CalendarNameActive.size());
         e.SetValue(tmp);
         return DLMS_ERROR_CODE_OK;
     }

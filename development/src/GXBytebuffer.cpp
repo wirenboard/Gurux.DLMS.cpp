@@ -332,7 +332,7 @@ void CGXByteBuffer::AddString(const char* value)
 
 void CGXByteBuffer::AddString(const std::string& value)
 {
-    CGXByteBuffer::Set(value.c_str(), value.length());
+    CGXByteBuffer::Set(value.c_str(), (unsigned long)value.length());
 }
 
 void CGXByteBuffer::AttachString(char* value)

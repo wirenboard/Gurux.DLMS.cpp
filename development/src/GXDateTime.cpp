@@ -592,6 +592,7 @@ int CGXDateTime::ToLocalTime(struct tm& localTime)
         localTime = *localtime(&t);
 #endif
     }
+    return 0;
 }
 
 long CGXDateTime::GetDifference(struct tm& start, CGXDateTime& to)

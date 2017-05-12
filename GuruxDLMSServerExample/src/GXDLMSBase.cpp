@@ -392,19 +392,20 @@ void AddActivityCalendar(CGXDLMSObjectCollection& items)
 {
     CGXDLMSActivityCalendar* pActivity = new CGXDLMSActivityCalendar();
     pActivity->SetCalendarNameActive("Active");
-    pActivity->GetSeasonProfileActive().push_back(CGXDLMSSeasonProfile("Summer time", CGXDate(-1, 3, 31), ""));
-    pActivity->GetWeekProfileTableActive().push_back(CGXDLMSWeekProfile("Monday", 1, 1, 1, 1, 1, 1, 1));
-    CGXDLMSDayProfile aDp;
-    aDp.SetDayId(1);
-    aDp.GetDaySchedules().push_back(CGXDLMSDayProfileAction(CGXDateTime::Now(), "test", 1));
+    pActivity->GetSeasonProfileActive().push_back(new CGXDLMSSeasonProfile("Summer time", CGXDate(-1, 3, 31), ""));
+    pActivity->GetWeekProfileTableActive().push_back(new CGXDLMSWeekProfile("Monday", 1, 1, 1, 1, 1, 1, 1));
+    CGXDLMSDayProfile *aDp = new CGXDLMSDayProfile();
+    aDp->SetDayId(1);
+    CGXTime time = CGXDateTime::Now();
+    aDp->GetDaySchedules().push_back(new CGXDLMSDayProfileAction(time, "test", 1));
     pActivity->GetDayProfileTableActive().push_back(aDp);
     pActivity->SetCalendarNamePassive("Passive");
-    pActivity->GetSeasonProfilePassive().push_back(CGXDLMSSeasonProfile("Winter time", CGXDate(-1, 10, 30), ""));
-    pActivity->GetWeekProfileTablePassive().push_back(CGXDLMSWeekProfile("Tuesday", 1, 1, 1, 1, 1, 1, 1));
+    pActivity->GetSeasonProfilePassive().push_back(new CGXDLMSSeasonProfile("Winter time", CGXDate(-1, 10, 30), ""));
+    pActivity->GetWeekProfileTablePassive().push_back(new CGXDLMSWeekProfile("Tuesday", 1, 1, 1, 1, 1, 1, 1));
 
-    CGXDLMSDayProfile passive;
-    passive.SetDayId(1);
-    passive.GetDaySchedules().push_back(CGXDLMSDayProfileAction(CGXDateTime::Now(), "0.0.1.0.0.255", 1));
+    CGXDLMSDayProfile* passive = new CGXDLMSDayProfile();
+    passive->SetDayId(1);
+    passive->GetDaySchedules().push_back(new CGXDLMSDayProfileAction(time, "0.0.1.0.0.255", 1));
     pActivity->GetDayProfileTablePassive().push_back(passive);
     CGXDateTime dt(CGXDateTime::Now());
     pActivity->SetTime(dt);
@@ -461,17 +462,15 @@ void AddRegisterMonitor(CGXDLMSObjectCollection& items, CGXDLMSRegister* pRegist
     CGXDLMSMonitoredValue mv;
     mv.Update(pRegister, 2);
     pRm->SetMonitoredValue(mv);
-    CGXDLMSActionSet action;
+    CGXDLMSActionSet * action = new CGXDLMSActionSet();
     string ln;
     pRm->GetLogicalName(ln);
-    action.GetActionDown().SetLogicalName(ln);
-    action.GetActionDown().SetScriptSelector(1);
+    action->GetActionDown().SetLogicalName(ln);
+    action->GetActionDown().SetScriptSelector(1);
     pRm->GetLogicalName(ln);
-    action.GetActionUp().SetLogicalName(ln);
-    action.GetActionUp().SetScriptSelector(1);
-    vector<CGXDLMSActionSet> actions;
-    actions.push_back(action);
-    pRm->SetActions(actions);
+    action->GetActionUp().SetLogicalName(ln);
+    action->GetActionUp().SetScriptSelector(1);
+    pRm->GetActions().push_back(action);
     items.push_back(pRm);
 }
 
