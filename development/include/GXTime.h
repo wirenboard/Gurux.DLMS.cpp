@@ -58,7 +58,7 @@ public:
     CGXTime(int hour, int minute, int second, int millisecond) :
         CGXDateTime(-1, -1, -1, hour, minute, second, millisecond)
     {
-        SetSkip((DATETIME_SKIPS)(GetSkip() | DATETIME_SKIPS_DAYOFWEEK));
+        SetSkip((DATETIME_SKIPS)(m_Skip | DATETIME_SKIPS_DAYOFWEEK));
     }
 
     /**
@@ -69,7 +69,21 @@ public:
     */
     CGXTime(CGXDateTime& value) : CGXDateTime(value.GetValue())
     {
-        SetSkip((DATETIME_SKIPS)(value.GetSkip() | DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY | DATETIME_SKIPS_DAYOFWEEK));
+        SetSkip((DATETIME_SKIPS)(value.m_Skip | DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY | DATETIME_SKIPS_DAYOFWEEK));
+    }
+
+    CGXTime& operator=(const CGXDateTime& value)
+    {
+        SetValue(value.m_Value);
+        SetSkip((DATETIME_SKIPS)(value.m_Skip | DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY | DATETIME_SKIPS_DAYOFWEEK));
+        return *this;
+    }
+
+    CGXTime& operator=(CGXDateTime value)
+    {
+        SetValue(value.m_Value);
+        SetSkip((DATETIME_SKIPS)(value.m_Skip | DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY | DATETIME_SKIPS_DAYOFWEEK));
+        return *this;
     }
 };
 #endif //GXTIME_H

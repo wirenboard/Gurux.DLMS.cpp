@@ -208,7 +208,7 @@ unsigned char CGXDateTime::DaysInMonth(int year, short month)
     return 28;
 }
 
-void CGXDateTime::SetValue(struct tm& value)
+void CGXDateTime::SetValue(const struct tm& value)
 {
     m_Value = value;
 }

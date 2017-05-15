@@ -72,7 +72,21 @@ public:
     /// </summary>
     CGXDate(CGXDateTime& value) : CGXDateTime(value.GetValue())
     {
-        SetSkip((DATETIME_SKIPS)(value.GetSkip() | DATETIME_SKIPS_HOUR | DATETIME_SKIPS_MINUTE | DATETIME_SKIPS_SECOND | DATETIME_SKIPS_MS));
+        SetSkip((DATETIME_SKIPS)(value.m_Skip | DATETIME_SKIPS_HOUR | DATETIME_SKIPS_MINUTE | DATETIME_SKIPS_SECOND | DATETIME_SKIPS_MS));
+    }
+
+    CGXDate& operator=(const CGXDateTime& value)
+    {
+        SetValue(value.m_Value);
+        SetSkip((DATETIME_SKIPS)(value.m_Skip | DATETIME_SKIPS_HOUR | DATETIME_SKIPS_MINUTE | DATETIME_SKIPS_SECOND | DATETIME_SKIPS_MS));
+        return *this;
+    }
+
+    CGXDate& operator=(CGXDateTime value)
+    {
+        SetValue(value.GetValue());
+        SetSkip((DATETIME_SKIPS)(value.m_Skip | DATETIME_SKIPS_HOUR | DATETIME_SKIPS_MINUTE | DATETIME_SKIPS_SECOND | DATETIME_SKIPS_MS));
+        return *this;
     }
 };
 #endif //GXDATE_H

@@ -325,13 +325,13 @@ int CGXDLMS::GetHdlcFrame(
     {
         len = data->GetSize() - data->GetPosition();
         // Is last packet.
-        reply.SetUInt8(0xA0 | (len >> 8) & 0x7);
+        reply.SetUInt8(0xA0 | ((len >> 8) & 0x7));
     }
     else
     {
         len = frameSize;
         // More data to left.
-        reply.SetUInt8(0xA8 | (len >> 8) & 0x7);
+        reply.SetUInt8(0xA8 | ((len >> 8) & 0x7));
     }
     // Frame len.
     if (len == 0)

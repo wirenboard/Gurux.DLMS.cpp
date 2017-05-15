@@ -396,7 +396,8 @@ void AddActivityCalendar(CGXDLMSObjectCollection& items)
     pActivity->GetWeekProfileTableActive().push_back(new CGXDLMSWeekProfile("Monday", 1, 1, 1, 1, 1, 1, 1));
     CGXDLMSDayProfile *aDp = new CGXDLMSDayProfile();
     aDp->SetDayId(1);
-    CGXTime time = CGXDateTime::Now();
+    CGXDateTime now = CGXDateTime::Now();
+    CGXTime time = now;
     aDp->GetDaySchedules().push_back(new CGXDLMSDayProfileAction(time, "test", 1));
     pActivity->GetDayProfileTableActive().push_back(aDp);
     pActivity->SetCalendarNamePassive("Passive");

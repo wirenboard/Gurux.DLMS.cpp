@@ -631,7 +631,7 @@ void AddDayProfileTable(std::vector<CGXDLMSDayProfile*>& items, std::vector<CGXD
             CGXDLMSDayProfileAction * ac = new CGXDLMSDayProfileAction();
             CGXDLMSVariant tmp;
             CGXDLMSClient::ChangeType(it2->Arr[0], DLMS_DATA_TYPE_TIME, tmp);
-            ac->SetStartTime((CGXTime)tmp.dateTime);
+            ac->SetStartTime((CGXTime&)tmp.dateTime);
             GXHelpers::GetLogicalName((*it2).Arr[1].byteArr, ln);
             ac->SetScriptLogicalName(ln);
             ac->SetScriptSelector((*it2).Arr[2].lVal);

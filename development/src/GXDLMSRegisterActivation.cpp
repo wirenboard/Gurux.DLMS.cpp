@@ -233,7 +233,7 @@ int CGXDLMSRegisterActivation::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
             }
             data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
             GXHelpers::SetObjectCount((unsigned long)it->second.GetSize(), data);
-            for (int pos = 0; pos != it->second.GetSize(); ++pos)
+            for (int pos = 0; pos != (int)it->second.GetSize(); ++pos)
             {
                 data.SetUInt8(DLMS_DATA_TYPE_UINT8);
                 data.SetUInt8(it->second.GetData()[pos]);

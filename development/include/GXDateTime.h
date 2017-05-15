@@ -66,6 +66,8 @@ enum DATETIME_SKIPS
 // Default behavior of DateTime do not allow this.
 class CGXDateTime
 {
+    friend class CGXTime;
+    friend class CGXDate;
     short m_Deviation;
     DATETIME_SKIPS m_Skip;
     struct tm m_Value;
@@ -87,7 +89,7 @@ public:
 
     // Used date time value.
     struct tm& GetValue();
-    void SetValue(struct tm& value);
+    void SetValue(const struct tm& value);
 
     // Skip selected date time fields.
     DATETIME_SKIPS GetSkip();
