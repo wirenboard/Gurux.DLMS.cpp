@@ -467,6 +467,15 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
         {
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
+        //Remove echo.
+        if (reply.Compare((unsigned char*)buff, len))
+        {
+            if (Read('\n', reply) != 0)
+            {
+                return DLMS_ERROR_CODE_INVALID_PARAMETER;
+            }
+        }
+
         if (m_Trace)
         {
             printf("-> %s\r\n", reply.ToHexString().c_str());
@@ -476,7 +485,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
             return DLMS_ERROR_CODE_SEND_FAILED;
         }
         //Get used baud rate.
-        if ((ret = reply.GetUInt8(4, &ch)) != 0)
+        if ((ret = reply.GetUInt8(reply.GetPosition() + 3, &ch)) != 0)
         {
             return DLMS_ERROR_CODE_SEND_FAILED;
         }
@@ -720,6 +729,16 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             {
                 return DLMS_ERROR_CODE_SEND_FAILED;
             }
+            if (tmp.size() == 0)
+            {
+                Now(tmp);
+                tmp = "-> " + tmp + "\t";
+            }
+            else
+            {
+                tmp += " ";
+            }
+            tmp += bb.ToHexString();
         }
         else
         {
@@ -734,17 +753,17 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
                 return DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
             bb.Set(m_Receivebuff, ret);
+            if (tmp.size() == 0)
+            {
+                Now(tmp);
+                tmp = "-> " + tmp + "\t";
+            }
+            else
+            {
+                tmp += " ";
+            }
+            tmp += GXHelpers::BytesToHex(m_Receivebuff, ret);
         }
-        if (tmp.size() == 0)
-        {
-            Now(tmp);
-            tmp = "-> " + tmp + "\t";
-        }
-        else
-        {
-            tmp += " ";
-        }
-        tmp += GXHelpers::BytesToHex(m_Receivebuff, ret);
     } while ((ret = m_Parser->GetData(bb, reply)) == DLMS_ERROR_CODE_FALSE);
     tmp += "\r\n";
     if (m_Trace)
