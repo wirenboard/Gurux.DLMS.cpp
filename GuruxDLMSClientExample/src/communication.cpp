@@ -203,7 +203,7 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
     DWORD bytesRead = 0;
 #else //If Linux.
     unsigned short bytesRead = 0;
-    int ret;
+    int ret, readTime = 0;
 #endif
     int pos;
     unsigned long cnt = 1;
@@ -270,7 +270,12 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             //If wait time has elapsed.
             if (errno == EAGAIN)
             {
-                return DLMS_ERROR_CODE_RECEIVE_FAILED;
+                if (readTime > m_WaitTime)
+                {
+                    return DLMS_ERROR_CODE_RECEIVE_FAILED;
+                }
+                readTime += 100;
+                bytesRead = 0;
             }
             //If connection is closed.
             else if (errno == EBADF)
@@ -281,7 +286,7 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             {
                 return DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
-        }
+    }
 #endif
         reply.Set(m_Receivebuff, bytesRead);
         //Note! Some USB converters can return true for ReadFile and Zero as bytesRead.
@@ -308,8 +313,8 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             }
             lastReadIndex = pos;
         }
-    } while (!bFound);
-    return DLMS_ERROR_CODE_OK;
+} while (!bFound);
+return DLMS_ERROR_CODE_OK;
 }
 
 //Open serial port.
@@ -542,7 +547,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
             break;
         default:
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
+            }
         //Send ACK
         buff[0] = 0x06;
         //Send Protocol control character
@@ -619,9 +624,9 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
 #endif
-    }
+            }
     return DLMS_ERROR_CODE_OK;
-}
+        }
 
 //Initialize connection to the meter.
 int CGXCommunication::InitializeConnection()
@@ -708,7 +713,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             return DLMS_ERROR_CODE_SEND_FAILED;
         }
 #endif
-    }
+            }
     else if ((ret = send(m_socket, (const char*)data.GetData(), len, 0)) == -1)
     {
         //If error has occured
@@ -718,7 +723,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         printf("send failed %d\n", errno);
 #endif
         return DLMS_ERROR_CODE_SEND_FAILED;
-    }
+        }
     // Loop until whole DLMS packet is received.
     tmp = "";
     do
@@ -781,7 +786,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         ret = ReadDLMSPacket(data, reply);
     }
     return ret;
-}
+    }
 
 int CGXCommunication::ReadDataBlock(CGXByteBuffer& data, CGXReplyData& reply)
 {

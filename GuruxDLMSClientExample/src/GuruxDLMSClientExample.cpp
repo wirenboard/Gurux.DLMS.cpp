@@ -53,9 +53,9 @@ int main(int argc, char* argv[])
 #endif
 {
     {
-        //Use user locale settings.
-        std::locale::global(std::locale(""));
 #if defined(_WIN32) || defined(_WIN64)//Windows
+        //Use user locale settings. This is causing errors in some Linux distros. Example Fedora
+        std::locale::global(std::locale(""));
         WSADATA wsaData;
         if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
         {
