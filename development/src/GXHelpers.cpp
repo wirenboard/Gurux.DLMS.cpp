@@ -960,23 +960,19 @@ int GetInt32(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 //Reserved for internal use.
 static void ToBitString(CGXByteBuffer& sb, unsigned char value, int count)
 {
-    if (count > 8)
-    {
-        count = 8;
-    }
-    char* data = new char[count];
-    for (int pos = 0; pos != count; ++pos)
-    {
-        if ((value & (1 << pos)) != 0)
-        {
-            data[count - pos - 1] = '1';
+    if (count > 0) {
+        if (count > 8) {
+            count = 8;
         }
-        else
-        {
-            data[count - pos - 1] = '0';
+        for (int pos = 7; pos != 8 - count - 1; --pos) {
+            if ((value & (1 << pos)) != 0) {
+                sb.SetInt8('1');
+            }
+            else {
+                sb.SetInt8('0');
+            }
         }
     }
-    sb.Set(data, count);
 }
 
 /**
@@ -1010,14 +1006,18 @@ static int GetBitString(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& 
     }
 
     CGXByteBuffer bb;
-    while (byteCnt > 0)
+    while (cnt > 0)
     {
         if ((ret = buff.GetUInt8(&ch)) != 0)
         {
             return ret;
         }
         ToBitString(bb, ch, cnt);
-        --byteCnt;
+        if (cnt < 8)
+        {
+            break;
+        }
+        cnt -= 8;
     }
     value.vt = DLMS_DATA_TYPE_BIT_STRING;
     value = bb.ToString();
@@ -1542,7 +1542,7 @@ static int SetString(CGXByteBuffer& buff, CGXDLMSVariant& value)
     else
     {
         buff.SetUInt8(0);
-}
+    }
     return 0;
 }
 
@@ -1557,42 +1557,30 @@ static int SetString(CGXByteBuffer& buff, CGXDLMSVariant& value)
 static int SetBitString(CGXByteBuffer& buff, CGXDLMSVariant& value)
 {
     unsigned char val = 0;
-    int ret, index = 0;
+    int index = 7;
     if (value.vt == DLMS_DATA_TYPE_STRING)
     {
-        CGXByteBuffer tmp;
         GXHelpers::SetObjectCount((unsigned long)value.strVal.size(), buff);
         for (std::string::iterator it = value.strVal.begin(); it != value.strVal.end(); ++it)
         {
             if (*it == '1')
             {
-                val |= (1 << index++);
+                val |= (1 << index);
             }
-            else if (*it == '0')
-            {
-                index++;
-            }
-            else
+            else if (*it != '0')
             {
                 return DLMS_ERROR_CODE_INVALID_PARAMETER;
             }
-            if (index == 8)
+            --index;
+            if (index == -1)
             {
-                index = 0;
-                tmp.SetUInt8(val);
+                index = 7;
+                buff.SetUInt8(val);
                 val = 0;
             }
         }
-        if (index != 0)
+        if (index != 7)
         {
-            tmp.SetUInt8(val);
-        }
-        for (int pos = tmp.GetSize() - 1; pos != -1; --pos)
-        {
-            if ((ret = tmp.GetUInt8(pos, &val)) != 0)
-            {
-                return ret;
-            }
             buff.SetUInt8(val);
         }
     }
