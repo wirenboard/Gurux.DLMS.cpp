@@ -270,9 +270,18 @@ public:
         CGXByteBuffer& data);
 
     /**
+    * Generates a release request.
+    *
+    * reply : Generated release message(s).
+    * Returns error status.
+    */
+    int ReleaseRequest(
+        std::vector<CGXByteBuffer>& packets);
+
+    /**
     * Generates a disconnect request.
     *
-    * reply : Generated read message(s).
+    * reply : Generated disconnect message(s).
     * Returns error status.
     */
     int DisconnectRequest(

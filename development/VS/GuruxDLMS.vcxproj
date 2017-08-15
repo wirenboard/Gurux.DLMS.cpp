@@ -168,6 +168,7 @@
     <ClCompile Include="..\src\GXDLMSMBusClient.cpp" />
     <ClCompile Include="..\src\GXDLMSMBusMasterPortSetup.cpp" />
     <ClCompile Include="..\src\GXDLMSMBusSlavePortSetup.cpp" />
+    <ClCompile Include="..\src\GXDLMSMd5.cpp" />
     <ClCompile Include="..\src\GXDLMSMessageHandler.cpp" />
     <ClCompile Include="..\src\GXDLMSModemConfiguration.cpp" />
     <ClCompile Include="..\src\GXDLMSModemInitialisation.cpp" />
@@ -198,6 +199,8 @@
     <ClCompile Include="..\src\GXDLMSSecuritySetup.cpp" />
     <ClCompile Include="..\src\GXDLMSServer.cpp" />
     <ClCompile Include="..\src\GXDLMSSettings.cpp" />
+    <ClCompile Include="..\src\GXDLMSSha1.cpp" />
+    <ClCompile Include="..\src\GXDLMSSha256.cpp" />
     <ClCompile Include="..\src\GXDLMSSNParameters.cpp" />
     <ClCompile Include="..\src\GXDLMSSpecialDay.cpp" />
     <ClCompile Include="..\src\GXDLMSSpecialDaysTable.cpp" />
@@ -264,6 +267,7 @@
     <ClInclude Include="..\include\GXDLMSMBusClient.h" />
     <ClInclude Include="..\include\GXDLMSMBusMasterPortSetup.h" />
     <ClInclude Include="..\include\GXDLMSMBusSlavePortSetup.h" />
+    <ClInclude Include="..\include\GXDLMSMd5.h" />
     <ClInclude Include="..\include\GXDLMSMessageHandler.h" />
     <ClInclude Include="..\include\GXDLMSModemConfiguration.h" />
     <ClInclude Include="..\include\GXDLMSModemInitialisation.h" />
@@ -294,6 +298,8 @@
     <ClInclude Include="..\include\GXDLMSSecuritySetup.h" />
     <ClInclude Include="..\include\GXDLMSServer.h" />
     <ClInclude Include="..\include\GXDLMSSettings.h" />
+    <ClInclude Include="..\include\GXDLMSSha1.h" />
+    <ClInclude Include="..\include\GXDLMSSha256.h" />
     <ClInclude Include="..\include\GXDLMSSNParameters.h" />
     <ClInclude Include="..\include\GXDLMSSpecialDay.h" />
     <ClInclude Include="..\include\GXDLMSSpecialDaysTable.h" />

@@ -222,6 +222,16 @@ private:
     *            Force update.
     */
     int UpdateShortNames(bool force);
+
+    /**
+    * Handles release request.
+    *
+    * @param data
+    *            Received data.
+    * @param connectionInfo
+    *            Connection info.
+    */
+    int HandleReleaseRequest(CGXByteBuffer& data);
 protected:
     /**
      * Server Settings.

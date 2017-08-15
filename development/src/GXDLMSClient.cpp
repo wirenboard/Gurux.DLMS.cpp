@@ -706,7 +706,7 @@ int CGXDLMSClient::AARQRequest(std::vector<CGXByteBuffer>& packets)
     {
         m_Settings.GetCtoSChallenge().Clear();
     }
-    if ((ret = CGXAPDU::GenerateAarq(m_Settings, m_Settings.GetCipher(), buff)) != 0)
+    if ((ret = CGXAPDU::GenerateAarq(m_Settings, m_Settings.GetCipher(), NULL, buff)) != 0)
     {
         return ret;
     }
@@ -998,6 +998,40 @@ void CGXDLMSClient::UpdateOBISCodes(CGXDLMSObjectCollection& objects)
     */
 }
 
+int CGXDLMSClient::ReleaseRequest(std::vector<CGXByteBuffer>& packets)
+{
+    int ret;
+    CGXByteBuffer buff;
+    packets.clear();
+    // If connection is not established, there is no need to send DisconnectRequest.
+    if (!m_Settings.IsConnected())
+    {
+        return 0;
+    }
+    //Length.
+    buff.SetUInt8(0);
+    buff.SetUInt8(0x80);
+    buff.SetUInt8(01);
+    buff.SetUInt8(00);
+    CGXAPDU::GenerateUserInformation(m_Settings, m_Settings.GetCipher(), NULL, buff);
+    buff.SetUInt8(0, (unsigned char)(buff.GetSize() - 1));
+    if (GetUseLogicalNameReferencing())
+    {
+        CGXDLMSLNParameters p(&m_Settings, DLMS_COMMAND_RELEASE_REQUEST, 0, NULL, &buff, 0xff);
+        ret = CGXDLMS::GetLnMessages(p, packets);
+    }
+    else
+    {
+        CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_RELEASE_REQUEST, 0xFF, 0xFF, NULL, &buff);
+        ret = CGXDLMS::GetSnMessages(p, packets);
+    }
+    if (GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER)
+    {
+        m_Settings.SetConnected(false);
+    }
+    return ret;
+}
+
 int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets)
 {
     int ret;
@@ -1016,7 +1050,7 @@ int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets)
         return ret;
     }
     CGXByteBuffer bb(2);
-    bb.SetUInt8(DLMS_COMMAND_DISCONNECT_REQUEST);
+    bb.SetUInt8(DLMS_COMMAND_RELEASE_REQUEST);
     bb.SetUInt8(0x0);
     ret = CGXDLMS::GetWrapperFrame(m_Settings, bb, reply);
     packets.push_back(reply);

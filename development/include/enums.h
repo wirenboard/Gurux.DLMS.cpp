@@ -731,7 +731,7 @@ typedef enum
     /**
     * High authentication is used. Password is hashed with SHA-256.
     */
-    DLMS_AUTHENTICATION_HIGH_HLS_SHA256,
+    DLMS_AUTHENTICATION_HIGH_SHA256,
 
     /**
     * High authentication is used. Password is hashed with ECDSA.
@@ -938,14 +938,14 @@ typedef enum
     DLMS_COMMAND_DISC = 0x53,
 
     /**
-     * Disconnect request.
+     * Release request.
      */
-    DLMS_COMMAND_DISCONNECT_REQUEST = 0x62,
+    DLMS_COMMAND_RELEASE_REQUEST = 0x62,
 
     /**
-     * Disconnect response.
+     * Release response.
      */
-    DLMS_COMMAND_DISCONNECT_RESPONSE = 0x63,
+    DLMS_COMMAND_RELEASE_RESPONSE = 0x63,
 
     /**
      * Confirmed Service Error.
@@ -961,6 +961,15 @@ typedef enum
      * General Block Transfer.
      */
     DLMS_COMMAND_GENERAL_BLOCK_TRANSFER = 0xE0,
+
+    /**
+    * Access Request.
+    */
+    DLMS_COMMAND_ACCESS_REQUEST = 0xD9,
+    /**
+     * Access Response.
+     */
+    DLMS_COMMAND_ACCESS_RESPONSE = 0xDA,
 
     /**
      * Data Notification request.
@@ -1031,7 +1040,27 @@ typedef enum
     /**
      * Glo write response.
      */
-    DLMS_COMMAND_GLO_WRITE_RESPONSE = 45
+    DLMS_COMMAND_GLO_WRITE_RESPONSE = 45,
+    /**
+    * General GLO ciphering.
+    */
+    DLMS_COMMAND_GENERAL_GLO_CIPHERING = 0xDB,
+    /**
+    * General DED ciphering.
+    */
+    DLMS_COMMAND_GENERAL_DED_CIPHERING = 0xDC,
+    /**
+    * General ciphering.
+    */
+    DLMS_COMMAND_GENERAL_CIPHERING = 0xDD,
+    /**
+    * Information Report request.
+    */
+    DLMS_COMMAND_INFORMATION_REPORT = 0x18,
+    /*
+    * Event Notification request.
+    */
+    DLMS_COMMAND_EVENT_NOTIFICATION = 0xC2
 } DLMS_COMMAND;
 
 typedef enum
@@ -1779,4 +1808,288 @@ typedef enum
     */
     DLMS_SET_RESPONSE_TYPE_WITH_LIST = 5
 }DLMS_SET_RESPONSE_TYPE;
+
+/*
+* Enumerates all Unit constants.
+*/
+typedef enum {
+    /**
+    * No Unit.
+    */
+    DLMS_UNIT_NONE = 0,
+    /**
+    * Year.
+    */
+    DLMS_UNIT_YEAR = 1,
+
+    /**
+    * Month.
+    */
+    DLMS_UNIT_MONTH = 2,
+
+    /**
+    * Week.
+    */
+    DLMS_UNIT_WEEK = 3,
+
+    /**
+    * Day.
+    */
+    DLMS_UNIT_DAY = 4,
+
+    /**
+    * Hour.
+    */
+    DLMS_UNIT_HOUR = 5,
+
+    /**
+    * Minute.
+    */
+    DLMS_UNIT_MINUTE = 6,
+
+    /**
+    * Second.
+    */
+    DLMS_UNIT_SECOND = 7,
+
+    /**
+    * Phase angle degree.
+    */
+    DLMS_UNIT_PHASE_ANGLEGEGREE = 8,
+    /*
+    * Temperature T degree centigrade, rad*180/p.
+    */
+    DLMS_UNIT_TEMPERATURE = 9,
+    /*
+    * Local currency.
+    */
+    DLMS_UNIT_LOCAL_CURRENCY = 10,
+    /*
+    * Length l meter m.
+    */
+    DLMS_UNIT_LENGTH = 11,
+    /*
+    * Speed v m/s.
+    */
+    DLMS_UNIT_SPEED = 12,
+    /*
+    * Volume V m3.
+    */
+    DLMS_UNIT_VOLUME_CUBIC_METER = 13,
+    /*
+    * Corrected volume m3.
+    */
+    DLMS_UNIT_CORRECTED_VOLUME = 14,
+    /*
+    * Volume flux m3/60*60s.
+    */
+    DLMS_UNIT_VOLUME_FLUX_HOUR = 15,
+    /*
+    * Corrected volume flux m3/60*60s.
+    */
+    DLMS_UNIT_CORRECTED_VOLUME_FLUX_HOUR = 16,
+    /*
+    * Volume flux m3/24*60*60s.
+    */
+    DLMS_UNIT_VOLUME_FLUXDAY = 17,
+    /*
+    * Corrected volume flux m3/24*60*60s.
+    */
+    DLMS_UNIT_CORRECTE_VOLUME_FLUX_DAY = 18,
+    /*
+    * Volume 10-3 m3.
+    */
+    DLMS_UNIT_VOLUME_LITER = 19,
+    /*
+    * Mass m kilogram kg.
+    */
+    DLMS_UNIT_MASS_KG = 20,
+    /*
+    * return "Force F newton N.
+    */
+    DLMS_UNIT_FORCE = 21,
+    /*
+    * Energy newtonmeter J = Nm = Ws.
+    */
+    DLMS_UNIT_ENERGY = 22,
+    /*
+    * Pressure p pascal N/m2.
+    */
+    PRESSURE_PASCAL = 23,
+    /*
+    * Pressure p bar 10-5 N/m2.
+    */
+    DLMS_UNIT_PRESSURE_BAR = 24,
+    /*
+    * Energy joule J = Nm = Ws.
+    */
+    DLMS_UNIT_ENERGY_JOULE = 25,
+    /*
+    * Thermal power J/60*60s.
+    */
+    DLMS_UNIT_THERMAL_POWER = 26,
+    /*
+    * Active power P watt W = J/s.
+    */
+    DLMS_UNIT_ACTIVE_POWER = 27,
+    /*
+    * Apparent power S.
+    */
+    DLMS_UNIT_APPARENT_POWER = 28,
+    /*
+    * Reactive power Q.
+    */
+    DLMS_UNIT_REACTIVE_POWER = 29,
+    /*
+    * Active energy W*60*60s.
+    */
+    DLMS_UNIT_ACTIVE_ENERGY = 30,
+    /*
+    * Apparent energy VA*60*60s.
+    */
+    DLMS_UNIT_APPARENT_ENERGY = 31,
+    /*
+    * Reactive energy var*60*60s.
+    */
+    REACTIVE_ENERGY = 32,
+    /*
+    * Current I ampere A.
+    */
+    DLMS_UNIT_CURRENT = 33,
+    /*
+    * Electrical charge Q coulomb C = As.
+    */
+    DLMS_UNIT_ELECTRICAL_CHARGE = 34,
+    /*
+    * Voltage.
+    */
+    DLMS_UNIT_VOLTAGE = 35,
+    /*
+    * Electrical field strength E V/m.
+    */
+    DLMS_UNIT_ELECTRICAL_FIELD_STRENGTH = 36,
+    /*
+    * Capacity C farad C/V = As/V.
+    */
+    DLMS_UNIT_CAPACITY = 37,
+    /*
+    * Resistance R ohm = V/A.
+    */
+    DLMS_UNIT_RESISTANCE = 38,
+    /*
+    * Resistivity.
+    */
+    DLMS_UNIT_RESISTIVITY = 39,
+    /*
+    * Magnetic flux F weber Wb = Vs.
+    */
+    DLMS_UNIT_MAGNETIC_FLUX = 40,
+    /*
+    * Induction T tesla Wb/m2.
+    */
+    DLMS_UNIT_INDUCTION = 41,
+    /*
+    * Magnetic field strength H A/m.
+    */
+    DLMS_UNIT_MAGNETIC = 42,
+    /*
+    * Inductivity L henry H = Wb/A.
+    */
+    DLMS_UNIT_INDUCTIVITY = 43,
+    /*
+    * Frequency f.
+    */
+    DLMS_UNIT_FREQUENCY = 44,
+    /*
+    * Active energy meter constant 1/Wh.
+    */
+    DLMS_UNIT_ACTIVE = 45,
+    /*
+    * Reactive energy meter constant.
+    */
+    DLMS_UNIT_REACTIVE = 46,
+    /*
+    * Apparent energy meter constant.
+    */
+    DLMS_UNIT_APPARENT = 47,
+    /*
+    * V260*60s.
+    */
+    DLMS_UNIT_V260 = 48,
+    /*
+    * A260*60s.
+    */
+    DLMS_UNIT_A260 = 49,
+    /*
+    * Mass flux kg/s.
+    */
+    DLMS_UNIT_MASS_KG_PER_SECOND = 50,
+    /*
+    * Unit is Conductance siemens 1/ohm.
+    */
+    DLMS_UNIT_CONDUCTANCE = 51,
+    /*
+    * Temperature in Kelvin.
+    */
+    DLMS_UNIT_KELVIN = 52,
+    /*
+    * 1/ = V2h) RU2h , volt-squared hour meter constant or pulse value.
+    */
+    DLMS_UNIT_V2H = 53,
+    /*
+    * 1/ = A2h) RI2h , ampere-squared hour meter constant or pulse value.
+    */
+    DLMS_UNIT_A2H = 54,
+    /*
+    * 1/m3 RV , meter constant or pulse value  = volume).
+    */
+    DLMS_UNIT_CUBIC_METER_RV = 55,
+    /*
+    * Percentage.
+    */
+    DLMS_UNIT_PERCENTAGE = 56,
+    /*
+    * Ah ampere hours.
+    */
+    DLMS_UNIT_AMPERE_HOURS = 57,
+    /*
+    * Wh/m3 energy per volume 3,6*103 J/m3.
+    */
+    DLMS_UNIT_ENERGY_PER_VOLUME = 60,
+    /*
+    * J/m3 calorific value, wobbe.
+    */
+    DLMS_UNIT_WOBBE = 61,
+    /*
+    * Mol % molar fraction of gas composition mole percent  = Basic gas
+    * composition unit).
+    */
+    DLMS_UNIT_MOLE_PERCENT = 62,
+    /*
+    * g/m3 mass density, quantity of material.
+    */
+    DLMS_UNIT_MASS_DENSITY = 63,
+    /*
+    * Dynamic viscosity pascal second  = Characteristic of gas stream).
+    */
+    DLMS_UNIT_PASCAL_SECOND = 64,
+    /*
+    * J/kg Specific energy NOTE The amount of energy per unit of mass of a
+    * substance Joule / kilogram m2 . kg . s -2 / kg = m2.
+    */
+    DLMS_UNIT_JOULE_KILOGRAM = 65,
+    /*
+    * dBm Signal strength  = e.g. of GSM radio systems).
+    */
+    DLMS_UNIT_SIGNAL_STRENGTH = 70,
+    /*
+    * Other Unit.
+    */
+    DLMS_UNIT_OTHER = 254,
+    /*
+    * No Unit.
+    */
+    DLMS_UNIT_NO_UNIT = 255
+}DLMS_UNIT;
+
 #endif //ENUMS_H

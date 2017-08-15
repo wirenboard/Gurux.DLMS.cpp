@@ -52,6 +52,7 @@ CGXDLMSLNParameters::CGXDLMSLNParameters(
     m_Status = status;
     m_MultipleBlocks = settings->GetCount() != settings->GetIndex();
     m_LastBlock = settings->GetCount() == settings->GetIndex();
+    m_InvokeId = 0;
 }
 
 CGXDLMSSettings* CGXDLMSLNParameters::GetSettings()
@@ -132,4 +133,12 @@ unsigned long CGXDLMSLNParameters::GetBlockIndex()
 void CGXDLMSLNParameters::SetBlockIndex(unsigned long value)
 {
     m_BlockIndex = value;
+}
+
+unsigned long CGXDLMSLNParameters::GetInvokeId() {
+    return m_InvokeId;
+}
+
+void CGXDLMSLNParameters::SetInvokeId(unsigned long value) {
+    m_InvokeId = value;
 }

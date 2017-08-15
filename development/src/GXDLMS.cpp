@@ -580,7 +580,42 @@ int CGXDLMS::GetLNPdu(
         // Add command.
         reply.SetUInt8((unsigned char)p.GetCommand());
 
-        if (p.GetCommand() != DLMS_COMMAND_DATA_NOTIFICATION)
+        if (p.GetCommand() == DLMS_COMMAND_EVENT_NOTIFICATION ||
+            p.GetCommand() == DLMS_COMMAND_DATA_NOTIFICATION ||
+            p.GetCommand() == DLMS_COMMAND_ACCESS_REQUEST ||
+            p.GetCommand() == DLMS_COMMAND_ACCESS_RESPONSE)
+        {
+            // Add Long-Invoke-Id-And-Priority
+            if (p.GetCommand() != DLMS_CONFORMANCE_EVENT_NOTIFICATION)
+            {
+                if (p.GetInvokeId() != 0)
+                {
+                    reply.SetUInt32(p.GetInvokeId());
+                }
+                else
+                {
+                    reply.SetUInt32(GetLongInvokeIDPriority(*p.GetSettings()));
+                }
+            }
+
+            // Add date time.
+            if (p.GetTime() == NULL)
+            {
+                reply.SetUInt8(DLMS_DATA_TYPE_NONE);
+            }
+            else
+            {
+                // Data is send in octet string. Remove data type.
+                int pos = reply.GetSize();
+                CGXDLMSVariant tmp = *p.GetTime();
+                if ((ret = GXHelpers::SetData(reply, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+                {
+                    return ret;
+                }
+                reply.Move(pos + 1, pos, reply.GetSize() - pos - 1);
+            }
+        }
+        else if (p.GetCommand() != DLMS_COMMAND_RELEASE_REQUEST)
         {
             // Get request size can be bigger than PDU size.
             if (p.GetCommand() != DLMS_COMMAND_GET_REQUEST && p.GetData() != NULL
@@ -618,32 +653,20 @@ int CGXDLMS::GetLNPdu(
             }
             reply.SetUInt8(p.GetRequestType());
             // Add Invoke Id And Priority.
-            reply.SetUInt8(GetInvokeIDPriority(*p.GetSettings()));
-        }
-        else
-        {
-            // Add Long-Invoke-Id-And-Priority
-            reply.SetUInt32(GetLongInvokeIDPriority(*p.GetSettings()));
-            // Add date time.
-            if (p.GetTime() == NULL)
+            if (p.GetInvokeId() != 0)
             {
-                reply.SetUInt8(DLMS_DATA_TYPE_NONE);
+                reply.SetUInt8((unsigned char)p.GetInvokeId());
             }
             else
             {
-                // Data is send in octet string. Remove data type.
-                int pos = reply.GetSize();
-                CGXDLMSVariant tmp = *p.GetTime();
-                if ((ret = GXHelpers::SetData(reply, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
-                {
-                    return ret;
-                }
-                reply.Move(pos + 1, pos, reply.GetSize() - pos - 1);
+                reply.SetUInt8(GetInvokeIDPriority(*p.GetSettings()));
             }
         }
+
         // Add attribute descriptor.
         reply.Set(p.GetAttributeDescriptor());
-        if (p.GetCommand() != DLMS_COMMAND_DATA_NOTIFICATION &&
+        if (p.GetCommand() != DLMS_COMMAND_EVENT_NOTIFICATION &&
+            p.GetCommand() != DLMS_COMMAND_DATA_NOTIFICATION &&
             (p.GetSettings()->GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER) == 0)
         {
             // If multiple blocks.
@@ -761,6 +784,9 @@ int CGXDLMS::GetLnMessages(
     if (p.GetCommand() == DLMS_COMMAND_AARQ)
     {
         frame = 0x10;
+    }
+    else if (p.GetCommand() == DLMS_COMMAND_EVENT_NOTIFICATION) {
+        frame = 0x13;
     }
     do
     {
@@ -891,7 +917,28 @@ int CGXDLMS::GetSNPdu(
         cnt = p.GetData()->GetSize() - p.GetData()->GetPosition();
     }
     // Add command.
-    if (p.GetCommand() != DLMS_COMMAND_AARQ && p.GetCommand() != DLMS_COMMAND_AARE)
+    if (p.GetCommand() == DLMS_COMMAND_INFORMATION_REPORT) {
+        reply.SetUInt8(p.GetCommand());
+        // Add date time.
+        if (p.GetTime() == NULL)
+        {
+            reply.SetUInt8(DLMS_DATA_TYPE_NONE);
+        }
+        else
+        {
+            // Data is send in octet string. Remove data type.
+            int pos = reply.GetSize();
+            CGXDLMSVariant tmp = *p.GetTime();
+            if ((ret = GXHelpers::SetData(reply, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+            {
+                return ret;
+            }
+            reply.Move(pos + 1, pos, reply.GetSize() - pos - 1);
+        }
+        GXHelpers::SetObjectCount(p.GetCount(), reply);
+        reply.Set(p.GetAttributeDescriptor());
+    }
+    else if (p.GetCommand() != DLMS_COMMAND_AARQ && p.GetCommand() != DLMS_COMMAND_AARE)
     {
         reply.SetUInt8((unsigned char)p.GetCommand());
         if (p.GetCount() != 0xFF)
@@ -1002,6 +1049,10 @@ int CGXDLMS::GetSnMessages(
     if (p.GetCommand() == DLMS_COMMAND_AARQ)
     {
         frame = 0x10;
+    }
+    else if (p.GetCommand() == DLMS_COMMAND_INFORMATION_REPORT)
+    {
+        frame = 0x13;
     }
     else if (p.GetCommand() == DLMS_COMMAND_NONE)
     {
@@ -1814,7 +1865,7 @@ int CGXDLMS::GetPdu(
             // This is parsed later.
             data.GetData().SetPosition(data.GetData().GetPosition() - 1);
             break;
-        case DLMS_COMMAND_DISCONNECT_RESPONSE:
+        case DLMS_COMMAND_RELEASE_RESPONSE:
             break;
         case DLMS_COMMAND_EXCEPTION_RESPONSE:
             /* TODO:
@@ -1827,7 +1878,7 @@ int CGXDLMS::GetPdu(
         case DLMS_COMMAND_WRITE_REQUEST:
         case DLMS_COMMAND_SET_REQUEST:
         case DLMS_COMMAND_METHOD_REQUEST:
-        case DLMS_COMMAND_DISCONNECT_REQUEST:
+        case DLMS_COMMAND_RELEASE_REQUEST:
             // Server handles this.
             if ((data.GetMoreData() & DLMS_DATA_REQUEST_TYPES_FRAME) != 0)
             {
@@ -1907,6 +1958,12 @@ int CGXDLMS::GetPdu(
             break;
         case DLMS_COMMAND_DATA_NOTIFICATION:
             ret = HandleDataNotification(settings, data);
+            // Client handles this.
+            break;
+        case DLMS_COMMAND_EVENT_NOTIFICATION:
+            // Client handles this.
+            break;
+        case DLMS_COMMAND_INFORMATION_REPORT:
             // Client handles this.
             break;
         default:
@@ -2738,6 +2795,14 @@ int CGXDLMS::GetActionInfo(DLMS_OBJECT_TYPE objectType, unsigned char& value, un
     case DLMS_OBJECT_TYPE_SPECIAL_DAYS_TABLE:
         value = 0x10;
         count = 2;
+        break;
+    case DLMS_OBJECT_TYPE_DISCONNECT_CONTROL:
+        value = 0x20;
+        count = 2;
+        break;
+    case DLMS_OBJECT_TYPE_PUSH_SETUP:
+        value = 0x38;
+        count = 1;
         break;
     default:
         count = value = 0;

@@ -191,18 +191,10 @@ int GetInitiateRequest(
     return 0;
 }
 
-/**
- * Generate user information.
- *
- * @param settings
- *            DLMS settings.
- * @param cipher
- * @param data
- *            Generated user information.
- */
-int GenerateUserInformation(
+int CGXAPDU::GenerateUserInformation(
     CGXDLMSSettings& settings,
     CGXCipher* cipher,
+    CGXByteBuffer* encryptedData,
     CGXByteBuffer& data)
 {
     int ret;
@@ -222,28 +214,42 @@ int GenerateUserInformation(
     }
     else
     {
-        CGXByteBuffer tmp, crypted;
-        if ((ret = GetInitiateRequest(settings, cipher, tmp)) != 0)
+        if (encryptedData != NULL && encryptedData->GetSize() != 0)
         {
-            return ret;
+            //Length for AARQ user field
+            data.SetUInt8((unsigned char)(4 + encryptedData->GetSize()));
+            //Tag
+            data.SetUInt8(BER_TYPE_OCTET_STRING);
+            data.SetUInt8((unsigned char)(2 + encryptedData->GetSize()));
+            //Coding the choice for user-information (Octet STRING, universal)
+            data.SetUInt8(DLMS_COMMAND_GLO_INITIATE_REQUEST);
+            data.SetUInt8((unsigned char)encryptedData->GetSize());
+            data.Set(encryptedData);
         }
-        if ((ret = cipher->Encrypt(cipher->GetSecurity(),
-            DLMS_COUNT_TYPE_PACKET,
-            settings.GetCipher()->GetFrameCounter(),
-            DLMS_COMMAND_GLO_INITIATE_REQUEST,
-            cipher->GetSystemTitle(),
-            tmp,
-            crypted)) != 0)
+        else
         {
-            return ret;
+            CGXByteBuffer tmp, crypted;
+            if ((ret = GetInitiateRequest(settings, cipher, tmp)) != 0)
+            {
+                return ret;
+            }
+            if ((ret = cipher->Encrypt(cipher->GetSecurity(),
+                DLMS_COUNT_TYPE_PACKET,
+                settings.GetCipher()->GetFrameCounter(),
+                DLMS_COMMAND_GLO_INITIATE_REQUEST,
+                cipher->GetSystemTitle(),
+                tmp,
+                crypted)) != 0)
+            {
+                return ret;
+            }
+            // Length for AARQ user field
+            GXHelpers::SetObjectCount(2 + crypted.GetSize(), data);
+            // Coding the choice for user-information (Octet string, universal)
+            data.SetUInt8(BER_TYPE_OCTET_STRING);
+            GXHelpers::SetObjectCount(crypted.GetSize(), data);
+            data.Set(&crypted);
         }
-
-        // Length for AARQ user field
-        GXHelpers::SetObjectCount(2 + crypted.GetSize(), data);
-        // Coding the choice for user-information (Octet string, universal)
-        data.SetUInt8(BER_TYPE_OCTET_STRING);
-        GXHelpers::SetObjectCount(crypted.GetSize(), data);
-        data.Set(&crypted);
     }
     return 0;
 }
@@ -709,7 +715,7 @@ int UpdateAuthentication(
     {
         return ret;
     }
-    if (ch > 5)
+    if (ch > DLMS_AUTHENTICATION_HIGH_SHA256)
     {
         return DLMS_ERROR_CODE_INVALID_TAG;
     }
@@ -767,6 +773,7 @@ int GetUserInformation(
 int CGXAPDU::GenerateAarq(
     CGXDLMSSettings& settings,
     CGXCipher* cipher,
+    CGXByteBuffer* encryptedData,
     CGXByteBuffer& data)
 {
     int ret;
@@ -785,7 +792,7 @@ int CGXAPDU::GenerateAarq(
     {
         return ret;
     }
-    if ((ret = GenerateUserInformation(settings, cipher, data)) != 0)
+    if ((ret = GenerateUserInformation(settings, cipher, encryptedData, data)) != 0)
     {
         return ret;
     }

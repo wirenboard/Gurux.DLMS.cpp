@@ -33,6 +33,10 @@
 //---------------------------------------------------------------------------
 
 #include "../include/GXSecure.h"
+#include "../include/GXDLMSMd5.h"
+#include "../include/GXDLMSSha1.h"
+#include "../include/GXDLMSSha256.h"
+
 #include <stdlib.h> //rand
 
 int CGXSecure::GenerateChallenge(DLMS_AUTHENTICATION authentication, CGXByteBuffer& challenge)
@@ -108,13 +112,15 @@ int CGXSecure::Secure(
     }
     if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_MD5)
     {
-        //MD5 is not supported at the moment.
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        return CGXDLMSMD5::Encrypt(challenge, reply);
     }
     else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA1)
     {
-        //SHA-1 is not supported at the moment.
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        return CGXDLMSSha1::Encrypt(challenge, reply);
+    }
+    else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256)
+    {
+        return CGXDLMSSha256::Encrypt(challenge, reply);
     }
     else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
     {

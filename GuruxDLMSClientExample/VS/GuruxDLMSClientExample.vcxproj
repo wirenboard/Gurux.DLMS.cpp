@@ -23,8 +23,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\communication.h" />
+    <ClInclude Include="..\include\getopt.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\getopt.c" />
     <ClCompile Include="..\src\GuruxDLMSClientExample.cpp" />
     <ClCompile Include="..\src\communication.cpp" />
   </ItemGroup>

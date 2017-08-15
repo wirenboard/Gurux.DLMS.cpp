@@ -18,9 +18,15 @@
     <ClCompile Include="..\src\communication.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\getopt.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\communication.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\getopt.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

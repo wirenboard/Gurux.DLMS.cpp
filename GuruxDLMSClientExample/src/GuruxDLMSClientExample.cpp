@@ -34,7 +34,7 @@
 
 // GuruxDLMSClientExample.cpp : Defines the entry point for the Gurux DLMS Client example.
 //
-
+#include "../include/getopt.h"
 #include "../include/communication.h"
 #include "../../development/include/GXDLMSConverter.h"
 #include "../../development/include/GXDLMSProfileGeneric.h"
@@ -44,6 +44,32 @@ static void WriteValue(std::string line)
 {
     printf(line.c_str());
     GXHelpers::Write("LogFile.txt", line);
+}
+
+static void ShowHelp()
+{
+    printf("GuruxDlmsSample reads data from the DLMS/COSEM device.\r\n");
+    printf("GuruxDlmsSample -h [Meter IP Address] -p [Meter Port No] -c 16 -s 1 -r SN\r\n");
+    printf(" -h \t host name or IP address.\r\n");
+    printf(" -p \t port number or name (Example: 1000).\r\n");
+    printf(" -S \t serial port.\r\n");
+    printf(" -i IEC is a start protocol.\r\n");
+    printf(" -a \t Authentication (None, Low, High).\r\n");
+    printf(" -P \t Password for authentication.\r\n");
+    printf(" -c \t Client address. (Default: 16)\r\n");
+    printf(" -s \t Server address. (Default: 1)\r\n");
+    printf(" -n \t Server address as serial number.\r\n");
+    printf(" -r [sn, sn]\t Short name or Logican Name (default) referencing is used.\r\n");
+    printf(" -w WRAPPER profile is used. HDLC is default.\r\n");
+    printf(" -t Trace messages.\r\n");
+    printf(" -g \"0.0.1.0.0.255:1; 0.0.1.0.0.255:2\" Get selected object(s) with given attribute index.\r\n");
+    printf("Example:\r\n");
+    printf("Read LG device using TCP/IP connection.\r\n");
+    printf("GuruxDlmsSample -r SN -c 16 -s 1 -h [Meter IP Address] -p [Meter Port No]\r\n");
+    printf("Read LG device using serial port connection.\r\n");
+    printf("GuruxDlmsSample -r SN -c 16 -s 1 -sp COM1 -i\r\n");
+    printf("Read Indian device using serial port connection.\r\n");
+    printf("GuruxDlmsSample -S COM1 -c 16 -s 1 -a Low -P [password]\r\n");
 }
 
 #if defined(_WIN32) || defined(_WIN64)//Windows
@@ -64,46 +90,175 @@ int main(int argc, char* argv[])
         }
 #endif
         int ret;
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //TODO: Client and Server addresses are manufacturer dependence. They should be standard values but they are not.
-        //Below are some example values. Ask correct values from your meter manufacturer or http://www.gurux.org.
-        /*
-            //Iskra Serial port settings.
-            CGXDLMSClient cl(true, 100, CGXDLMSClient::GetServerAddress(1, 17), DLMS_AUTHENTICATION_LOW, "12345678");
-            //Landis+Gyr settings.
-            CGXDLMSClient cl(false);
-            //Kamstrup settings.
-            CGXDLMSClient cl(true);
-            //Actaris settings.
-            CGXDLMSClient cl(true, 1, CGXDLMSClient::GetServerAddress(1, 17), DLMS_AUTHENTICATION_LOW, "ABCDEFGH");
-            //Iskra TCP/IP settings.
-            CGXDLMSClient cl(true, 100, 1, DLMS_AUTHENTICATION_LOW, "12345678", DLMS_INTERFACE_TYPE_WRAPPER);
-            CGXDLMSClient cl(true, 1, 1, DLMS_AUTHENTICATION_LOW, "12345678", DLMS_INTERFACE_TYPE_WRAPPER);
-            //Note! New Iskra meters need also this.
-            cl.SetServiceClass(DLMS_SERVICE_CLASS_CONFIRMED);
-            //ZIV settings.
-            CGXDLMSClient cl(true, 1, 1, DLMS_AUTHENTICATION_NONE, NULL, DLMS_INTERFACE_TYPE_WRAPPER);
-        */
+
         //Remove trace file if exists.
         remove("trace.txt");
         remove("LogFile.txt");
-        bool trace = true;
-        //Use Logical name.
-        CGXDLMSClient cl(true);
-        CGXCommunication comm(&cl, 5000, trace);
-        //Serial port settings.
-        /*
-        if ((ret = comm.Open("COM3", false)) != 0)
-        {
-            TRACE("Connect failed %S.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
-            return 1;
-        }
+        bool trace = false, useLogicalNameReferencing = true;
+        int clientAddress = 16, serverAddress = 1;
+        DLMS_AUTHENTICATION authentication = DLMS_AUTHENTICATION_NONE;
+        DLMS_INTERFACE_TYPE interfaceType = DLMS_INTERFACE_TYPE_HDLC;
+        char *password = NULL;
 
-        */
-        //TCP/IP settings. Default is Gurux example meter.
-        if ((ret = comm.Connect("localhost", 4061)) != 0)
+        int opt = 0;
+        int port = 0;
+        char* address = NULL;
+        char* serialPort = NULL;
+        bool iec = false;
+        while ((opt = getopt(argc, argv, "h:p:c:s:r:ita:p:wP:")) != -1)
         {
-            TRACE("Connect failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
+            switch (opt)
+            {
+            case 'w':
+                interfaceType = DLMS_INTERFACE_TYPE_WRAPPER;
+                break;
+            case 'r':
+                if (strcmp("sn", optarg) == 0)
+                {
+                    useLogicalNameReferencing = false;
+                }
+                else if (strcmp("ln", optarg) == 0)
+                {
+                    useLogicalNameReferencing = 1;
+                }
+                else
+                {
+                    printf("Invalid reference option.\n");
+                    return 1;
+                }
+                break;
+            case 'h':
+                //Host address.
+                address = optarg;
+                break;
+            case 't':
+                //Trace.
+                trace = 1;
+                break;
+            case 'p':
+                //Port.
+                port = atoi(optarg);
+                break;
+            case 'P':
+                password = optarg;
+                break;
+            case 'i':
+                //IEC.
+                iec = 1;
+                break;
+            case 'S':
+                serialPort = optarg;
+                break;
+            case 'a':
+                if (strcmp("None", optarg) == 0)
+                {
+                    authentication = DLMS_AUTHENTICATION_NONE;
+                }
+                else if (strcmp("Low", optarg) == 0)
+                {
+                    authentication = DLMS_AUTHENTICATION_LOW;
+                }
+                else if (strcmp("High", optarg) == 0)
+                {
+                    authentication = DLMS_AUTHENTICATION_HIGH;
+                }
+                else if (strcmp("HighMd5", optarg) == 0)
+                {
+                    authentication = DLMS_AUTHENTICATION_HIGH_MD5;
+                }
+                else if (strcmp("HighSha1", optarg) == 0)
+                {
+                    authentication = DLMS_AUTHENTICATION_HIGH_SHA1;
+                }
+                else if (strcmp("HighGmac", optarg) == 0)
+                {
+                    authentication = DLMS_AUTHENTICATION_HIGH_GMAC;
+                }
+                else if (strcmp("HighSha256", optarg) == 0)
+                {
+                    authentication = DLMS_AUTHENTICATION_HIGH_SHA256;
+                }
+                else
+                {
+                    printf("Invalid Authentication option. (None, Low, High, HighMd5, HighSha1, HighGmac, HighSha256)\n");
+                    return 1;
+                }
+                break;
+            case 'o':
+                break;
+            case 'c':
+                clientAddress = atoi(optarg);
+                break;
+            case 's':
+                serverAddress = atoi(optarg);
+                break;
+            case '?':
+            {
+                if (optarg[0] == 'c') {
+                    printf("Missing mandatory client option.\n");
+                }
+                else if (optarg[0] == 's') {
+                    printf("Missing mandatory server option.\n");
+                }
+                else if (optarg[0] == 'h') {
+                    printf("Missing mandatory host name option.\n");
+                }
+                else if (optarg[0] == 'p') {
+                    printf("Missing mandatory port option.\n");
+                }
+                else if (optarg[0] == 'r') {
+                    printf("Missing mandatory reference option.\n");
+                }
+                else if (optarg[0] == 'a') {
+                    printf("Missing mandatory authentication option.\n");
+                }
+                else if (optarg[0] == 'S') {
+                    printf("Missing mandatory Serial port option.\n");
+                }
+                else
+                {
+                    ShowHelp();
+                    return 1;
+                }
+            }
+            break;
+            default:
+                ShowHelp();
+                return 1;
+            }
+        }
+        CGXDLMSSecureClient cl(useLogicalNameReferencing, clientAddress, serverAddress, authentication, password, interfaceType);
+        CGXCommunication comm(&cl, 5000, trace);
+
+        if (port != 0 || address != NULL)
+        {
+            if (port == 0)
+            {
+                printf("Missing mandatory port option.\n");
+                return 1;
+            }
+            if (address == NULL)
+            {
+                printf("Missing mandatory host option.\n");
+                return 1;
+            }
+            if ((ret = comm.Connect(address, port)) != 0)
+            {
+                TRACE("Connect failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
+                return 1;
+            }
+        }
+        else if (serialPort != NULL)
+        {
+            if ((ret = comm.Open(serialPort, iec)) != 0)
+            {
+                TRACE("Connect failed %S.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
+                return 1;
+            }
+        }
+        else
+        {
+            printf("Missing mandatory connection information for TCP/IP or serial port connection.\n");
             return 1;
         }
         if ((ret = comm.InitializeConnection()) != 0)
@@ -117,6 +272,10 @@ int main(int argc, char* argv[])
             TRACE("InitializeConnection failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
             return 1;
         }
+
+        CGXDLMSRegister* pReg = new CGXDLMSRegister("1.0.32.7.0.255");
+        Objects.push_back(pReg);
+
         std::string value;
         std::string str;
         std::string ln;
@@ -315,7 +474,7 @@ int main(int argc, char* argv[])
 #endif
                 WriteValue(buff);
                 //Continue reading.
-            }
+        }
             std::string entries = value;
             str = "Entries: ";
             str += entriesInUse;

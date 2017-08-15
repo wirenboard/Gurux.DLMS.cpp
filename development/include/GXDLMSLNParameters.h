@@ -84,7 +84,10 @@ private:
      * Block index.
      */
     unsigned long m_BlockIndex;
-
+    /**
+    * Invoke ID.
+    */
+    unsigned long m_InvokeId;
 public:
     /**
      * Constructor.
@@ -101,11 +104,11 @@ public:
      *            Data.
      */
     CGXDLMSLNParameters(CGXDLMSSettings* settings,
-                        DLMS_COMMAND command,
-                        int commandType,
-                        CGXByteBuffer* attributeDescriptor,
-                        CGXByteBuffer* data,
-                        int status);
+        DLMS_COMMAND command,
+        int commandType,
+        CGXByteBuffer* attributeDescriptor,
+        CGXByteBuffer* data,
+        int status);
 
     /**
      * @return DLMS settings.
@@ -192,6 +195,19 @@ public:
      *            the blockIndex to set
      */
     void SetBlockIndex(unsigned long value);
+
+    /**
+    * @return Get Invoke ID and priority. This can be used for Priority
+    *         Management.
+    */
+    unsigned long GetInvokeId();
+
+    /**
+    * @param value
+    *            Set Invoke ID and priority. This can be used for Priority
+    *            Management.
+    */
+    void SetInvokeId(unsigned long value);
 };
 
 #endif //GXDLMSLNPARAMETERS_H

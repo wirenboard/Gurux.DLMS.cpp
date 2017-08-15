@@ -286,7 +286,7 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             {
                 return DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
-    }
+        }
 #endif
         reply.Set(m_Receivebuff, bytesRead);
         //Note! Some USB converters can return true for ReadFile and Zero as bytesRead.
@@ -313,8 +313,8 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             }
             lastReadIndex = pos;
         }
-} while (!bFound);
-return DLMS_ERROR_CODE_OK;
+    } while (!bFound);
+    return DLMS_ERROR_CODE_OK;
 }
 
 //Open serial port.
@@ -547,7 +547,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
             break;
         default:
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
-            }
+        }
         //Send ACK
         buff[0] = 0x06;
         //Send Protocol control character
@@ -624,9 +624,9 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
 #endif
-            }
+    }
     return DLMS_ERROR_CODE_OK;
-        }
+}
 
 //Initialize connection to the meter.
 int CGXCommunication::InitializeConnection()
@@ -713,7 +713,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             return DLMS_ERROR_CODE_SEND_FAILED;
         }
 #endif
-            }
+    }
     else if ((ret = send(m_socket, (const char*)data.GetData(), len, 0)) == -1)
     {
         //If error has occured
@@ -723,7 +723,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         printf("send failed %d\n", errno);
 #endif
         return DLMS_ERROR_CODE_SEND_FAILED;
-        }
+    }
     // Loop until whole DLMS packet is received.
     tmp = "";
     do
@@ -744,7 +744,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
                 tmp += " ";
             }
             tmp += bb.ToHexString();
-        }
+            }
         else
         {
             len = RECEIVE_BUFFER_SIZE;
@@ -769,24 +769,24 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             }
             tmp += GXHelpers::BytesToHex(m_Receivebuff, ret);
         }
-    } while ((ret = m_Parser->GetData(bb, reply)) == DLMS_ERROR_CODE_FALSE);
-    tmp += "\r\n";
-    if (m_Trace)
-    {
-        printf("%s", tmp.c_str());
-    }
-    GXHelpers::Write("trace.txt", tmp);
-    if (ret == DLMS_ERROR_CODE_REJECTED)
-    {
+        } while ((ret = m_Parser->GetData(bb, reply)) == DLMS_ERROR_CODE_FALSE);
+        tmp += "\r\n";
+        if (m_Trace)
+        {
+            printf("%s", tmp.c_str());
+        }
+        GXHelpers::Write("trace.txt", tmp);
+        if (ret == DLMS_ERROR_CODE_REJECTED)
+        {
 #if defined(_WIN32) || defined(_WIN64)//Windows
-        Sleep(1000);
+            Sleep(1000);
 #else
-        usleep(1000000);
+            usleep(1000000);
 #endif
-        ret = ReadDLMSPacket(data, reply);
-    }
-    return ret;
-    }
+            ret = ReadDLMSPacket(data, reply);
+        }
+        return ret;
+        }
 
 int CGXCommunication::ReadDataBlock(CGXByteBuffer& data, CGXReplyData& reply)
 {
@@ -815,7 +815,7 @@ int CGXCommunication::ReadDataBlock(CGXByteBuffer& data, CGXReplyData& reply)
         }
     }
     return DLMS_ERROR_CODE_OK;
-}
+        }
 
 
 int CGXCommunication::ReadDataBlock(std::vector<CGXByteBuffer>& data, CGXReplyData& reply)

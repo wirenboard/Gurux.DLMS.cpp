@@ -1782,6 +1782,29 @@ int CGXDLMSServer::HandleWriteRequest(CGXByteBuffer& data)
     return CGXDLMS::GetSNPdu(p, m_ReplyData);
 }
 
+/**
+* Handles release request.
+*
+* @param data
+*            Received data.
+* @param connectionInfo
+*            Connection info.
+*/
+int CGXDLMSServer::HandleReleaseRequest(CGXByteBuffer& data)
+{
+    if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC)
+    {
+        m_ReplyData.Set(LLC_REPLY_BYTES, 3);
+    }
+    m_ReplyData.SetUInt8(0x63);
+    // LEN.
+    m_ReplyData.SetUInt8(0x03);
+    m_ReplyData.SetUInt8(0x80);
+    m_ReplyData.SetUInt8(0x01);
+    m_ReplyData.SetUInt8(0x00);
+    return 0;
+}
+
 int CGXDLMSServer::HandleCommand(
     CGXDLMSConnectionEventArgs& connectionInfo,
     DLMS_COMMAND cmd,
@@ -1817,7 +1840,9 @@ int CGXDLMSServer::HandleCommand(
     case DLMS_COMMAND_AARQ:
         ret = HandleAarqRequest(data, connectionInfo);
         break;
-    case DLMS_COMMAND_DISCONNECT_REQUEST:
+    case DLMS_COMMAND_RELEASE_REQUEST:
+        ret = HandleReleaseRequest(data);
+        break;
     case DLMS_COMMAND_DISC:
         ret = GenerateDisconnectRequest(m_Settings, m_ReplyData);
         m_Settings.SetConnected(false);

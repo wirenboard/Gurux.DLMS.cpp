@@ -68,6 +68,9 @@ int Test()
         return ret;
     }
     printf("Short Name DLMS Server in port 4060.\r\n");
+    printf("Example connection settings:\n");
+    printf("Gurux.DLMS.Client.Example.Net /r=SN /h=localhost /p=4060\n");
+    printf("----------------------------------------------------------\n");
     ///////////////////////////////////////////////////////////////////////
     //Create Gurux DLMS server component for Short Name and start listen events.
     CGXDLMSServerLN LNServer;
@@ -76,6 +79,9 @@ int Test()
         return ret;
     }
     printf("Logical Name DLMS Server in port 4061.\r\n");
+    printf("Example connection settings:\n");
+    printf("GuruxDLMSClientExample -h localhost -p 4061\n");
+    printf("----------------------------------------------------------\n");
     ///////////////////////////////////////////////////////////////////////
     //Create Gurux DLMS server component for Short Name and start listen events.
     CGXDLMSServerSN_47 SN_47Server;
@@ -84,6 +90,9 @@ int Test()
         return ret;
     }
     printf("Short Name DLMS Server with IEC 62056-47 in port 4062.\r\n");
+    printf("Example connection settings:\n");
+    printf("GuruxDLMSClientExample -r sn -h localhost -p 4062 -w\n");
+    printf("----------------------------------------------------------\n");
     ///////////////////////////////////////////////////////////////////////
     //Create Gurux DLMS server component for Short Name and start listen events.
     CGXDLMSServerLN_47 LN_47Server;
@@ -92,10 +101,13 @@ int Test()
         return ret;
     }
     printf("Logical Name DLMS Server with IEC 62056-47 in port 4063.\r\n");
+    printf("Example connection settings:\n");
+    printf("GuruxDLMSClientExample -h localhost -p 4063 -w\n");
+    printf("----------------------------------------------------------\n");
     printf("Press Enter to close application.\r\n");
     getchar();
     return 0;
-}
+    }
 
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
 int _tmain(int argc, _TCHAR* argv[])
