@@ -272,10 +272,6 @@ int main(int argc, char* argv[])
             TRACE("InitializeConnection failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
             return 1;
         }
-
-        CGXDLMSRegister* pReg = new CGXDLMSRegister("1.0.32.7.0.255");
-        Objects.push_back(pReg);
-
         std::string value;
         std::string str;
         std::string ln;
@@ -437,8 +433,8 @@ int main(int argc, char* argv[])
                     WriteValue(value.c_str());
                     WriteValue("\r\n");
                 }
+                }
             }
-        }
 
         //Find profile generics and read them.
         CGXDLMSObjectCollection pgs;
@@ -529,10 +525,10 @@ int main(int argc, char* argv[])
                     WriteValue(rows.ToString());
                 }
             }
-        }
+            }
         //Close connection.
         comm.Close();
-    }
+            }
 #if defined(_WIN32) || defined(_WIN64)//Windows
     WSACleanup();
 #if _MSC_VER > 1400
@@ -540,5 +536,5 @@ int main(int argc, char* argv[])
 #endif
 #endif
     return 0;
-}
+        }
 
