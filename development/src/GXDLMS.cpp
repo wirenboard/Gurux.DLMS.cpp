@@ -586,7 +586,7 @@ int CGXDLMS::GetLNPdu(
             p.GetCommand() == DLMS_COMMAND_ACCESS_RESPONSE)
         {
             // Add Long-Invoke-Id-And-Priority
-            if (p.GetCommand() != DLMS_CONFORMANCE_EVENT_NOTIFICATION)
+            if (p.GetCommand() != DLMS_COMMAND_EVENT_NOTIFICATION)
             {
                 if (p.GetInvokeId() != 0)
                 {

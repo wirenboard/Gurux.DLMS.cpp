@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
         char* address = NULL;
         char* serialPort = NULL;
         bool iec = false;
-        while ((opt = getopt(argc, argv, "h:p:c:s:r:ita:p:wP:")) != -1)
+        while ((opt = getopt(argc, argv, "h:p:c:s:r:ita:wP:")) != -1)
         {
             switch (opt)
             {
@@ -474,7 +474,7 @@ int main(int argc, char* argv[])
 #endif
                 WriteValue(buff);
                 //Continue reading.
-        }
+            }
             std::string entries = value;
             str = "Entries: ";
             str += entriesInUse;

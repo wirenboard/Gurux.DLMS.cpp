@@ -35,7 +35,7 @@
 #ifndef GXDLMSSHA256_H
 #define GXDLMSSHA256_H
 
-#include "gxbytebuffer.h"
+#include "GXBytebuffer.h"
 
 //This class is used to handle SHA-256.
 class CGXDLMSSha256

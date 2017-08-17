@@ -35,7 +35,7 @@
 #ifndef GXDLMSSHA1_H
 #define GXDLMSSHA1_H
 
-#include "gxbytebuffer.h"
+#include "GXBytebuffer.h"
 
 //This class is used to handle SHA-1.
 class CGXDLMSSha1

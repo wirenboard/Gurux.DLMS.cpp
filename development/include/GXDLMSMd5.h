@@ -35,7 +35,7 @@
 #ifndef GXDLMSMD5_H
 #define GXDLMSMD5_H
 
-#include "gxbytebuffer.h"
+#include "GXBytebuffer.h"
 
 class CGXDLMSMD5
 {
