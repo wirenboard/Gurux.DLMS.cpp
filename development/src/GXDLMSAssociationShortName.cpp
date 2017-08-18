@@ -186,15 +186,18 @@ void CGXDLMSAssociationShortName::GetAttributeIndexToRead(std::vector<int>& attr
     {
         attributes.push_back(2);
     }
-    //AccessRightsList is static and read only once.
-    if (!IsRead(3))
+    if (m_Version > 1)
     {
-        attributes.push_back(3);
-    }
-    //SecuritySetupReference is static and read only once.
-    if (!IsRead(4))
-    {
-        attributes.push_back(4);
+        //AccessRightsList is static and read only once.
+        if (!IsRead(3))
+        {
+            attributes.push_back(3);
+        }
+        //SecuritySetupReference is static and read only once.
+        if (!IsRead(4))
+        {
+            attributes.push_back(4);
+        }
     }
 }
 

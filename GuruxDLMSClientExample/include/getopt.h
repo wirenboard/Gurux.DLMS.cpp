@@ -24,10 +24,12 @@
 extern "C" {
 #endif
 
+#if defined(_WIN32) || defined(_WIN64)//Windows
     extern char *optarg;
     extern int optind;
-
     int getopt(int argc, char *const argv[], const char *optstring);
+#endif
+
 
 #ifdef __cplusplus
 }

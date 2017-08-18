@@ -45,6 +45,12 @@ CGXDLMSProfileGeneric::~CGXDLMSProfileGeneric()
     {
         delete it->second;
     }
+    for (std::vector<CGXDLMSObject*>::iterator it = m_DynamicColumns.begin();
+        it != m_DynamicColumns.end(); ++it)
+    {
+        delete *it;
+    }
+    m_DynamicColumns.clear();
     m_CaptureObjects.clear();
     m_Buffer.clear();
 }
@@ -906,6 +912,7 @@ int CGXDLMSProfileGeneric::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
                 if (pObj == NULL)
                 {
                     pObj = CGXDLMSObjectFactory::CreateObject(type, ln);
+                    m_DynamicColumns.push_back(pObj);
                 }
                 AddCaptureObject(pObj, (*it).Arr[2].ToInteger(), (*it).Arr[3].ToInteger());
             }

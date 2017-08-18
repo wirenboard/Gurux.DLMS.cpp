@@ -33,8 +33,9 @@
 //---------------------------------------------------------------------------
 
 // GuruxDLMSClientExample.cpp : Defines the entry point for the Gurux DLMS Client example.
-//
+#if defined(_WIN32) || defined(_WIN64)//Windows
 #include "../include/getopt.h"
+#endif
 #include "../include/communication.h"
 #include "../../development/include/GXDLMSConverter.h"
 #include "../../development/include/GXDLMSProfileGeneric.h"
@@ -433,8 +434,8 @@ int main(int argc, char* argv[])
                     WriteValue(value.c_str());
                     WriteValue("\r\n");
                 }
-                }
             }
+        }
 
         //Find profile generics and read them.
         CGXDLMSObjectCollection pgs;
@@ -525,10 +526,10 @@ int main(int argc, char* argv[])
                     WriteValue(rows.ToString());
                 }
             }
-            }
+        }
         //Close connection.
         comm.Close();
-            }
+    }
 #if defined(_WIN32) || defined(_WIN64)//Windows
     WSACleanup();
 #if _MSC_VER > 1400
@@ -536,5 +537,5 @@ int main(int argc, char* argv[])
 #endif
 #endif
     return 0;
-        }
+}
 

@@ -60,6 +60,14 @@ int CGXCommunication::Close()
     CGXReplyData reply;
     if (m_hComPort != INVALID_HANDLE_VALUE || m_socket != -1)
     {
+        if ((ret = m_Parser->ReleaseRequest(data)) != 0 ||
+            (ret = ReadDataBlock(data, reply)) != 0)
+        {
+            //Show error but continue close.
+        }
+    }
+    if (m_hComPort != INVALID_HANDLE_VALUE || m_socket != -1)
+    {
         if ((ret = m_Parser->DisconnectRequest(data)) != 0 ||
             (ret = ReadDataBlock(data, reply)) != 0)
         {
@@ -87,7 +95,7 @@ int CGXCommunication::Close()
         m_socket = -1;
     }
     return 0;
-}
+        }
 
 //Make TCP/IP connection to the meter.
 int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
@@ -428,7 +436,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
             printf("Failed to Open port. tcsetattr failed.\r");
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
-    }
+        }
 #endif
     if (iec)
     {
@@ -493,7 +501,7 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
         if ((ret = reply.GetUInt8(reply.GetPosition() + 3, &ch)) != 0)
         {
             return DLMS_ERROR_CODE_SEND_FAILED;
-        }
+    }
         switch (ch)
         {
         case '0':
@@ -624,9 +632,9 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
 #endif
-    }
+        }
     return DLMS_ERROR_CODE_OK;
-}
+    }
 
 //Initialize connection to the meter.
 int CGXCommunication::InitializeConnection()
@@ -713,7 +721,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             return DLMS_ERROR_CODE_SEND_FAILED;
         }
 #endif
-    }
+        }
     else if ((ret = send(m_socket, (const char*)data.GetData(), len, 0)) == -1)
     {
         //If error has occured
@@ -744,7 +752,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
                 tmp += " ";
             }
             tmp += bb.ToHexString();
-            }
+        }
         else
         {
             len = RECEIVE_BUFFER_SIZE;
@@ -774,7 +782,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         if (m_Trace)
         {
             printf("%s", tmp.c_str());
-        }
+    }
         GXHelpers::Write("trace.txt", tmp);
         if (ret == DLMS_ERROR_CODE_REJECTED)
         {
@@ -786,7 +794,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             ret = ReadDLMSPacket(data, reply);
         }
         return ret;
-        }
+    }
 
 int CGXCommunication::ReadDataBlock(CGXByteBuffer& data, CGXReplyData& reply)
 {
@@ -815,7 +823,7 @@ int CGXCommunication::ReadDataBlock(CGXByteBuffer& data, CGXReplyData& reply)
         }
     }
     return DLMS_ERROR_CODE_OK;
-        }
+}
 
 
 int CGXCommunication::ReadDataBlock(std::vector<CGXByteBuffer>& data, CGXReplyData& reply)

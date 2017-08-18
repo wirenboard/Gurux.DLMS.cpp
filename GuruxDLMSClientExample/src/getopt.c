@@ -17,6 +17,8 @@
 *
 ******************************************************************/
 
+#if defined(_WIN32) || defined(_WIN64)//Windows
+
 #include "../include/getopt.h"
 #include <string.h>
 
@@ -49,3 +51,4 @@ int getopt(int argc, char *const argv[], const char *optstring)
     }
     return opt;
 }
+#endif

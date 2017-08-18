@@ -95,29 +95,29 @@ void CGXDLMSActivityCalendar::SetCalendarNameActive(std::string value)
     m_CalendarNameActive = value;
 }
 
-std::vector<CGXDLMSSeasonProfile*> CGXDLMSActivityCalendar::GetSeasonProfileActive()
+std::vector<CGXDLMSSeasonProfile*>& CGXDLMSActivityCalendar::GetSeasonProfileActive()
 {
     return m_SeasonProfileActive;
 }
-void CGXDLMSActivityCalendar::SetSeasonProfileActive(std::vector<CGXDLMSSeasonProfile*> value)
+void CGXDLMSActivityCalendar::SetSeasonProfileActive(std::vector<CGXDLMSSeasonProfile*>& value)
 {
     m_SeasonProfileActive = value;
 }
 
-std::vector<CGXDLMSWeekProfile*> CGXDLMSActivityCalendar::GetWeekProfileTableActive()
+std::vector<CGXDLMSWeekProfile*>& CGXDLMSActivityCalendar::GetWeekProfileTableActive()
 {
     return m_WeekProfileTableActive;
 }
-void CGXDLMSActivityCalendar::SetWeekProfileTableActive(std::vector<CGXDLMSWeekProfile*> value)
+void CGXDLMSActivityCalendar::SetWeekProfileTableActive(std::vector<CGXDLMSWeekProfile*>& value)
 {
     m_WeekProfileTableActive = value;
 }
 
-std::vector<CGXDLMSDayProfile*> CGXDLMSActivityCalendar::GetDayProfileTableActive()
+std::vector<CGXDLMSDayProfile*>& CGXDLMSActivityCalendar::GetDayProfileTableActive()
 {
     return m_DayProfileTableActive;
 }
-void CGXDLMSActivityCalendar::SetDayProfileTableActive(std::vector<CGXDLMSDayProfile*> value)
+void CGXDLMSActivityCalendar::SetDayProfileTableActive(std::vector<CGXDLMSDayProfile*>& value)
 {
     m_DayProfileTableActive = value;
 }
@@ -131,30 +131,30 @@ void CGXDLMSActivityCalendar::SetCalendarNamePassive(std::string value)
     m_CalendarNamePassive = value;
 }
 
-std::vector<CGXDLMSSeasonProfile*> CGXDLMSActivityCalendar::GetSeasonProfilePassive()
+std::vector<CGXDLMSSeasonProfile*>& CGXDLMSActivityCalendar::GetSeasonProfilePassive()
 {
     return m_SeasonProfilePassive;
 }
 
-void CGXDLMSActivityCalendar::SetSeasonProfilePassive(std::vector<CGXDLMSSeasonProfile*> value)
+void CGXDLMSActivityCalendar::SetSeasonProfilePassive(std::vector<CGXDLMSSeasonProfile*>& value)
 {
     m_SeasonProfilePassive = value;
 }
 
-std::vector<CGXDLMSWeekProfile*> CGXDLMSActivityCalendar::GetWeekProfileTablePassive()
+std::vector<CGXDLMSWeekProfile*>& CGXDLMSActivityCalendar::GetWeekProfileTablePassive()
 {
     return m_WeekProfileTablePassive;
 }
-void CGXDLMSActivityCalendar::SetWeekProfileTablePassive(std::vector<CGXDLMSWeekProfile*> value)
+void CGXDLMSActivityCalendar::SetWeekProfileTablePassive(std::vector<CGXDLMSWeekProfile*>& value)
 {
     m_WeekProfileTablePassive = value;
 }
 
-std::vector<CGXDLMSDayProfile*> CGXDLMSActivityCalendar::GetDayProfileTablePassive()
+std::vector<CGXDLMSDayProfile*>& CGXDLMSActivityCalendar::GetDayProfileTablePassive()
 {
     return m_DayProfileTablePassive;
 }
-void CGXDLMSActivityCalendar::SetDayProfileTablePassive(std::vector<CGXDLMSDayProfile*> value)
+void CGXDLMSActivityCalendar::SetDayProfileTablePassive(std::vector<CGXDLMSDayProfile*>& value)
 {
     m_DayProfileTablePassive = value;
 }

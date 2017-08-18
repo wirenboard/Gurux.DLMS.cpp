@@ -67,26 +67,26 @@ public:
     std::string GetCalendarNameActive();
     void SetCalendarNameActive(std::string value);
 
-    std::vector<CGXDLMSSeasonProfile*> GetSeasonProfileActive();
-    void SetSeasonProfileActive(std::vector<CGXDLMSSeasonProfile*> value);
+    std::vector<CGXDLMSSeasonProfile*>& GetSeasonProfileActive();
+    void SetSeasonProfileActive(std::vector<CGXDLMSSeasonProfile*>& value);
 
-    std::vector<CGXDLMSWeekProfile*> GetWeekProfileTableActive();
-    void SetWeekProfileTableActive(std::vector<CGXDLMSWeekProfile*> value);
+    std::vector<CGXDLMSWeekProfile*>& GetWeekProfileTableActive();
+    void SetWeekProfileTableActive(std::vector<CGXDLMSWeekProfile*>& value);
 
-    std::vector<CGXDLMSDayProfile*> GetDayProfileTableActive();
-    void SetDayProfileTableActive(std::vector<CGXDLMSDayProfile*> value);
+    std::vector<CGXDLMSDayProfile*>& GetDayProfileTableActive();
+    void SetDayProfileTableActive(std::vector<CGXDLMSDayProfile*>& value);
 
     std::string GetCalendarNamePassive();
     void SetCalendarNamePassive(std::string value);
 
-    std::vector<CGXDLMSSeasonProfile*> GetSeasonProfilePassive();
-    void SetSeasonProfilePassive(std::vector<CGXDLMSSeasonProfile*> value);
+    std::vector<CGXDLMSSeasonProfile*>& GetSeasonProfilePassive();
+    void SetSeasonProfilePassive(std::vector<CGXDLMSSeasonProfile*>& value);
 
-    std::vector<CGXDLMSWeekProfile*> GetWeekProfileTablePassive();
-    void SetWeekProfileTablePassive(std::vector<CGXDLMSWeekProfile*> value);
+    std::vector<CGXDLMSWeekProfile*>& GetWeekProfileTablePassive();
+    void SetWeekProfileTablePassive(std::vector<CGXDLMSWeekProfile*>& value);
 
-    std::vector<CGXDLMSDayProfile*> GetDayProfileTablePassive();
-    void SetDayProfileTablePassive(std::vector<CGXDLMSDayProfile*> value);
+    std::vector<CGXDLMSDayProfile*>& GetDayProfileTablePassive();
+    void SetDayProfileTablePassive(std::vector<CGXDLMSDayProfile*>& value);
 
     CGXDateTime& GetTime();
     void SetTime(CGXDateTime& value);
