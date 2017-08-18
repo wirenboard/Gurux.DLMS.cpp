@@ -25,7 +25,7 @@
 char* optarg = 0;
 int optind = 1;
 
-int getopt(int argc, _TCHAR *const argv[], const _TCHAR *optstring)
+int getopt(int argc, _TCHAR *const argv[], const char *optstring)
 {
     if ((optind >= argc) || (argv[optind][0] != '-') || (argv[optind][0] == 0))
     {

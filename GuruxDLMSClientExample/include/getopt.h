@@ -29,7 +29,7 @@ extern "C" {
 
     extern char *optarg;
     extern int optind;
-    int getopt(int argc, _TCHAR *const argv[], const _TCHAR *optstring);
+    int getopt(int argc, _TCHAR *const argv[], const char *optstring);
 #endif
 
 
