@@ -25,9 +25,11 @@ extern "C" {
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)//Windows
+#include <tchar.h>
+
     extern char *optarg;
     extern int optind;
-    int getopt(int argc, char *const argv[], const char *optstring);
+    int getopt(int argc, _TCHAR *const argv[], const _TCHAR *optstring);
 #endif
 
 
