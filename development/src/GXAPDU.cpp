@@ -800,6 +800,34 @@ int CGXAPDU::GenerateAarq(
     return 0;
 }
 
+int handleResultComponent(DLMS_SOURCE_DIAGNOSTIC value)
+{
+    int ret;
+    switch ((int)value)
+    {
+    case DLMS_SOURCE_DIAGNOSTIC_NO_REASON_GIVEN:
+        ret = DLMS_ERROR_CODE_NO_REASON_GIVEN;
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED:
+        ret = DLMS_ERROR_CODE_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED;
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_MECHANISM_NAME_NOT_RECOGNISED:
+        ret = DLMS_ERROR_CODE_AUTHENTICATION_MECHANISM_NAME_NOT_RECOGNISED;
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_MECHANISM_NAME_REQUIRED:
+        ret = DLMS_ERROR_CODE_AUTHENTICATION_MECHANISM_NAME_REQUIRED;
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_FAILURE:
+        ret = DLMS_ERROR_CODE_AUTHENTICATION_FAILURE;
+        break;
+    default:
+        //OK.
+        ret = 0;
+        break;
+    }
+    return ret;
+}
+
 int CGXAPDU::ParsePDU(
     CGXDLMSSettings& settings,
     CGXCipher* cipher,
@@ -1026,10 +1054,11 @@ int CGXAPDU::ParsePDU(
             break;
             // 0xBE
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_USER_INFORMATION:
+            //Check result component. Some meters are returning invalid user-information if connection failed.
             if (resultComponent != DLMS_ASSOCIATION_RESULT_ACCEPTED
                 && diagnostic != DLMS_SOURCE_DIAGNOSTIC_NONE)
             {
-                return DLMS_ERROR_CODE_REJECTED_PERMAMENT;
+                return handleResultComponent(diagnostic);
             }
             if ((ret = ParseUserInformation(settings, cipher, buff)) != 0)
             {
@@ -1049,28 +1078,9 @@ int CGXAPDU::ParsePDU(
             break;
         }
     }
-    switch ((int)resultComponent)
-    {
-    case DLMS_SOURCE_DIAGNOSTIC_NO_REASON_GIVEN:
-        return DLMS_ERROR_CODE_NO_REASON_GIVEN;
-        break;
-    case DLMS_SOURCE_DIAGNOSTIC_NOT_SUPPORTED:
-        return DLMS_ERROR_CODE_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED;
-        break;
-    case DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_MECHANISM_NAME_NOT_RECOGNISED:
-        return DLMS_ERROR_CODE_AUTHENTICATION_MECHANISM_NAME_NOT_RECOGNISED;
-        break;
-    case DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_MECHANISM_NAME_REQUIRED:
-        return DLMS_ERROR_CODE_AUTHENTICATION_MECHANISM_NAME_REQUIRED;
-        break;
-    case DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_FAILURE:
-        return DLMS_ERROR_CODE_AUTHENTICATION_FAILURE;
-        break;
-    default:
-        //OK.
-        break;
-    }
-    return 0;
+    //All meters don't send user-information if connection is failed.
+    //For this reason result component is check again.
+    return handleResultComponent(diagnostic);
 }
 
 /**
