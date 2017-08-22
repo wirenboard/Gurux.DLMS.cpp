@@ -323,7 +323,7 @@ int CGXDLMSServer::HandleAarqRequest(
     if (diagnostic != DLMS_SOURCE_DIAGNOSTIC_NONE)
     {
         result = DLMS_ASSOCIATION_RESULT_PERMANENT_REJECTED;
-        diagnostic = DLMS_SOURCE_DIAGNOSTIC_NOT_SUPPORTED;
+        diagnostic = DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED;
         InvalidConnection(connectionInfo);
     }
     else
