@@ -2092,4 +2092,35 @@ typedef enum {
     DLMS_UNIT_NO_UNIT = 255
 }DLMS_UNIT;
 
+/*
+* Specifies trace levels.
+*
+*/
+typedef enum {
+    /**
+    * Output no tracing and debugging messages.
+    */
+    GX_TRACE_LEVEL_OFF,
+
+    /**
+    * Output error-handling messages.
+    */
+    GX_TRACE_LEVEL_ERROR,
+
+    /**
+    * Output warnings and error-handling messages.
+    */
+    GX_TRACE_LEVEL_WARNING,
+
+    /**
+    * Output informational messages, warnings, and error-handling messages.
+    */
+    GX_TRACE_LEVEL_INFO,
+
+    /**
+    * Output all debugging and tracing messages.
+    */
+    GX_TRACE_LEVEL_VERBOSE
+}GX_TRACE_LEVEL;
+
 #endif //ENUMS_H

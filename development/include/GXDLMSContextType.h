@@ -49,7 +49,8 @@ private:
     CGXByteBuffer m_CypheringInfo;
 
 public:
-
+    /*Constructor.*/
+    CGXDLMSContextType();
     /**
     * Server will tell what functionality is available for the client.
     * @return Available functionality.

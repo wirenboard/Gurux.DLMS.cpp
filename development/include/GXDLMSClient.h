@@ -49,7 +49,7 @@ private:
     bool m_IsAuthenticationRequired;
     static void UpdateOBISCodes(CGXDLMSObjectCollection& objects);
     // SN referencing
-    int ParseSNObjects(CGXByteBuffer& buff, CGXDLMSObjectCollection& objects, bool onlyKnownObjects);
+    int ParseSNObjects(CGXByteBuffer& buff, bool onlyKnownObjects);
     /**
     * Parse LN objects.
     *
@@ -61,7 +61,6 @@ private:
     */
     int ParseLNObjects(
         CGXByteBuffer& buff,
-        CGXDLMSObjectCollection& objects,
         bool onlyKnownObjects);
 
     /**
@@ -127,6 +126,9 @@ public:
     void SetServiceClass(DLMS_SERVICE_CLASS value);
 
     CGXDLMSLimits& GetLimits();
+
+    // Collection of the objects.
+    CGXDLMSObjectCollection& GetObjects();
 
     /////////////////////////////////////////////////////////////////////////////
     // Returns SNRMRequest query as byte array.
@@ -237,7 +239,6 @@ public:
     */
     int ParseObjects(
         CGXByteBuffer& data,
-        CGXDLMSObjectCollection& objects,
         bool onlyKnownObjects);
 
     /*
@@ -263,11 +264,11 @@ public:
     * Update list of values.
     *
     * list : List of read objects and atributes.
-    * data : Received reply from the meter.
+    * values :  Received values.
     */
     int UpdateValues(
-        std::vector< std::pair<CGXDLMSObject*, int> >& list,
-        CGXByteBuffer& data);
+        std::vector< std::pair<CGXDLMSObject*, unsigned char> >& list,
+        std::vector<CGXDLMSVariant>& values);
 
     /**
     * Generates a release request.
@@ -345,18 +346,6 @@ public:
     int ReadList(
         std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list,
         std::vector<CGXByteBuffer>& reply);
-
-    /**
-         * Update list of values.
-         *
-         * @param list
-         *            read objects.
-         * @param data
-         *            Received reply from the meter.
-         */
-    int UpdateValues(
-        std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list,
-        CGXByteBuffer& data);
 
     /**
     * Generates a write message.

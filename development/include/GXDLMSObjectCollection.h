@@ -45,7 +45,7 @@ public:
 
     CGXDLMSObject* FindByLN(DLMS_OBJECT_TYPE type, std::string& ln);
 
-    CGXDLMSObject* FindByLN(DLMS_OBJECT_TYPE type, CGXByteBuffer& ln);
+    CGXDLMSObject* FindByLN(DLMS_OBJECT_TYPE type, unsigned char ln[6]);
 
     CGXDLMSObject* FindBySN(unsigned short sn);
 

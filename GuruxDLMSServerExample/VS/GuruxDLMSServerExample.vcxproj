@@ -22,6 +22,7 @@
     <None Include="..\..\README.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\getopt.h" />
     <ClInclude Include="..\include\GXDLMSBase.h" />
     <ClInclude Include="..\include\GXDLMSServerLN.h" />
     <ClInclude Include="..\include\GXDLMSServerLN_47.h" />
@@ -29,6 +30,7 @@
     <ClInclude Include="..\include\GXDLMSServerSN_47.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\getopt.c" />
     <ClCompile Include="..\src\GXDLMSBase.cpp" />
     <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>

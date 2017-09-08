@@ -519,7 +519,10 @@ int CGXDLMSAssociationLogicalName::GetValue(CGXDLMSSettings& settings, CGXDLMSVa
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(6);
-        CGXDLMSVariant conformance = m_XDLMSContextInfo.GetConformance();
+        CGXByteBuffer bb, bb2;
+        bb.SetUInt32(m_XDLMSContextInfo.GetConformance());
+        bb.SubArray(1, 3, bb2);
+        CGXDLMSVariant conformance = bb2;
         CGXDLMSVariant rx = m_XDLMSContextInfo.GetMaxPduSize();
         CGXDLMSVariant tx = m_XDLMSContextInfo.GetMaxSendPpuSize();
         CGXDLMSVariant version = m_XDLMSContextInfo.GetDlmsVersionNumber();

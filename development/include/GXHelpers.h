@@ -102,11 +102,6 @@ public:
         GetLogicalName(tmp, ln);
     }
 
-#define TRACEUL(text, ul) printf("%s %x%x%x%x\r\n", text, (unsigned char) (ul >> 24) & 0xFF, (unsigned char)(ul >> 16) & 0xFF, (unsigned char) (ul >> 8) & 0xFF, (unsigned char) ul & 0xFF)
-
-#define TRACE1(var) printf(var)
-#define TRACE(var, fmt) printf(var, fmt)
-
     /////////////////////////////////////////////////////////////////////////////
     //Set logical name from std::string.
     /////////////////////////////////////////////////////////////////////////////

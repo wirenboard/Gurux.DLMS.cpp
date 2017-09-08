@@ -84,7 +84,7 @@
 #include "../../development/include/GXDLMSAssociationShortName.h"
 
 using namespace std;
-static const char* DATAFILE = "data.csv";
+char DATAFILE[FILENAME_MAX];
 
 void ListenerThread(void* pVoid)
 {
@@ -113,6 +113,7 @@ void ListenerThread(void* pVoid)
         len = sizeof(client);
         senderInfo.clear();
         socket = accept(server->GetSocket(), (struct sockaddr*)&client, &len);
+        server->Reset();
         if (server->IsConnected())
         {
             if ((ret = getpeername(socket, (sockaddr*)&add, &AddrLen)) == -1)
@@ -289,9 +290,9 @@ int CGXDLMSBase::StopServer()
         pthread_join(m_ReceiverThread, (void **)&res);
         free(res);
 #endif
-    }
+        }
     return 0;
-}
+    }
 
 int GetIpAddress(std::string& address)
 {

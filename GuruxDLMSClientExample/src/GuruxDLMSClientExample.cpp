@@ -37,15 +37,6 @@
 #include "../include/getopt.h"
 #endif
 #include "../include/communication.h"
-#include "../../development/include/GXDLMSConverter.h"
-#include "../../development/include/GXDLMSProfileGeneric.h"
-#include "../../development/include/GXDLMSDemandRegister.h"
-
-static void WriteValue(std::string line)
-{
-    printf(line.c_str());
-    GXHelpers::Write("LogFile.txt", line);
-}
 
 static void ShowHelp()
 {
@@ -95,18 +86,20 @@ int main(int argc, char* argv[])
         //Remove trace file if exists.
         remove("trace.txt");
         remove("LogFile.txt");
-        bool trace = false, useLogicalNameReferencing = true;
+        GX_TRACE_LEVEL trace = GX_TRACE_LEVEL_INFO;
+        bool useLogicalNameReferencing = true;
         int clientAddress = 16, serverAddress = 1;
         DLMS_AUTHENTICATION authentication = DLMS_AUTHENTICATION_NONE;
         DLMS_INTERFACE_TYPE interfaceType = DLMS_INTERFACE_TYPE_HDLC;
         char *password = NULL;
-
+        char *p, *p2, *readObjects = NULL;
+        int index, a, b, c, d, e, f;
         int opt = 0;
         int port = 0;
         char* address = NULL;
         char* serialPort = NULL;
         bool iec = false;
-        while ((opt = getopt(argc, argv, "h:p:c:s:r:ita:wP:")) != -1)
+        while ((opt = getopt(argc, argv, "h:p:c:s:r:it:a:wP:g:")) != -1)
         {
             switch (opt)
             {
@@ -134,7 +127,21 @@ int main(int argc, char* argv[])
                 break;
             case 't':
                 //Trace.
-                trace = 1;
+                if (strcmp("Error", optarg) == 0)
+                    trace = GX_TRACE_LEVEL_ERROR;
+                else  if (strcmp("Warning", optarg) == 0)
+                    trace = GX_TRACE_LEVEL_WARNING;
+                else  if (strcmp("Info", optarg) == 0)
+                    trace = GX_TRACE_LEVEL_INFO;
+                else  if (strcmp("Verbose", optarg) == 0)
+                    trace = GX_TRACE_LEVEL_VERBOSE;
+                else  if (strcmp("Off", optarg) == 0)
+                    trace = GX_TRACE_LEVEL_OFF;
+                else
+                {
+                    printf("Invalid trace option '%s'. (Error, Warning, Info, Verbose, Off)", optarg);
+                    return 1;
+                }
                 break;
             case 'p':
                 //Port.
@@ -146,6 +153,23 @@ int main(int argc, char* argv[])
             case 'i':
                 //IEC.
                 iec = 1;
+                break;
+            case 'g':
+                //Get (read) selected objects.
+                p = optarg;
+                do
+                {
+                    if (p != optarg)
+                    {
+                        ++p;
+                    }
+                    if ((ret = sscanf_s(p, "%d.%d.%d.%d.%d.%d:%d", &a, &b, &c, &d, &e, &f, &index)) != 7)
+                    {
+                        ShowHelp();
+                        return 1;
+                    }
+                } while ((p = strchr(p, ',')) != NULL);
+                readObjects = optarg;
                 break;
             case 'S':
                 serialPort = optarg;
@@ -216,6 +240,9 @@ int main(int argc, char* argv[])
                 else if (optarg[0] == 'S') {
                     printf("Missing mandatory Serial port option.\n");
                 }
+                else if (optarg[0] == 'g') {
+                    printf("Missing mandatory OBIS code option.\n");
+                }
                 else
                 {
                     ShowHelp();
@@ -245,7 +272,7 @@ int main(int argc, char* argv[])
             }
             if ((ret = comm.Connect(address, port)) != 0)
             {
-                TRACE("Connect failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
+                printf("Connect failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
                 return 1;
             }
         }
@@ -253,7 +280,7 @@ int main(int argc, char* argv[])
         {
             if ((ret = comm.Open(serialPort, iec)) != 0)
             {
-                TRACE("Connect failed %S.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
+                printf("Connect failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
                 return 1;
             }
         }
@@ -262,270 +289,56 @@ int main(int argc, char* argv[])
             printf("Missing mandatory connection information for TCP/IP or serial port connection.\n");
             return 1;
         }
-        if ((ret = comm.InitializeConnection()) != 0)
+
+        if (readObjects != NULL)
         {
-            TRACE("InitializeConnection failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
-            return 1;
-        }
-        CGXDLMSObjectCollection Objects;
-        if ((ret = comm.GetObjects(Objects)) != 0)
-        {
-            TRACE("InitializeConnection failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
-            return 1;
-        }
-        std::string value;
-        std::string str;
-        std::string ln;
-        std::vector<std::pair<CGXDLMSObject*, unsigned char> > list;
-        if ((cl.GetNegotiatedConformance() & DLMS_CONFORMANCE_MULTIPLE_REFERENCES) != 0)
-        {
-            // Read scalers and units from the device.
-            for (std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)
+            if ((ret = comm.InitializeConnection()) == 0 &&
+                (ret = comm.GetAssociationView()) == 0)
             {
-                if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_REGISTER ||
-                    (*it)->GetObjectType() == DLMS_OBJECT_TYPE_EXTENDED_REGISTER)
+                std::string str;
+                std::string value;
+                char buff[200];
+                p = readObjects;
+                do
                 {
-                    list.push_back(std::make_pair(*it, 3));
-                }
-                else if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_DEMAND_REGISTER)
-                {
-                    list.push_back(std::make_pair(*it, 4));
-                }
-            }
-            if ((ret = comm.ReadList(list)) != 0)
-            {
-                TRACE("Err! Failed to read register: %s", CGXDLMSConverter::GetErrorMessage(ret));
-                cl.SetNegotiatedConformance((DLMS_CONFORMANCE)(cl.GetNegotiatedConformance() & ~DLMS_CONFORMANCE_MULTIPLE_REFERENCES));
-            }
-        }
-        if ((cl.GetNegotiatedConformance() & DLMS_CONFORMANCE_MULTIPLE_REFERENCES) == 0)
-        {
-            //If readlist is not supported read one value at the time.
-            for (std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)
-            {
-                if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_REGISTER ||
-                    (*it)->GetObjectType() == DLMS_OBJECT_TYPE_EXTENDED_REGISTER)
-                {
-                    (*it)->GetLogicalName(ln);
-                    TRACE("%s\r\n", ln.c_str());
-                    if ((ret = comm.Read(*it, 3, value)) != 0)
+                    if (p != readObjects)
                     {
-                        TRACE("Err! Failed to read register: %s", CGXDLMSConverter::GetErrorMessage(ret));
+                        ++p;
+                    }
+                    str.clear();
+                    p2 = strchr(p, ':');
+                    ++p2;
+                    sscanf_s(p2, "%d", &index);
+                    str.append(p, p2 - p);
+                    CGXDLMSObject* obj = cl.GetObjects().FindByLN(DLMS_OBJECT_TYPE_ALL, str);
+                    value.clear();
+                    if ((ret = comm.Read(obj, index, value)) != DLMS_ERROR_CODE_OK)
+                    {
+#if _MSC_VER > 1000
+                        sprintf_s(buff, 100, "Error! Index: %d %s\r\n", index, CGXDLMSConverter::GetErrorMessage(ret));
+#else
+                        sprintf(buff, "Error! Index: %d read failed: %s\r\n", *pos, CGXDLMSConverter::GetErrorMessage(ret));
+#endif
+                        comm.WriteValue(GX_TRACE_LEVEL_ERROR, buff);
                         //Continue reading.
-                        continue;
                     }
-                }
-                else if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_DEMAND_REGISTER)
-                {
-                    (*it)->GetLogicalName(ln);
-                    TRACE("%s\r\n", ln.c_str());
-                    if ((ret = comm.Read(*it, 4, value)) != 0)
+                    else
                     {
-                        TRACE("Err! Failed to read demand register: %s", CGXDLMSConverter::GetErrorMessage(ret));
-                        //Continue reading.
-                        continue;
+#if _MSC_VER > 1000
+                        sprintf_s(buff, 100, "Index: %d Value: ", index);
+#else
+                        sprintf(buff, "Index: %d Value: ", *pos);
+#endif
+                        comm.WriteValue(trace, buff);
+                        comm.WriteValue(trace, value.c_str());
+                        comm.WriteValue(trace, "\r\n");
                     }
-                }
+
+                } while ((p = strchr(p, ',')) != NULL);
             }
         }
-        //Read columns.
-        CGXDLMSObjectCollection profileGenerics;
-        Objects.GetObjects(DLMS_OBJECT_TYPE_PROFILE_GENERIC, profileGenerics);
-        for (std::vector<CGXDLMSObject*>::iterator it = profileGenerics.begin(); it != profileGenerics.end(); ++it)
-        {
-            //Read Profile Generic columns first.
-            CGXDLMSProfileGeneric* pg = (CGXDLMSProfileGeneric*)*it;
-            if ((ret = comm.Read(pg, 3, value)) != 0)
-            {
-                TRACE("Err! Failed to read columns: %s", CGXDLMSConverter::GetErrorMessage(ret));
-                //Continue reading.
-                continue;
-            }
-
-            //Update columns scalers.
-            DLMS_OBJECT_TYPE ot;
-            CGXDLMSObject* obj;
-            for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it2 = pg->GetCaptureObjects().begin(); it2 != pg->GetCaptureObjects().end(); ++it2)
-            {
-                ot = it2->first->GetObjectType();
-                if (ot == DLMS_OBJECT_TYPE_REGISTER ||
-                    ot == DLMS_OBJECT_TYPE_EXTENDED_REGISTER ||
-                    ot == DLMS_OBJECT_TYPE_DEMAND_REGISTER)
-                {
-                    it2->first->GetLogicalName(ln);
-                    obj = Objects.FindByLN(ot, ln);
-                    if (obj != NULL)
-                    {
-                        if (ot == DLMS_OBJECT_TYPE_REGISTER || ot == DLMS_OBJECT_TYPE_EXTENDED_REGISTER)
-                        {
-                            ((CGXDLMSRegister*)it2->first)->SetScaler(((CGXDLMSRegister*)obj)->GetScaler());
-                            ((CGXDLMSRegister*)it2->first)->SetUnit(((CGXDLMSRegister*)obj)->GetUnit());
-                        }
-                        else if (ot == DLMS_OBJECT_TYPE_DEMAND_REGISTER)
-                        {
-                            ((CGXDLMSDemandRegister*)it2->first)->SetScaler(((CGXDLMSDemandRegister*)obj)->GetScaler());
-                            ((CGXDLMSDemandRegister*)it2->first)->SetUnit(((CGXDLMSDemandRegister*)obj)->GetUnit());
-                        }
-                    }
-                }
-            }
-            WriteValue("Profile Generic " + (*it)->GetName().ToString() + " Columns:\r\n");
-            std::string str;
-            for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it2 = pg->GetCaptureObjects().begin(); it2 != pg->GetCaptureObjects().end(); ++it2)
-            {
-                if (str.size() != 0)
-                {
-                    str.append(" | ");
-                }
-                str.append((*it2).first->GetName().ToString());
-                str.append(" ");
-                str.append((*it2).first->GetDescription());
-            }
-            str.append("\r\n");
-            WriteValue(str);
-        }
-
-        for (std::vector<CGXDLMSObject*>::iterator it = Objects.begin(); it != Objects.end(); ++it)
-        {
-            // Profile generics are read later because they are special cases.
-            // (There might be so lots of data and we so not want waste time to read all the data.)
-            if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_PROFILE_GENERIC)
-            {
-                continue;
-            }
-
-            if (dynamic_cast<CGXDLMSCustomObject*>((*it)) != NULL)
-            {
-                //If interface is not implemented.
-                //Example manufacturer specific interface.
-                printf("Unknown Interface: %d\r\n", (*it)->GetObjectType());
-                continue;
-            }
-            char buff[200];
-#if _MSC_VER > 1000
-            sprintf_s(buff, 200, "-------- Reading %s %s %s\r\n", CGXDLMSClient::ObjectTypeToString((*it)->GetObjectType()).c_str(), (*it)->GetName().ToString().c_str(), (*it)->GetDescription().c_str());
-#else
-            sprintf(buff, "-------- Reading %s %s %s\r\n", CGXDLMSClient::ObjectTypeToString((*it)->GetObjectType()).c_str(), (*it)->GetName().ToString().c_str(), (*it)->GetDescription().c_str());
-#endif
-            WriteValue(buff);
-            std::vector<int> attributes;
-            (*it)->GetAttributeIndexToRead(attributes);
-            for (std::vector<int>::iterator pos = attributes.begin(); pos != attributes.end(); ++pos)
-            {
-                value.clear();
-                if ((ret = comm.Read(*it, *pos, value)) != DLMS_ERROR_CODE_OK)
-                {
-#if _MSC_VER > 1000
-                    sprintf_s(buff, 100, "Error! Index: %d %s\r\n", *pos, CGXDLMSConverter::GetErrorMessage(ret));
-#else
-                    sprintf(buff, "Error! Index: %d read failed: %s\r\n", *pos, CGXDLMSConverter::GetErrorMessage(ret));
-#endif
-                    WriteValue(buff);
-                    //Continue reading.
-                }
-                else
-                {
-#if _MSC_VER > 1000
-                    sprintf_s(buff, 100, "Index: %d Value: ", *pos);
-#else
-                    sprintf(buff, "Index: %d Value: ", *pos);
-#endif
-                    WriteValue(buff);
-                    WriteValue(value.c_str());
-                    WriteValue("\r\n");
-                }
-            }
-        }
-
-        //Find profile generics and read them.
-        CGXDLMSObjectCollection pgs;
-        Objects.GetObjects(DLMS_OBJECT_TYPE_PROFILE_GENERIC, pgs);
-        for (std::vector<CGXDLMSObject*>::iterator it = pgs.begin(); it != pgs.end(); ++it)
-        {
-            char buff[200];
-#if _MSC_VER > 1000
-            sprintf_s(buff, 200, "-------- Reading %s %s %s\r\n", CGXDLMSClient::ObjectTypeToString((*it)->GetObjectType()).c_str(), (*it)->GetName().ToString().c_str(), (*it)->GetDescription().c_str());
-#else
-            sprintf(buff, "-------- Reading %s %s %s\r\n", CGXDLMSClient::ObjectTypeToString((*it)->GetObjectType()).c_str(), (*it)->GetName().ToString().c_str(), (*it)->GetDescription().c_str());
-#endif
-            WriteValue(buff);
-
-            if ((ret = comm.Read(*it, 7, value)) != DLMS_ERROR_CODE_OK)
-            {
-#if _MSC_VER > 1000
-                sprintf_s(buff, 100, "Error! Index: %d: %s\r\n", 7, CGXDLMSConverter::GetErrorMessage(ret));
-#else
-                sprintf(buff, "Error! Index: %d: %s\r\n", 7, CGXDLMSConverter::GetErrorMessage(ret));
-#endif
-                WriteValue(buff);
-                //Continue reading.
-            }
-
-            std::string entriesInUse = value;
-            if ((ret = comm.Read(*it, 8, value)) != DLMS_ERROR_CODE_OK)
-            {
-#if _MSC_VER > 1000
-                sprintf_s(buff, 100, "Error! Index: %d: %s\r\n", 8, CGXDLMSConverter::GetErrorMessage(ret));
-#else
-                sprintf(buff, "Error! Index: %d: %s\r\n", 8, CGXDLMSConverter::GetErrorMessage(ret));
-#endif
-                WriteValue(buff);
-                //Continue reading.
-            }
-            std::string entries = value;
-            str = "Entries: ";
-            str += entriesInUse;
-            str += "/";
-            str += entries;
-            str += "\r\n";
-            WriteValue(str);
-            //If there are no columns or rows.
-            if (((CGXDLMSProfileGeneric*)*it)->GetEntriesInUse() == 0 || ((CGXDLMSProfileGeneric*)*it)->GetCaptureObjects().size() == 0)
-            {
-                continue;
-            }
-            //All meters are not supporting parameterized read.
-            CGXDLMSVariant rows;
-            if ((cl.GetNegotiatedConformance() & (DLMS_CONFORMANCE_PARAMETERIZED_ACCESS | DLMS_CONFORMANCE_SELECTIVE_ACCESS)) != 0)
-            {
-                //Read first row from Profile Generic.
-                if ((ret = comm.ReadRowsByEntry((CGXDLMSProfileGeneric*)*it, 1, 1, rows)) != 0)
-                {
-                    str = "Error! Failed to read first row:";
-                    str += CGXDLMSConverter::GetErrorMessage(ret);
-                    str += "\r\n";
-                    WriteValue(str);
-                    //Continue reading.
-                }
-                else
-                {
-                    //////////////////////////////////////////////////////////////////////////////
-                    //Show rows.
-                    WriteValue(rows.ToString());
-                }
-            }
-
-            //All meters are not supporting parameterized read.
-            if ((cl.GetNegotiatedConformance() & (DLMS_CONFORMANCE_PARAMETERIZED_ACCESS | DLMS_CONFORMANCE_SELECTIVE_ACCESS)) != 0)
-            {
-                CGXDateTime start = CGXDateTime::Now();
-                start.ResetTime();
-                CGXDateTime end = CGXDateTime::Now();
-                if ((ret = comm.ReadRowsByRange((CGXDLMSProfileGeneric*)(*it), start, end, rows)) != 0)
-                {
-                    str = "Error! Failed to read last day:";
-                    str += CGXDLMSConverter::GetErrorMessage(ret);
-                    str += "\r\n";
-                    WriteValue(str);
-                    //Continue reading.
-                }
-                else
-                {
-                    //////////////////////////////////////////////////////////////////////////////
-                    //Show rows.
-                    WriteValue(rows.ToString());
-                }
-            }
+        else {
+            ret = comm.ReadAll();
         }
         //Close connection.
         comm.Close();

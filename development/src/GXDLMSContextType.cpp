@@ -36,6 +36,15 @@
 #include "../include/GXDLMSVariant.h"
 #include "../include/GXHelpers.h"
 
+CGXDLMSContextType::CGXDLMSContextType()
+{
+    m_Conformance = (DLMS_CONFORMANCE)0;
+    m_MaxReceivePduSize = 0;
+    m_MaxSendPpuSize = 0;
+    m_DlmsVersionNumber = 0;
+    m_QualityOfService = 0;
+}
+
 DLMS_CONFORMANCE CGXDLMSContextType::GetConformance()
 {
     return m_Conformance;

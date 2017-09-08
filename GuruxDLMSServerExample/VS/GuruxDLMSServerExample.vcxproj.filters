@@ -27,12 +27,18 @@
     <ClInclude Include="..\include\GXDLMSServerSN_47.h">
       <Filter>Header files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\getopt.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\GXDLMSBase.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\main.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\getopt.c">
       <Filter>Source files</Filter>
     </ClCompile>
   </ItemGroup>

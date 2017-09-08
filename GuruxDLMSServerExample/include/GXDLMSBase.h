@@ -39,6 +39,7 @@
 #endif
 
 #include "../../development/include/GXDLMSSecureServer.h"
+extern char DATAFILE[FILENAME_MAX];
 
 class CGXDLMSBase : public CGXDLMSSecureServer
 {

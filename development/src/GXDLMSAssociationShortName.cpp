@@ -63,6 +63,7 @@ int CGXDLMSAssociationShortName::GetAccessRights(CGXDLMSObject* pObj, CGXDLMSSer
         }
         //attribute_access_item
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+        data.SetUInt8(3);
         if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_INT8, index)) != 0 ||
             (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_ENUM, access)) != 0 ||
             (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_NONE, empty)) != 0)
@@ -124,9 +125,9 @@ void CGXDLMSAssociationShortName::UpdateAccessRights(CGXDLMSVariant& buff)
 CGXDLMSAssociationShortName::CGXDLMSAssociationShortName() : CGXDLMSObject(DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME)
 {
     GXHelpers::SetLogicalName("0.0.40.0.0.255", m_LN);
-    m_LlsSecret.AddString("Gurux");
-    m_HlsSecret.AddString("Gurux");
+    m_Secret.AddString("Gurux");
     m_SN = 0xFA00;
+    m_Version = 2;
 }
 
 CGXDLMSObjectCollection& CGXDLMSAssociationShortName::GetObjectList()
@@ -136,32 +137,22 @@ CGXDLMSObjectCollection& CGXDLMSAssociationShortName::GetObjectList()
 
 CGXByteBuffer& CGXDLMSAssociationShortName::GetSecret()
 {
-    return m_LlsSecret;
+    return m_Secret;
 }
 void CGXDLMSAssociationShortName::SetSecret(CGXByteBuffer& value)
 {
-    m_LlsSecret = value;
+    m_Secret = value;
 }
 
-/* TODO:
-Object GetAccessRightsList()
-{
-    return m_AccessRightsList;
-}
-void SetAccessRightsList(Object value)
-{
-    m_AccessRightsList = value;
-}
-
-Object GetSecuritySetupReference()
+std::string& CGXDLMSAssociationShortName::GetSecuritySetupReference()
 {
     return m_SecuritySetupReference;
 }
-void SetSecuritySetupReference(Object value)
+void CGXDLMSAssociationShortName::SetSecuritySetupReference(std::string& value)
 {
     m_SecuritySetupReference = value;
 }
-*/
+
 
 void CGXDLMSAssociationShortName::GetValues(std::vector<std::string>& values)
 {
@@ -170,7 +161,7 @@ void CGXDLMSAssociationShortName::GetValues(std::vector<std::string>& values)
     GetLogicalName(ln);
     values.push_back(ln);
     values.push_back(m_ObjectList.ToString());
-    values.push_back(m_AccessRightsList.ToString());
+    values.push_back("");
     values.push_back(m_SecuritySetupReference);
 }
 
@@ -204,6 +195,10 @@ void CGXDLMSAssociationShortName::GetAttributeIndexToRead(std::vector<int>& attr
 // Returns amount of attributes.
 int CGXDLMSAssociationShortName::GetAttributeCount()
 {
+    if (m_Version < 2)
+    {
+        return 2;
+    }
     return 4;
 }
 
@@ -311,7 +306,7 @@ int CGXDLMSAssociationShortName::Invoke(CGXDLMSSettings& settings, CGXDLMSValueE
         }
         else
         {
-            readSecret = &m_HlsSecret;
+            readSecret = &m_Secret;
         }
         CGXByteBuffer serverChallenge;
         if ((ret = CGXSecure::Secure(settings, settings.GetCipher(), ic,
@@ -329,7 +324,7 @@ int CGXDLMSAssociationShortName::Invoke(CGXDLMSSettings& settings, CGXDLMSValueE
             }
             else
             {
-                readSecret = &m_HlsSecret;
+                readSecret = &m_Secret;
             }
             serverChallenge.Clear();
             if ((ret = CGXSecure::Secure(settings,

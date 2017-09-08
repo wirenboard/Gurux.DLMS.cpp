@@ -534,8 +534,9 @@ int CGXDLMSServer::HandleSetRequest(
         return ret;
     }
     DLMS_OBJECT_TYPE ci = (DLMS_OBJECT_TYPE)tmp;
-    CGXByteBuffer ln;
-    ln.Set(&data, data.GetPosition(), 6);
+    unsigned char * ln;
+    ln = data.GetData() + data.GetPosition();
+    data.SetPosition(data.GetPosition() + 6);
     // Attribute index.
     if ((ret = data.GetUInt8(&index)) != 0)
     {
@@ -844,7 +845,7 @@ int CGXDLMSServer::GetRequestNormal(CGXByteBuffer& data)
     CGXDLMSValueEventCollection arr;
     unsigned char attributeIndex;
     int ret;
-    CGXByteBuffer ln;
+    unsigned char *ln;
     // CI
     unsigned short tmp;
     if ((ret = data.GetUInt16(&tmp)) != 0)
@@ -852,7 +853,8 @@ int CGXDLMSServer::GetRequestNormal(CGXByteBuffer& data)
         return ret;
     }
     DLMS_OBJECT_TYPE ci = (DLMS_OBJECT_TYPE)tmp;
-    ln.Set(&data, data.GetPosition(), 6);
+    ln = data.GetData() + data.GetPosition();
+    data.SetPosition(data.GetPosition() + 6);
     // Attribute Id
     if ((ret = data.GetUInt8(&attributeIndex)) != 0)
     {
@@ -1050,8 +1052,9 @@ int CGXDLMSServer::GetRequestWithList(CGXByteBuffer& data)
             return ret;
         }
         DLMS_OBJECT_TYPE ci = (DLMS_OBJECT_TYPE)id;
-        CGXByteBuffer ln;
-        ln.Set(&data, data.GetPosition(), 6);
+        unsigned char * ln;
+        ln = data.GetData() + data.GetPosition();
+        data.SetPosition(data.GetPosition() + 6);
         if ((ret = data.GetUInt8(&attributeIndex)) != 0)
         {
             return ret;
@@ -1905,8 +1908,9 @@ int CGXDLMSServer::HandleMethodRequest(
         return ret;
     }
     DLMS_OBJECT_TYPE ci = (DLMS_OBJECT_TYPE)tmp;
-    CGXByteBuffer ln;
-    ln.Set(&data, data.GetPosition(), 6);
+    unsigned char * ln;
+    ln = data.GetData() + data.GetPosition();
+    data.SetPosition(data.GetPosition() + 6);
     // Attribute
     if ((ret = data.GetUInt8(&id)) != 0)
     {

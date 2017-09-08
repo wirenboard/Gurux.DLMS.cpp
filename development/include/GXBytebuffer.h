@@ -58,6 +58,9 @@ public:
     //Destructor.
     ~CGXByteBuffer();
 
+    //Amount of non read bytes in the buffer.
+    unsigned long Available();
+
     //Returns buffer size.
     unsigned long GetSize();
 

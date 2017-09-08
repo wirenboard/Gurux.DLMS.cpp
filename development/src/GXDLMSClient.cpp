@@ -138,6 +138,12 @@ CGXDLMSLimits& CGXDLMSClient::GetLimits()
     return m_Settings.GetLimits();
 }
 
+// Collection of the objects.
+CGXDLMSObjectCollection& CGXDLMSClient::GetObjects()
+{
+    return m_Settings.GetObjects();
+}
+
 int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
 {
     int ret;
@@ -211,7 +217,7 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
 }
 
 // SN referencing
-int CGXDLMSClient::ParseSNObjects(CGXByteBuffer& buff, CGXDLMSObjectCollection& objects, bool onlyKnownObjects)
+int CGXDLMSClient::ParseSNObjects(CGXByteBuffer& buff, bool onlyKnownObjects)
 {
     int ret;
     CGXDataInfo info;
@@ -264,13 +270,13 @@ int CGXDLMSClient::ParseSNObjects(CGXByteBuffer& buff, CGXDLMSObjectCollection& 
             int cnt = ln.GetSize();
             assert(cnt == 6);
             CGXDLMSObject::SetLogicalName(pObj, ln);
-            objects.push_back(pObj);
+            m_Settings.GetObjects().push_back(pObj);
         }
     }
     return 0;
 }
 
-int CGXDLMSClient::ParseLNObjects(CGXByteBuffer& buff, CGXDLMSObjectCollection& objects, bool onlyKnownObjects)
+int CGXDLMSClient::ParseLNObjects(CGXByteBuffer& buff, bool onlyKnownObjects)
 {
     int ret;
     unsigned long cnt;
@@ -418,33 +424,31 @@ int CGXDLMSClient::ParseLNObjects(CGXByteBuffer& buff, CGXDLMSObjectCollection& 
                 {
                     return ret;
                 }
-                objects.push_back(pObj);
+                m_Settings.GetObjects().push_back(pObj);
             }
         }
     }
     return 0;
 }
 
-int CGXDLMSClient::ParseObjects(CGXByteBuffer& data, CGXDLMSObjectCollection& objects, bool onlyKnownObjects)
+int CGXDLMSClient::ParseObjects(CGXByteBuffer& data, bool onlyKnownObjects)
 {
     int ret;
-    objects.clear();
+    m_Settings.GetObjects().Free();
     if (GetUseLogicalNameReferencing())
     {
-        if ((ret = ParseLNObjects(data, objects, onlyKnownObjects)) != 0)
+        if ((ret = ParseLNObjects(data, onlyKnownObjects)) != 0)
         {
             return ret;
         }
     }
     else
     {
-        if ((ret = ParseSNObjects(data, objects, onlyKnownObjects)) != 0)
+        if ((ret = ParseSNObjects(data, onlyKnownObjects)) != 0)
         {
             return ret;
         }
     }
-    m_Settings.GetObjects().Free();
-    m_Settings.GetObjects().insert(m_Settings.GetObjects().end(), objects.begin(), objects.end());
     return 0;
 }
 
@@ -482,47 +486,6 @@ int CGXDLMSClient::GetValue(CGXByteBuffer& data, CGXDLMSVariant& value)
     return GXHelpers::GetData(data, info, value);
 }
 
-int CGXDLMSClient::UpdateValues(std::vector< std::pair<CGXDLMSObject*, int> >& list, CGXByteBuffer& data)
-{
-    CGXDLMSVariant value;
-    CGXDataInfo info;
-    unsigned long cnt;
-    int ret;
-    unsigned char ch;
-    if ((ret = GXHelpers::GetObjectCount(data, cnt)) != 0)
-    {
-        return ret;
-    }
-    if (cnt != (unsigned long)list.size())
-    {
-        // Invalid reply. Read items count do not match.
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
-    for (std::vector< std::pair<CGXDLMSObject*, int> >::iterator it = list.begin(); it != list.end(); ++it)
-    {
-        if ((ret = data.GetUInt8(&ch)) != 0)
-        {
-            return ret;
-        }
-        if (ch == 0)
-        {
-            if ((ret = GXHelpers::GetData(data, info, value)) != 0)
-            {
-                return ret;
-            }
-            CGXDLMSValueEventArg e(NULL, it->first, it->second);
-            e.SetValue(value);
-            it->first->SetValue(m_Settings, e);
-            info.Clear();
-        }
-        else
-        {
-            //Return error code.
-            return ch;
-        }
-    }
-    return 0;
-}
 
 int CGXDLMSClient::ChangeType(CGXDLMSVariant& value, DLMS_DATA_TYPE type, CGXDLMSVariant& newValue)
 {
@@ -1228,7 +1191,7 @@ int CGXDLMSClient::ReadList(
             bb.SetUInt16(sn);
         }
         CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_READ_REQUEST,
-            (unsigned long)list.size(), 3, &bb, NULL);
+            (unsigned long)list.size(), 0xFF, &bb, NULL);
         ret = CGXDLMS::GetSnMessages(p, reply);
     }
     return ret;
@@ -1239,39 +1202,23 @@ int CGXDLMSClient::ReadList(
      *
      * @param list
      *            read objects.
-     * @param data
-     *            Received reply from the meter.
+     * @param values
+     *            Received values.
      */
 int CGXDLMSClient::UpdateValues(
     std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list,
-    CGXByteBuffer& data)
+    std::vector<CGXDLMSVariant>& values)
 {
-    int ret;
-    CGXDLMSVariant value;
-    CGXDataInfo info;
-    unsigned char ch;
+    int ret, pos = 0;
     for (std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = list.begin(); it != list.end(); ++it)
     {
-        ret = data.GetUInt8(&ch);
-        if (ret != 0)
+        CGXDLMSValueEventArg e(NULL, it->first, it->second);
+        e.SetValue(values.at(pos));
+        if ((ret = it->first->SetValue(m_Settings, e)) != 0)
         {
             return ret;
         }
-        if (ch == 0)
-        {
-            if ((ret = GXHelpers::GetData(data, info, value)) != 0)
-            {
-                return ret;
-            }
-            CGXDLMSValueEventArg e(NULL, it->first, it->second);
-            e.SetValue(value);
-            it->first->SetValue(m_Settings, e);
-            info.Clear();
-        }
-        else
-        {
-            return ch;
-        }
+        ++pos;
     }
     return 0;
 }

@@ -39,11 +39,9 @@
 
 class CGXDLMSAssociationShortName : public CGXDLMSObject
 {
-    CGXDLMSVariant m_AccessRightsList;
     CGXDLMSObjectCollection m_ObjectList;
     std::string m_SecuritySetupReference;
-    CGXByteBuffer m_LlsSecret;
-    CGXByteBuffer m_HlsSecret;
+    CGXByteBuffer m_Secret;
 
     int GetAccessRights(CGXDLMSObject* pObj, CGXDLMSServer* server, CGXByteBuffer& data);
     void UpdateAccessRights(CGXDLMSVariant& buff);
@@ -58,23 +56,9 @@ public:
 
     void SetSecret(CGXByteBuffer& value);
 
-    CGXDLMSVariant& GetAccessRightsList()
-    {
-        return m_AccessRightsList;
-    }
-    void SetAccessRightsList(CGXDLMSVariant& value)
-    {
-        m_AccessRightsList = value;
-    }
+    std::string& GetSecuritySetupReference();
 
-    std::string& GetSecuritySetupReference()
-    {
-        return m_SecuritySetupReference;
-    }
-    void SetSecuritySetupReference(std::string& value)
-    {
-        m_SecuritySetupReference = value;
-    }
+    void SetSecuritySetupReference(std::string& value);
 
     //Get attribute values of object.
     void GetValues(

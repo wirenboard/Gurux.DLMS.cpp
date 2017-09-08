@@ -65,7 +65,12 @@ CGXByteBuffer::~CGXByteBuffer()
 {
     Clear();
 }
-//Returns buffer size.
+
+unsigned long CGXByteBuffer::Available()
+{
+    return m_Size - m_Position;
+}
+
 unsigned long CGXByteBuffer::GetSize()
 {
     return m_Size;

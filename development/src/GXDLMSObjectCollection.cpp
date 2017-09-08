@@ -41,14 +41,13 @@ CGXDLMSObjectCollection::~CGXDLMSObjectCollection()
 
 CGXDLMSObject* CGXDLMSObjectCollection::FindByLN(DLMS_OBJECT_TYPE type, std::string& ln)
 {
-    const char* pLn = ln.c_str();
-    std::string ln2;
+    unsigned char tmp[6];
+    GXHelpers::SetLogicalName(ln.c_str(), tmp);
     for (CGXDLMSObjectCollection::iterator it = this->begin(); it != end(); ++it)
     {
         if ((type == DLMS_OBJECT_TYPE_ALL || (*it)->GetObjectType() == type))
         {
-            (*it)->GetLogicalName(ln2);
-            if (strcmp(ln2.c_str(), pLn) == 0)
+            if (memcmp(tmp, (*it)->m_LN, 6) == 0)
             {
                 return *it;
             }
@@ -57,17 +56,13 @@ CGXDLMSObject* CGXDLMSObjectCollection::FindByLN(DLMS_OBJECT_TYPE type, std::str
     return NULL;
 }
 
-CGXDLMSObject* CGXDLMSObjectCollection::FindByLN(DLMS_OBJECT_TYPE type, CGXByteBuffer& ln)
+CGXDLMSObject* CGXDLMSObjectCollection::FindByLN(DLMS_OBJECT_TYPE type, unsigned char ln[6])
 {
-    if (ln.GetSize() != 6)
-    {
-        return NULL;
-    }
     for (CGXDLMSObjectCollection::iterator it = this->begin(); it != end(); ++it)
     {
         if (type == DLMS_OBJECT_TYPE_ALL || (*it)->GetObjectType() == type)
         {
-            if (memcmp(ln.GetData(), (*it)->m_LN, 6) == 0)
+            if (memcmp(ln, (*it)->m_LN, 6) == 0)
             {
                 return *it;
             }

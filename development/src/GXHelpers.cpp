@@ -1586,7 +1586,7 @@ static int SetBitString(CGXByteBuffer& buff, CGXDLMSVariant& value)
     }
     else if (value.vt == DLMS_DATA_TYPE_OCTET_STRING)
     {
-        GXHelpers::SetObjectCount(value.size, buff);
+        GXHelpers::SetObjectCount(8 * value.size, buff);
         buff.Set(value.byteArr, value.size);
     }
     else if (value.vt == DLMS_DATA_TYPE_NONE)

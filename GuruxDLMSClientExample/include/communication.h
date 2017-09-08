@@ -38,11 +38,6 @@
 
 #include <stdio.h>
 
-#define TRACEUL(text, ul) printf("%s %x%x%x%x\r\n", text, (unsigned char) (ul >> 24) & 0xFF, (unsigned char)(ul >> 16) & 0xFF, (unsigned char) (ul >> 8) & 0xFF, (unsigned char) ul & 0xFF)
-
-#define TRACE1(var) printf(var)
-#define TRACE(var, fmt) printf(var, fmt)
-
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
 #if _MSC_VER > 1400
 #define _CRTDBG_MAP_ALLOC
@@ -73,12 +68,10 @@
 
 class CGXCommunication
 {
-    static const unsigned int RECEIVE_BUFFER_SIZE = 200;
-    int m_WaitTime;
-    int Read(unsigned char eop, CGXByteBuffer& reply);
-public:
+    GX_TRACE_LEVEL m_Trace;
     CGXDLMSClient* m_Parser;
     int m_socket;
+    static const unsigned int RECEIVE_BUFFER_SIZE = 200;
     unsigned char   m_Receivebuff[RECEIVE_BUFFER_SIZE];
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
     HANDLE			m_hComPort;
@@ -87,10 +80,13 @@ public:
 #else
     int             m_hComPort;
 #endif
+    int m_WaitTime;
+    int Read(unsigned char eop, CGXByteBuffer& reply);
 public:
-    bool m_Trace;
+    void WriteValue(GX_TRACE_LEVEL trace, std::string line);
+public:
 
-    CGXCommunication(CGXDLMSClient* pCosem, int wt, bool trace);
+    CGXCommunication(CGXDLMSClient* pCosem, int wt, GX_TRACE_LEVEL trace);
     ~CGXCommunication(void);
 
     int Close();
@@ -132,8 +128,7 @@ public:
     int ReadDataBlock(std::vector<CGXByteBuffer>& data, CGXReplyData& reply);
 
     int InitializeConnection();
-    int GetObjects(
-        CGXDLMSObjectCollection& objects);
+    int GetAssociationView();
 
     //Read selected object.
     int Read(CGXDLMSObject* pObject, int attributeIndex, std::string& value);
@@ -176,5 +171,17 @@ public:
         unsigned int Index,
         unsigned int Count,
         CGXDLMSVariant& rows);
-};
+
+    int ReadScalerAndUnits();
+    int GetProfileGenericColumns();
+
+    int GetReadOut();
+    int GetProfileGenerics();
+
+    /*
+    * Read all objects from the meter. This is only example. Usually there is
+    * no need to read all data from the meter.
+    */
+    int ReadAll();
+    };
 #endif //GXCOMMUNICATION_H
