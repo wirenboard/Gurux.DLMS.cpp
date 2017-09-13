@@ -84,7 +84,11 @@
 #include "../../development/include/GXDLMSAssociationShortName.h"
 
 using namespace std;
+#if defined(_WIN32) || defined(_WIN64)//Windows
+TCHAR DATAFILE[FILENAME_MAX];
+#else
 char DATAFILE[FILENAME_MAX];
+#endif
 
 void ListenerThread(void* pVoid)
 {
@@ -229,7 +233,7 @@ bool CGXDLMSBase::IsConnected()
 
 int CGXDLMSBase::GetSocket()
 {
-    return m_ServerSocket;
+    return (int)m_ServerSocket;
 }
 
 int CGXDLMSBase::StartServer(int port)
@@ -332,7 +336,11 @@ int GetIpAddress(std::string& address)
 CGXDLMSData* AddLogicalDeviceName(CGXDLMSObjectCollection& items, unsigned long sn)
 {
     char buff[17];
+#if defined(_WIN32) || defined(_WIN64)//Windows
+    sprintf_s(buff, "GRX%.13d", sn);
+#else
     sprintf(buff, "GRX%.13d", sn);
+#endif
     CGXDLMSVariant id;
     id.Add((const char*)buff, 16);
     CGXDLMSData* ldn = new CGXDLMSData("0.0.42.0.0.255", id);
@@ -358,7 +366,11 @@ void AddFirmwareVersion(CGXDLMSObjectCollection& items)
 void AddElectricityID1(CGXDLMSObjectCollection& items, unsigned long sn)
 {
     char buff[17];
+#if defined(_WIN32) || defined(_WIN64)//Windows
+    sprintf_s(buff, "GRX%.13d", sn);
+#else
     sprintf(buff, "GRX%.13d", sn);
+#endif
     CGXDLMSVariant id;
     id.Add((const char*)buff, 16);
     CGXDLMSData* d = new CGXDLMSData("1.1.0.0.0.255", id);
@@ -623,7 +635,12 @@ int CGXDLMSBase::Init(int port, GX_TRACE_LEVEL trace)
     tm.AddSeconds(-tm.GetValue().tm_sec);
     tm.AddHours(-(rowCount - 1));
 
+#if defined(_WIN32) || defined(_WIN64)//Windows
+    FILE* f;
+    fopen_s(&f, DATAFILE, "w");
+#else
     FILE* f = fopen(DATAFILE, "w");
+#endif
     for (int pos = 0; pos != rowCount; ++pos) {
         fprintf(f, "%s;%d\n", tm.ToString().c_str(), pos + 1);
         tm.AddHours(1);
@@ -722,10 +739,19 @@ void GetProfileGenericDataByEntry(CGXDLMSProfileGeneric* p, long index, long cou
     p->GetBuffer().clear();
     if (count != 0)
     {
-        FILE* f = fopen(DATAFILE, "r");
+#if defined(_WIN32) || defined(_WIN64)//Windows
+        FILE* f;
+        fopen_s(&f, DATAFILE, "w");
+#else
+        FILE* f = fopen(DATAFILE, "w");
+#endif
         if (f != NULL)
         {
+#if defined(_WIN32) || defined(_WIN64)//Windows
+            while ((len = fscanf_s(f, "%d/%d/%d %d:%d:%d;%d", &month, &day, &year, &hour, &minute, &second, &value)) != -1)
+#else
             while ((len = fscanf(f, "%d/%d/%d %d:%d:%d;%d", &month, &day, &year, &hour, &minute, &second, &value)) != -1)
+#endif
             {
                 // Skip row
                 if (index > 0) {
@@ -773,10 +799,19 @@ void GetProfileGenericDataByRange(CGXDLMSValueEventArg* e)
     bb.Clear();
     bb.Set(e->GetParameters().Arr[2].byteArr, e->GetParameters().Arr[2].size);
     CGXDLMSClient::ChangeType(bb, DLMS_DATA_TYPE_DATETIME, end);
-    FILE* f = fopen(DATAFILE, "r");
+#if defined(_WIN32) || defined(_WIN64)//Windows
+    FILE* f;
+    fopen_s(&f, DATAFILE, "w");
+#else
+    FILE* f = fopen(DATAFILE, "w");
+#endif
     if (f != NULL)
     {
+#if defined(_WIN32) || defined(_WIN64)//Windows
+        while ((len = fscanf_s(f, "%d/%d/%d %d:%d:%d;%d", &month, &day, &year, &hour, &minute, &second, &value)) != -1)
+#else
         while ((len = fscanf(f, "%d/%d/%d %d:%d:%d;%d", &month, &day, &year, &hour, &minute, &second, &value)) != -1)
+#endif
         {
             CGXDateTime tm(2000 + year, month, day, hour, minute, second, 0, 0x8000);
             if (tm.CompareTo(end.dateTime) > 0) {
@@ -801,7 +836,12 @@ void GetProfileGenericDataByRange(CGXDLMSValueEventArg* e)
 int GetProfileGenericDataCount() {
     int rows = 0;
     int ch;
-    FILE* f = fopen(DATAFILE, "r");
+#if defined(_WIN32) || defined(_WIN64)//Windows
+    FILE* f;
+    fopen_s(&f, DATAFILE, "w");
+#else
+    FILE* f = fopen(DATAFILE, "w");
+#endif
     if (f != NULL)
     {
         while ((ch = fgetc(f)) != EOF)
@@ -986,13 +1026,23 @@ void HandleProfileGenericActions(CGXDLMSValueEventArg* it)
     CGXDLMSProfileGeneric* pg = (CGXDLMSProfileGeneric*)it->GetTarget();
     if (it->GetIndex() == 1) {
         // Profile generic clear is called. Clear data.
+#if defined(_WIN32) || defined(_WIN64)//Windows
+        FILE* f;
+        fopen_s(&f, DATAFILE, "w");
+#else
         FILE* f = fopen(DATAFILE, "w");
+#endif
         fclose(f);
     }
     else if (it->GetIndex() == 2) {
         // Profile generic Capture is called.
-        FILE* f = fopen(DATAFILE, "a");
-        for (int pos = pg->GetBuffer().size() - 1; pos != pg->GetBuffer().size(); ++pos)
+#if defined(_WIN32) || defined(_WIN64)//Windows
+        FILE* f;
+        fopen_s(&f, DATAFILE, "w");
+#else
+        FILE* f = fopen(DATAFILE, "w");
+#endif
+        for (int pos = (int)pg->GetBuffer().size() - 1; pos != (int)pg->GetBuffer().size(); ++pos)
         {
             CGXDateTime tm = pg->GetBuffer().at(0).at(0).dateTime;
             int value = pg->GetBuffer().at(0).at(1).ToInteger();
