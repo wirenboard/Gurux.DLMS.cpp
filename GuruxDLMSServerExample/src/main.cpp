@@ -124,12 +124,12 @@ int main(int argc, char* argv[])
 #endif
 {
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
-    strcpy_s(DATAFILE, argv[0]);
+    strcpy_s(DATAFILE, sizeof(DATAFILE), argv[0]);
 #else
     strcpy(DATAFILE, argv[0]);
 #endif
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
-    char *p = strrchr(DATAFILE, '\\');
+    char *p = _tcsrchr(DATAFILE, '\\');
     *p = '\0';
     strcat_s(DATAFILE, "\\data.csv");
 #else

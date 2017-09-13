@@ -637,7 +637,7 @@ int CGXDLMSBase::Init(int port, GX_TRACE_LEVEL trace)
 
 #if defined(_WIN32) || defined(_WIN64)//Windows
     FILE* f;
-    fopen_s(&f, DATAFILE, "w");
+    fopen_s(&f, DATAFILE, _T("w"));
 #else
     FILE* f = fopen(DATAFILE, "w");
 #endif
@@ -741,7 +741,7 @@ void GetProfileGenericDataByEntry(CGXDLMSProfileGeneric* p, long index, long cou
     {
 #if defined(_WIN32) || defined(_WIN64)//Windows
         FILE* f;
-        fopen_s(&f, DATAFILE, "w");
+        fopen_s(&f, DATAFILE, _T("w"));
 #else
         FILE* f = fopen(DATAFILE, "w");
 #endif
@@ -801,7 +801,7 @@ void GetProfileGenericDataByRange(CGXDLMSValueEventArg* e)
     CGXDLMSClient::ChangeType(bb, DLMS_DATA_TYPE_DATETIME, end);
 #if defined(_WIN32) || defined(_WIN64)//Windows
     FILE* f;
-    fopen_s(&f, DATAFILE, "w");
+    fopen_s(&f, DATAFILE, _T("w"));
 #else
     FILE* f = fopen(DATAFILE, "w");
 #endif
@@ -838,7 +838,7 @@ int GetProfileGenericDataCount() {
     int ch;
 #if defined(_WIN32) || defined(_WIN64)//Windows
     FILE* f;
-    fopen_s(&f, DATAFILE, "w");
+    fopen_s(&f, DATAFILE, _T("w"));
 #else
     FILE* f = fopen(DATAFILE, "w");
 #endif
@@ -1028,7 +1028,7 @@ void HandleProfileGenericActions(CGXDLMSValueEventArg* it)
         // Profile generic clear is called. Clear data.
 #if defined(_WIN32) || defined(_WIN64)//Windows
         FILE* f;
-        fopen_s(&f, DATAFILE, "w");
+        fopen_s(&f, DATAFILE, _T("w"));
 #else
         FILE* f = fopen(DATAFILE, "w");
 #endif
@@ -1038,7 +1038,7 @@ void HandleProfileGenericActions(CGXDLMSValueEventArg* it)
         // Profile generic Capture is called.
 #if defined(_WIN32) || defined(_WIN64)//Windows
         FILE* f;
-        fopen_s(&f, DATAFILE, "w");
+        fopen_s(&f, DATAFILE, _T("w"));
 #else
         FILE* f = fopen(DATAFILE, "w");
 #endif
