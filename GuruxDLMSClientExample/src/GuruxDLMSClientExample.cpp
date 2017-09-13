@@ -163,7 +163,11 @@ int main(int argc, char* argv[])
                     {
                         ++p;
                     }
+#if defined(_WIN32) || defined(_WIN64)//Windows
                     if ((ret = sscanf_s(p, "%d.%d.%d.%d.%d.%d:%d", &a, &b, &c, &d, &e, &f, &index)) != 7)
+#else
+                    if ((ret = sscanf(p, "%d.%d.%d.%d.%d.%d:%d", &a, &b, &c, &d, &e, &f, &index)) != 7)
+#endif
                     {
                         ShowHelp();
                         return 1;
@@ -308,7 +312,11 @@ int main(int argc, char* argv[])
                     str.clear();
                     p2 = strchr(p, ':');
                     ++p2;
+#if defined(_WIN32) || defined(_WIN64)//Windows
                     sscanf_s(p2, "%d", &index);
+#else
+                    sscanf(p2, "%d", &index);
+#endif
                     str.append(p, p2 - p);
                     CGXDLMSObject* obj = cl.GetObjects().FindByLN(DLMS_OBJECT_TYPE_ALL, str);
                     value.clear();
@@ -317,7 +325,7 @@ int main(int argc, char* argv[])
 #if _MSC_VER > 1000
                         sprintf_s(buff, 100, "Error! Index: %d %s\r\n", index, CGXDLMSConverter::GetErrorMessage(ret));
 #else
-                        sprintf(buff, "Error! Index: %d read failed: %s\r\n", *pos, CGXDLMSConverter::GetErrorMessage(ret));
+                        sprintf(buff, "Error! Index: %d read failed: %s\r\n", index, CGXDLMSConverter::GetErrorMessage(ret));
 #endif
                         comm.WriteValue(GX_TRACE_LEVEL_ERROR, buff);
                         //Continue reading.
@@ -327,7 +335,7 @@ int main(int argc, char* argv[])
 #if _MSC_VER > 1000
                         sprintf_s(buff, 100, "Index: %d Value: ", index);
 #else
-                        sprintf(buff, "Index: %d Value: ", *pos);
+                        sprintf(buff, "Index: %d Value: ", index);
 #endif
                         comm.WriteValue(trace, buff);
                         comm.WriteValue(trace, value.c_str());

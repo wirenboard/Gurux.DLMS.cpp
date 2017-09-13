@@ -2226,7 +2226,7 @@ int CGXDLMS::HandleGetResponse(
         {
             return ret;
         }
-        for (int pos = 0; pos != count; ++pos) {
+        for (unsigned short pos = 0; pos != (unsigned short)count; ++pos) {
             // Result
             if ((ret = data.GetUInt8(&ch)) != 0)
             {

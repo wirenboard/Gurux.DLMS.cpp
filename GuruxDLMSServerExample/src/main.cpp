@@ -39,6 +39,7 @@
 #include <time.h>
 #include <process.h>//Add support for threads
 #else //Linux includes.
+#include <unistd.h>
 #include <pthread.h>
 #include <termios.h>
 #include <sys/types.h>
@@ -132,9 +133,9 @@ int main(int argc, char* argv[])
     *p = '\0';
     strcat(DATAFILE, "\\data.csv");
 #else
-    char *p = strrchr(DATAFILE, '//');
+    char *p = strrchr(DATAFILE, '/');
     *p = '\0';
-    strcat(DATAFILE, "//data.csv");
+    strcat(DATAFILE, "/data.csv");
 #endif
 
     int opt, port = 4060;
