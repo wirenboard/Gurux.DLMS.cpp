@@ -40,8 +40,7 @@
 void CGXDLMSAssociationLogicalName::Init()
 {
     m_AssociationStatus = DLMS_DLMS_ASSOCIATION_STATUS_NON_ASSOCIATED;
-    m_LlsSecret.AddString("Gurux");
-    m_HlsSecret.AddString("Gurux");
+    m_Secret.AddString("Gurux");
 }
 
 void CGXDLMSAssociationLogicalName::UpdateAccessRights(CGXDLMSObject* pObj, CGXDLMSVariant data)
@@ -115,6 +114,33 @@ int CGXDLMSAssociationLogicalName::GetAccessRights(CGXDLMSObject* pItem, CGXDLMS
         GXHelpers::SetData(data, DLMS_DATA_TYPE_ENUM, access);
     }
     return DLMS_ERROR_CODE_OK;
+}
+
+
+/// Updates secret.
+int CGXDLMSAssociationLogicalName::UpdateSecret(CGXDLMSClient* client, std::vector<CGXByteBuffer>& reply)
+{
+    if (m_AuthenticationMechanismName.GetMechanismId() == DLMS_AUTHENTICATION_NONE)
+    {
+#if defined(_WIN32) || defined(_WIN64)//Windows
+        printf("Invalid authentication level in MechanismId.\n");
+#endif
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    if (m_AuthenticationMechanismName.GetMechanismId() == DLMS_AUTHENTICATION_HIGH_GMAC)
+    {
+#if defined(_WIN32) || defined(_WIN64)//Windows
+        printf("HighGMAC secret is updated using Security setup.\n");
+#endif
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    if (m_AuthenticationMechanismName.GetMechanismId() == DLMS_AUTHENTICATION_LOW)
+    {
+        return client->Write(this, 7, reply);
+    }
+    //Action is used to update High authentication password.
+    CGXDLMSVariant tmp = m_Secret;
+    return client->Method(this, 2, tmp, reply);
 }
 
 // Returns LN Association View.
@@ -206,28 +232,28 @@ void CGXDLMSAssociationLogicalName::SetServerSAP(unsigned short value)
     m_ServerSAP = value;
 }
 
-CGXApplicationContextName CGXDLMSAssociationLogicalName::GetApplicationContextName()
+CGXApplicationContextName& CGXDLMSAssociationLogicalName::GetApplicationContextName()
 {
     return m_ApplicationContextName;
 }
 
-CGXDLMSContextType CGXDLMSAssociationLogicalName::GetXDLMSContextInfo()
+CGXDLMSContextType& CGXDLMSAssociationLogicalName::GetXDLMSContextInfo()
 {
     return m_XDLMSContextInfo;
 }
 
-CGXAuthenticationMechanismName CGXDLMSAssociationLogicalName::GetAuthenticationMechanismMame()
+CGXAuthenticationMechanismName& CGXDLMSAssociationLogicalName::GetAuthenticationMechanismName()
 {
     return m_AuthenticationMechanismName;
 }
 
 CGXByteBuffer& CGXDLMSAssociationLogicalName::GetSecret()
 {
-    return m_LlsSecret;
+    return m_Secret;
 }
 void CGXDLMSAssociationLogicalName::SetSecret(CGXByteBuffer& value)
 {
-    m_LlsSecret = value;
+    m_Secret = value;
 }
 
 DLMS_DLMS_ASSOCIATION_STATUS CGXDLMSAssociationLogicalName::GetAssociationStatus()
@@ -278,7 +304,7 @@ void CGXDLMSAssociationLogicalName::GetValues(std::vector<std::string>& values)
     values.push_back(m_ApplicationContextName.ToString());
     values.push_back(m_XDLMSContextInfo.ToString());
     values.push_back(m_AuthenticationMechanismName.ToString());
-    values.push_back(m_LlsSecret.ToHexString());
+    values.push_back(m_Secret.ToHexString());
     values.push_back(CGXDLMSVariant(m_AssociationStatus).ToString());
     //Security Setup Reference is from version 1.
     if (GetVersion() > 0)
@@ -411,7 +437,7 @@ int CGXDLMSAssociationLogicalName::Invoke(CGXDLMSSettings& settings, CGXDLMSValu
         }
         else
         {
-            readSecret = &m_HlsSecret;
+            readSecret = &m_Secret;
         }
         CGXByteBuffer serverChallenge;
         if ((ret = CGXSecure::Secure(settings, settings.GetCipher(), ic,
@@ -428,7 +454,7 @@ int CGXDLMSAssociationLogicalName::Invoke(CGXDLMSSettings& settings, CGXDLMSValu
             }
             else
             {
-                readSecret = &m_HlsSecret;
+                readSecret = &m_Secret;
             }
             if ((ret = CGXSecure::Secure(settings, settings.GetCipher(), ic,
                 settings.GetCtoSChallenge(), *readSecret, serverChallenge)) != 0)
@@ -569,7 +595,7 @@ int CGXDLMSAssociationLogicalName::GetValue(CGXDLMSSettings& settings, CGXDLMSVa
     }
     if (e.GetIndex() == 7)
     {
-        e.SetValue(m_LlsSecret);
+        e.SetValue(m_Secret);
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 8)
@@ -986,8 +1012,8 @@ int CGXDLMSAssociationLogicalName::SetValue(CGXDLMSSettings& settings, CGXDLMSVa
     }
     else if (e.GetIndex() == 7)
     {
-        m_LlsSecret.Clear();
-        m_LlsSecret.Set(e.GetValue().byteArr, e.GetValue().size);
+        m_Secret.Clear();
+        m_Secret.Set(e.GetValue().byteArr, e.GetValue().size);
     }
     else if (e.GetIndex() == 8)
     {

@@ -55,7 +55,7 @@
 #include "../include/GXDLMSServerSN_47.h"
 #include "../include/GXDLMSServerLN_47.h"
 
-int Start(int port, int trace)
+int Start(int port, GX_TRACE_LEVEL trace)
 {
     int ret;
     //Create Network media component and start listen events.
@@ -63,7 +63,7 @@ int Start(int port, int trace)
     ///////////////////////////////////////////////////////////////////////
     //Create Gurux DLMS server component for Short Name and start listen events.
     CGXDLMSServerSN SNServer;
-    if ((ret = SNServer.Init(port)) != 0)
+    if ((ret = SNServer.Init(port, trace)) != 0)
     {
         return ret;
     }
@@ -74,7 +74,7 @@ int Start(int port, int trace)
     ///////////////////////////////////////////////////////////////////////
     //Create Gurux DLMS server component for Short Name and start listen events.
     CGXDLMSServerLN LNServer;
-    if ((ret = LNServer.Init(port + 1)) != 0)
+    if ((ret = LNServer.Init(port + 1, trace)) != 0)
     {
         return ret;
     }
@@ -85,7 +85,7 @@ int Start(int port, int trace)
     ///////////////////////////////////////////////////////////////////////
     //Create Gurux DLMS server component for Short Name and start listen events.
     CGXDLMSServerSN_47 SN_47Server;
-    if ((ret = SN_47Server.Init(port + 2)) != 0)
+    if ((ret = SN_47Server.Init(port + 2, trace)) != 0)
     {
         return ret;
     }
@@ -96,7 +96,7 @@ int Start(int port, int trace)
     ///////////////////////////////////////////////////////////////////////
     //Create Gurux DLMS server component for Short Name and start listen events.
     CGXDLMSServerLN_47 LN_47Server;
-    if ((ret = LN_47Server.Init(port + 3)) != 0)
+    if ((ret = LN_47Server.Init(port + 3, trace)) != 0)
     {
         return ret;
     }
@@ -122,7 +122,11 @@ int _tmain(int argc, _TCHAR* argv[])
 int main(int argc, char* argv[])
 #endif
 {
+#if defined(_WIN32) || defined(_WIN64)//Windows includes
+    strcpy_s(DATAFILE, argv[0]);
+#else
     strcpy(DATAFILE, argv[0]);
+#endif
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
     char *p = strrchr(DATAFILE, '\\');
     *p = '\0';
@@ -133,7 +137,8 @@ int main(int argc, char* argv[])
     strcat(DATAFILE, "//data.csv");
 #endif
 
-    int opt, port = 4060, trace = 0;
+    int opt, port = 4060;
+    GX_TRACE_LEVEL trace = GX_TRACE_LEVEL_INFO;
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -148,7 +153,21 @@ int main(int argc, char* argv[])
         {
         case 't':
             //Trace.
-            trace = 1;
+            if (strcmp("Error", optarg) == 0)
+                trace = GX_TRACE_LEVEL_ERROR;
+            else  if (strcmp("Warning", optarg) == 0)
+                trace = GX_TRACE_LEVEL_WARNING;
+            else  if (strcmp("Info", optarg) == 0)
+                trace = GX_TRACE_LEVEL_INFO;
+            else  if (strcmp("Verbose", optarg) == 0)
+                trace = GX_TRACE_LEVEL_VERBOSE;
+            else  if (strcmp("Off", optarg) == 0)
+                trace = GX_TRACE_LEVEL_OFF;
+            else
+            {
+                printf("Invalid trace option '%s'. (Error, Warning, Info, Verbose, Off)", optarg);
+                return 1;
+            }
             break;
         case 'p':
             //Port.

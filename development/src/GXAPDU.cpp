@@ -451,7 +451,8 @@ int ParseUserInformation(
     bb.GetUInt32(&v);
     if (settings.IsServer())
     {
-        settings.SetNegotiatedConformance((DLMS_CONFORMANCE)(v & settings.GetProposedConformance()));
+        v &= settings.GetProposedConformance();
+        settings.SetNegotiatedConformance((DLMS_CONFORMANCE)v);
     }
     else
     {
@@ -1091,7 +1092,9 @@ int CGXAPDU::GenerateAARE(
     CGXByteBuffer& data,
     DLMS_ASSOCIATION_RESULT result,
     DLMS_SOURCE_DIAGNOSTIC diagnostic,
-    CGXCipher* cipher)
+    CGXCipher* cipher,
+    CGXByteBuffer *errorData,
+    CGXByteBuffer *encryptedData)
 {
     int ret;
     unsigned long offset = data.GetSize();
@@ -1162,10 +1165,28 @@ int CGXAPDU::GenerateAARE(
     // Tag 0xBE
     data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_USER_INFORMATION);
     CGXByteBuffer tmp;
-    if ((ret = GetUserInformation(settings, cipher, tmp)) != 0)
+    if (encryptedData != NULL && encryptedData->GetSize() != 0)
     {
-        return ret;
+        tmp.Capacity(2 + encryptedData->GetSize());
+        tmp.SetUInt8(DLMS_COMMAND_GLO_INITIATE_RESPONSE);
+        GXHelpers::SetObjectCount(encryptedData->GetSize(), tmp);
+        tmp.Set(encryptedData);
     }
+    else
+    {
+        if (errorData != NULL && errorData->GetSize() != 0)
+        {
+            tmp.Set(errorData);
+        }
+        else
+        {
+            if ((ret = GetUserInformation(settings, cipher, tmp)) != 0)
+            {
+                return ret;
+            }
+        }
+    }
+
     GXHelpers::SetObjectCount(2 + tmp.GetSize(), data);
     // Coding the choice for user-information (Octet STRING, universal)
     data.SetUInt8(BER_TYPE_OCTET_STRING);

@@ -53,6 +53,7 @@ private:
 #endif
 
 public:
+    GX_TRACE_LEVEL m_Trace;
 
     /////////////////////////////////////////////////////////////////////////
     //Constructor.
@@ -89,7 +90,7 @@ public:
 
     int StopServer();
 
-    int Init(int port);
+    int Init(int port, GX_TRACE_LEVEL trace);
 
     CGXDLMSObject* FindObject(
         DLMS_OBJECT_TYPE objectType,

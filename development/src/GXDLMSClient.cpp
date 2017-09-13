@@ -742,11 +742,7 @@ int CGXDLMSClient::GetApplicationAssociationRequest(
     {
         return ret;
     }
-    CGXByteBuffer bb;
-    bb.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
-    GXHelpers::SetObjectCount(challenge.GetSize(), bb);
-    bb.Set(&challenge);
-    CGXDLMSVariant name, data = bb;
+    CGXDLMSVariant name, data = challenge;
     if (GetUseLogicalNameReferencing())
     {
         name = "0.0.40.0.0.255";
@@ -1416,19 +1412,9 @@ int CGXDLMSClient::Method(CGXDLMSVariant name, DLMS_OBJECT_TYPE objectType,
 
     CGXByteBuffer bb, data;
     m_Settings.ResetBlockIndex();
-    if (value.vt != DLMS_DATA_TYPE_NONE)
+    if ((ret = GXHelpers::SetData(data, value.vt, value)) != 0)
     {
-        if (value.vt == DLMS_DATA_TYPE_OCTET_STRING)
-        {
-            data.Set(value.byteArr, value.size);
-        }
-        else
-        {
-            if ((ret = GXHelpers::SetData(data, value.vt, value)) != 0)
-            {
-                return ret;
-            }
-        }
+        return ret;
     }
     if (GetUseLogicalNameReferencing())
     {

@@ -106,7 +106,9 @@ public:
         CGXByteBuffer& data,
         DLMS_ASSOCIATION_RESULT result,
         DLMS_SOURCE_DIAGNOSTIC diagnostic,
-        CGXCipher* cipher);
+        CGXCipher* cipher,
+        CGXByteBuffer *errorData,
+        CGXByteBuffer *encryptedData);
 };
 
 #endif //GXAPDU_H

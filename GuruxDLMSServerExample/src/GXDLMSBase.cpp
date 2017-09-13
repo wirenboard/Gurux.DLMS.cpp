@@ -116,6 +116,7 @@ void ListenerThread(void* pVoid)
         server->Reset();
         if (server->IsConnected())
         {
+            server->Reset();
             if ((ret = getpeername(socket, (sockaddr*)&add, &AddrLen)) == -1)
             {
                 closesocket(socket);
@@ -167,8 +168,10 @@ void ListenerThread(void* pVoid)
                     break;
                 }
                 bb.SetSize(bb.GetSize() + ret);
-                printf("-> %s\r\n", bb.ToHexString().c_str());
-
+                if (server->m_Trace == GX_TRACE_LEVEL_VERBOSE)
+                {
+                    printf("-> %s\r\n", bb.ToHexString().c_str());
+                }
                 if (server->HandleRequest(bb, reply) != 0)
                 {
 #if defined(_WIN32) || defined(_WIN64)//If Windows
@@ -182,7 +185,10 @@ void ListenerThread(void* pVoid)
                 bb.SetSize(0);
                 if (reply.GetSize() != 0)
                 {
-                    printf("<- %s\r\n", reply.ToHexString().c_str());
+                    if (server->m_Trace == GX_TRACE_LEVEL_VERBOSE)
+                    {
+                        printf("<- %s\r\n", reply.ToHexString().c_str());
+                    }
                     if (send(socket, (const char*)reply.GetData(), reply.GetSize() - reply.GetPosition(), 0) == -1)
                     {
                         //If error has occured
@@ -290,9 +296,9 @@ int CGXDLMSBase::StopServer()
         pthread_join(m_ReceiverThread, (void **)&res);
         free(res);
 #endif
-        }
-    return 0;
     }
+    return 0;
+}
 
 int GetIpAddress(std::string& address)
 {
@@ -558,9 +564,10 @@ CGXDLMSIp4Setup* AddIp4Setup(CGXDLMSObjectCollection& items, std::string& addres
 /*
 * Generic initialize for all servers.
 */
-int CGXDLMSBase::Init(int port)
+int CGXDLMSBase::Init(int port, GX_TRACE_LEVEL trace)
 {
     int ret;
+    m_Trace = trace;
     if ((ret = StartServer(port)) != 0)
     {
         return ret;
@@ -950,9 +957,12 @@ void CGXDLMSBase::PreWrite(std::vector<CGXDLMSValueEventArg*>& args)
     std::string ln;
     for (std::vector<CGXDLMSValueEventArg*>::iterator it = args.begin(); it != args.end(); ++it)
     {
-        (*it)->GetTarget()->GetLogicalName(ln);
-        printf("Writing: %s \r\n", ln.c_str());
-        ln.clear();
+        if (m_Trace > GX_TRACE_LEVEL_WARNING)
+        {
+            (*it)->GetTarget()->GetLogicalName(ln);
+            printf("Writing: %s \r\n", ln.c_str());
+            ln.clear();
+        }
     }
 }
 
@@ -1106,14 +1116,19 @@ DLMS_METHOD_ACCESS_MODE CGXDLMSBase::GetMethodAccess(CGXDLMSValueEventArg* arg)
 void CGXDLMSBase::Connected(
     CGXDLMSConnectionEventArgs& connectionInfo)
 {
-    printf("Connected.\r\n");
+    if (m_Trace > GX_TRACE_LEVEL_WARNING)
+    {
+        printf("Connected.\r\n");
+    }
 }
 
 void CGXDLMSBase::InvalidConnection(
     CGXDLMSConnectionEventArgs& connectionInfo)
 {
-    printf("InvalidConnection.\r\n");
-
+    if (m_Trace > GX_TRACE_LEVEL_WARNING)
+    {
+        printf("InvalidConnection.\r\n");
+    }
 }
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1121,7 +1136,10 @@ void CGXDLMSBase::InvalidConnection(
 void CGXDLMSBase::Disconnected(
     CGXDLMSConnectionEventArgs& connectionInfo)
 {
-    printf("Disconnected.\r\n");
+    if (m_Trace > GX_TRACE_LEVEL_WARNING)
+    {
+        printf("Disconnected.\r\n");
+    }
 }
 
 void CGXDLMSBase::PreGet(

@@ -301,7 +301,7 @@ unsigned short CGXDLMSSettings::GetMaxPduSize()
 
 int CGXDLMSSettings::SetMaxReceivePDUSize(unsigned short value)
 {
-    if (value < 64)
+    if (value < 64 && !m_Server)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }

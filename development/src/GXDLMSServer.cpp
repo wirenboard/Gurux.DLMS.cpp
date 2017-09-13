@@ -307,6 +307,7 @@ int CGXDLMSServer::HandleAarqRequest(
     CGXDLMSConnectionEventArgs& connectionInfo)
 {
     int ret;
+    CGXByteBuffer error;
     DLMS_ASSOCIATION_RESULT result = DLMS_ASSOCIATION_RESULT_ACCEPTED;
     m_Settings.GetCtoSChallenge().Clear();
     m_Settings.GetStoCChallenge().Clear();
@@ -320,7 +321,36 @@ int CGXDLMSServer::HandleAarqRequest(
     {
         return ret;
     }
-    if (diagnostic != DLMS_SOURCE_DIAGNOSTIC_NONE)
+    if (m_Settings.GetDLMSVersion() != 6)
+    {
+        result = DLMS_ASSOCIATION_RESULT_PERMANENT_REJECTED;
+        diagnostic = DLMS_SOURCE_DIAGNOSTIC_NO_REASON_GIVEN;
+        error.SetUInt8(0xE);
+        error.SetUInt8(DLMS_CONFIRMED_SERVICE_ERROR_INITIATE_ERROR);
+        error.SetUInt8(DLMS_SERVICE_ERROR_INITIATE);
+        error.SetUInt8(DLMS_INITIATE_DLMS_VERSION_TOO_LOW);
+        m_Settings.SetDLMSVersion(6);
+    }
+    else if (m_Settings.GetMaxPduSize() < 64)
+    {
+        result = DLMS_ASSOCIATION_RESULT_PERMANENT_REJECTED;
+        diagnostic = DLMS_SOURCE_DIAGNOSTIC_NO_REASON_GIVEN;
+        error.SetUInt8(0xE);
+        error.SetUInt8(DLMS_CONFIRMED_SERVICE_ERROR_INITIATE_ERROR);
+        error.SetUInt8(DLMS_SERVICE_ERROR_INITIATE);
+        error.SetUInt8(DLMS_INITIATE_PDU_SIZE_TOOSHORT);
+        m_Settings.SetMaxReceivePDUSize(64);
+    }
+    else if (m_Settings.GetNegotiatedConformance() == 0)
+    {
+        result = DLMS_ASSOCIATION_RESULT_PERMANENT_REJECTED;
+        diagnostic = DLMS_SOURCE_DIAGNOSTIC_NO_REASON_GIVEN;
+        error.SetUInt8(0xE);
+        error.SetUInt8(DLMS_CONFIRMED_SERVICE_ERROR_INITIATE_ERROR);
+        error.SetUInt8(DLMS_SERVICE_ERROR_INITIATE);
+        error.SetUInt8(DLMS_INITIATE_INCOMPATIBLE_CONFORMANCE);
+    }
+    else if (diagnostic != DLMS_SOURCE_DIAGNOSTIC_NONE)
     {
         result = DLMS_ASSOCIATION_RESULT_PERMANENT_REJECTED;
         diagnostic = DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED;
@@ -358,7 +388,7 @@ int CGXDLMSServer::HandleAarqRequest(
     }
     // Generate AARE packet.
     m_Settings.ResetFrameSequence();
-    return CGXAPDU::GenerateAARE(m_Settings, m_ReplyData, result, diagnostic, m_Settings.GetCipher());
+    return CGXAPDU::GenerateAARE(m_Settings, m_ReplyData, result, diagnostic, m_Settings.GetCipher(), &error, NULL);
 }
 
 /**
@@ -1851,7 +1881,6 @@ int CGXDLMSServer::HandleCommand(
         m_Settings.SetConnected(false);
         Disconnected(connectionInfo);
         frame = DLMS_COMMAND_UA;
-        Reset(true);
         break;
     case DLMS_COMMAND_NONE:
         //Get next frame.

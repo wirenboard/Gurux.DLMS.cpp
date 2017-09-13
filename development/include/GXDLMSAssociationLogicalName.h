@@ -51,13 +51,10 @@ private:
     CGXDLMSContextType m_XDLMSContextInfo;
     CGXAuthenticationMechanismName m_AuthenticationMechanismName;
     /**
-     * Secret used in Low Level Authentication.
+     * Secret.
      */
-    CGXByteBuffer m_LlsSecret;
-    /**
-     * Secret used in High Level Authentication.
-     */
-    CGXByteBuffer m_HlsSecret;
+    CGXByteBuffer m_Secret;
+
     std::string m_SecuritySetupReference;
 
     void Init();
@@ -102,15 +99,21 @@ public:
     unsigned short GetServerSAP();
     void SetServerSAP(unsigned short value);
 
-    CGXApplicationContextName GetApplicationContextName();
+    CGXApplicationContextName& GetApplicationContextName();
 
-    CGXDLMSContextType GetXDLMSContextInfo();
+    CGXDLMSContextType& GetXDLMSContextInfo();
 
-    CGXAuthenticationMechanismName GetAuthenticationMechanismMame();
+    CGXAuthenticationMechanismName& GetAuthenticationMechanismName();
 
     CGXByteBuffer& GetSecret();
 
     void SetSecret(CGXByteBuffer& value);
+
+    // Updates secret.
+    int UpdateSecret(
+        CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
+
 
     DLMS_DLMS_ASSOCIATION_STATUS GetAssociationStatus();
 
