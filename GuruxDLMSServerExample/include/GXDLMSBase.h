@@ -39,7 +39,11 @@
 #endif
 
 #include "../../development/include/GXDLMSSecureServer.h"
+#if defined(_WIN32) || defined(_WIN64)//Windows
+extern TCHAR DATAFILE[FILENAME_MAX];
+#else
 extern char DATAFILE[FILENAME_MAX];
+#endif
 
 class CGXDLMSBase : public CGXDLMSSecureServer
 {

@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
     char *p = strrchr(DATAFILE, '\\');
     *p = '\0';
-    strcat(DATAFILE, "\\data.csv");
+    strcat_s(DATAFILE, "\\data.csv");
 #else
     char *p = strrchr(DATAFILE, '/');
     *p = '\0';
