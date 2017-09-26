@@ -56,7 +56,7 @@ public:
     CGXDLMSActivityCalendar();
 
     //SN Constructor.
-    CGXDLMSActivityCalendar(unsigned short sn);
+    CGXDLMSActivityCalendar(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSActivityCalendar(std::string ln);

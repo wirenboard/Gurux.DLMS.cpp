@@ -88,9 +88,6 @@ private:
     int m_SortObjectAttributeIndex;
     int m_SortObjectDataIndex;
 
-
-    void Init();
-
     int GetColumns(CGXByteBuffer& data);
     int GetData(
         CGXDLMSSettings& settings,
@@ -145,10 +142,7 @@ public:
     CGXDLMSProfileGeneric();
 
     //SN Constructor.
-    CGXDLMSProfileGeneric(unsigned short sn);
-
-    //SN Constructor.
-    CGXDLMSProfileGeneric(unsigned short sn, CGXDLMSVariant value);
+    CGXDLMSProfileGeneric(std::string ln, unsigned short sn);
 
     /**
      Constructor.

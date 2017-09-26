@@ -48,7 +48,6 @@ class CGXDLMSClock : public CGXDLMSObject
     short m_TimeZone;
     CGXDateTime m_Time;
 
-    void Init();
 public:
     /**
      Constructor.
@@ -66,7 +65,7 @@ public:
      @param ln Logical Name of the object.
      @param sn Short Name of the object.
     */
-    CGXDLMSClock(std::string ln, int sn);
+    CGXDLMSClock(std::string ln, unsigned short sn);
 
     /**
      Time of COSEM Clock object.

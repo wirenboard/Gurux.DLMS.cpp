@@ -58,7 +58,7 @@ public:
      @param ln Logical Name of the object.
      @param sn Short Name of the object.
     */
-    CGXDLMSMacAddressSetup(int sn);
+    CGXDLMSMacAddressSetup(std::string ln, unsigned short sn);
 
     /**
      Value of COSEM Data object.

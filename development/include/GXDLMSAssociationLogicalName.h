@@ -57,8 +57,6 @@ private:
 
     std::string m_SecuritySetupReference;
 
-    void Init();
-
     void UpdateAccessRights(
         CGXDLMSObject* pObj,
         CGXDLMSVariant data);

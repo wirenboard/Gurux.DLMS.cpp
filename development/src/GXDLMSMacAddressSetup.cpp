@@ -35,29 +35,18 @@
 #include "../include/GXDLMSMacAddressSetup.h"
 #include "../include/GXDLMSClient.h"
 
-/**
- Constructor.
-*/
-CGXDLMSMacAddressSetup::CGXDLMSMacAddressSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_MAC_ADDRESS_SETUP, "0.0.25.2.0.255")
+CGXDLMSMacAddressSetup::CGXDLMSMacAddressSetup() :
+    CGXDLMSMacAddressSetup("0.0.25.2.0.255", 0)
 {
 }
 
-/**
- Constructor.
-
- @param ln Logical Name of the object.
-*/
-CGXDLMSMacAddressSetup::CGXDLMSMacAddressSetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_MAC_ADDRESS_SETUP, ln)
+CGXDLMSMacAddressSetup::CGXDLMSMacAddressSetup(std::string ln) :
+    CGXDLMSMacAddressSetup(ln, 0)
 {
 }
 
-/**
- Constructor.
-
- @param ln Logical Name of the object.
- @param sn Short Name of the object.
-*/
-CGXDLMSMacAddressSetup::CGXDLMSMacAddressSetup(int sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_MAC_ADDRESS_SETUP, sn)
+CGXDLMSMacAddressSetup::CGXDLMSMacAddressSetup(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_MAC_ADDRESS_SETUP, ln, sn)
 {
 
 }

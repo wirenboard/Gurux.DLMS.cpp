@@ -85,12 +85,24 @@ CGXDateTime::CGXDateTime()
 }
 
 // Constructor.
-CGXDateTime::CGXDateTime(struct tm value)
+CGXDateTime::CGXDateTime(struct tm& value)
 {
     int hours, minutes;
     GetUtcOffset(hours, minutes);
     m_Deviation = -(hours * 60 + minutes);
     m_Value = value;
+    m_Skip = DATETIME_SKIPS_NONE;
+    m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
+    m_Status = DLMS_CLOCK_STATUS_OK;
+}
+
+// Constructor.
+CGXDateTime::CGXDateTime(struct tm* value)
+{
+    int hours, minutes;
+    GetUtcOffset(hours, minutes);
+    m_Deviation = -(hours * 60 + minutes);
+    m_Value = *value;
     m_Skip = DATETIME_SKIPS_NONE;
     m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
     m_Status = DLMS_CLOCK_STATUS_OK;

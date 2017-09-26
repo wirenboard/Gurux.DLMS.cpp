@@ -37,18 +37,21 @@
 #include "../include/GXDLMSSchedule.h"
 
 //Constructor.
-CGXDLMSSchedule::CGXDLMSSchedule() : CGXDLMSObject(DLMS_OBJECT_TYPE_SCHEDULE)
+CGXDLMSSchedule::CGXDLMSSchedule() :
+    CGXDLMSSchedule("", 0)
 {
 }
 
 //SN Constructor.
-CGXDLMSSchedule::CGXDLMSSchedule(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_SCHEDULE, sn)
+CGXDLMSSchedule::CGXDLMSSchedule(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_SCHEDULE, ln, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSSchedule::CGXDLMSSchedule(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_SCHEDULE, ln)
+CGXDLMSSchedule::CGXDLMSSchedule(std::string ln) :
+    CGXDLMSSchedule(ln, 0)
 {
 
 }

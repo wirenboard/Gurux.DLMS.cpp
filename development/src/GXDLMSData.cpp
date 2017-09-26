@@ -35,32 +35,23 @@
 #include "../include/GXDLMSData.h"
 
 //Constructor.
-CGXDLMSData::CGXDLMSData() : CGXDLMSObject(DLMS_OBJECT_TYPE_DATA)
+CGXDLMSData::CGXDLMSData() :
+    CGXDLMSData("", 0)
 {
 }
 
 //SN Constructor.
-CGXDLMSData::CGXDLMSData(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_DATA, sn)
-{
-
-}
-
-//SN Constructor.
-CGXDLMSData::CGXDLMSData(unsigned short sn, CGXDLMSVariant value) : CGXDLMSObject(DLMS_OBJECT_TYPE_DATA, sn)
-{
-    m_Value = value;
-}
-
-//LN Constructor.
-CGXDLMSData::CGXDLMSData(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_DATA, ln)
+CGXDLMSData::CGXDLMSData(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_DATA, ln, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSData::CGXDLMSData(std::string ln, CGXDLMSVariant value) : CGXDLMSObject(DLMS_OBJECT_TYPE_DATA, ln)
+CGXDLMSData::CGXDLMSData(std::string ln) :
+    CGXDLMSData(ln, 0)
 {
-    m_Value = value;
+
 }
 
 // Get value of COSEM Data object.

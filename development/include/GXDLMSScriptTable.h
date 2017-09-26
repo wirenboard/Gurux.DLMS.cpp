@@ -47,7 +47,7 @@ public:
     CGXDLMSScriptTable();
 
     //SN Constructor.
-    CGXDLMSScriptTable(unsigned short sn);
+    CGXDLMSScriptTable(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSScriptTable(std::string ln);

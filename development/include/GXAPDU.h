@@ -96,6 +96,7 @@ public:
     static int ParsePDU(CGXDLMSSettings& settings,
         CGXCipher* cipher,
         CGXByteBuffer& buff,
+        DLMS_ASSOCIATION_RESULT &result,
         DLMS_SOURCE_DIAGNOSTIC& diagnostic);
 
     /**

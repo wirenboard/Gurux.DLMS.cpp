@@ -37,16 +37,19 @@
 #include "../include/GXDLMSActivityCalendar.h"
 #include <sstream>
 
-CGXDLMSActivityCalendar::CGXDLMSActivityCalendar() : CGXDLMSObject(DLMS_OBJECT_TYPE_ACTIVITY_CALENDAR, "0.0.13.0.0.255")
+CGXDLMSActivityCalendar::CGXDLMSActivityCalendar() :
+    CGXDLMSActivityCalendar("0.0.13.0.0.255", 0)
 {
 }
 
-CGXDLMSActivityCalendar::CGXDLMSActivityCalendar(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_ACTIVITY_CALENDAR, sn)
+CGXDLMSActivityCalendar::CGXDLMSActivityCalendar(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_ACTIVITY_CALENDAR, ln, sn)
 {
 
 }
 
-CGXDLMSActivityCalendar::CGXDLMSActivityCalendar(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_ACTIVITY_CALENDAR, ln)
+CGXDLMSActivityCalendar::CGXDLMSActivityCalendar(std::string ln) :
+    CGXDLMSActivityCalendar(ln, 0)
 {
 
 }

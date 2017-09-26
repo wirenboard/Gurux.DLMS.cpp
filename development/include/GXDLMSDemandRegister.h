@@ -71,7 +71,7 @@ public:
      @param ln Logical Name of the object.
      @param sn Short Name of the object.
     */
-    CGXDLMSDemandRegister(int sn);
+    CGXDLMSDemandRegister(std::string ln, unsigned short sn);
 
     /**
      Current avarage value of COSEM Data object.

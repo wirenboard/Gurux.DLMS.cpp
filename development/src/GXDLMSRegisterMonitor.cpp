@@ -35,29 +35,19 @@
 #include "../include/GXDLMSRegisterMonitor.h"
 #include "../include/GXDLMSClient.h"
 
-/**
- Constructor.
-*/
-CGXDLMSRegisterMonitor::CGXDLMSRegisterMonitor() : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER_MONITOR)
+CGXDLMSRegisterMonitor::CGXDLMSRegisterMonitor() :
+    CGXDLMSRegisterMonitor("", 0)
 {
 }
 
-/**
- Constructor.
 
- @param ln Logical Name of the object.
-*/
-CGXDLMSRegisterMonitor::CGXDLMSRegisterMonitor(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER_MONITOR, ln)
+CGXDLMSRegisterMonitor::CGXDLMSRegisterMonitor(std::string ln) :
+    CGXDLMSRegisterMonitor(ln, 0)
 {
 }
 
-/**
- Constructor.
-
- @param ln Logical Name of the object.
- @param sn Short Name of the object.
-*/
-CGXDLMSRegisterMonitor::CGXDLMSRegisterMonitor(int sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER_MONITOR, sn)
+CGXDLMSRegisterMonitor::CGXDLMSRegisterMonitor(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER_MONITOR, ln, sn)
 {
 }
 

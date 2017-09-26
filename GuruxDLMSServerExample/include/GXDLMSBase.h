@@ -41,8 +41,10 @@
 #include "../../development/include/GXDLMSSecureServer.h"
 #if defined(_WIN32) || defined(_WIN64)//Windows
 extern TCHAR DATAFILE[FILENAME_MAX];
+extern TCHAR IMAGEFILE[FILENAME_MAX];
 #else
 extern char DATAFILE[FILENAME_MAX];
+extern char IMAGEFILE[FILENAME_MAX];
 #endif
 
 class CGXDLMSBase : public CGXDLMSSecureServer
@@ -63,9 +65,9 @@ public:
     //Constructor.
     /////////////////////////////////////////////////////////////////////////
     CGXDLMSBase(
-        bool UseLogicalNameReferencing = true,
-        DLMS_INTERFACE_TYPE IntefaceType = DLMS_INTERFACE_TYPE_HDLC) :
-        CGXDLMSSecureServer(UseLogicalNameReferencing, IntefaceType)
+        CGXDLMSAssociationLogicalName* ln,
+        CGXDLMSIecHdlcSetup* hdlc) :
+        CGXDLMSSecureServer(ln, hdlc)
     {
 #if defined(_WIN32) || defined(_WIN64)//If Windows 
         m_ReceiverThread = INVALID_HANDLE_VALUE;
@@ -77,6 +79,59 @@ public:
         SetMaxReceivePDUSize(1024);
     }
 
+    /////////////////////////////////////////////////////////////////////////
+    //Constructor.
+    /////////////////////////////////////////////////////////////////////////
+    CGXDLMSBase(
+        CGXDLMSAssociationLogicalName* ln,
+        CGXDLMSTcpUdpSetup* wrapper) :
+        CGXDLMSSecureServer(ln, wrapper)
+    {
+#if defined(_WIN32) || defined(_WIN64)//If Windows 
+        m_ReceiverThread = INVALID_HANDLE_VALUE;
+        m_ServerSocket = INVALID_SOCKET;
+#else //If Linux.
+        m_ServerSocket = -1;
+        m_ReceiverThread = -1;
+#endif
+        SetMaxReceivePDUSize(1024);
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    //Constructor.
+    /////////////////////////////////////////////////////////////////////////
+    CGXDLMSBase(
+        CGXDLMSAssociationShortName* sn,
+        CGXDLMSIecHdlcSetup* hdlc) :
+        CGXDLMSSecureServer(sn, hdlc)
+    {
+#if defined(_WIN32) || defined(_WIN64)//If Windows 
+        m_ReceiverThread = INVALID_HANDLE_VALUE;
+        m_ServerSocket = INVALID_SOCKET;
+#else //If Linux.
+        m_ServerSocket = -1;
+        m_ReceiverThread = -1;
+#endif
+        SetMaxReceivePDUSize(1024);
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    //Constructor.
+    /////////////////////////////////////////////////////////////////////////
+    CGXDLMSBase(
+        CGXDLMSAssociationShortName* sn,
+        CGXDLMSTcpUdpSetup* wrapper) :
+        CGXDLMSSecureServer(sn, wrapper)
+    {
+#if defined(_WIN32) || defined(_WIN64)//If Windows 
+        m_ReceiverThread = INVALID_HANDLE_VALUE;
+        m_ServerSocket = INVALID_SOCKET;
+#else //If Linux.
+        m_ServerSocket = -1;
+        m_ReceiverThread = -1;
+#endif
+        SetMaxReceivePDUSize(1024);
+    }
 
     /////////////////////////////////////////////////////////////////////////
     //Destructor.

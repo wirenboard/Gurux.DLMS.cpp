@@ -39,7 +39,8 @@ class CGXDLMSServerSN :
     public CGXDLMSBase
 {
 public:
-    CGXDLMSServerSN() : CGXDLMSBase(false, DLMS_INTERFACE_TYPE_HDLC)
+    CGXDLMSServerSN(CGXDLMSAssociationShortName* sn,
+        CGXDLMSIecHdlcSetup* hdlc) : CGXDLMSBase(sn, hdlc)
     {
     }
 };

@@ -51,7 +51,7 @@ public:
     CGXDLMSGPRSSetup();
 
     //SN Constructor.
-    CGXDLMSGPRSSetup(unsigned short sn);
+    CGXDLMSGPRSSetup(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSGPRSSetup(std::string ln);

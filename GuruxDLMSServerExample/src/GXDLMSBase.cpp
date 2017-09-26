@@ -82,13 +82,17 @@
 #include "../../development/include/GXDLMSPushSetup.h"
 #include "../../development/include/GXDLMSAssociationLogicalName.h"
 #include "../../development/include/GXDLMSAssociationShortName.h"
+#include "../../development/include/GXDLMSImageTransfer.h"
 
 using namespace std;
 #if defined(_WIN32) || defined(_WIN64)//Windows
 TCHAR DATAFILE[FILENAME_MAX];
+TCHAR IMAGEFILE[FILENAME_MAX];
 #else
 char DATAFILE[FILENAME_MAX];
+char IMAGEFILE[FILENAME_MAX];
 #endif
+int imageSize;
 
 void ListenerThread(void* pVoid)
 {
@@ -343,7 +347,8 @@ CGXDLMSData* AddLogicalDeviceName(CGXDLMSObjectCollection& items, unsigned long 
 #endif
     CGXDLMSVariant id;
     id.Add((const char*)buff, 16);
-    CGXDLMSData* ldn = new CGXDLMSData("0.0.42.0.0.255", id);
+    CGXDLMSData* ldn = new CGXDLMSData("0.0.42.0.0.255");
+    ldn->SetValue(id);
     items.push_back(ldn);
     return ldn;
 }
@@ -373,7 +378,8 @@ void AddElectricityID1(CGXDLMSObjectCollection& items, unsigned long sn)
 #endif
     CGXDLMSVariant id;
     id.Add((const char*)buff, 16);
-    CGXDLMSData* d = new CGXDLMSData("1.1.0.0.0.255", id);
+    CGXDLMSData* d = new CGXDLMSData("1.1.0.0.0.255");
+    d->SetValue(id);
     d->GetAttributes().push_back(CGXDLMSAttribute(2, DLMS_DATA_TYPE_STRING));
     items.push_back(d);
 }
@@ -384,7 +390,8 @@ void AddElectricityID1(CGXDLMSObjectCollection& items, unsigned long sn)
 void AddElectricityID2(CGXDLMSObjectCollection& items, unsigned long sn)
 {
     CGXDLMSVariant id2(sn);
-    CGXDLMSData* d = new CGXDLMSData("1.1.0.0.1.255", id2);
+    CGXDLMSData* d = new CGXDLMSData("1.1.0.0.1.255");
+    d->SetValue(id2);
     d->GetAttributes().push_back(CGXDLMSAttribute(2, DLMS_DATA_TYPE_UINT32));
     items.push_back(d);
 }
@@ -607,9 +614,6 @@ int CGXDLMSBase::Init(int port, GX_TRACE_LEVEL trace)
     CGXDateTime end(-1, 3, 1, -1, -1, -1, -1);
     pClock->SetEnd(end);
     GetItems().push_back(pClock);
-    //Add Tcp/Udp setup. Default Logical Name is 0.0.25.0.0.255.
-    GetItems().push_back(new CGXDLMSTcpUdpSetup());
-
     ///////////////////////////////////////////////////////////////////////
     //Add profile generic (historical data) object.
     CGXDLMSProfileGeneric* profileGeneric = new CGXDLMSProfileGeneric("1.0.99.1.0.255");
@@ -705,6 +709,11 @@ int CGXDLMSBase::Init(int port, GX_TRACE_LEVEL trace)
     pPush->GetPushObjectList().push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject>(ldn, CGXDLMSCaptureObject(2, 0)));
     // Add 0.0.25.1.0.255 Ch. 0 IPv4 setup IP address.
     pPush->GetPushObjectList().push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject>(pIp4, CGXDLMSCaptureObject(3, 0)));
+
+    ///////////////////////////////////////////////////////////////////////
+    //Add image transfer object.
+    CGXDLMSImageTransfer* image = new CGXDLMSImageTransfer();
+    GetItems().push_back(image);
     ///////////////////////////////////////////////////////////////////////
     //Server must initialize after all objects are added.
     ret = Initialize();
@@ -883,7 +892,7 @@ void CGXDLMSBase::PreRead(std::vector<CGXDLMSValueEventArg*>& args)
         {
             CGXDLMSProfileGeneric* p = (CGXDLMSProfileGeneric*)pObj;
             // If buffer is read and we want to save memory.
-            if (index == 6) {
+            if (index == 7) {
                 // If client wants to know EntriesInUse.
                 p->SetEntriesInUse(GetProfileGenericDataCount());
             }
@@ -1013,12 +1022,108 @@ void CGXDLMSBase::PostWrite(std::vector<CGXDLMSValueEventArg*>& args)
 {
 }
 
+void HandleImageTransfer(CGXDLMSValueEventArg* e)
+{
+    CGXDLMSImageTransfer* i = (CGXDLMSImageTransfer*)e->GetTarget();
+    //Image name and size to transfer 
+    FILE *f;
+    if (e->GetIndex() == 1)
+    {
+        if (e->GetParameters().Arr.size() != 2)
+        {
+            e->SetError(DLMS_ERROR_CODE_HARDWARE_FAULT);
+            return;
+        }
+        imageSize = e->GetParameters().Arr[1].ToInteger();
+        char *p = strrchr(IMAGEFILE, '\\');
+        ++p;
+        *p = '\0';
+        strncat(IMAGEFILE, (char*)e->GetParameters().Arr[0].byteArr, (int)e->GetParameters().Arr[0].GetSize());
+        strcat(IMAGEFILE, ".bin");
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
+        printf("Updating image %s Size: %d", IMAGEFILE, imageSize);
+#endif
+        f = fopen(IMAGEFILE, "wb");
+        if (!f)
+        {
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
+            printf("Unable to open file %s", IMAGEFILE);
+#endif
+            e->SetError(DLMS_ERROR_CODE_HARDWARE_FAULT);
+            return;
+        }
+        fclose(f);
+    }
+    //Transfers one block of the Image to the server
+    else if (e->GetIndex() == 2)
+    {
+        if (e->GetParameters().Arr.size() != 2)
+        {
+            e->SetError(DLMS_ERROR_CODE_HARDWARE_FAULT);
+            return;
+        }
+        f = fopen(IMAGEFILE, "ab");
+        if (!f)
+        {
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
+            printf("Unable to open file %s", IMAGEFILE);
+#endif
+            e->SetError(DLMS_ERROR_CODE_HARDWARE_FAULT);
+            return;
+        }
+
+        int ret = fwrite(e->GetParameters().Arr[1].byteArr, 1, (int)e->GetParameters().Arr[1].GetSize(), f);
+        fclose(f);
+        if (ret != e->GetParameters().Arr[1].GetSize())
+        {
+            e->SetError(DLMS_ERROR_CODE_HARDWARE_FAULT);
+        }
+        return;
+    }
+    //Verifies the integrity of the Image before activation.
+    else if (e->GetIndex() == 3)
+    {
+        i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_VERIFICATION_INITIATED);
+        f = fopen(IMAGEFILE, "rb");
+        if (!f)
+        {
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
+            printf("Unable to open file %s", IMAGEFILE);
+#endif
+            e->SetError(DLMS_ERROR_CODE_HARDWARE_FAULT);
+            return;
+        }
+        fseek(f, 0L, SEEK_END);
+        int size = (int)ftell(f);
+        fclose(f);
+        if (size != imageSize)
+        {
+            i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_VERIFICATION_FAILED);
+        }
+        else
+        {
+            i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_VERIFICATION_SUCCESSFUL);
+        }
+    }
+    //Activates the Image.
+    else if (e->GetIndex() == 4)
+    {
+
+    }
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 void CGXDLMSBase::PreAction(std::vector<CGXDLMSValueEventArg*>& args)
 {
+    for (std::vector<CGXDLMSValueEventArg*>::iterator it = args.begin(); it != args.end(); ++it)
+    {
+        if ((*it)->GetTarget()->GetObjectType() == DLMS_OBJECT_TYPE_IMAGE_TRANSFER)
+        {
+            HandleImageTransfer(*it);
+        }
+    }
 }
 
 void HandleProfileGenericActions(CGXDLMSValueEventArg* it)

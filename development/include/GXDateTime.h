@@ -79,7 +79,10 @@ public:
     // Constructor.
     CGXDateTime();
     // Constructor.
-    CGXDateTime(struct tm value);
+    CGXDateTime(struct tm& value);
+
+    // Constructor.
+    CGXDateTime(struct tm* value);
 
     // Constructor.
     CGXDateTime(int year, int month, int day, int hour, int minute, int second, int millisecond);

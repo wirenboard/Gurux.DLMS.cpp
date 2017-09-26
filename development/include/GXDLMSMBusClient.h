@@ -56,7 +56,7 @@ public:
     CGXDLMSMBusClient();
 
     //SN Constructor.
-    CGXDLMSMBusClient(unsigned short sn);
+    CGXDLMSMBusClient(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSMBusClient(std::string ln);

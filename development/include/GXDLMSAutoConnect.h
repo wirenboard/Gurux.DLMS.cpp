@@ -46,14 +46,12 @@ class CGXDLMSAutoConnect : public CGXDLMSObject
     int m_RepetitionDelay;
     int m_Repetitions;
 
-    void Init();
-
 public:
     //Constructor.
     CGXDLMSAutoConnect();
 
     //SN Constructor.
-    CGXDLMSAutoConnect(unsigned short sn);
+    CGXDLMSAutoConnect(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSAutoConnect(std::string ln);

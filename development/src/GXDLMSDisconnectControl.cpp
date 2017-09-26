@@ -38,18 +38,21 @@
 #include "../include/GXDLMSConverter.h"
 
 //Constructor.
-CGXDLMSDisconnectControl::CGXDLMSDisconnectControl() : CGXDLMSObject(DLMS_OBJECT_TYPE_DISCONNECT_CONTROL)
+CGXDLMSDisconnectControl::CGXDLMSDisconnectControl() :
+    CGXDLMSDisconnectControl("", 0)
 {
 }
 
 //SN Constructor.
-CGXDLMSDisconnectControl::CGXDLMSDisconnectControl(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_DISCONNECT_CONTROL, sn)
+CGXDLMSDisconnectControl::CGXDLMSDisconnectControl(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_DISCONNECT_CONTROL, ln, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSDisconnectControl::CGXDLMSDisconnectControl(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_DISCONNECT_CONTROL, ln)
+CGXDLMSDisconnectControl::CGXDLMSDisconnectControl(std::string ln) :
+    CGXDLMSDisconnectControl(ln, 0)
 {
 
 }

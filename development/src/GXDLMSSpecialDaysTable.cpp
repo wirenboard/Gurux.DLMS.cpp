@@ -38,18 +38,21 @@
 #include <sstream>
 
 //Constructor.
-CGXDLMSSpecialDaysTable::CGXDLMSSpecialDaysTable() : CGXDLMSObject(DLMS_OBJECT_TYPE_SPECIAL_DAYS_TABLE)
+CGXDLMSSpecialDaysTable::CGXDLMSSpecialDaysTable() :
+    CGXDLMSSpecialDaysTable("", 0)
 {
 }
 
 //SN Constructor.
-CGXDLMSSpecialDaysTable::CGXDLMSSpecialDaysTable(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_SPECIAL_DAYS_TABLE, sn)
+CGXDLMSSpecialDaysTable::CGXDLMSSpecialDaysTable(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_SPECIAL_DAYS_TABLE, ln, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSSpecialDaysTable::CGXDLMSSpecialDaysTable(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_SPECIAL_DAYS_TABLE, ln)
+CGXDLMSSpecialDaysTable::CGXDLMSSpecialDaysTable(std::string ln) :
+    CGXDLMSSpecialDaysTable(ln, 0)
 {
 
 }

@@ -37,28 +37,24 @@
 #include "../include/GXDLMSAutoConnect.h"
 #include <sstream>
 
-void CGXDLMSAutoConnect::Init()
+//Constructor.
+CGXDLMSAutoConnect::CGXDLMSAutoConnect() :
+    CGXDLMSAutoConnect("0.0.2.1.0.255", 0)
+{
+}
+
+//SN Constructor.
+CGXDLMSAutoConnect::CGXDLMSAutoConnect(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_AUTO_CONNECT, ln, sn)
 {
     m_Mode = AUTO_CONNECT_MODE_NO_AUTO_DIALLING;
     m_RepetitionDelay = m_Repetitions = 0;
 }
 
-//Constructor.
-CGXDLMSAutoConnect::CGXDLMSAutoConnect() : CGXDLMSObject(DLMS_OBJECT_TYPE_AUTO_CONNECT, "0.0.2.1.0.255")
-{
-    Init();
-}
-
-//SN Constructor.
-CGXDLMSAutoConnect::CGXDLMSAutoConnect(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_AUTO_CONNECT, sn)
-{
-    Init();
-}
-
 //LN Constructor.
-CGXDLMSAutoConnect::CGXDLMSAutoConnect(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_AUTO_CONNECT, ln)
+CGXDLMSAutoConnect::CGXDLMSAutoConnect(std::string ln) :
+    CGXDLMSAutoConnect(ln, 0)
 {
-    Init();
 }
 
 AUTO_CONNECT_MODE CGXDLMSAutoConnect::GetMode()

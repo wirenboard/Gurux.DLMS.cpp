@@ -38,18 +38,19 @@
 #include "../include/GXDLMSConverter.h"
 
 //Constructor.
-CGXDLMSSecuritySetup::CGXDLMSSecuritySetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP)
+CGXDLMSSecuritySetup::CGXDLMSSecuritySetup() : CGXDLMSSecuritySetup("", 0)
 {
 }
 
 //SN Constructor.
-CGXDLMSSecuritySetup::CGXDLMSSecuritySetup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP, sn)
+CGXDLMSSecuritySetup::CGXDLMSSecuritySetup(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP, ln, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSSecuritySetup::CGXDLMSSecuritySetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP, ln)
+CGXDLMSSecuritySetup::CGXDLMSSecuritySetup(std::string ln) : CGXDLMSSecuritySetup(ln, 0)
 {
 
 }

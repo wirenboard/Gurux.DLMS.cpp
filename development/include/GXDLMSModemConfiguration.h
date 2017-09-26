@@ -44,7 +44,6 @@ class CGXDLMSModemConfiguration : public CGXDLMSObject
     std::vector< std::string > m_ModemProfile;
     DLMS_BAUD_RATE m_CommunicationSpeed;
 
-    void Init();
 public:
 
     /**
@@ -62,7 +61,7 @@ public:
      @param ln Logical Name of the object.
      @param sn Short Name of the object.
     */
-    CGXDLMSModemConfiguration(int sn);
+    CGXDLMSModemConfiguration(std::string ln, unsigned short sn);
 
     DLMS_BAUD_RATE GetCommunicationSpeed();
 

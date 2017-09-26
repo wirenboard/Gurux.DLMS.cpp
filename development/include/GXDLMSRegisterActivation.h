@@ -51,7 +51,7 @@ public:
     CGXDLMSRegisterActivation();
 
     //SN Constructor.
-    CGXDLMSRegisterActivation(unsigned short sn);
+    CGXDLMSRegisterActivation(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSRegisterActivation(std::string ln);

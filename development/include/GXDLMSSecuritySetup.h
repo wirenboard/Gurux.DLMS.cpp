@@ -48,7 +48,7 @@ public:
     CGXDLMSSecuritySetup();
 
     //SN Constructor.
-    CGXDLMSSecuritySetup(unsigned short sn);
+    CGXDLMSSecuritySetup(std::string ln, unsigned short sn);
 
 
     //LN Constructor.

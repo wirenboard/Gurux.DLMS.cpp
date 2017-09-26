@@ -83,7 +83,6 @@ class CGXDLMSAutoAnswer : public CGXDLMSObject
     std::vector<std::pair< CGXDateTime, CGXDateTime> > m_ListeningWindow;
     AUTO_ANSWER_STATUS m_Status;
     int m_NumberOfCalls;
-    void Init();
 public:
     /**
      Constructor.
@@ -103,7 +102,7 @@ public:
      @param ln Logical Name of the object.
      @param sn Short Name of the object.
     */
-    CGXDLMSAutoAnswer(int sn);
+    CGXDLMSAutoAnswer(std::string ln, unsigned short sn);
 
     AUTO_CONNECT_MODE GetMode();
     void SetMode(AUTO_CONNECT_MODE value);

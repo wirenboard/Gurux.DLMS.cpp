@@ -387,5 +387,10 @@ public:
         unsigned char index,
         CGXByteBuffer& bb,
         CGXDLMSVariant& value);
+
+    static int ParseSnrmUaResponse(
+        CGXByteBuffer& data,
+        CGXDLMSLimits* limits);
+
 };
 #endif //GXDLMS_H

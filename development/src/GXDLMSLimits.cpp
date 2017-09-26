@@ -42,42 +42,42 @@ CGXDLMSLimits::CGXDLMSLimits()
     m_WindowSizeRX = DEFAULT_WINDOWS_SIZE_RX;
 }
 
-CGXDLMSVariant CGXDLMSLimits::GetMaxInfoTX()
+unsigned char CGXDLMSLimits::GetMaxInfoTX()
 {
     return m_MaxInfoTX;
 }
 
-void CGXDLMSLimits::SetMaxInfoTX(CGXDLMSVariant value)
+void CGXDLMSLimits::SetMaxInfoTX(unsigned char value)
 {
     m_MaxInfoTX = value;
 }
 
-CGXDLMSVariant CGXDLMSLimits::GetMaxInfoRX()
+unsigned char CGXDLMSLimits::GetMaxInfoRX()
 {
     return m_MaxInfoRX;
 }
 
-void CGXDLMSLimits::SetMaxInfoRX(CGXDLMSVariant value)
+void CGXDLMSLimits::SetMaxInfoRX(unsigned char value)
 {
     m_MaxInfoRX = value;
 }
 
-CGXDLMSVariant CGXDLMSLimits::GetWindowSizeTX()
+unsigned char CGXDLMSLimits::GetWindowSizeTX()
 {
     return m_WindowSizeRX;
 }
 
-void CGXDLMSLimits::SetWindowSizeTX(CGXDLMSVariant value)
+void CGXDLMSLimits::SetWindowSizeTX(unsigned char value)
 {
     m_WindowSizeRX = value;
 }
 
-CGXDLMSVariant CGXDLMSLimits::GetWindowSizeRX()
+unsigned char CGXDLMSLimits::GetWindowSizeRX()
 {
     return m_WindowSizeTX;
 }
 
-void CGXDLMSLimits::SetWindowSizeRX(CGXDLMSVariant value)
+void CGXDLMSLimits::SetWindowSizeRX(unsigned char value)
 {
     m_WindowSizeTX = value;
 }

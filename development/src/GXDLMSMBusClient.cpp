@@ -36,19 +36,19 @@
 #include "../include/GXDLMSClient.h"
 #include <sstream>
 
-//Constructor.
-CGXDLMSMBusClient::CGXDLMSMBusClient() : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_CLIENT)
+CGXDLMSMBusClient::CGXDLMSMBusClient() :
+    CGXDLMSMBusClient("", 0)
 {
 }
 
-//SN Constructor.
-CGXDLMSMBusClient::CGXDLMSMBusClient(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_CLIENT, sn)
+CGXDLMSMBusClient::CGXDLMSMBusClient(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_CLIENT, ln, sn)
 {
 
 }
 
-//LN Constructor.
-CGXDLMSMBusClient::CGXDLMSMBusClient(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_CLIENT, ln)
+CGXDLMSMBusClient::CGXDLMSMBusClient(std::string ln) :
+    CGXDLMSMBusClient(ln, 0)
 {
 
 }

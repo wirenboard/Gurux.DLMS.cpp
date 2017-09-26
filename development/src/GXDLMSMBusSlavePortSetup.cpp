@@ -36,18 +36,21 @@
 #include "../include/GXDLMSConverter.h"
 
 //Constructor.
-CGXDLMSMBusSlavePortSetup::CGXDLMSMBusSlavePortSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP)
+CGXDLMSMBusSlavePortSetup::CGXDLMSMBusSlavePortSetup() :
+    CGXDLMSMBusSlavePortSetup("", 0)
 {
 }
 
 //SN Constructor.
-CGXDLMSMBusSlavePortSetup::CGXDLMSMBusSlavePortSetup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP, sn)
+CGXDLMSMBusSlavePortSetup::CGXDLMSMBusSlavePortSetup(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP, ln, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSMBusSlavePortSetup::CGXDLMSMBusSlavePortSetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP, ln)
+CGXDLMSMBusSlavePortSetup::CGXDLMSMBusSlavePortSetup(std::string ln) :
+    CGXDLMSMBusSlavePortSetup(ln, 0)
 {
 
 }

@@ -50,11 +50,11 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             std::string str = "{";
             for (std::vector<CGXDLMSVariant>::iterator it = tmp.Arr.begin(); it != tmp.Arr.end(); ++it)
             {
-                str += it->ToString();
-                if (it != tmp.Arr.end())
+                if (str.size() != 0)
                 {
                     str += ", ";
                 }
+                str += it->ToString();
             }
             str += "}";
             item->strVal = str;
@@ -1246,7 +1246,7 @@ std::string CGXDLMSVariant::ToString()
     {
         return "";
     }
-    return tmp.strVal.c_str();
+    return tmp.strVal;
 }
 
 int CGXDLMSVariant::ToInteger()

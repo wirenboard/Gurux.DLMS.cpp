@@ -36,6 +36,7 @@
 
 CGXDLMSLNParameters::CGXDLMSLNParameters(
     CGXDLMSSettings* settings,
+    unsigned long invokeId,
     DLMS_COMMAND command,
     int commandType,
     CGXByteBuffer* attributeDescriptor,
@@ -52,7 +53,7 @@ CGXDLMSLNParameters::CGXDLMSLNParameters(
     m_Status = status;
     m_MultipleBlocks = settings->GetCount() != settings->GetIndex();
     m_LastBlock = settings->GetCount() == settings->GetIndex();
-    m_InvokeId = 0;
+    m_InvokeId = invokeId;
 }
 
 CGXDLMSSettings* CGXDLMSLNParameters::GetSettings()

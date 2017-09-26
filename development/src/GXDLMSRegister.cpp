@@ -36,24 +36,6 @@
 #include "../include/GXDLMSRegister.h"
 #include "../include/GXDLMSConverter.h"
 
-void CGXDLMSRegister::Init()
-{
-    m_Unit = 0;
-    m_Scaler = 0;
-}
-
-//SN Constructor.
-CGXDLMSRegister::CGXDLMSRegister(DLMS_OBJECT_TYPE type, unsigned short sn) : CGXDLMSObject(type, sn)
-{
-    Init();
-}
-
-//LN Constructor.
-CGXDLMSRegister::CGXDLMSRegister(DLMS_OBJECT_TYPE type, std::string ln) : CGXDLMSObject(type, ln)
-{
-    Init();
-}
-
 bool CGXDLMSRegister::IsRead(int index)
 {
     if (index == 3)
@@ -64,35 +46,30 @@ bool CGXDLMSRegister::IsRead(int index)
 }
 
 //Constructor.
-CGXDLMSRegister::CGXDLMSRegister(void) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER)
+CGXDLMSRegister::CGXDLMSRegister() :
+    CGXDLMSRegister("", 0)
 {
-    Init();
+}
+
+CGXDLMSRegister::CGXDLMSRegister(DLMS_OBJECT_TYPE type, std::string ln, unsigned short sn) :
+    CGXDLMSObject(type, ln, sn)
+{
+    m_Unit = 0;
+    m_Scaler = 0;
 }
 
 //SN Constructor.
-CGXDLMSRegister::CGXDLMSRegister(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER, sn)
+CGXDLMSRegister::CGXDLMSRegister(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER, ln, sn)
 {
-    Init();
-}
-
-//SN Constructor.
-CGXDLMSRegister::CGXDLMSRegister(unsigned short sn, double scaler, int unit, CGXDLMSVariant value) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER, sn)
-{
-    m_Value = value;
-    Init();
+    m_Unit = 0;
+    m_Scaler = 0;
 }
 
 //LN Constructor.
-CGXDLMSRegister::CGXDLMSRegister(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER, ln)
+CGXDLMSRegister::CGXDLMSRegister(std::string ln) :
+    CGXDLMSRegister(ln, 0)
 {
-    Init();
-}
-
-//LN Constructor.
-CGXDLMSRegister::CGXDLMSRegister(std::string ln, double scaler, int unit, CGXDLMSVariant value) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER, ln)
-{
-    m_Value = value;
-    Init();
 }
 
 /// <summary>

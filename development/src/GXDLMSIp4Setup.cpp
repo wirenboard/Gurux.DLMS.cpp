@@ -47,18 +47,14 @@
 
 
 //Constructor.
-CGXDLMSIp4Setup::CGXDLMSIp4Setup() : CGXDLMSObject(DLMS_OBJECT_TYPE_IP4_SETUP)
+CGXDLMSIp4Setup::CGXDLMSIp4Setup() :
+    CGXDLMSIp4Setup("", 0)
 {
-    m_IPAddress.empty();
-    m_SubnetMask = 0;
-    m_GatewayIPAddress = 0;
-    m_UseDHCP = false;
-    m_PrimaryDNSAddress = 0;
-    m_SecondaryDNSAddress = 0;
 }
 
 //SN Constructor.
-CGXDLMSIp4Setup::CGXDLMSIp4Setup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_IP4_SETUP, sn)
+CGXDLMSIp4Setup::CGXDLMSIp4Setup(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_IP4_SETUP, ln, sn)
 {
     m_IPAddress.empty();
     m_SubnetMask = 0;
@@ -69,14 +65,9 @@ CGXDLMSIp4Setup::CGXDLMSIp4Setup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_
 }
 
 //LN Constructor.
-CGXDLMSIp4Setup::CGXDLMSIp4Setup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_IP4_SETUP, ln)
+CGXDLMSIp4Setup::CGXDLMSIp4Setup(std::string ln) :
+    CGXDLMSIp4Setup(ln, 0)
 {
-    m_IPAddress.empty();
-    m_SubnetMask = 0;
-    m_GatewayIPAddress = 0;
-    m_UseDHCP = false;
-    m_PrimaryDNSAddress = 0;
-    m_SecondaryDNSAddress = 0;
 }
 
 std::string& CGXDLMSIp4Setup::GetDataLinkLayerReference()

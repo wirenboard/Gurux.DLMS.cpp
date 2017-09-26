@@ -37,21 +37,22 @@
 #include "../include/GXDLMSGPRSSetup.h"
 
 //Constructor.
-CGXDLMSGPRSSetup::CGXDLMSGPRSSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_GPRS_SETUP)
+CGXDLMSGPRSSetup::CGXDLMSGPRSSetup() :
+    CGXDLMSGPRSSetup("", 0)
 {
-    m_PINCode = 0;
 }
 
 //SN Constructor.
-CGXDLMSGPRSSetup::CGXDLMSGPRSSetup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_GPRS_SETUP, sn)
+CGXDLMSGPRSSetup::CGXDLMSGPRSSetup(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_GPRS_SETUP, ln, sn)
 {
     m_PINCode = 0;
 }
 
 //LN Constructor.
-CGXDLMSGPRSSetup::CGXDLMSGPRSSetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_GPRS_SETUP, ln)
+CGXDLMSGPRSSetup::CGXDLMSGPRSSetup(std::string ln) :
+    CGXDLMSGPRSSetup(ln, 0)
 {
-    m_PINCode = 0;
 }
 
 std::string CGXDLMSGPRSSetup::GetAPN()

@@ -732,9 +732,8 @@ int GetUserInformation(
     data.Clear();
     data.SetUInt8(DLMS_COMMAND_INITIATE_RESPONSE); // Tag for xDLMS-Initiate
     // response
-    data.SetUInt8(0x01);
-    data.SetUInt8(0x00); // Usage field for the response allowed component
-    // (not used)
+    // Usage field for the response allowed component.// (not used)
+    data.SetUInt8(0x00);
     // DLMS Version Number
     data.SetUInt8(06);
     data.SetUInt8(0x5F);
@@ -833,6 +832,7 @@ int CGXAPDU::ParsePDU(
     CGXDLMSSettings& settings,
     CGXCipher* cipher,
     CGXByteBuffer& buff,
+    DLMS_ASSOCIATION_RESULT& result,
     DLMS_SOURCE_DIAGNOSTIC& diagnostic)
 {
     CGXByteBuffer tmp;
@@ -854,7 +854,7 @@ int CGXAPDU::ParsePDU(
         //Encoding failed. Not enough data.
         return DLMS_ERROR_CODE_OUTOFMEMORY;
     }
-    DLMS_ASSOCIATION_RESULT resultComponent = DLMS_ASSOCIATION_RESULT_ACCEPTED;
+    result = DLMS_ASSOCIATION_RESULT_ACCEPTED;
     while (buff.GetPosition() < buff.GetSize())
     {
         if ((ret = buff.GetUInt8(&tag)) != 0)
@@ -906,7 +906,7 @@ int CGXAPDU::ParsePDU(
             {
                 return ret;
             }
-            resultComponent = (DLMS_ASSOCIATION_RESULT)tag;
+            result = (DLMS_ASSOCIATION_RESULT)tag;
             break;
             // 0xA3 SourceDiagnostic
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLED_AE_QUALIFIER:
@@ -1056,14 +1056,16 @@ int CGXAPDU::ParsePDU(
             // 0xBE
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_USER_INFORMATION:
             //Check result component. Some meters are returning invalid user-information if connection failed.
-            if (resultComponent != DLMS_ASSOCIATION_RESULT_ACCEPTED
+            if (result != DLMS_ASSOCIATION_RESULT_ACCEPTED
                 && diagnostic != DLMS_SOURCE_DIAGNOSTIC_NONE)
             {
                 return handleResultComponent(diagnostic);
             }
             if ((ret = ParseUserInformation(settings, cipher, buff)) != 0)
             {
-                return ret;
+                result = DLMS_ASSOCIATION_RESULT_PERMANENT_REJECTED;
+                diagnostic = DLMS_SOURCE_DIAGNOSTIC_NO_REASON_GIVEN;
+                return 0;
             }
             break;
         default:
@@ -1136,9 +1138,7 @@ int CGXAPDU::GenerateAARE(
         GXHelpers::SetObjectCount(cipher->GetSystemTitle().GetSize(), data);
         data.Set(&cipher->GetSystemTitle());
     }
-
-    if (result != DLMS_ASSOCIATION_RESULT_PERMANENT_REJECTED
-        && diagnostic == DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_REQUIRED)
+    if (settings.GetAuthentication() > DLMS_AUTHENTICATION_LOW)
     {
         // Add server ACSE-requirenents field component.
         data.SetUInt8(0x88);
@@ -1161,38 +1161,40 @@ int CGXAPDU::GenerateAARE(
         GXHelpers::SetObjectCount(settings.GetStoCChallenge().GetSize(), data);
         data.Set(settings.GetStoCChallenge().GetData(), settings.GetStoCChallenge().GetSize());
     }
-    // Add User Information
-    // Tag 0xBE
-    data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_USER_INFORMATION);
-    CGXByteBuffer tmp;
-    if (encryptedData != NULL && encryptedData->GetSize() != 0)
+    if (result == DLMS_ASSOCIATION_RESULT_ACCEPTED || cipher == NULL || cipher->GetSecurity() == DLMS_SECURITY_NONE)
     {
-        tmp.Capacity(2 + encryptedData->GetSize());
-        tmp.SetUInt8(DLMS_COMMAND_GLO_INITIATE_RESPONSE);
-        GXHelpers::SetObjectCount(encryptedData->GetSize(), tmp);
-        tmp.Set(encryptedData);
-    }
-    else
-    {
-        if (errorData != NULL && errorData->GetSize() != 0)
+        // Add User Information. Tag 0xBE
+        data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_USER_INFORMATION);
+        CGXByteBuffer tmp;
+        if (encryptedData != NULL && encryptedData->GetSize() != 0)
         {
-            tmp.Set(errorData);
+            tmp.Capacity(2 + encryptedData->GetSize());
+            tmp.SetUInt8(DLMS_COMMAND_GLO_INITIATE_RESPONSE);
+            GXHelpers::SetObjectCount(encryptedData->GetSize(), tmp);
+            tmp.Set(encryptedData);
         }
         else
         {
-            if ((ret = GetUserInformation(settings, cipher, tmp)) != 0)
+            if (errorData != NULL && errorData->GetSize() != 0)
             {
-                return ret;
+                tmp.Set(errorData);
+            }
+            else
+            {
+                if ((ret = GetUserInformation(settings, cipher, tmp)) != 0)
+                {
+                    return ret;
+                }
             }
         }
-    }
 
-    GXHelpers::SetObjectCount(2 + tmp.GetSize(), data);
-    // Coding the choice for user-information (Octet STRING, universal)
-    data.SetUInt8(BER_TYPE_OCTET_STRING);
-    // Length
-    GXHelpers::SetObjectCount(tmp.GetSize(), data);
-    data.Set(&tmp);
+        GXHelpers::SetObjectCount(2 + tmp.GetSize(), data);
+        // Coding the choice for user-information (Octet STRING, universal)
+        data.SetUInt8(BER_TYPE_OCTET_STRING);
+        // Length
+        GXHelpers::SetObjectCount(tmp.GetSize(), data);
+        data.Set(&tmp);
+    }
     data.SetUInt8(offset + 1, (unsigned char)(data.GetSize() - offset - 2));
     return 0;
 }

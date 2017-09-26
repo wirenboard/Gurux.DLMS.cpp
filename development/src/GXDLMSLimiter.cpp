@@ -38,17 +38,14 @@
 #include <sstream>
 
 //Constructor.
-CGXDLMSLimiter::CGXDLMSLimiter() : CGXDLMSObject(DLMS_OBJECT_TYPE_LIMITER)
+CGXDLMSLimiter::CGXDLMSLimiter() :
+    CGXDLMSLimiter("", 0)
 {
-    m_MonitoredValue = NULL;
-    m_MinOverThresholdDuration = 0;
-    m_MinUnderThresholdDuration = 0;
-    m_EmergencyProfileActive = false;
-    m_MonitoredAttributeIndex = 0;
 }
 
 //SN Constructor.
-CGXDLMSLimiter::CGXDLMSLimiter(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_LIMITER, sn)
+CGXDLMSLimiter::CGXDLMSLimiter(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_LIMITER, ln, sn)
 {
     m_MonitoredValue = NULL;
     m_MinOverThresholdDuration = 0;
@@ -58,13 +55,8 @@ CGXDLMSLimiter::CGXDLMSLimiter(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TY
 }
 
 //LN Constructor.
-CGXDLMSLimiter::CGXDLMSLimiter(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_LIMITER, ln)
+CGXDLMSLimiter::CGXDLMSLimiter(std::string ln) : CGXDLMSLimiter(ln, 0)
 {
-    m_MonitoredValue = NULL;
-    m_MinOverThresholdDuration = 0;
-    m_MinUnderThresholdDuration = 0;
-    m_EmergencyProfileActive = false;
-    m_MonitoredAttributeIndex = 0;
 }
 
 /**

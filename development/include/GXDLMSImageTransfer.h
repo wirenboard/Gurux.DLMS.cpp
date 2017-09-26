@@ -45,16 +45,17 @@ class CGXDLMSImageTransfer : public CGXDLMSObject
     long m_ImageFirstNotTransferredBlockNumber;
     bool m_ImageTransferEnabled;
     DLMS_IMAGE_TRANSFER_STATUS m_ImageTransferStatus;
-    std::vector<CGXDLMSImageActivateInfo> m_ImageActivateInfo;
+    std::vector<CGXDLMSImageActivateInfo*> m_ImageActivateInfo;
 public:
     //Constructor.
     CGXDLMSImageTransfer();
 
     //SN Constructor.
-    CGXDLMSImageTransfer(unsigned short sn);
+    CGXDLMSImageTransfer(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSImageTransfer(std::string ln);
+    ~CGXDLMSImageTransfer();
 
     /**
      Holds the ImageBlockSize, expressed in octets,
@@ -92,7 +93,7 @@ public:
     DLMS_IMAGE_TRANSFER_STATUS GetImageTransferStatus();
     void SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS value);
 
-    std::vector<CGXDLMSImageActivateInfo>& GetImageActivateInfo();
+    std::vector<CGXDLMSImageActivateInfo*>& GetImageActivateInfo();
 
     // Returns amount of attributes.
     int GetAttributeCount();
@@ -106,6 +107,8 @@ public:
     void GetAttributeIndexToRead(std::vector<int>& attributes);
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
+
+    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 
     // Returns value of given attribute.
     int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);

@@ -37,40 +37,23 @@
 #include "../include/GXDLMSClock.h"
 #include "../include/GXDLMSConverter.h"
 
-void CGXDLMSClock::Init()
+CGXDLMSClock::CGXDLMSClock() :
+    CGXDLMSClock("0.0.1.0.0.255", 0)
+{
+}
+
+CGXDLMSClock::CGXDLMSClock(std::string ln) :
+    CGXDLMSClock(ln, 0)
+{
+}
+
+CGXDLMSClock::CGXDLMSClock(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_CLOCK, ln, sn)
 {
     m_Deviation = m_ClockBase = DLMS_CLOCK_BASE_NONE;
     m_Enabled = false;
     m_TimeZone = 0;
     m_Status = DLMS_CLOCK_STATUS_OK;
-}
-
-/**
- Constructor.
-*/
-CGXDLMSClock::CGXDLMSClock() : CGXDLMSObject(DLMS_OBJECT_TYPE_CLOCK, "0.0.1.0.0.255")
-{
-    Init();
-}
-
-/**
-Constructor.
-@param ln Logical Name of the object.
-*/
-CGXDLMSClock::CGXDLMSClock(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_CLOCK, ln)
-{
-    Init();
-}
-
-/**
- Constructor.
- @param ln Logical Name of the object.
- @param sn Short Name of the object.
-*/
-CGXDLMSClock::CGXDLMSClock(std::string ln, int sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_CLOCK, ln)
-{
-    Init();
-    SetShortName(sn);
 }
 
 /**

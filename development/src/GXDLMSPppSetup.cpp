@@ -37,19 +37,22 @@
 #include <sstream>
 
 //Constructor.
-CGXDLMSPppSetup::CGXDLMSPppSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_PPP_SETUP)
+CGXDLMSPppSetup::CGXDLMSPppSetup() :
+    CGXDLMSPppSetup("", 0)
 {
     m_Authentication = PPP_AUTHENTICATION_TYPE_NONE;
 }
 
 //SN Constructor.
-CGXDLMSPppSetup::CGXDLMSPppSetup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_PPP_SETUP, sn)
+CGXDLMSPppSetup::CGXDLMSPppSetup(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_PPP_SETUP, ln, sn)
 {
     m_Authentication = PPP_AUTHENTICATION_TYPE_NONE;
 }
 
 //LN Constructor.
-CGXDLMSPppSetup::CGXDLMSPppSetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_PPP_SETUP, ln)
+CGXDLMSPppSetup::CGXDLMSPppSetup(std::string ln) :
+    CGXDLMSPppSetup(ln, 0)
 {
     m_Authentication = PPP_AUTHENTICATION_TYPE_NONE;
 }

@@ -36,18 +36,18 @@
 #include <sstream>
 
 //Constructor.
-CGXDLMSScriptTable::CGXDLMSScriptTable() : CGXDLMSObject(DLMS_OBJECT_TYPE_SCRIPT_TABLE)
+CGXDLMSScriptTable::CGXDLMSScriptTable() : CGXDLMSScriptTable("", 0)
 {
 }
 
 //SN Constructor.
-CGXDLMSScriptTable::CGXDLMSScriptTable(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_SCRIPT_TABLE, sn)
+CGXDLMSScriptTable::CGXDLMSScriptTable(std::string ln, unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_SCRIPT_TABLE, ln, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSScriptTable::CGXDLMSScriptTable(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_SCRIPT_TABLE, ln)
+CGXDLMSScriptTable::CGXDLMSScriptTable(std::string ln) : CGXDLMSScriptTable(ln, 0)
 {
 
 }

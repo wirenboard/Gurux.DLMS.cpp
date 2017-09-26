@@ -38,7 +38,14 @@
 #include <sstream>
 
 //Constructor.
-CGXDLMSPushSetup::CGXDLMSPushSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_PUSH_SETUP)
+CGXDLMSPushSetup::CGXDLMSPushSetup() :
+    CGXDLMSPushSetup("0.7.25.9.0.255", 0)
+{
+}
+
+//SN Constructor.
+CGXDLMSPushSetup::CGXDLMSPushSetup(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_PUSH_SETUP, ln, sn)
 {
     m_RandomisationStartInterval = m_NumberOfRetries = m_RepetitionDelay = 0;
     GXHelpers::SetLogicalName("0.7.25.9.0.255", m_LN);
@@ -46,18 +53,10 @@ CGXDLMSPushSetup::CGXDLMSPushSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_PUSH_SETUP
     m_Message = DLMS_MESSAGE_TYPE_COSEM_APDU;
 }
 
-//SN Constructor.
-CGXDLMSPushSetup::CGXDLMSPushSetup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_PUSH_SETUP, sn)
-{
-    m_RandomisationStartInterval = m_NumberOfRetries = m_RepetitionDelay = 0;
-    GXHelpers::SetLogicalName("0.7.25.9.0.255", m_LN);
-}
-
 //LN Constructor.
-CGXDLMSPushSetup::CGXDLMSPushSetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_PUSH_SETUP, ln)
+CGXDLMSPushSetup::CGXDLMSPushSetup(std::string ln) :
+    CGXDLMSPushSetup(ln, 0)
 {
-    m_RandomisationStartInterval = m_NumberOfRetries = m_RepetitionDelay = 0;
-    GXHelpers::SetLogicalName(ln.c_str(), m_LN);
 }
 
 DLMS_SERVICE_TYPE CGXDLMSPushSetup::GetService()

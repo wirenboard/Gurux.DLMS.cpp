@@ -57,7 +57,7 @@ public:
      Constructor.
      @param sn Short Name of the object.
     */
-    CGXDLMSSapAssignment(int sn);
+    CGXDLMSSapAssignment(std::string ln, unsigned short sn);
 
     std::map<int, std::string >& GetSapAssignmentList();
 

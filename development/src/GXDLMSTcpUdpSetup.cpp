@@ -36,22 +36,12 @@
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSTcpUdpSetup.h"
 
-
-void CGXDLMSTcpUdpSetup::Init()
-{
-    m_Port = 4059;
-    m_IPReference = "127.0.0.1";
-    m_MaximumSimultaneousConnections = 1;
-    SetInactivityTimeout(180);
-    SetMaximumSegmentSize(576);
-}
-
 /**
  Constructor.
 */
-CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_TCP_UDP_SETUP, "0.0.25.0.0.255")
+CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup() :
+    CGXDLMSTcpUdpSetup("0.0.25.0.0.255", 0)
 {
-    Init();
 }
 
 /**
@@ -59,9 +49,9 @@ CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_TCP_UD
 
  @param ln Logical Name of the object.
 */
-CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_TCP_UDP_SETUP, ln)
+CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup(std::string ln) :
+    CGXDLMSTcpUdpSetup(ln, 0)
 {
-    Init();
 }
 
 /**
@@ -70,9 +60,13 @@ CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup(std::string ln) : CGXDLMSObject(DLMS_OBJE
  @param ln Logical Name of the object.
  @param sn Short Name of the object.
 */
-CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup(std::string ln, short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_TCP_UDP_SETUP, sn)
+CGXDLMSTcpUdpSetup::CGXDLMSTcpUdpSetup(std::string ln, short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_TCP_UDP_SETUP, ln, sn)
 {
-    Init();
+    m_Port = 4059;
+    m_IPReference = "127.0.0.1";
+    m_MaximumSimultaneousConnections = 1;
+    m_InactivityTimeout = 180;
+    m_MaximumSegmentSize = 576;
 }
 
 int CGXDLMSTcpUdpSetup::GetPort()

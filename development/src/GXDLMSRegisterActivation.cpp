@@ -38,18 +38,21 @@
 #include <sstream>
 
 //Constructor.
-CGXDLMSRegisterActivation::CGXDLMSRegisterActivation() : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER_ACTIVATION)
+CGXDLMSRegisterActivation::CGXDLMSRegisterActivation() :
+    CGXDLMSRegisterActivation("", 0)
 {
 }
 
 //SN Constructor.
-CGXDLMSRegisterActivation::CGXDLMSRegisterActivation(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER_ACTIVATION, sn)
+CGXDLMSRegisterActivation::CGXDLMSRegisterActivation(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER_ACTIVATION, ln, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSRegisterActivation::CGXDLMSRegisterActivation(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER_ACTIVATION, ln)
+CGXDLMSRegisterActivation::CGXDLMSRegisterActivation(std::string ln) :
+    CGXDLMSRegisterActivation(ln, 0)
 {
 
 }

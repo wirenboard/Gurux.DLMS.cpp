@@ -39,7 +39,8 @@ class CGXDLMSServerLN :
 {
 public:
     //Constructor.
-    CGXDLMSServerLN(void) : CGXDLMSBase(true, DLMS_INTERFACE_TYPE_HDLC)
+    CGXDLMSServerLN(CGXDLMSAssociationLogicalName* ln,
+        CGXDLMSIecHdlcSetup* hdlc) : CGXDLMSBase(ln, hdlc)
     {
     }
 };

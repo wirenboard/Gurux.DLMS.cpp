@@ -55,16 +55,6 @@ CGXDLMSProfileGeneric::~CGXDLMSProfileGeneric()
     m_Buffer.clear();
 }
 
-void CGXDLMSProfileGeneric::Init()
-{
-    m_SortObjectAttributeIndex = 0;
-    m_SortObjectDataIndex = 0;
-    m_SortObject = NULL;
-    m_CapturePeriod = 3600;
-    m_EntriesInUse = m_ProfileEntries = 0;
-    m_SortMethod = DLMS_SORT_METHOD_FIFO;
-}
-
 int CGXDLMSProfileGeneric::GetSelectedColumns(
     int selector,
     CGXDLMSVariant& parameters,
@@ -380,21 +370,21 @@ int CGXDLMSProfileGeneric::GetProfileGenericData(
 /**
  Constructor.
 */
-CGXDLMSProfileGeneric::CGXDLMSProfileGeneric() : CGXDLMSObject(DLMS_OBJECT_TYPE_PROFILE_GENERIC)
+CGXDLMSProfileGeneric::CGXDLMSProfileGeneric() :
+    CGXDLMSProfileGeneric("", 0)
 {
-    Init();
 }
 
 //SN Constructor.
-CGXDLMSProfileGeneric::CGXDLMSProfileGeneric(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_PROFILE_GENERIC, sn)
+CGXDLMSProfileGeneric::CGXDLMSProfileGeneric(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_PROFILE_GENERIC, ln, sn)
 {
-    Init();
-}
-
-//SN Constructor.
-CGXDLMSProfileGeneric::CGXDLMSProfileGeneric(unsigned short sn, CGXDLMSVariant value) : CGXDLMSObject(DLMS_OBJECT_TYPE_PROFILE_GENERIC, sn)
-{
-    Init();
+    m_SortObjectAttributeIndex = 0;
+    m_SortObjectDataIndex = 0;
+    m_SortObject = NULL;
+    m_CapturePeriod = 3600;
+    m_EntriesInUse = m_ProfileEntries = 0;
+    m_SortMethod = DLMS_SORT_METHOD_FIFO;
 }
 
 /**
@@ -402,9 +392,9 @@ CGXDLMSProfileGeneric::CGXDLMSProfileGeneric(unsigned short sn, CGXDLMSVariant v
 
  @param ln Logical Name of the object.
 */
-CGXDLMSProfileGeneric::CGXDLMSProfileGeneric(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_PROFILE_GENERIC, ln)
+CGXDLMSProfileGeneric::CGXDLMSProfileGeneric(std::string ln) :
+    CGXDLMSProfileGeneric(ln, 0)
 {
-    Init();
 }
 
 /**

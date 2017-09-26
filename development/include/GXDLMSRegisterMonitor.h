@@ -68,7 +68,7 @@ public:
      @param ln Logical Name of the object.
      @param sn Short Name of the object.
     */
-    CGXDLMSRegisterMonitor(int sn);
+    CGXDLMSRegisterMonitor(std::string ln, unsigned short sn);
 
     std::vector<CGXDLMSVariant> GetThresholds();
 

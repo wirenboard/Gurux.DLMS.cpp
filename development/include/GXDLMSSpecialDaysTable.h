@@ -46,7 +46,7 @@ public:
     CGXDLMSSpecialDaysTable();
 
     //SN Constructor.
-    CGXDLMSSpecialDaysTable(unsigned short sn);
+    CGXDLMSSpecialDaysTable(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSSpecialDaysTable(std::string ln);

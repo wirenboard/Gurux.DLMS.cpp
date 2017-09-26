@@ -44,7 +44,6 @@ class CGXDLMSActionSchedule : public CGXDLMSObject
     DLMS_SINGLE_ACTION_SCHEDULE_TYPE m_Type;
     std::vector<CGXDateTime> m_ExecutionTime;
 
-    void Init();
 public:
 
     /**
@@ -65,7 +64,7 @@ public:
      @param ln Logical Name of the object.
      @param sn Short Name of the object.
     */
-    CGXDLMSActionSchedule(int sn);
+    CGXDLMSActionSchedule(std::string ln, unsigned short sn);
 
     std::string GetExecutedScriptLogicalName();
     void SetExecutedScriptLogicalName(std::string value);

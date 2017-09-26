@@ -46,7 +46,7 @@ public:
     CGXDLMSSchedule();
 
     //SN Constructor.
-    CGXDLMSSchedule(unsigned short sn);
+    CGXDLMSSchedule(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSSchedule(std::string ln);

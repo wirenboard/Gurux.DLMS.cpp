@@ -50,7 +50,7 @@ public:
     CGXDLMSExtendedRegister(void);
 
     //SN Constructor.
-    CGXDLMSExtendedRegister(unsigned short sn);
+    CGXDLMSExtendedRegister(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSExtendedRegister(std::string ln);

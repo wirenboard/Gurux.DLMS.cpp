@@ -55,6 +55,9 @@
 #include "../include/GXDLMSServerLN.h"
 #include "../include/GXDLMSServerSN_47.h"
 #include "../include/GXDLMSServerLN_47.h"
+#include "../../development/include/GXDLMSAssociationLogicalName.h"
+#include "../../development/include/GXDLMSAssociationShortName.h"
+
 
 int Start(int port, GX_TRACE_LEVEL trace)
 {
@@ -63,7 +66,7 @@ int Start(int port, GX_TRACE_LEVEL trace)
     //4059 is Official DLMS port.
     ///////////////////////////////////////////////////////////////////////
     //Create Gurux DLMS server component for Short Name and start listen events.
-    CGXDLMSServerSN SNServer;
+    CGXDLMSServerSN SNServer(new CGXDLMSAssociationShortName(), new CGXDLMSIecHdlcSetup());
     if ((ret = SNServer.Init(port, trace)) != 0)
     {
         return ret;
@@ -74,7 +77,7 @@ int Start(int port, GX_TRACE_LEVEL trace)
     printf("----------------------------------------------------------\n");
     ///////////////////////////////////////////////////////////////////////
     //Create Gurux DLMS server component for Short Name and start listen events.
-    CGXDLMSServerLN LNServer;
+    CGXDLMSServerLN LNServer(new CGXDLMSAssociationLogicalName(), new CGXDLMSIecHdlcSetup());
     if ((ret = LNServer.Init(port + 1, trace)) != 0)
     {
         return ret;
@@ -85,7 +88,7 @@ int Start(int port, GX_TRACE_LEVEL trace)
     printf("----------------------------------------------------------\n");
     ///////////////////////////////////////////////////////////////////////
     //Create Gurux DLMS server component for Short Name and start listen events.
-    CGXDLMSServerSN_47 SN_47Server;
+    CGXDLMSServerSN_47 SN_47Server(new CGXDLMSAssociationShortName(), new CGXDLMSTcpUdpSetup());
     if ((ret = SN_47Server.Init(port + 2, trace)) != 0)
     {
         return ret;
@@ -96,7 +99,7 @@ int Start(int port, GX_TRACE_LEVEL trace)
     printf("----------------------------------------------------------\n");
     ///////////////////////////////////////////////////////////////////////
     //Create Gurux DLMS server component for Short Name and start listen events.
-    CGXDLMSServerLN_47 LN_47Server;
+    CGXDLMSServerLN_47 LN_47Server(new CGXDLMSAssociationLogicalName(), new CGXDLMSTcpUdpSetup());
     if ((ret = LN_47Server.Init(port + 3, trace)) != 0)
     {
         return ret;
@@ -131,10 +134,16 @@ int main(int argc, char* argv[])
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
     char *p = _tcsrchr(DATAFILE, '\\');
     *p = '\0';
+    strcpy(IMAGEFILE, DATAFILE);
+    //Add empty file name. This is removed when data is updated.
+    strcat(IMAGEFILE, "\\empty.bin");
     strcat_s(DATAFILE, "\\data.csv");
 #else
     char *p = strrchr(DATAFILE, '/');
     *p = '\0';
+    strcpy(IMAGEFILE, DATAFILE);
+    //Add empty file name.
+    strcat(IMAGEFILE, "/empty.bin");
     strcat(DATAFILE, "/data.csv");
 #endif
 

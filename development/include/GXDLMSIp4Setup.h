@@ -56,7 +56,7 @@ public:
     CGXDLMSIp4Setup();
 
     //SN Constructor.
-    CGXDLMSIp4Setup(unsigned short sn);
+    CGXDLMSIp4Setup(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSIp4Setup(std::string ln);

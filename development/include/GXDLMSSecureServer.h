@@ -49,6 +49,50 @@ public:
         bool UseLogicalNameReferencing = true,
         DLMS_INTERFACE_TYPE intefaceType = DLMS_INTERFACE_TYPE_HDLC);
 
+    /**
+    * Constructor.
+    *
+    * @param ln
+    *           Logical name settings..
+    * @param hdlc
+    *            HDLC settings.
+    */
+    CGXDLMSSecureServer(
+        CGXDLMSAssociationLogicalName* ln, CGXDLMSIecHdlcSetup* hdlc);
+
+    /**
+    * Constructor.
+    *
+    * @param ln
+    *           Logical name settings..
+    * @param wrapper
+    *            WRAPPER settings.
+    */
+    CGXDLMSSecureServer(
+        CGXDLMSAssociationLogicalName* ln, CGXDLMSTcpUdpSetup* wrapper);
+
+    /**
+    * Constructor.
+    *
+    * @param sn
+    *           Short name settings..
+    * @param hdlc
+    *            HDLC settings.
+    */
+    CGXDLMSSecureServer(
+        CGXDLMSAssociationShortName* sn, CGXDLMSIecHdlcSetup* hdlc);
+
+    /**
+    * Constructor.
+    *
+    * @param sn
+    *           Short name settings..
+    * @param wrapper
+    *            WRAPPER settings.
+    */
+    CGXDLMSSecureServer(
+        CGXDLMSAssociationShortName* sn, CGXDLMSTcpUdpSetup* wrapper);
+
     /////////////////////////////////////////////////////////////////////////////
     //Destructor.
     /////////////////////////////////////////////////////////////////////////////

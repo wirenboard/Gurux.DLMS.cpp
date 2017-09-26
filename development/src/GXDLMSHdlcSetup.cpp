@@ -36,27 +36,27 @@
 #include "../include/GXDLMSConverter.h"
 
 //Constructor.
-CGXDLMSIecHdlcSetup::CGXDLMSIecHdlcSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_IEC_HDLC_SETUP)
+CGXDLMSIecHdlcSetup::CGXDLMSIecHdlcSetup() :
+    CGXDLMSIecHdlcSetup("0.0.22.0.0.255", 0)
 {
-    m_CommunicationSpeed = DLMS_BAUD_RATE_9600;
-    m_WindowSizeTransmit = m_WindowSizeReceive = 1;
-    m_MaximumInfoLengthTransmit = m_MaximumInfoLengthReceive = 128;
 }
 
 //SN Constructor.
-CGXDLMSIecHdlcSetup::CGXDLMSIecHdlcSetup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_IEC_HDLC_SETUP, sn)
+CGXDLMSIecHdlcSetup::CGXDLMSIecHdlcSetup(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_IEC_HDLC_SETUP, ln, sn)
 {
     m_CommunicationSpeed = DLMS_BAUD_RATE_9600;
     m_WindowSizeTransmit = m_WindowSizeReceive = 1;
     m_MaximumInfoLengthTransmit = m_MaximumInfoLengthReceive = 128;
+    m_InactivityTimeout = 120;
+    m_DeviceAddress = 0;
+    m_InterCharachterTimeout = 30;
 }
 
 //LN Constructor.
-CGXDLMSIecHdlcSetup::CGXDLMSIecHdlcSetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_IEC_HDLC_SETUP, ln)
+CGXDLMSIecHdlcSetup::CGXDLMSIecHdlcSetup(std::string ln) :
+    CGXDLMSIecHdlcSetup(ln, 0)
 {
-    m_CommunicationSpeed = DLMS_BAUD_RATE_9600;
-    m_WindowSizeTransmit = m_WindowSizeReceive = 1;
-    m_MaximumInfoLengthTransmit = m_MaximumInfoLengthReceive = 128;
 }
 
 DLMS_BAUD_RATE CGXDLMSIecHdlcSetup::GetCommunicationSpeed()

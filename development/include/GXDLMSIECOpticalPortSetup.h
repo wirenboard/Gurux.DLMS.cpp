@@ -54,7 +54,7 @@ public:
     //Constructor.
     CGXDLMSIECOpticalPortSetup();
     //SN Constructor.
-    CGXDLMSIECOpticalPortSetup(unsigned short sn);
+    CGXDLMSIECOpticalPortSetup(std::string ln, unsigned short sn);
     //LN Constructor.
     CGXDLMSIECOpticalPortSetup(std::string ln);
 

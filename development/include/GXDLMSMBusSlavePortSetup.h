@@ -49,7 +49,7 @@ public:
     CGXDLMSMBusSlavePortSetup();
 
     //SN Constructor.
-    CGXDLMSMBusSlavePortSetup(unsigned short sn);
+    CGXDLMSMBusSlavePortSetup(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSMBusSlavePortSetup(std::string ln);

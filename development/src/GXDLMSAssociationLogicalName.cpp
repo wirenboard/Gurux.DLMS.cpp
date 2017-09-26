@@ -37,12 +37,6 @@
 #include "../include/GXDLMSAssociationLogicalName.h"
 #include "../include/GXDLMSServer.h"
 
-void CGXDLMSAssociationLogicalName::Init()
-{
-    m_AssociationStatus = DLMS_DLMS_ASSOCIATION_STATUS_NON_ASSOCIATED;
-    m_Secret.AddString("Gurux");
-}
-
 void CGXDLMSAssociationLogicalName::UpdateAccessRights(CGXDLMSObject* pObj, CGXDLMSVariant data)
 {
     for (std::vector<CGXDLMSVariant >::iterator it = data.Arr[0].Arr.begin(); it != data.Arr[0].Arr.end(); ++it)
@@ -191,21 +185,20 @@ int CGXDLMSAssociationLogicalName::GetObjects(
     return DLMS_ERROR_CODE_OK;
 }
 
-/**
- Constructor.
-*/
-CGXDLMSAssociationLogicalName::CGXDLMSAssociationLogicalName() : CGXDLMSObject(DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME, "0.0.40.0.0.255")
+CGXDLMSAssociationLogicalName::CGXDLMSAssociationLogicalName() :
+    CGXDLMSAssociationLogicalName("0.0.40.0.0.255")
 {
-    Init();
 }
 
 /**
  Constructor.
  @param ln Logical Name of the object.
 */
-CGXDLMSAssociationLogicalName::CGXDLMSAssociationLogicalName(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME, ln)
+CGXDLMSAssociationLogicalName::CGXDLMSAssociationLogicalName(std::string ln) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME, ln, 0)
 {
-    Init();
+    m_AssociationStatus = DLMS_DLMS_ASSOCIATION_STATUS_NON_ASSOCIATED;
+    m_Secret.AddString("Gurux");
 }
 
 CGXDLMSObjectCollection& CGXDLMSAssociationLogicalName::GetObjectList()

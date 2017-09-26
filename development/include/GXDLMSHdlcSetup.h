@@ -53,7 +53,7 @@ public:
     CGXDLMSIecHdlcSetup();
 
     //SN Constructor.
-    CGXDLMSIecHdlcSetup(unsigned short sn);
+    CGXDLMSIecHdlcSetup(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSIecHdlcSetup(std::string ln);

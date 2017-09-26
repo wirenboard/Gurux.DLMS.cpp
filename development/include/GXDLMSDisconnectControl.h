@@ -48,7 +48,7 @@ public:
     CGXDLMSDisconnectControl();
 
     //SN Constructor.
-    CGXDLMSDisconnectControl(unsigned short sn);
+    CGXDLMSDisconnectControl(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSDisconnectControl(std::string ln);

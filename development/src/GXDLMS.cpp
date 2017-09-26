@@ -206,7 +206,7 @@ int CGXDLMS::ReceiverReady(
     settings.IncreaseBlockIndex();
     if (settings.GetUseLogicalNameReferencing())
     {
-        CGXDLMSLNParameters p(&settings, cmd,
+        CGXDLMSLNParameters p(&settings, 0, cmd,
             DLMS_GET_COMMAND_TYPE_NEXT_DATA_BLOCK, &bb, NULL, 0xff);
         ret = GetLnMessages(p, tmp);
     }
@@ -315,7 +315,8 @@ int CGXDLMS::GetHdlcFrame(
 
     // Add BOP
     reply.SetUInt8(HDLC_FRAME_START_END);
-    frameSize = settings.GetLimits().GetMaxInfoTX().ToInteger();
+    frameSize = settings.GetLimits().GetMaxInfoTX();
+    frameSize -= 11;
     // If no data
     if (data == NULL || data->GetSize() == 0)
     {
@@ -432,6 +433,15 @@ unsigned char GetGloMessage(DLMS_COMMAND command)
     case DLMS_COMMAND_METHOD_RESPONSE:
         cmd = DLMS_COMMAND_GLO_METHOD_RESPONSE;
         break;
+    case DLMS_COMMAND_DATA_NOTIFICATION:
+        cmd = DLMS_COMMAND_GENERAL_GLO_CIPHERING;
+        break;
+    case DLMS_COMMAND_RELEASE_REQUEST:
+        cmd = DLMS_COMMAND_RELEASE_REQUEST;
+        break;
+    case DLMS_COMMAND_RELEASE_RESPONSE:
+        cmd = DLMS_COMMAND_RELEASE_RESPONSE;
+        break;
     default:
         cmd = DLMS_COMMAND_NONE;
     }
@@ -443,13 +453,13 @@ unsigned char GetInvokeIDPriority(CGXDLMSSettings& settings)
     unsigned char value = 0;
     if (settings.GetPriority() == DLMS_PRIORITY_HIGH)
     {
-        value |= 0x80;
+        value = 0x80;
     }
     if (settings.GetServiceClass() == DLMS_SERVICE_CLASS_CONFIRMED)
     {
         value |= 0x40;
     }
-    value |= settings.GetInvokeID();
+    value |= settings.GetInvokeID() & 0xF;
     return value;
 }
 
@@ -810,7 +820,8 @@ int CGXDLMS::GetLnMessages(
                 ret = GetHdlcFrame(*p.GetSettings(), frame, &reply, tmp);
                 if (ret == 0 && reply.GetPosition() != reply.GetSize())
                 {
-                    if (p.GetSettings()->IsServer())
+                    if (p.GetSettings()->IsServer() || p.GetCommand() == DLMS_COMMAND_SET_REQUEST ||
+                        p.GetCommand() == DLMS_COMMAND_METHOD_REQUEST)
                     {
                         frame = 0;
                     }
@@ -2875,4 +2886,92 @@ int CGXDLMS::AppendData(
         }
     }
     return GXHelpers::SetData(bb, tp, value);
+}
+
+int CGXDLMS::ParseSnrmUaResponse(
+    CGXByteBuffer& data,
+    CGXDLMSLimits* limits)
+{
+    unsigned char ch, id, len;
+    unsigned short ui;
+    unsigned long ul;
+    int ret;
+    if (data.GetSize() == 0)
+    {
+        return 0;
+    }
+    // Skip FromatID
+    if ((ret = data.GetUInt8(&ch)) != 0)
+    {
+        return ret;
+    }
+    // Skip Group ID.
+    if ((ret = data.GetUInt8(&ch)) != 0)
+    {
+        return ret;
+    }
+    // Skip Group len
+    if ((ret = data.GetUInt8(&ch)) != 0)
+    {
+        return ret;
+    }
+    CGXDLMSVariant value;
+    while (data.GetPosition() < data.GetSize())
+    {
+        if ((ret = data.GetUInt8(&id)) != 0)
+        {
+            return ret;
+        }
+        if ((ret = data.GetUInt8(&len)) != 0)
+        {
+            return ret;
+        }
+        switch (len)
+        {
+        case 1:
+            if ((ret = data.GetUInt8(&ch)) != 0)
+            {
+                return ret;
+            }
+            value = ch;
+            break;
+        case 2:
+            if ((ret = data.GetUInt16(&ui)) != 0)
+            {
+                return ret;
+            }
+            value = ui;
+            break;
+        case 4:
+            if ((ret = data.GetUInt32(&ul)) != 0)
+            {
+                return ret;
+            }
+            value = ul;
+            break;
+        default:
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+        // RX / TX are delivered from the partner's point of view =>
+        // reversed to ours
+        switch (id)
+        {
+        case HDLC_INFO_MAX_INFO_TX:
+            limits->SetMaxInfoRX((unsigned char)value.ToInteger());
+            break;
+        case HDLC_INFO_MAX_INFO_RX:
+            limits->SetMaxInfoTX((unsigned char)value.ToInteger());
+            break;
+        case HDLC_INFO_WINDOW_SIZE_TX:
+            limits->SetWindowSizeRX((unsigned char)value.ToInteger());
+            break;
+        case HDLC_INFO_WINDOW_SIZE_RX:
+            limits->SetWindowSizeTX((unsigned char)value.ToInteger());
+            break;
+        default:
+            ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
+            break;
+        }
+    }
+    return ret;
 }

@@ -37,18 +37,21 @@
 #include <sstream>
 
 //Constructor.
-CGXDLMSMessageHandler::CGXDLMSMessageHandler() : CGXDLMSObject(DLMS_OBJECT_TYPE_MESSAGE_HANDLER)
+CGXDLMSMessageHandler::CGXDLMSMessageHandler() :
+    CGXDLMSMessageHandler("", 0)
 {
 }
 
 //SN Constructor.
-CGXDLMSMessageHandler::CGXDLMSMessageHandler(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_MESSAGE_HANDLER, sn)
+CGXDLMSMessageHandler::CGXDLMSMessageHandler(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_MESSAGE_HANDLER, ln, sn)
 {
 
 }
 
 //LN Constructor.
-CGXDLMSMessageHandler::CGXDLMSMessageHandler(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_MESSAGE_HANDLER, ln)
+CGXDLMSMessageHandler::CGXDLMSMessageHandler(std::string ln) :
+    CGXDLMSMessageHandler(ln, 0)
 {
 
 }

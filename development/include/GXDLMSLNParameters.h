@@ -104,6 +104,7 @@ public:
      *            Data.
      */
     CGXDLMSLNParameters(CGXDLMSSettings* settings,
+        unsigned long invokeId,
         DLMS_COMMAND command,
         int commandType,
         CGXByteBuffer* attributeDescriptor,

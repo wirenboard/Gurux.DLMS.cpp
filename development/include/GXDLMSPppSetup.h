@@ -70,7 +70,7 @@ public:
     CGXDLMSPppSetup();
 
     //SN Constructor.
-    CGXDLMSPppSetup(unsigned short sn);
+    CGXDLMSPppSetup(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSPppSetup(std::string ln);

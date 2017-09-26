@@ -36,29 +36,25 @@
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSConverter.h"
 
-void CGXDLMSIECOpticalPortSetup::Init()
+//Constructor.
+CGXDLMSIECOpticalPortSetup::CGXDLMSIECOpticalPortSetup() :
+    CGXDLMSIECOpticalPortSetup("0.0.20.0.0.255", 0)
+{
+}
+
+//SN Constructor.
+CGXDLMSIECOpticalPortSetup::CGXDLMSIECOpticalPortSetup(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_IEC_LOCAL_PORT_SETUP, ln, sn)
 {
     m_DefaultMode = DLMS_OPTICAL_PROTOCOL_MODE_DEFAULT;
     m_DefaultBaudrate = DLMS_BAUD_RATE_300;
     m_ProposedBaudrate = DLMS_BAUD_RATE_9600;
 }
 
-//Constructor.
-CGXDLMSIECOpticalPortSetup::CGXDLMSIECOpticalPortSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_IEC_LOCAL_PORT_SETUP, "0.0.20.0.0.255")
-{
-    Init();
-}
-
-//SN Constructor.
-CGXDLMSIECOpticalPortSetup::CGXDLMSIECOpticalPortSetup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_IEC_LOCAL_PORT_SETUP, sn)
-{
-    Init();
-}
-
 //LN Constructor.
-CGXDLMSIECOpticalPortSetup::CGXDLMSIECOpticalPortSetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_IEC_LOCAL_PORT_SETUP, ln)
+CGXDLMSIECOpticalPortSetup::CGXDLMSIECOpticalPortSetup(std::string ln) :
+    CGXDLMSIECOpticalPortSetup(ln, 0)
 {
-    Init();
 }
 
 DLMS_OPTICAL_PROTOCOL_MODE CGXDLMSIECOpticalPortSetup::GetDefaultMode()

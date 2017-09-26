@@ -38,7 +38,18 @@
 #include "../include/GXDLMSConverter.h"
 #include <sstream>
 
-void CGXDLMSModemConfiguration::Init()
+CGXDLMSModemConfiguration::CGXDLMSModemConfiguration() :
+    CGXDLMSModemConfiguration("0.0.2.0.0.255", 0)
+{
+}
+
+CGXDLMSModemConfiguration::CGXDLMSModemConfiguration(std::string ln) :
+    CGXDLMSModemConfiguration(ln, 0)
+{
+}
+
+CGXDLMSModemConfiguration::CGXDLMSModemConfiguration(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_MODEM_CONFIGURATION, ln, sn)
 {
     m_CommunicationSpeed = DLMS_BAUD_RATE_9600;
     m_ModemProfile.push_back("OK");
@@ -58,31 +69,6 @@ void CGXDLMSModemConfiguration::Init()
     m_ModemProfile.push_back("CONNECT 28 800");
     m_ModemProfile.push_back("CONNECT 33 600");
     m_ModemProfile.push_back("CONNECT 56 000");
-}
-
-// Constructor.
-CGXDLMSModemConfiguration::CGXDLMSModemConfiguration() : CGXDLMSObject(DLMS_OBJECT_TYPE_MODEM_CONFIGURATION, "0.0.2.0.0.255")
-{
-    Init();
-}
-
-/**
- Constructor.
- @param ln Logical Name of the object.
-*/
-CGXDLMSModemConfiguration::CGXDLMSModemConfiguration(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_MODEM_CONFIGURATION, ln)
-{
-    Init();
-}
-
-/**
- Constructor.
- @param ln Logical Name of the object.
- @param sn Short Name of the object.
-*/
-CGXDLMSModemConfiguration::CGXDLMSModemConfiguration(int sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_MODEM_CONFIGURATION, sn)
-{
-    Init();
 }
 
 DLMS_BAUD_RATE CGXDLMSModemConfiguration::GetCommunicationSpeed()

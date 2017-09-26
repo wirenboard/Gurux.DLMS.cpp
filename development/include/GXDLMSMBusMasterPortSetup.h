@@ -45,7 +45,7 @@ public:
     CGXDLMSMBusMasterPortSetup();
 
     //SN Constructor.
-    CGXDLMSMBusMasterPortSetup(unsigned short sn);
+    CGXDLMSMBusMasterPortSetup(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSMBusMasterPortSetup(std::string ln);

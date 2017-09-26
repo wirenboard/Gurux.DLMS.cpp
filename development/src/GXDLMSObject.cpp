@@ -36,13 +36,14 @@
 #include "../include/GXHelpers.h"
 
 //SN Constructor.
-CGXDLMSObject::CGXDLMSObject(DLMS_OBJECT_TYPE type, unsigned short sn)
+CGXDLMSObject::CGXDLMSObject(DLMS_OBJECT_TYPE type, std::string& ln, unsigned short sn)
 {
     Initialize(sn, type, 0, NULL);
+    GXHelpers::SetLogicalName(ln.c_str(), m_LN);
 }
 
 //LN Constructor.
-CGXDLMSObject::CGXDLMSObject(DLMS_OBJECT_TYPE type, std::string ln)
+CGXDLMSObject::CGXDLMSObject(DLMS_OBJECT_TYPE type, std::string& ln)
 {
     Initialize(0, type, 0, NULL);
     GXHelpers::SetLogicalName(ln.c_str(), m_LN);

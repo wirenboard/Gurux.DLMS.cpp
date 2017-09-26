@@ -124,6 +124,11 @@ private:
     */
     CGXDLMSServer* m_Server;
 
+    /**
+    * Received invoke ID.
+    */
+    unsigned int m_InvokeId;
+
     void Init(
         CGXDLMSServer* server,
         CGXDLMSObject* target,
@@ -191,17 +196,6 @@ public:
     *            CGXDLMSVariant value.
     */
     void SetValue(CGXDLMSVariant value);
-
-    /**
-    * @return Data type of the value.
-    */
-    DLMS_DATA_TYPE GetDataType();
-
-    /**
-    * @param value
-    *            Data type of the value.
-    */
-    void SetDataType(DLMS_DATA_TYPE value);
 
     /**
     * @return Is request handled.
@@ -349,5 +343,16 @@ public:
     * DLMS settings.
     */
     CGXDLMSSettings* GetSettings();
+
+    /**
+    * @param value
+    *            Received invoke ID.
+    */
+    void SetInvokeId(unsigned int value);
+
+    /**
+    * @return Received invoke ID.
+    */
+    unsigned int GetInvokeId();
 };
 #endif //GXDLMSVALUEEVENTARGS_H

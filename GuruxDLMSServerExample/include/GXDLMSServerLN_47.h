@@ -40,7 +40,8 @@ class CGXDLMSServerLN_47 :
 {
 public:
     //Constructor.
-    CGXDLMSServerLN_47(void) : CGXDLMSBase(true, DLMS_INTERFACE_TYPE_WRAPPER)
+    CGXDLMSServerLN_47(CGXDLMSAssociationLogicalName* ln,
+        CGXDLMSTcpUdpSetup* wrapper) : CGXDLMSBase(ln, wrapper)
     {
     }
 };

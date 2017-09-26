@@ -43,8 +43,13 @@
 #include "GXDLMSSNParameters.h"
 #include "GXDLMSLNParameters.h"
 #include "GXDLMSConnectionEventArgs.h"
+#include "GXDLMSHdlcSetup.h"
+#include "GXDLMSTcpUdpSetup.h"
+#include "GXDLMSAssociationLogicalName.h"
+#include "GXDLMSAssociationShortName.h"
 
 class CGXDLMSProfileGeneric;
+
 class CGXDLMSServer
 {
     friend class CGXDLMSProfileGeneric;
@@ -52,6 +57,9 @@ class CGXDLMSServer
     friend class CGXDLMSAssociationLogicalName;
     friend class CGXDLMSAssociationShortName;
 private:
+    long m_DataReceived;
+    CGXDLMSIecHdlcSetup* m_Hdlc;
+    CGXDLMSTcpUdpSetup* m_Wrapper;
     CGXReplyData m_Info;
     /**
      * Received data.
@@ -79,7 +87,7 @@ private:
     *
     * @return Returns returned UA packet.
     */
-    int HandleSnrmRequest(CGXDLMSSettings& settings, CGXByteBuffer& reply);
+    int HandleSnrmRequest(CGXDLMSSettings& settings, CGXByteBuffer& data, CGXByteBuffer& reply);
 
     /**
     * Handle get request normal command.
@@ -87,7 +95,7 @@ private:
     * @param data
     *            Received data.
     */
-    int GetRequestNormal(CGXByteBuffer& data);
+    int GetRequestNormal(CGXByteBuffer& data, unsigned char invokeID);
 
     /**
     * Handle get request next data block command.
@@ -95,7 +103,7 @@ private:
     * @param data
     *            Received data.
     */
-    int GetRequestNextDataBlock(CGXByteBuffer& data);
+    int GetRequestNextDataBlock(CGXByteBuffer& data, unsigned char invokeID);
 
     /**
      * Handle get request with list command.
@@ -103,7 +111,7 @@ private:
      * @param data
      *            Received data.
      */
-    int GetRequestWithList(CGXByteBuffer& data);
+    int GetRequestWithList(CGXByteBuffer& data, unsigned char invokeID);
 
     int HandleSetRequest(
         CGXByteBuffer& data,
@@ -413,6 +421,28 @@ protected:
 
 public:
     /**
+    * @return HDLC settings.
+    */
+    CGXDLMSIecHdlcSetup* GetHdlc();
+
+    /**
+    * @param value
+    *            HDLC settings.
+    */
+    void SetHdlc(CGXDLMSIecHdlcSetup* value);
+
+    /**
+    * @return Wrapper settings.
+    */
+    CGXDLMSTcpUdpSetup* GetWrapper();
+
+    /**
+    * @param value
+    *            Wrapper settings.
+    */
+    void SetWrapper(CGXDLMSTcpUdpSetup* value);
+
+    /**
      * @return Client to Server challenge.
      */
     CGXByteBuffer& GetCtoSChallenge();
@@ -462,6 +492,51 @@ public:
     CGXDLMSServer(
         bool logicalNameReferencing,
         DLMS_INTERFACE_TYPE type);
+
+    /**
+    * Constructor.
+    *
+    * @param ln
+    *           Logical name settings..
+    * @param hdlc
+    *            HDLC settings.
+    */
+    CGXDLMSServer(
+        CGXDLMSAssociationLogicalName* ln, CGXDLMSIecHdlcSetup* hdlc);
+
+    /**
+    * Constructor.
+    *
+    * @param ln
+    *           Logical name settings..
+    * @param wrapper
+    *            WRAPPER settings.
+    */
+    CGXDLMSServer(
+        CGXDLMSAssociationLogicalName* ln, CGXDLMSTcpUdpSetup* wrapper);
+
+    /**
+    * Constructor.
+    *
+    * @param sn
+    *           Short name settings..
+    * @param hdlc
+    *            HDLC settings.
+    */
+    CGXDLMSServer(
+        CGXDLMSAssociationShortName* sn, CGXDLMSIecHdlcSetup* hdlc);
+
+    /**
+    * Constructor.
+    *
+    * @param sn
+    *           Short name settings..
+    * @param wrapper
+    *            WRAPPER settings.
+    */
+    CGXDLMSServer(
+        CGXDLMSAssociationShortName* sn, CGXDLMSTcpUdpSetup* wrapper);
+
 
     /**
     * Destructor.

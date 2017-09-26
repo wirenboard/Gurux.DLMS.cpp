@@ -37,39 +37,24 @@
 #include "../include/GXDLMSActionSchedule.h"
 #include <sstream>
 
-void CGXDLMSActionSchedule::Init()
+/**
+ Constructor.
+*/
+CGXDLMSActionSchedule::CGXDLMSActionSchedule() :
+    CGXDLMSActionSchedule("", 0)
+{
+}
+
+CGXDLMSActionSchedule::CGXDLMSActionSchedule(std::string ln) :
+    CGXDLMSActionSchedule(ln, 0)
+{
+}
+
+CGXDLMSActionSchedule::CGXDLMSActionSchedule(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_ACTION_SCHEDULE, ln, sn)
 {
     m_ExecutedScriptSelector = 0;
     m_Type = DLMS_SINGLE_ACTION_SCHEDULE_TYPE1;
-}
-
-/**
- Constructor.
-*/
-CGXDLMSActionSchedule::CGXDLMSActionSchedule() : CGXDLMSObject(DLMS_OBJECT_TYPE_ACTION_SCHEDULE)
-{
-    Init();
-}
-
-/**
- Constructor.
-
- @param ln Logical Name of the object.
-*/
-CGXDLMSActionSchedule::CGXDLMSActionSchedule(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_ACTION_SCHEDULE, ln)
-{
-    Init();
-}
-
-/**
- Constructor.
-
- @param ln Logical Name of the object.
- @param sn Short Name of the object.
-*/
-CGXDLMSActionSchedule::CGXDLMSActionSchedule(int sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_ACTION_SCHEDULE, sn)
-{
-    Init();
 }
 
 std::string CGXDLMSActionSchedule::GetExecutedScriptLogicalName()

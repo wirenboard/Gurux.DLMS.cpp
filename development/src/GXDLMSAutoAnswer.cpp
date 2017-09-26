@@ -37,41 +37,23 @@
 #include "../include/GXDLMSAutoAnswer.h"
 #include <sstream>
 
-void CGXDLMSAutoAnswer::Init()
+CGXDLMSAutoAnswer::CGXDLMSAutoAnswer() :
+    CGXDLMSAutoAnswer("0.0.2.2.0.255", 0)
+{
+}
+
+CGXDLMSAutoAnswer::CGXDLMSAutoAnswer(std::string ln) :
+    CGXDLMSAutoAnswer(ln, 0)
+{
+}
+
+CGXDLMSAutoAnswer::CGXDLMSAutoAnswer(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_AUTO_ANSWER, ln, sn)
 {
     m_NumberOfRingsInListeningWindow = m_NumberOfRingsOutListeningWindow = 0;
     m_Mode = AUTO_CONNECT_MODE_NO_AUTO_DIALLING;
     m_Status = AUTO_ANSWER_STATUS_INACTIVE;
     m_NumberOfCalls = 0;
-}
-
-/**
- Constructor.
-*/
-CGXDLMSAutoAnswer::CGXDLMSAutoAnswer() : CGXDLMSObject(DLMS_OBJECT_TYPE_AUTO_ANSWER, "0.0.2.2.0.255")
-{
-    Init();
-}
-
-/**
- Constructor.
-
- @param ln Logical Name of the object.
-*/
-CGXDLMSAutoAnswer::CGXDLMSAutoAnswer(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_AUTO_ANSWER, ln)
-{
-    Init();
-}
-
-/**
- Constructor.
-
- @param ln Logical Name of the object.
- @param sn Short Name of the object.
-*/
-CGXDLMSAutoAnswer::CGXDLMSAutoAnswer(int sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_AUTO_ANSWER, sn)
-{
-    Init();
 }
 
 AUTO_CONNECT_MODE CGXDLMSAutoAnswer::GetMode()

@@ -54,7 +54,7 @@ public:
     CGXDLMSPushSetup();
 
     //SN Constructor.
-    CGXDLMSPushSetup(unsigned short sn);
+    CGXDLMSPushSetup(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSPushSetup(std::string ln);

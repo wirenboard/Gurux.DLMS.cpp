@@ -49,9 +49,9 @@ bool CGXDLMSDemandRegister::IsRead(int index)
 /**
  Constructor.
 */
-CGXDLMSDemandRegister::CGXDLMSDemandRegister() : CGXDLMSObject(DLMS_OBJECT_TYPE_DEMAND_REGISTER)
+CGXDLMSDemandRegister::CGXDLMSDemandRegister() :
+    CGXDLMSDemandRegister("", 0)
 {
-    m_Period = m_NumberOfPeriods = m_Unit = m_Scaler = 0;
 }
 
 /**
@@ -59,18 +59,13 @@ CGXDLMSDemandRegister::CGXDLMSDemandRegister() : CGXDLMSObject(DLMS_OBJECT_TYPE_
 
  @param ln Logical Name of the object.
 */
-CGXDLMSDemandRegister::CGXDLMSDemandRegister(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_DEMAND_REGISTER, ln)
+CGXDLMSDemandRegister::CGXDLMSDemandRegister(std::string ln) :
+    CGXDLMSDemandRegister(ln, 0)
 {
-    m_Period = m_NumberOfPeriods = m_Unit = m_Scaler = 0;
 }
 
-/**
- Constructor.
-
- @param ln Logical Name of the object.
- @param sn Short Name of the object.
-*/
-CGXDLMSDemandRegister::CGXDLMSDemandRegister(int sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_DEMAND_REGISTER, sn)
+CGXDLMSDemandRegister::CGXDLMSDemandRegister(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_DEMAND_REGISTER, ln, sn)
 {
     m_Period = m_NumberOfPeriods = m_Unit = m_Scaler = 0;
 }
@@ -415,7 +410,7 @@ int CGXDLMSDemandRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     {
         if (m_Scaler != 0)
         {
-            SetCurrentAvarageValue(CGXDLMSVariant(e.GetValue().ToDouble() * m_Scaler));
+            SetCurrentAvarageValue(CGXDLMSVariant(e.GetValue().ToDouble() * GetScaler()));
         }
         else
         {

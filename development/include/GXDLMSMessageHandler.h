@@ -49,7 +49,7 @@ public:
     CGXDLMSMessageHandler();
 
     //SN Constructor.
-    CGXDLMSMessageHandler(unsigned short sn);
+    CGXDLMSMessageHandler(std::string ln, unsigned short sn);
 
     //LN Constructor.
     CGXDLMSMessageHandler(std::string ln);

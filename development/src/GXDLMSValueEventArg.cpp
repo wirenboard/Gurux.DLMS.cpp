@@ -227,3 +227,13 @@ CGXDLMSServer* CGXDLMSValueEventArg::GetServer()
 {
     return m_Server;
 }
+
+void CGXDLMSValueEventArg::SetInvokeId(unsigned int value)
+{
+    m_InvokeId = value;
+}
+
+unsigned int CGXDLMSValueEventArg::GetInvokeId()
+{
+    return m_InvokeId;
+}

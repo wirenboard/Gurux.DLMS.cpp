@@ -163,41 +163,29 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
     // Length is updated later.
     data.SetUInt8(0);
     // If custom HDLC parameters are used.
-    if (CGXDLMSLimits::DEFAULT_MAX_INFO_TX != GetLimits().GetMaxInfoTX().ToInteger())
+    if (CGXDLMSLimits::DEFAULT_MAX_INFO_TX != GetLimits().GetMaxInfoTX())
     {
         data.SetUInt8(HDLC_INFO_MAX_INFO_TX);
-        data.SetUInt8(GetLimits().GetMaxInfoTX().GetSize());
-        if ((ret = GetLimits().GetMaxInfoTX().GetBytes(data)) != 0)
-        {
-            return ret;
-        }
+        data.SetUInt8(1);
+        data.SetUInt8(GetLimits().GetMaxInfoTX());
     }
-    if (CGXDLMSLimits::DEFAULT_MAX_INFO_RX != GetLimits().GetMaxInfoRX().ToInteger())
+    if (CGXDLMSLimits::DEFAULT_MAX_INFO_RX != GetLimits().GetMaxInfoRX())
     {
         data.SetUInt8(HDLC_INFO_MAX_INFO_RX);
-        data.SetUInt8(GetLimits().GetMaxInfoRX().GetSize());
-        if ((ret = GetLimits().GetMaxInfoRX().GetBytes(data)) != 0)
-        {
-            return ret;
-        }
+        data.SetUInt8(1);
+        data.SetUInt8(GetLimits().GetMaxInfoRX());
     }
-    if (CGXDLMSLimits::DEFAULT_WINDOWS_SIZE_TX != GetLimits().GetWindowSizeTX().ToInteger())
+    if (CGXDLMSLimits::DEFAULT_WINDOWS_SIZE_TX != GetLimits().GetWindowSizeTX())
     {
         data.SetUInt8(HDLC_INFO_WINDOW_SIZE_TX);
-        data.SetUInt8(GetLimits().GetWindowSizeTX().GetSize());
-        if ((ret = GetLimits().GetWindowSizeTX().GetBytes(data)) != 0)
-        {
-            return ret;
-        }
+        data.SetUInt8(4);
+        data.SetUInt32(GetLimits().GetWindowSizeTX());
     }
-    if (CGXDLMSLimits::DEFAULT_WINDOWS_SIZE_RX != GetLimits().GetWindowSizeRX().ToInteger())
+    if (CGXDLMSLimits::DEFAULT_WINDOWS_SIZE_RX != GetLimits().GetWindowSizeRX())
     {
         data.SetUInt8(HDLC_INFO_WINDOW_SIZE_RX);
-        data.SetUInt8(GetLimits().GetWindowSizeRX().ToInteger());
-        if ((ret = GetLimits().GetWindowSizeRX().GetBytes(data)) != 0)
-        {
-            return ret;
-        }
+        data.SetUInt8(4);
+        data.SetUInt32(GetLimits().GetWindowSizeRX());
     }
     // If default HDLC parameters are not used.
     if (data.GetSize() != 3)
@@ -559,88 +547,7 @@ int CGXDLMSClient::ChangeType(CGXByteBuffer& value, DLMS_DATA_TYPE type, CGXDLMS
 
 int CGXDLMSClient::ParseUAResponse(CGXByteBuffer& data)
 {
-    unsigned char ch, id, len;
-    unsigned short ui;
-    unsigned long ul;
-    int ret;
-    if (data.GetSize() == 0)
-    {
-        return 0;
-    }
-    // Skip FromatID
-    if ((ret = data.GetUInt8(&ch)) != 0)
-    {
-        return ret;
-    }
-    // Skip Group ID.
-    if ((ret = data.GetUInt8(&ch)) != 0)
-    {
-        return ret;
-    }
-    // Skip Group len
-    if ((ret = data.GetUInt8(&ch)) != 0)
-    {
-        return ret;
-    }
-    CGXDLMSVariant value;
-    while (data.GetPosition() < data.GetSize())
-    {
-        if ((ret = data.GetUInt8(&id)) != 0)
-        {
-            return ret;
-        }
-        if ((ret = data.GetUInt8(&len)) != 0)
-        {
-            return ret;
-        }
-        switch (len)
-        {
-        case 1:
-            if ((ret = data.GetUInt8(&ch)) != 0)
-            {
-                return ret;
-            }
-            value = ch;
-            break;
-        case 2:
-            if ((ret = data.GetUInt16(&ui)) != 0)
-            {
-                return ret;
-            }
-            value = ui;
-            break;
-        case 4:
-            if ((ret = data.GetUInt32(&ul)) != 0)
-            {
-                return ret;
-            }
-            value = ul;
-            break;
-        default:
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-        // RX / TX are delivered from the partner's point of view =>
-        // reversed to ours
-        switch (id)
-        {
-        case HDLC_INFO_MAX_INFO_TX:
-            m_Settings.GetLimits().SetMaxInfoRX(value);
-            break;
-        case HDLC_INFO_MAX_INFO_RX:
-            m_Settings.GetLimits().SetMaxInfoTX(value);
-            break;
-        case HDLC_INFO_WINDOW_SIZE_TX:
-            m_Settings.GetLimits().SetWindowSizeRX(value);
-            break;
-        case HDLC_INFO_WINDOW_SIZE_RX:
-            m_Settings.GetLimits().SetWindowSizeTX(value);
-            break;
-        default:
-            ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
-            break;
-        }
-    }
-    return ret;
+    return CGXDLMS::ParseSnrmUaResponse(data, &m_Settings.GetLimits());
 }
 
 int CGXDLMSClient::AARQRequest(std::vector<CGXByteBuffer>& packets)
@@ -675,7 +582,7 @@ int CGXDLMSClient::AARQRequest(std::vector<CGXByteBuffer>& packets)
     }
     if (GetUseLogicalNameReferencing())
     {
-        CGXDLMSLNParameters p(&m_Settings, DLMS_COMMAND_AARQ, 0, &buff, NULL, 0xff);
+        CGXDLMSLNParameters p(&m_Settings, 0, DLMS_COMMAND_AARQ, 0, &buff, NULL, 0xff);
         ret = CGXDLMS::GetLnMessages(p, packets);
     }
     else
@@ -690,8 +597,9 @@ int CGXDLMSClient::ParseAAREResponse(CGXByteBuffer& reply)
 {
     int ret;
     DLMS_SOURCE_DIAGNOSTIC sd;
+    DLMS_ASSOCIATION_RESULT result;
     if ((ret = CGXAPDU::ParsePDU(m_Settings, m_Settings.GetCipher(),
-        reply, sd)) != 0)
+        reply, result, sd)) != 0)
     {
         return ret;
     }
@@ -976,7 +884,7 @@ int CGXDLMSClient::ReleaseRequest(std::vector<CGXByteBuffer>& packets)
     buff.SetUInt8(0, (unsigned char)(buff.GetSize() - 1));
     if (GetUseLogicalNameReferencing())
     {
-        CGXDLMSLNParameters p(&m_Settings, DLMS_COMMAND_RELEASE_REQUEST, 0, NULL, &buff, 0xff);
+        CGXDLMSLNParameters p(&m_Settings, 0, DLMS_COMMAND_RELEASE_REQUEST, 0, NULL, &buff, 0xff);
         ret = CGXDLMS::GetLnMessages(p, packets);
     }
     else
@@ -1079,7 +987,7 @@ int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int a
             // Add data.
             attributeDescriptor.Set(data, 0, data->GetSize());
         }
-        CGXDLMSLNParameters p(&m_Settings,
+        CGXDLMSLNParameters p(&m_Settings, 0,
             DLMS_COMMAND_GET_REQUEST, DLMS_GET_COMMAND_TYPE_NORMAL,
             &attributeDescriptor, data, 0xFF);
         ret = CGXDLMS::GetLnMessages(p, reply);
@@ -1127,7 +1035,7 @@ int CGXDLMSClient::ReadList(
     CGXByteBuffer bb;
     if (GetUseLogicalNameReferencing())
     {
-        CGXDLMSLNParameters p(&m_Settings,
+        CGXDLMSLNParameters p(&m_Settings, 0,
             DLMS_COMMAND_GET_REQUEST, DLMS_GET_COMMAND_TYPE_WITH_LIST,
             &bb, NULL, 0xff);
         //Request service primitive shall always fit in a single APDU.
@@ -1281,7 +1189,7 @@ int CGXDLMSClient::Write(
             bb.SetUInt8(index);
             // Access selection is not used.
             bb.SetUInt8(0);
-            CGXDLMSLNParameters p(&m_Settings,
+            CGXDLMSLNParameters p(&m_Settings, 0,
                 DLMS_COMMAND_SET_REQUEST, DLMS_SET_COMMAND_TYPE_NORMAL,
                 &bb, &data, 0xff);
             ret = CGXDLMS::GetLnMessages(p, reply);
@@ -1343,7 +1251,7 @@ int CGXDLMSClient::Write(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType,
         bb.SetUInt8(index);
         // Access selection is not used.
         bb.SetUInt8(0);
-        CGXDLMSLNParameters p(&m_Settings,
+        CGXDLMSLNParameters p(&m_Settings, 0,
             DLMS_COMMAND_SET_REQUEST, DLMS_SET_COMMAND_TYPE_NORMAL,
             &bb, &data, 0xff);
         ret = CGXDLMS::GetLnMessages(p, reply);
@@ -1435,7 +1343,7 @@ int CGXDLMSClient::Method(CGXDLMSVariant name, DLMS_OBJECT_TYPE objectType,
         {
             bb.SetUInt8(1);
         }
-        CGXDLMSLNParameters p(&m_Settings,
+        CGXDLMSLNParameters p(&m_Settings, 0,
             DLMS_COMMAND_METHOD_REQUEST, DLMS_ACTION_COMMAND_TYPE_NORMAL,
             &bb, &data, 0xff);
         ret = CGXDLMS::GetLnMessages(p, reply);
@@ -1541,37 +1449,16 @@ int CGXDLMSClient::ReadRowsByEntry(
 }
 
 int CGXDLMSClient::ReadRowsByRange(
-    CGXDLMSProfileGeneric* pObject,
+    CGXDLMSProfileGeneric* pg,
     CGXDateTime& start,
     CGXDateTime& end,
-    std::vector<CGXByteBuffer>& reply)
-{
-    return ReadRowsByRange(pObject, &start.GetValue(), &end.GetValue(), reply);
-}
-
-
-int CGXDLMSClient::ReadRowsByRange(
-    CGXDLMSProfileGeneric* pg,
-    struct tm* start,
-    struct tm* end,
-    std::vector<CGXByteBuffer>& reply)
-{
-    std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> > columns;
-    return ReadRowsByRange(pg, start, end, columns, reply);
-}
-
-int CGXDLMSClient::ReadRowsByRange(
-    CGXDLMSProfileGeneric* pg,
-    struct tm* start,
-    struct tm* end,
-    std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns,
     std::vector<CGXByteBuffer>& reply)
 {
     int ret;
     unsigned char LN[] = { 0, 0, 1, 0, 0, 255 };
     CGXByteBuffer buff(51);
     CGXDLMSVariant name = pg->GetName();
-    if (pg == NULL || start == NULL || end == NULL)
+    if (pg == NULL)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
@@ -1603,15 +1490,13 @@ int CGXDLMSClient::ReadRowsByRange(
         return ret;
     }
     // Add start time
-    tmp = *start;
-    tmp.dateTime.SetSkip((DATETIME_SKIPS)(tmp.dateTime.GetSkip() | DATETIME_SKIPS_MS));
+    tmp = start;
     if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
     {
         return ret;
     }
     // Add end time
-    tmp = *end;
-    tmp.dateTime.SetSkip((DATETIME_SKIPS)(tmp.dateTime.GetSkip() | DATETIME_SKIPS_MS));
+    tmp = end;
     if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
     {
         return ret;
@@ -1621,6 +1506,33 @@ int CGXDLMSClient::ReadRowsByRange(
     // Add item count
     buff.SetUInt8(0x00);
     return Read(name, DLMS_OBJECT_TYPE_PROFILE_GENERIC, 2, &buff, reply);
+}
+
+
+int CGXDLMSClient::ReadRowsByRange(
+    CGXDLMSProfileGeneric* pg,
+    struct tm* start,
+    struct tm* end,
+    std::vector<CGXByteBuffer>& reply)
+{
+    if (pg == NULL || start == NULL || end == NULL)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    CGXDateTime s(start), e(end);
+    s.SetSkip(DATETIME_SKIPS_MS);
+    e.SetSkip(DATETIME_SKIPS_MS);
+    return ReadRowsByRange(pg, s, e, reply);
+}
+
+int CGXDLMSClient::ReadRowsByRange(
+    CGXDLMSProfileGeneric* pg,
+    struct tm* start,
+    struct tm* end,
+    std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns,
+    std::vector<CGXByteBuffer>& reply)
+{
+    return ReadRowsByRange(pg, start, end, reply);
 }
 
 int CGXDLMSClient::GetServerAddress(unsigned long serialNumber,

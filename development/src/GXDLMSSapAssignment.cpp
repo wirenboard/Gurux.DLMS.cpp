@@ -37,27 +37,20 @@
 #include "../include/GXDLMSSapAssignment.h"
 #include <sstream>
 
-/**
- Constructor.
-*/
-CGXDLMSSapAssignment::CGXDLMSSapAssignment() : CGXDLMSObject(DLMS_OBJECT_TYPE_SAP_ASSIGNMENT, "0.0.41.0.0.255")
+CGXDLMSSapAssignment::CGXDLMSSapAssignment() :
+    CGXDLMSSapAssignment("0.0.41.0.0.255", 0)
 {
 }
 
-/**
- Constructor.
 
- @param ln Logical Name of the object.
-*/
-CGXDLMSSapAssignment::CGXDLMSSapAssignment(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_SAP_ASSIGNMENT, ln)
+CGXDLMSSapAssignment::CGXDLMSSapAssignment(std::string ln) :
+    CGXDLMSSapAssignment(ln, 0)
 {
 }
 
-/**
- Constructor.
- @param sn Short Name of the object.
-*/
-CGXDLMSSapAssignment::CGXDLMSSapAssignment(int sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_SAP_ASSIGNMENT, sn)
+
+CGXDLMSSapAssignment::CGXDLMSSapAssignment(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_SAP_ASSIGNMENT, ln, sn)
 {
 
 }

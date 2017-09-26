@@ -36,21 +36,22 @@
 #include "../include/GXDLMSConverter.h"
 
 //Constructor.
-CGXDLMSMBusMasterPortSetup::CGXDLMSMBusMasterPortSetup() : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_MASTER_PORT_SETUP)
+CGXDLMSMBusMasterPortSetup::CGXDLMSMBusMasterPortSetup() :
+    CGXDLMSMBusMasterPortSetup("", 0)
 {
-    m_CommSpeed = DLMS_BAUD_RATE_2400;
 }
 
 //SN Constructor.
-CGXDLMSMBusMasterPortSetup::CGXDLMSMBusMasterPortSetup(unsigned short sn) : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_MASTER_PORT_SETUP, sn)
+CGXDLMSMBusMasterPortSetup::CGXDLMSMBusMasterPortSetup(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_MASTER_PORT_SETUP, ln, sn)
 {
     m_CommSpeed = DLMS_BAUD_RATE_2400;
 }
 
 //LN Constructor.
-CGXDLMSMBusMasterPortSetup::CGXDLMSMBusMasterPortSetup(std::string ln) : CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_MASTER_PORT_SETUP, ln)
+CGXDLMSMBusMasterPortSetup::CGXDLMSMBusMasterPortSetup(std::string ln) :
+    CGXDLMSMBusMasterPortSetup(ln, 0)
 {
-    m_CommSpeed = DLMS_BAUD_RATE_2400;
 }
 
 /**

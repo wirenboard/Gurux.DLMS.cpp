@@ -43,8 +43,6 @@ class CGXDLMSTcpUdpSetup : public CGXDLMSObject
     int m_InactivityTimeout;
     int m_MaximumSegmentSize;
 
-    void Init();
-
 public:
     /**
      Constructor.
