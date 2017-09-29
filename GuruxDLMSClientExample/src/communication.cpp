@@ -943,15 +943,31 @@ int CGXCommunication::ReadList(
         return ret;
     }
 
+    std::vector<CGXDLMSVariant> values;
     for (std::vector<CGXByteBuffer>::iterator it = data.begin(); it != data.end(); ++it)
     {
-        reply.Clear();
         if ((ret = ReadDataBlock(*it, reply)) != 0)
         {
             return ret;
         }
+        if (list.size() != 1 && reply.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
+        {
+            values.insert(values.end(), reply.GetValue().Arr.begin(), reply.GetValue().Arr.end());
+        }
+        else if (reply.GetValue().vt != DLMS_DATA_TYPE_NONE)
+        {
+            // Value is null if data is send multiple frames.
+            values.push_back(reply.GetValue());
+        }
+        reply.Clear();
     }
-    return m_Parser->UpdateValues(list, reply.GetValue().Arr);
+
+    if (values.size() != list.size())
+    {
+        //Invalid reply. Read items count do not match.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    return m_Parser->UpdateValues(list, values);
 }
 
 //Write selected object.
