@@ -836,6 +836,7 @@ int CGXAPDU::ParsePDU(
     DLMS_SOURCE_DIAGNOSTIC& diagnostic)
 {
     CGXByteBuffer tmp;
+    unsigned long len2;
     unsigned char tag, len;
     int ret;
     diagnostic = DLMS_SOURCE_DIAGNOSTIC_NONE;
@@ -844,12 +845,12 @@ int CGXAPDU::ParsePDU(
     {
         return ret;
     }
-    if ((ret = buff.GetUInt8(&len)) != 0)
+    if ((ret = GXHelpers::GetObjectCount(buff, len2)) != 0)
     {
         return ret;
     }
     int size = buff.GetSize() - buff.GetPosition();
-    if (len > size)
+    if (len2 > size)
     {
         //Encoding failed. Not enough data.
         return DLMS_ERROR_CODE_OUTOFMEMORY;

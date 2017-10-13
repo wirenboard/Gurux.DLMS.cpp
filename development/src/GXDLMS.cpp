@@ -551,7 +551,8 @@ int CGXDLMS::GetLNPdu(
     CGXByteBuffer& reply)
 {
     int ret;
-    unsigned char ciphering = p.GetSettings()->GetCipher() != NULL
+    unsigned char ciphering = p.GetCommand() != DLMS_COMMAND_AARQ && p.GetCommand() != DLMS_COMMAND_AARE
+        && p.GetSettings()->GetCipher() != NULL
         && p.GetSettings()->GetCipher()->GetSecurity() != DLMS_SECURITY_NONE;
     int len = 0;
     if (!ciphering && p.GetSettings()->GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC)
@@ -898,7 +899,8 @@ int CGXDLMS::GetSNPdu(
     CGXByteBuffer& reply)
 {
     int ret;
-    unsigned char ciphering = p.GetSettings()->GetCipher() != NULL
+    unsigned char ciphering = p.GetCommand() != DLMS_COMMAND_AARQ && p.GetCommand() != DLMS_COMMAND_AARE
+        && p.GetSettings()->GetCipher() != NULL
         && p.GetSettings()->GetCipher()->GetSecurity() != DLMS_SECURITY_NONE;
     if (!ciphering
         && p.GetSettings()->GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC)

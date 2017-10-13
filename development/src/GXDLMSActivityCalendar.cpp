@@ -434,7 +434,7 @@ int GetWeekProfile(std::vector<CGXDLMSWeekProfile*>& items, CGXByteBuffer& data)
     CGXDLMSVariant tmp;
     for (std::vector<CGXDLMSWeekProfile*>::iterator it = items.begin(); it != items.end(); ++it)
     {
-        data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
+        data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(8);
         tmp.Clear();
         tmp.Add((*it)->GetName());

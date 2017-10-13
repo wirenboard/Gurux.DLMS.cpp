@@ -495,7 +495,7 @@ int CGXDLMSAssociationLogicalName::GetValue(CGXDLMSSettings& settings, CGXDLMSVa
     {
         e.SetByteArray(true);
         CGXByteBuffer data;
-        data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
+        data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         //Add count
         data.SetUInt8(2);
         data.SetUInt8(DLMS_DATA_TYPE_UINT8);
@@ -642,8 +642,15 @@ int CGXDLMSAssociationLogicalName::SetValue(CGXDLMSSettings& settings, CGXDLMSVa
     }
     else if (e.GetIndex() == 3)
     {
-        m_ClientSAP = e.GetValue().Arr[0].ToInteger();
-        m_ServerSAP = e.GetValue().Arr[1].ToInteger();
+        if (e.GetValue().Arr.size() == 2)
+        {
+            m_ClientSAP = e.GetValue().Arr[0].ToInteger();
+            m_ServerSAP = e.GetValue().Arr[1].ToInteger();
+        }
+        else
+        {
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
     }
     else if (e.GetIndex() == 4)
     {
