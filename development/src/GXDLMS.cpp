@@ -326,7 +326,8 @@ int CGXDLMS::GetHdlcFrame(
     {
         len = data->GetSize() - data->GetPosition();
         // Is last packet.
-        reply.SetUInt8(0xA0 | ((len >> 8) & 0x7));
+        reply.SetUInt8(0xA0 | (((7 + primaryAddress.GetSize() +
+            secondaryAddress.GetSize() + len) >> 8) & 0x7));
     }
     else
     {
@@ -762,12 +763,22 @@ int CGXDLMS::GetLNPdu(
         }
         if (ciphering)
         {
+            p.GetSettings()->GetCipher()->SetFrameCounter(p.GetSettings()->GetCipher()->GetFrameCounter() + 1);
             CGXByteBuffer tmp;
+            unsigned char cmd;
+            if ((p.GetSettings()->GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_PROTECTION) == 0)
+            {
+                cmd = GetGloMessage(p.GetCommand());
+            }
+            else
+            {
+                cmd = (unsigned char)DLMS_COMMAND_GENERAL_GLO_CIPHERING;
+            }
             ret = p.GetSettings()->GetCipher()->Encrypt(
                 p.GetSettings()->GetCipher()->GetSecurity(),
                 DLMS_COUNT_TYPE_PACKET,
                 p.GetSettings()->GetCipher()->GetFrameCounter(),
-                GetGloMessage(p.GetCommand()),
+                cmd,
                 p.GetSettings()->GetCipher()->GetSystemTitle(),
                 reply, tmp);
             if (ret != 0)
@@ -779,7 +790,20 @@ int CGXDLMS::GetLNPdu(
             {
                 AddLLCBytes(p.GetSettings(), reply);
             }
-            reply.Set(&tmp, 0, tmp.GetSize());
+            if (p.GetCommand() == DLMS_COMMAND_DATA_NOTIFICATION || (p.GetSettings()->GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_PROTECTION) != 0)
+            {
+                // Add command.
+                reply.SetUInt8(tmp.GetData()[0]);
+                // Add system title.
+                GXHelpers::SetObjectCount(p.GetSettings()->GetCipher()->GetSystemTitle().GetSize(), reply);
+                reply.Set(&p.GetSettings()->GetCipher()->GetSystemTitle());
+                // Add data.
+                reply.Set(&tmp, 1, tmp.GetSize() - 1);
+            }
+            else
+            {
+                reply.Set(&tmp, 0, tmp.GetSize());
+            }
         }
     }
     return 0;
@@ -2396,6 +2420,7 @@ int CGXDLMS::HandleReadResponse(
             {
                 GetDataFromBlock(reply.GetData(), 0);
                 reply.SetValue(values);
+                reply.SetReadPosition(reply.GetData().GetPosition());
             }
             return DLMS_ERROR_CODE_FALSE;
         }
@@ -2898,8 +2923,13 @@ int CGXDLMS::ParseSnrmUaResponse(
     unsigned short ui;
     unsigned long ul;
     int ret;
+    //If default settings are used.
     if (data.GetSize() == 0)
     {
+        limits->SetMaxInfoRX(CGXDLMSLimits::DEFAULT_MAX_INFO_RX);
+        limits->SetMaxInfoTX(CGXDLMSLimits::DEFAULT_MAX_INFO_TX);
+        limits->SetWindowSizeRX(CGXDLMSLimits::DEFAULT_WINDOWS_SIZE_RX);
+        limits->SetWindowSizeTX(CGXDLMSLimits::DEFAULT_WINDOWS_SIZE_TX);
         return 0;
     }
     // Skip FromatID
@@ -2976,4 +3006,18 @@ int CGXDLMS::ParseSnrmUaResponse(
         }
     }
     return ret;
+}
+
+void CGXDLMS::AppendHdlcParameter(CGXByteBuffer& data, unsigned short value)
+{
+    if (value < 0x100)
+    {
+        data.SetUInt8(1);
+        data.SetUInt8((unsigned char)value);
+    }
+    else
+    {
+        data.SetUInt8(2);
+        data.SetUInt16(value);
+    }
 }

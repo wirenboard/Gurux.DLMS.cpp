@@ -392,5 +392,7 @@ public:
         CGXByteBuffer& data,
         CGXDLMSLimits* limits);
 
+    // Add HDLC parameter.
+    static void AppendHdlcParameter(CGXByteBuffer& data, unsigned short value);
 };
 #endif //GXDLMS_H

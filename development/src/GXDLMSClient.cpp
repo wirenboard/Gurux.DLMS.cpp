@@ -66,15 +66,14 @@ CGXDLMSClient::CGXDLMSClient(bool UseLogicalNameReferencing,
             DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_GET_OR_READ |
             DLMS_CONFORMANCE_SET | DLMS_CONFORMANCE_SELECTIVE_ACCESS |
             DLMS_CONFORMANCE_ACTION | DLMS_CONFORMANCE_MULTIPLE_REFERENCES |
-            DLMS_CONFORMANCE_GET | DLMS_CONFORMANCE_GENERAL_PROTECTION));
+            DLMS_CONFORMANCE_GET));
     }
     else
     {
         SetProposedConformance((DLMS_CONFORMANCE)(DLMS_CONFORMANCE_INFORMATION_REPORT |
             DLMS_CONFORMANCE_READ | DLMS_CONFORMANCE_UN_CONFIRMED_WRITE |
             DLMS_CONFORMANCE_WRITE | DLMS_CONFORMANCE_PARAMETERIZED_ACCESS |
-            DLMS_CONFORMANCE_MULTIPLE_REFERENCES |
-            DLMS_CONFORMANCE_GENERAL_PROTECTION));
+            DLMS_CONFORMANCE_MULTIPLE_REFERENCES));
     }
 }
 
@@ -166,14 +165,12 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
     if (CGXDLMSLimits::DEFAULT_MAX_INFO_TX != GetLimits().GetMaxInfoTX())
     {
         data.SetUInt8(HDLC_INFO_MAX_INFO_TX);
-        data.SetUInt8(1);
-        data.SetUInt8(GetLimits().GetMaxInfoTX());
+        CGXDLMS::AppendHdlcParameter(data, GetLimits().GetMaxInfoTX());
     }
     if (CGXDLMSLimits::DEFAULT_MAX_INFO_RX != GetLimits().GetMaxInfoRX())
     {
         data.SetUInt8(HDLC_INFO_MAX_INFO_RX);
-        data.SetUInt8(1);
-        data.SetUInt8(GetLimits().GetMaxInfoRX());
+        CGXDLMS::AppendHdlcParameter(data, GetLimits().GetMaxInfoRX());
     }
     if (CGXDLMSLimits::DEFAULT_WINDOWS_SIZE_TX != GetLimits().GetWindowSizeTX())
     {

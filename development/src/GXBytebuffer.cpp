@@ -54,9 +54,9 @@ CGXByteBuffer::CGXByteBuffer(const CGXByteBuffer& value)
     m_Data = NULL;
     m_Position = 0;
     m_Size = 0;
-    if (value.m_Size != 0)
+    if (value.m_Size - value.m_Position != 0)
     {
-        Set(value.m_Data, value.m_Size);
+        Set(value.m_Data + value.m_Position, value.m_Size - value.m_Position);
     }
 }
 

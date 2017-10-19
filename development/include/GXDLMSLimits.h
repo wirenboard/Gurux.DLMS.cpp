@@ -39,26 +39,27 @@
 
 class CGXDLMSLimits
 {
-    unsigned char m_MaxInfoTX, m_MaxInfoRX, m_WindowSizeRX, m_WindowSizeTX;
+    unsigned short m_MaxInfoTX, m_MaxInfoRX;
+    unsigned char m_WindowSizeRX, m_WindowSizeTX;
 public:
-    static const unsigned char DEFAULT_MAX_INFO_RX = 128;
-    static const unsigned char DEFAULT_MAX_INFO_TX = 128;
-    static const unsigned char  DEFAULT_WINDOWS_SIZE_RX = 1;
+    static const unsigned short DEFAULT_MAX_INFO_RX = 128;
+    static const unsigned short DEFAULT_MAX_INFO_TX = 128;
+    static const unsigned char DEFAULT_WINDOWS_SIZE_RX = 1;
     static const unsigned char DEFAULT_WINDOWS_SIZE_TX = 1;
     //Constructor.
     CGXDLMSLimits();
 
     // The maximum information field length in transmit.
     // DefaultValue is 128.
-    unsigned char GetMaxInfoTX();
+    unsigned short GetMaxInfoTX();
 
-    void SetMaxInfoTX(unsigned char value);
+    void SetMaxInfoTX(unsigned short value);
 
     /// The maximum information field length in receive.
     /// DefaultValue is 62.
-    unsigned char GetMaxInfoRX();
+    unsigned short GetMaxInfoRX();
 
-    void SetMaxInfoRX(unsigned char value);
+    void SetMaxInfoRX(unsigned short value);
 
     /// The window size in transmit.
     /// DefaultValue is 1.

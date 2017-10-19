@@ -525,12 +525,10 @@ int CGXDLMSServer::HandleSnrmRequest(
     }
 
     reply.SetUInt8(HDLC_INFO_MAX_INFO_TX);
-    reply.SetUInt8(1);
-    reply.SetUInt8(m_Settings.GetLimits().GetMaxInfoTX());
+    CGXDLMS::AppendHdlcParameter(reply, GetLimits().GetMaxInfoTX());
 
     reply.SetUInt8(HDLC_INFO_MAX_INFO_RX);
-    reply.SetUInt8(1);
-    reply.SetUInt8(m_Settings.GetLimits().GetMaxInfoRX());
+    CGXDLMS::AppendHdlcParameter(reply, GetLimits().GetMaxInfoRX());
 
     reply.SetUInt8(HDLC_INFO_WINDOW_SIZE_TX);
     reply.SetUInt8(4);
@@ -563,12 +561,10 @@ int GenerateDisconnectRequest(CGXDLMSSettings& settings, CGXByteBuffer& reply)
         reply.SetUInt8(0); // Length
 
         reply.SetUInt8(HDLC_INFO_MAX_INFO_TX);
-        reply.SetUInt8(1);
-        reply.SetUInt8(settings.GetLimits().GetMaxInfoTX());
+        CGXDLMS::AppendHdlcParameter(reply, settings.GetLimits().GetMaxInfoTX());
 
         reply.SetUInt8(HDLC_INFO_MAX_INFO_RX);
-        reply.SetUInt8(1);
-        reply.SetUInt8(settings.GetLimits().GetMaxInfoRX());
+        CGXDLMS::AppendHdlcParameter(reply, settings.GetLimits().GetMaxInfoRX());
 
         reply.SetUInt8(HDLC_INFO_WINDOW_SIZE_TX);
         reply.SetUInt8(4);

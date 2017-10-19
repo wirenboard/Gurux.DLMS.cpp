@@ -42,22 +42,22 @@ CGXDLMSLimits::CGXDLMSLimits()
     m_WindowSizeRX = DEFAULT_WINDOWS_SIZE_RX;
 }
 
-unsigned char CGXDLMSLimits::GetMaxInfoTX()
+unsigned short CGXDLMSLimits::GetMaxInfoTX()
 {
     return m_MaxInfoTX;
 }
 
-void CGXDLMSLimits::SetMaxInfoTX(unsigned char value)
+void CGXDLMSLimits::SetMaxInfoTX(unsigned short value)
 {
     m_MaxInfoTX = value;
 }
 
-unsigned char CGXDLMSLimits::GetMaxInfoRX()
+unsigned short CGXDLMSLimits::GetMaxInfoRX()
 {
     return m_MaxInfoRX;
 }
 
-void CGXDLMSLimits::SetMaxInfoRX(unsigned char value)
+void CGXDLMSLimits::SetMaxInfoRX(unsigned short value)
 {
     m_MaxInfoRX = value;
 }

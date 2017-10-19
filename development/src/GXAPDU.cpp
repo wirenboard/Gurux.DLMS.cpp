@@ -849,7 +849,7 @@ int CGXAPDU::ParsePDU(
     {
         return ret;
     }
-    int size = buff.GetSize() - buff.GetPosition();
+    unsigned int size = buff.GetSize() - buff.GetPosition();
     if (len2 > size)
     {
         //Encoding failed. Not enough data.
