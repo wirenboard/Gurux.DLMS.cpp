@@ -2238,9 +2238,17 @@ int CGXDLMS::HandleGetResponse(
                 }
                 reply.SetCommand(DLMS_COMMAND_NONE);
             }
-            if ((ret = GetDataFromBlock(data, index)) != 0)
+            if (count == 0)
             {
-                return ret;
+                // If meter sends empty data block.
+                data.SetSize(index);
+            }
+            else
+            {
+                if ((ret = GetDataFromBlock(data, index)) != 0)
+                {
+                    return ret;
+                }
             }
             // If last packet and data is not try to peek.
             if (reply.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE)
