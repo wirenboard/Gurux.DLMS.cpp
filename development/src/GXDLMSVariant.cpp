@@ -47,17 +47,23 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
         item->Clear();
         if (tmp.vt == DLMS_DATA_TYPE_ARRAY || tmp.vt == DLMS_DATA_TYPE_STRUCTURE)
         {
-            std::string str = "{";
+            bool empty = true;
+            std::stringstream sb;
+            sb << "{";
             for (std::vector<CGXDLMSVariant>::iterator it = tmp.Arr.begin(); it != tmp.Arr.end(); ++it)
             {
-                if (str.size() != 0)
+                if (!empty)
                 {
-                    str += ", ";
+                    sb << ", ";
                 }
-                str += it->ToString();
+                else
+                {
+                    empty = false;
+                }
+                sb << it->ToString();
             }
-            str += "}";
-            item->strVal = str;
+            sb << "}";
+            item->strVal = sb.str();
             item->vt = type;
             return DLMS_ERROR_CODE_OK;
         }
@@ -85,7 +91,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             item->strVal = buff;
             item->vt = type;
             return DLMS_ERROR_CODE_OK;
-        }
+    }
         if (tmp.vt == DLMS_DATA_TYPE_UINT32)
         {
 #if _MSC_VER > 1000
@@ -96,7 +102,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             item->strVal = buff;
             item->vt = type;
             return DLMS_ERROR_CODE_OK;
-        }
+}
         if (tmp.vt == DLMS_DATA_TYPE_INT8)
         {
 #if _MSC_VER > 1000
@@ -249,7 +255,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #endif
             item->vt = type;
             return DLMS_ERROR_CODE_OK;
-        }
+    }
         if (type == DLMS_DATA_TYPE_UINT32)
         {
 #if _MSC_VER > 1000

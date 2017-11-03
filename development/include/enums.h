@@ -1855,7 +1855,7 @@ typedef enum {
     /**
     * Phase angle degree.
     */
-    DLMS_UNIT_PHASE_ANGLEGEGREE = 8,
+    DLMS_UNIT_PHASE_ANGLE_DEGREE = 8,
     /*
     * Temperature T degree centigrade, rad*180/p.
     */

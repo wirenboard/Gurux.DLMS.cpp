@@ -47,6 +47,7 @@
 #include "GXDLMSTcpUdpSetup.h"
 #include "GXDLMSAssociationLogicalName.h"
 #include "GXDLMSAssociationShortName.h"
+#include "GXDLMSPushSetup.h"
 
 class CGXDLMSProfileGeneric;
 
@@ -192,7 +193,8 @@ private:
     /**
     * Handle read request.
     */
-    int HandleReadRequest(CGXByteBuffer& data);
+    int HandleReadRequest(
+        CGXByteBuffer& data);
 
     /**
     * Handle write request.
@@ -201,7 +203,8 @@ private:
     *            Received data from the client.
     * @return Reply.
     */
-    int HandleWriteRequest(CGXByteBuffer& data);
+    int HandleWriteRequest(
+        CGXByteBuffer& data);
 
     /**
     * Handle action request.
@@ -221,7 +224,8 @@ private:
     *            Read profile generic.
     * @return Rows to fit one PDU.
     */
-    unsigned short GetRowsToPdu(CGXDLMSProfileGeneric* pg);
+    unsigned short GetRowsToPdu(
+        CGXDLMSProfileGeneric* pg);
 
     /**
     * Update short names.
@@ -239,7 +243,14 @@ private:
     * @param connectionInfo
     *            Connection info.
     */
-    int HandleReleaseRequest(CGXByteBuffer& data);
+    int HandleReleaseRequest(
+        CGXByteBuffer& data);
+
+    int AddData(
+        CGXDLMSObject* obj,
+        unsigned char index,
+        CGXByteBuffer& buff);
+
 protected:
     /**
      * Server Settings.
@@ -671,5 +682,20 @@ public:
     *            Available functionality.
     */
     void SetConformance(DLMS_CONFORMANCE value);
+
+    int GenerateDataNotificationMessages(
+        struct tm* time,
+        CGXByteBuffer& data,
+        std::vector<CGXByteBuffer>& reply);
+
+    int GenerateDataNotificationMessages(
+        struct tm* date,
+        std::vector<std::pair<CGXDLMSObject*, unsigned char> >& objects,
+        std::vector<CGXByteBuffer>& reply);
+
+    int GeneratePushSetupMessages(
+        struct tm* date,
+        CGXDLMSPushSetup* push,
+        std::vector<CGXByteBuffer>& reply);
 };
 #endif //GXDLMSSERVER_H

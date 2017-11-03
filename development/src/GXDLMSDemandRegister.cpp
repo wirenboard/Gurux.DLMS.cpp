@@ -430,8 +430,8 @@ int CGXDLMSDemandRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     else if (e.GetIndex() == 4 && e.GetValue().vt == DLMS_DATA_TYPE_STRUCTURE)
     {
-        m_Scaler = e.GetValue().Arr[0].bVal;
-        m_Unit = e.GetValue().Arr[1].bVal;
+        m_Scaler = e.GetValue().Arr[0].ToInteger();
+        m_Unit = e.GetValue().Arr[1].ToInteger();
     }
     else if (e.GetIndex() == 5)
     {

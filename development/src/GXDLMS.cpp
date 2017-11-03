@@ -820,7 +820,8 @@ int CGXDLMS::GetLnMessages(
     {
         frame = 0x10;
     }
-    else if (p.GetCommand() == DLMS_COMMAND_EVENT_NOTIFICATION) {
+    else if (p.GetCommand() == DLMS_COMMAND_DATA_NOTIFICATION ||
+        p.GetCommand() == DLMS_COMMAND_EVENT_NOTIFICATION) {
         frame = 0x13;
     }
     do

@@ -339,11 +339,58 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
 }
 
 //Open serial port.
-int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
+int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
 {
     Close();
+    WORD baudRate;
+    byte parity, stopBits, dataBits, byteSize;
+    std::string port;
+    port = settings;
+    std::vector< std::string > tmp = GXHelpers::Split(port, ':');
+    std::string tmp2;
+    port.clear();
+    port = tmp[0];
+    if (tmp.size() > 1)
+    {
+        baudRate = atoi(tmp[1].c_str());
+        dataBits = atoi(tmp[2].substr(0, 1).c_str());
+        tmp2 = tmp[2].substr(1, tmp[2].size() - 2);
+        if (tmp2.compare("None") == 0)
+        {
+            parity = NOPARITY;
+        }
+        else if (tmp2.compare("Odd") == 0)
+        {
+            parity = ODDPARITY;
+        }
+        else if (tmp2.compare("Even") == 0)
+        {
+            parity = EVENPARITY;
+        }
+        else if (tmp2.compare("Mark") == 0)
+        {
+            parity = MARKPARITY;
+        }
+        else if (tmp2.compare("Space") == 0)
+        {
+            parity = SPACEPARITY;
+        }
+        else
+        {
+            printf("Invalid parity :\"%s\"\r\n", tmp2.c_str());
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+        stopBits = atoi(tmp[2].substr(tmp[2].size() - 1, 1).c_str());
+    }
+    else
+    {
+        baudRate = 9600;
+        dataBits = 8;
+        parity = NOPARITY;
+        stopBits = ONESTOPBIT;
+    }
+
     CGXByteBuffer reply;
-    unsigned short baudRate;
     int ret, len, pos;
     unsigned char ch;
     //In Linux serial port name might be very long.
@@ -352,9 +399,9 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
     DCB dcb = { 0 };
     unsigned long sendSize = 0;
 #if _MSC_VER > 1000
-    sprintf_s(buff, 50, "\\\\.\\%s", port);
+    sprintf_s(buff, 50, "\\\\.\\%s", port.c_str());
 #else
-    sprintf(buff, "\\\\.\\%s", port);
+    sprintf(buff, "\\\\.\\%s", port.c_str());
 #endif
     //Open serial port for read / write. Port can't share.
     m_hComPort = CreateFileA(buff,
@@ -378,10 +425,10 @@ int CGXCommunication::Open(const char* port, bool iec, int maxBaudrate)
     }
     else
     {
-        dcb.BaudRate = 9600;
-        dcb.ByteSize = 8;
-        dcb.StopBits = ONESTOPBIT;
-        dcb.Parity = NOPARITY;
+        dcb.BaudRate = baudRate;
+        dcb.ByteSize = byteSize;
+        dcb.StopBits = stopBits;
+        dcb.Parity = parity;
     }
     if ((ret = GXSetCommState(m_hComPort, &dcb)) != 0)
     {

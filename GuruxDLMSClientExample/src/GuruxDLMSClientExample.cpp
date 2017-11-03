@@ -44,7 +44,7 @@ static void ShowHelp()
     printf("GuruxDlmsSample -h [Meter IP Address] -p [Meter Port No] -c 16 -s 1 -r SN\r\n");
     printf(" -h \t host name or IP address.\r\n");
     printf(" -p \t port number or name (Example: 1000).\r\n");
-    printf(" -S \t serial port.\r\n");
+    printf(" -S [COM1:9600:8None1]\t serial port.");
     printf(" -i IEC is a start protocol.\r\n");
     printf(" -a \t Authentication (None, Low, High).\r\n");
     printf(" -P \t Password for authentication.\r\n");
@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
         char* address = NULL;
         char* serialPort = NULL;
         bool iec = false;
-        while ((opt = getopt(argc, argv, "h:p:c:s:r:it:a:wP:g:")) != -1)
+        while ((opt = getopt(argc, argv, "h:p:c:s:r:it:a:wP:g:S:")) != -1)
         {
             switch (opt)
             {

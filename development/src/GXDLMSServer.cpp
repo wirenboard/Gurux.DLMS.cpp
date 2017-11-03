@@ -2223,22 +2223,94 @@ int CGXDLMSServer::HandleRequest(
     return ret;
 }
 
-/**
-* Server will tell what functionality is available for the client.
-* @return Available functionality.
-*/
 DLMS_CONFORMANCE CGXDLMSServer::GetConformance()
 {
     return m_Settings.GetProposedConformance();
 }
 
-/**
-* Server will tell what functionality is available for the client.
-*
-* @param value
-*            Available functionality.
-*/
 void CGXDLMSServer::SetConformance(DLMS_CONFORMANCE value)
 {
     m_Settings.SetProposedConformance(value);
+}
+
+int CGXDLMSServer::AddData(
+    CGXDLMSObject* obj,
+    unsigned char index,
+    CGXByteBuffer& buff)
+{
+    int ret;
+    DLMS_DATA_TYPE dt;
+    CGXDLMSValueEventArg e(NULL, obj, index);
+    if ((ret = obj->GetValue(m_Settings, e)) != 0)
+    {
+        return ret;
+    }
+    if ((ret = obj->GetDataType(index, dt)) != 0)
+    {
+        return ret;
+    }
+    if (dt == DLMS_DATA_TYPE_ARRAY)
+    {
+        buff.Set(e.GetValue().byteArr, e.GetValue().GetSize());
+        return 0;
+    }
+    if (dt == DLMS_DATA_TYPE_NONE)
+    {
+        dt = e.GetValue().vt;
+    }
+    return GXHelpers::SetData(buff, e.GetValue().vt, e.GetValue());
+}
+
+int CGXDLMSServer::GenerateDataNotificationMessages(
+    struct tm* time,
+    CGXByteBuffer& data,
+    std::vector<CGXByteBuffer>& reply)
+{
+    int ret;
+    if (GetUseLogicalNameReferencing())
+    {
+        CGXDLMSLNParameters p(&m_Settings, 0, DLMS_COMMAND_DATA_NOTIFICATION, 0, NULL, &data, 0xff);
+        p.SetTime(time);
+        ret = CGXDLMS::GetLnMessages(p, reply);
+    }
+    else
+    {
+        CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_DATA_NOTIFICATION, 1, 0, &data, NULL);
+        ret = CGXDLMS::GetSnMessages(p, reply);
+    }
+    return ret;
+}
+
+int CGXDLMSServer::GenerateDataNotificationMessages(
+    struct tm* date,
+    std::vector<std::pair<CGXDLMSObject*, unsigned char> >& objects,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXByteBuffer buff;
+    buff.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+    GXHelpers::SetObjectCount((unsigned long)objects.size(), buff);
+    for (std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = objects.begin(); it != objects.end(); ++it)
+    {
+        AddData(it->first, it->second, buff);
+    }
+    return GenerateDataNotificationMessages(date, buff, reply);
+}
+
+int CGXDLMSServer::GeneratePushSetupMessages(
+    struct tm* date,
+    CGXDLMSPushSetup* push,
+    std::vector<CGXByteBuffer>& reply)
+{
+    if (push == NULL)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    CGXByteBuffer buff;
+    buff.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+    GXHelpers::SetObjectCount((unsigned long)push->GetPushObjectList().size(), buff);
+    for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> >::iterator it = push->GetPushObjectList().begin(); it != push->GetPushObjectList().end(); ++it)
+    {
+        AddData(it->first, it->second.GetAttributeIndex(), buff);
+    }
+    return GenerateDataNotificationMessages(date, buff, reply);
 }
