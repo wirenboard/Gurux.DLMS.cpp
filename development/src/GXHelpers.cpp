@@ -1330,7 +1330,13 @@ static int SetDateTime(CGXByteBuffer& buff, CGXDLMSVariant& value)
     }
     else
     {
-        buff.SetUInt8(dt.tm_wday % 7);
+        int val = dt.tm_wday;
+        //If Sunday.
+        if (val == 0)
+        {
+            val = 7;
+        }
+        buff.SetUInt8(val);
     }
     //Add Hours
     if (dt.tm_hour != -1 && (skip & DATETIME_SKIPS_HOUR) == 0)
