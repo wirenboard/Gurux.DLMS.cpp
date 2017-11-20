@@ -2181,7 +2181,7 @@ int CGXDLMSServer::HandleRequest(
     // If client want next frame.
     if ((m_Info.GetMoreData() & DLMS_DATA_REQUEST_TYPES_FRAME) == DLMS_DATA_REQUEST_TYPES_FRAME)
     {
-        m_DataReceived = time(NULL);
+        m_DataReceived = (long) time(NULL);
         return CGXDLMS::GetHdlcFrame(m_Settings, m_Settings.GetReceiverReady(), &m_ReplyData, reply);
     }
     // Update command if m_Transaction and next frame is asked.
@@ -2219,7 +2219,7 @@ int CGXDLMSServer::HandleRequest(
     }
     ret = HandleCommand(connectionInfo, m_Info.GetCommand(), m_Info.GetData(), reply);
     m_Info.Clear();
-    m_DataReceived = time(NULL);
+    m_DataReceived = (long) time(NULL);
     return ret;
 }
 

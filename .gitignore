@@ -229,3 +229,5 @@ GuruxDLMSClientExample/VS/GuruxDLMClientExample.VC.db
 GuruxDLMSClientExample/VS/GuruxDLMClientExample.VC.db
 *.db
 GuruxDLMSServerExample/VS/data.csv
+*.db-shm
+*.db-wal
