@@ -2091,7 +2091,7 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     // If all data is not read yet.
-    if (!data.IsComplete())\
+    if (!data.IsComplete())
     {
         return DLMS_ERROR_CODE_FALSE;
     }
@@ -2111,30 +2111,7 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
         }
         return DLMS_ERROR_CODE_OK;
     }
-    if ((ret = GetPdu(settings, data)) != 0)
-    {
-        return ret;
-    }
-
-    if (data.GetCommand() == DLMS_COMMAND_DATA_NOTIFICATION)
-    {
-        // Check is there more messages left. This is Push message special
-        // case.
-        if (reply.GetPosition() == reply.GetSize())
-        {
-            reply.SetSize(0);
-        }
-        else
-        {
-            int cnt = reply.GetSize() - reply.GetPosition();
-            if ((ret = reply.Move(reply.GetPosition(), 0, cnt)) != 0)
-            {
-                return ret;
-            }
-            reply.SetPosition(0);
-        }
-    }
-    return 0;
+    return GetPdu(settings, data);
 }
 
 int CGXDLMS::HandleGetResponse(

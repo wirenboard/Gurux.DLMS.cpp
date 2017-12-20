@@ -50,12 +50,17 @@ private:
     CGXApplicationContextName m_ApplicationContextName;
     CGXDLMSContextType m_XDLMSContextInfo;
     CGXAuthenticationMechanismName m_AuthenticationMechanismName;
+
     /**
-     * Secret.
-     */
+    * Secret.
+    */
     CGXByteBuffer m_Secret;
 
     std::string m_SecuritySetupReference;
+
+    std::vector<std::pair<unsigned char, std::string>> m_UserList;
+
+    std::pair<unsigned char, std::string> m_CurrentUser;
 
     void UpdateAccessRights(
         CGXDLMSObject* pObj,
@@ -72,6 +77,10 @@ private:
         CGXDLMSValueEventArg& e,
         CGXByteBuffer& data);
 
+    int CGXDLMSAssociationLogicalName::GetUsers(
+        CGXDLMSSettings& settings,
+        CGXDLMSValueEventArg& e,
+        CGXByteBuffer& data);
 public:
     /**
      Constructor.
@@ -107,9 +116,32 @@ public:
 
     void SetSecret(CGXByteBuffer& value);
 
+    std::vector<std::pair<unsigned char, std::string>>& GetUserList();
+
+    void SetUserList(std::vector<std::pair<unsigned char, std::string>>& value);
+
+    std::pair<unsigned char, std::string>& GetCurrentUser();
+
+    void SetCurrentUser(std::pair<unsigned char, std::string>& value);
+
+
     // Updates secret.
     int UpdateSecret(
         CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
+
+    // Add user to user list.
+    int AddUser(
+        CGXDLMSClient* client, 
+        unsigned char id, 
+        std::string name, 
+        std::vector<CGXByteBuffer>& reply);
+    
+    // Remove user fro user list.
+    int RemoveUser(
+        CGXDLMSClient* client, 
+        unsigned char id, 
+        std::string name, 
         std::vector<CGXByteBuffer>& reply);
 
 
