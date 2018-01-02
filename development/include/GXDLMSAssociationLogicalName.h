@@ -77,7 +77,7 @@ private:
         CGXDLMSValueEventArg& e,
         CGXByteBuffer& data);
 
-    int CGXDLMSAssociationLogicalName::GetUsers(
+    int GetUsers(
         CGXDLMSSettings& settings,
         CGXDLMSValueEventArg& e,
         CGXByteBuffer& data);
