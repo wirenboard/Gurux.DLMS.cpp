@@ -2857,6 +2857,10 @@ int CGXDLMS::GetActionInfo(DLMS_OBJECT_TYPE objectType, unsigned char& value, un
         value = 0x38;
         count = 1;
         break;
+    case DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP:
+        value = 0x30;
+        count = 8;
+    break;
     default:
         count = value = 0;
         break;

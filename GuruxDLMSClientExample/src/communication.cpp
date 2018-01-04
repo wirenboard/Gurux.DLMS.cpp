@@ -342,8 +342,8 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
 int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
 {
     Close();
-    WORD baudRate;
-    byte parity, stopBits, dataBits, byteSize;
+    unsigned short baudRate;
+    unsigned char parity, stopBits, dataBits, byteSize;
     std::string port;
     port = settings;
     std::vector< std::string > tmp = GXHelpers::Split(port, ':');
@@ -384,7 +384,11 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
     }
     else
     {
+#if defined(_WIN32) || defined(_WIN64)
         baudRate = 9600;
+#else
+        baudRate = B9600;
+#endif
         dataBits = 8;
         parity = NOPARITY;
         stopBits = ONESTOPBIT;
@@ -418,7 +422,11 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
     dcb.fAbortOnError = 1;
     if (iec)
     {
+#if defined(_WIN32) || defined(_WIN64)
         dcb.BaudRate = 300;
+#else
+        baudRate = B300;
+#endif
         dcb.ByteSize = 7;
         dcb.StopBits = ONESTOPBIT;
         dcb.Parity = EVENPARITY;
@@ -566,55 +574,55 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         {
         case '0':
 #if defined(_WIN32) || defined(_WIN64)
-            baudRate = 300;
+        baudRate = 300;
 #else
-            baudRate = B300;
+        baudRate = B300;
 #endif
-            break;
+        break;
         case '1':
 #if defined(_WIN32) || defined(_WIN64)
-            baudRate = 600;
+        baudRate = 600;
 #else
-            baudRate = B600;
+        baudRate = B600;
 #endif
-            break;
+        break;
         case '2':
 #if defined(_WIN32) || defined(_WIN64)
-            baudRate = 1200;
+        baudRate = 1200;
 #else
-            baudRate = B1200;
+        baudRate = B1200;
 #endif
-            break;
+        break;
         case '3':
 #if defined(_WIN32) || defined(_WIN64)
-            baudRate = 2400;
+        baudRate = 2400;
 #else
-            baudRate = B2400;
+        baudRate = B2400;
 #endif
-            break;
+        break;
         case '4':
 #if defined(_WIN32) || defined(_WIN64)
-            baudRate = 4800;
+        baudRate = 4800;
 #else
-            baudRate = B4800;
+        baudRate = B4800;
 #endif
-            break;
+        break;
         case '5':
 #if defined(_WIN32) || defined(_WIN64)
-            baudRate = 9600;
+        baudRate = 9600;
 #else
-            baudRate = B9600;
+        baudRate = B9600;
 #endif
-            break;
+        break;
         case '6':
 #if defined(_WIN32) || defined(_WIN64)
-            baudRate = 19200;
+        baudRate = 19200;
 #else
-            baudRate = B19200;
+        baudRate = B19200;
 #endif
-            break;
+        break;
         default:
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         //Send ACK
         buff[0] = 0x06;
