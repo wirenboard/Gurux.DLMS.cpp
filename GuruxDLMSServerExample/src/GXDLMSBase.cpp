@@ -278,9 +278,9 @@ int CGXDLMSBase::StartServer(int port)
         return -1;
     }
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
-    m_ReceiverThread = (HANDLE)_beginthread(ListenerThread, 0, (LPVOID) this);
+    m_ReceiverThread = (HANDLE)_beginthread(ListenerThread, 0, (LPVOID)this);
 #else
-    ret = pthread_create(&m_ReceiverThread, NULL, UnixListenerThread, (void *) this);
+    ret = pthread_create(&m_ReceiverThread, NULL, UnixListenerThread, (void *)this);
 #endif
     return ret;
 }
@@ -645,7 +645,8 @@ int CGXDLMSBase::Init(int port, GX_TRACE_LEVEL trace)
 #else
     FILE* f = fopen(DATAFILE, "w");
 #endif
-    for (int pos = 0; pos != rowCount; ++pos) {
+    for (int pos = 0; pos != rowCount; ++pos)
+    {
         fprintf(f, "%s;%d\n", tm.ToString().c_str(), pos + 1);
         tm.AddHours(1);
     }
@@ -750,9 +751,9 @@ void GetProfileGenericDataByEntry(CGXDLMSProfileGeneric* p, long index, long cou
     {
 #if defined(_WIN32) || defined(_WIN64)//Windows
         FILE* f;
-        fopen_s(&f, DATAFILE, _T("w"));
+        fopen_s(&f, DATAFILE, _T("r"));
 #else
-        FILE* f = fopen(DATAFILE, "w");
+        FILE* f = fopen(DATAFILE, "r");
 #endif
         if (f != NULL)
         {
@@ -763,12 +764,14 @@ void GetProfileGenericDataByEntry(CGXDLMSProfileGeneric* p, long index, long cou
 #endif
             {
                 // Skip row
-                if (index > 0) {
+                if (index > 0)
+                {
                     --index;
                 }
                 else if (len == 7)
                 {
-                    if (p->GetBuffer().size() == count) {
+                    if (p->GetBuffer().size() == count)
+                    {
                         break;
                     }
                     CGXDateTime tm(2000 + year, month, day, hour, minute, second, 0, 0x8000);
@@ -777,7 +780,8 @@ void GetProfileGenericDataByEntry(CGXDLMSProfileGeneric* p, long index, long cou
                     row.push_back(value);
                     p->GetBuffer().push_back(row);
                 }
-                if (p->GetBuffer().size() == count) {
+                if (p->GetBuffer().size() == count)
+                {
                     break;
                 }
             }
@@ -810,9 +814,9 @@ void GetProfileGenericDataByRange(CGXDLMSValueEventArg* e)
     CGXDLMSClient::ChangeType(bb, DLMS_DATA_TYPE_DATETIME, end);
 #if defined(_WIN32) || defined(_WIN64)//Windows
     FILE* f;
-    fopen_s(&f, DATAFILE, _T("w"));
+    fopen_s(&f, DATAFILE, _T("r"));
 #else
-    FILE* f = fopen(DATAFILE, "w");
+    FILE* f = fopen(DATAFILE, "r");
 #endif
     if (f != NULL)
     {
@@ -823,11 +827,13 @@ void GetProfileGenericDataByRange(CGXDLMSValueEventArg* e)
 #endif
         {
             CGXDateTime tm(2000 + year, month, day, hour, minute, second, 0, 0x8000);
-            if (tm.CompareTo(end.dateTime) > 0) {
+            if (tm.CompareTo(end.dateTime) > 0)
+            {
                 // If all data is read.
                 break;
             }
-            if (tm.CompareTo(start.dateTime) < 0) {
+            if (tm.CompareTo(start.dateTime) < 0)
+            {
                 // If we have not find first item.
                 e->SetRowBeginIndex(e->GetRowBeginIndex() + 1);
             }
@@ -847,9 +853,9 @@ int GetProfileGenericDataCount() {
     int ch;
 #if defined(_WIN32) || defined(_WIN64)//Windows
     FILE* f;
-    fopen_s(&f, DATAFILE, _T("w"));
+    fopen_s(&f, DATAFILE, _T("r"));
 #else
-    FILE* f = fopen(DATAFILE, "w");
+    FILE* f = fopen(DATAFILE, "r");
 #endif
     if (f != NULL)
     {
@@ -892,7 +898,8 @@ void CGXDLMSBase::PreRead(std::vector<CGXDLMSValueEventArg*>& args)
         {
             CGXDLMSProfileGeneric* p = (CGXDLMSProfileGeneric*)pObj;
             // If buffer is read and we want to save memory.
-            if (index == 7) {
+            if (index == 7)
+            {
                 // If client wants to know EntriesInUse.
                 p->SetEntriesInUse(GetProfileGenericDataCount());
             }
@@ -900,15 +907,19 @@ void CGXDLMSBase::PreRead(std::vector<CGXDLMSValueEventArg*>& args)
             {
                 // Read rows from file.
                 // If reading first time.
-                if ((*it)->GetRowEndIndex() == 0) {
-                    if ((*it)->GetSelector() == 0) {
+                if ((*it)->GetRowEndIndex() == 0)
+                {
+                    if ((*it)->GetSelector() == 0)
+                    {
                         (*it)->SetRowEndIndex(GetProfileGenericDataCount());
                     }
-                    else if ((*it)->GetSelector() == 1) {
+                    else if ((*it)->GetSelector() == 1)
+                    {
                         // Read by entry.
                         GetProfileGenericDataByRange((*it));
                     }
-                    else if ((*it)->GetSelector() == 2) {
+                    else if ((*it)->GetSelector() == 2)
+                    {
                         // Read by range.
                         unsigned int begin = (*it)->GetParameters().Arr[0].ulVal;
                         (*it)->SetRowBeginIndex(begin);
@@ -918,7 +929,8 @@ void CGXDLMSBase::PreRead(std::vector<CGXDLMSValueEventArg*>& args)
                         if ((*it)->GetRowEndIndex() - (*it)->GetRowBeginIndex() > cnt - (*it)->GetRowBeginIndex())
                         {
                             (*it)->SetRowEndIndex(cnt - (*it)->GetRowBeginIndex());
-                            if ((*it)->GetRowEndIndex() < 0) {
+                            if ((*it)->GetRowEndIndex() < 0)
+                            {
                                 (*it)->SetRowEndIndex(0);
                             }
                         }
@@ -926,7 +938,8 @@ void CGXDLMSBase::PreRead(std::vector<CGXDLMSValueEventArg*>& args)
                 }
                 long count = (*it)->GetRowEndIndex() - (*it)->GetRowBeginIndex();
                 // Read only rows that can fit to one PDU.
-                if ((*it)->GetRowEndIndex() - (*it)->GetRowBeginIndex() > (*it)->GetRowToPdu()) {
+                if ((*it)->GetRowEndIndex() - (*it)->GetRowBeginIndex() > (*it)->GetRowToPdu())
+                {
                     count = (*it)->GetRowToPdu();
                 }
                 GetProfileGenericDataByEntry(p, (*it)->GetRowBeginIndex(), count);
@@ -1126,10 +1139,59 @@ void CGXDLMSBase::PreAction(std::vector<CGXDLMSValueEventArg*>& args)
     }
 }
 
+void Capture(CGXDLMSProfileGeneric* pg)
+{
+    std::vector<std::string> values;
+    std::string value;
+    unsigned char first = 1;
+    int cnt = GetProfileGenericDataCount();
+#if defined(_WIN32) || defined(_WIN64)//Windows
+    FILE* f;
+    fopen_s(&f, DATAFILE, _T("a"));
+#else
+    FILE* f = fopen(DATAFILE, "a");
+#endif
+    for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it = pg->GetCaptureObjects().begin(); 
+        it != pg->GetCaptureObjects().end(); ++it)
+    {
+        if (first)
+        {
+            first = 0;
+        }
+        else
+        {
+            fprintf(f, ";");
+            values.clear();
+        }
+        if (it->first->GetObjectType() == DLMS_OBJECT_TYPE_CLOCK && it->second->GetAttributeIndex() == 2)
+        {
+            value = CGXDateTime::Now().ToString();
+        }
+        else
+        {
+            // TODO: Read value here example from the meter if it's not
+            // updated automatically.
+            it->first->GetValues(values);
+            value = values.at(it->second->GetAttributeIndex() - 1);
+            if (value == "")
+            {
+                char tmp[20]; 
+                // Generate random value here.
+                sprintf(tmp, "%d", ++cnt);
+                value = tmp;
+            }
+        }
+        fprintf(f, "%s", value.c_str());
+    }
+    fprintf(f, "\n");
+    fclose(f);
+}
+
 void HandleProfileGenericActions(CGXDLMSValueEventArg* it)
 {
     CGXDLMSProfileGeneric* pg = (CGXDLMSProfileGeneric*)it->GetTarget();
-    if (it->GetIndex() == 1) {
+    if (it->GetIndex() == 1)
+    {
         // Profile generic clear is called. Clear data.
 #if defined(_WIN32) || defined(_WIN64)//Windows
         FILE* f;
@@ -1139,21 +1201,9 @@ void HandleProfileGenericActions(CGXDLMSValueEventArg* it)
 #endif
         fclose(f);
     }
-    else if (it->GetIndex() == 2) {
+    else if (it->GetIndex() == 2)
+    {
         // Profile generic Capture is called.
-#if defined(_WIN32) || defined(_WIN64)//Windows
-        FILE* f;
-        fopen_s(&f, DATAFILE, _T("w"));
-#else
-        FILE* f = fopen(DATAFILE, "w");
-#endif
-        for (int pos = (int)pg->GetBuffer().size() - 1; pos != (int)pg->GetBuffer().size(); ++pos)
-        {
-            CGXDateTime tm = pg->GetBuffer().at(0).at(0).dateTime;
-            int value = pg->GetBuffer().at(0).at(1).ToInteger();
-            fprintf(f, "%s;%d\n", tm.ToString().c_str(), value);
-        }
-        fclose(f);
     }
 }
 
@@ -1253,10 +1303,11 @@ DLMS_METHOD_ACCESS_MODE CGXDLMSBase::GetMethodAccess(CGXDLMSValueEventArg* arg)
     {
         return DLMS_METHOD_ACCESS_MODE_NONE;
     }
-    // Only clock methods are allowed.
+    // Only clock and profile generic methods are allowed.
     if (arg->GetSettings()->GetAuthentication() == DLMS_AUTHENTICATION_LOW)
     {
-        if (arg->GetTarget()->GetObjectType() == DLMS_OBJECT_TYPE_CLOCK)
+        if (arg->GetTarget()->GetObjectType() == DLMS_OBJECT_TYPE_CLOCK ||
+            arg->GetTarget()->GetObjectType() == DLMS_OBJECT_TYPE_PROFILE_GENERIC)
         {
             return DLMS_METHOD_ACCESS_MODE_ACCESS;
         }
@@ -1305,14 +1356,7 @@ void CGXDLMSBase::PreGet(
         if ((*it)->GetTarget()->GetObjectType() == DLMS_OBJECT_TYPE_PROFILE_GENERIC)
         {
             CGXDLMSProfileGeneric* pg = (CGXDLMSProfileGeneric*)(*it)->GetTarget();
-            pg->GetBuffer().clear();
-            int cnt = GetProfileGenericDataCount() + 1;
-            // Update last average value.
-            CGXDateTime tm = CGXDateTime::Now();
-            std::vector<CGXDLMSVariant> row;
-            row.push_back(tm);
-            row.push_back(cnt);
-            pg->GetBuffer().push_back(row);
+            Capture(pg);
             (*it)->SetHandled(true);
         }
     }

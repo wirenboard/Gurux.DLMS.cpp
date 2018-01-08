@@ -125,8 +125,11 @@ int CGXDLMSProfileGeneric::GetColumns(CGXByteBuffer& data)
         {
             return ret;
         }
-        (*it).first->GetLogicalName(ln);
-        tmp = ln;
+        tmp.Clear();
+        if ((ret = GetLogicalName((*it).first, tmp)) != 0)
+        {
+            return ret;
+        }
         ai = (*it).second->GetAttributeIndex();
         di = (*it).second->GetDataIndex();
         if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0 || //LN
@@ -783,7 +786,7 @@ int CGXDLMSProfileGeneric::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
             {
                 return ret;
             }
-            data.Set(&ln.byteArr, 6);
+            data.Set(ln.byteArr, 6);
             //Selected Attribute Index
             data.SetUInt8(DLMS_DATA_TYPE_INT8);
             data.SetUInt8(m_SortObjectAttributeIndex);

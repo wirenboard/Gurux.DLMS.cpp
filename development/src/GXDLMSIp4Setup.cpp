@@ -172,7 +172,6 @@ void CGXDLMSIp4Setup::GetValues(std::vector<std::string>& values)
     std::string ln;
     GetLogicalName(ln);
     values.push_back(ln);
-    //CGXDLMSVariant().ToString()
     values.push_back(m_DataLinkLayerReference);
     values.push_back(m_IPAddress);
     std::stringstream sb;
