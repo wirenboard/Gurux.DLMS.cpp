@@ -23,7 +23,7 @@
     <ProjectGuid>{9E063408-C11A-4C0C-BEAA-9D07E2E0A00A}</ProjectGuid>
     <RootNamespace>GuruxDLMS</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -127,6 +127,8 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\GXAdjacentCell.cpp" />
+    <ClCompile Include="..\src\GXDLMSGSMCellInfo.cpp" />
     <ClCompile Include="..\src\GXAPDU.cpp" />
     <ClCompile Include="..\src\GXApplicationContextName.cpp" />
     <ClCompile Include="..\src\GXAuthenticationMechanismName.cpp" />
@@ -155,6 +157,7 @@
     <ClCompile Include="..\src\GXDLMSEmergencyProfile.cpp" />
     <ClCompile Include="..\src\GXDLMSExtendedRegister.cpp" />
     <ClCompile Include="..\src\GXDLMSGPRSSetup.cpp" />
+    <ClCompile Include="..\src\GXDLMSGSMDiagnostic.cpp" />
     <ClCompile Include="..\src\GXDLMSHdlcSetup.cpp" />
     <ClCompile Include="..\src\GXDLMSIECOpticalPortSetup.cpp" />
     <ClCompile Include="..\src\GXDLMSImageActivateInfo.cpp" />
@@ -220,6 +223,7 @@
     <ClInclude Include="..\include\chipperingenums.h" />
     <ClInclude Include="..\include\Enums.h" />
     <ClInclude Include="..\include\ErrorCodes.h" />
+    <ClInclude Include="..\include\GXAdjacentCell.h" />
     <ClInclude Include="..\include\GXAPDU.h" />
     <ClInclude Include="..\include\GXApplicationContextName.h" />
     <ClInclude Include="..\include\GXAttributeCollection.h" />
@@ -253,6 +257,8 @@
     <ClInclude Include="..\include\GXDLMSEmergencyProfile.h" />
     <ClInclude Include="..\include\GXDLMSExtendedRegister.h" />
     <ClInclude Include="..\include\GXDLMSGPRSSetup.h" />
+    <ClInclude Include="..\include\GXDLMSGSMCellInfo.h" />
+    <ClInclude Include="..\include\GXDLMSGSMDiagnostic.h" />
     <ClInclude Include="..\include\GXDLMSHdlcSetup.h" />
     <ClInclude Include="..\include\GXDLMSIECOpticalPortSetup.h" />
     <ClInclude Include="..\include\GXDLMSImageActivateInfo.h" />

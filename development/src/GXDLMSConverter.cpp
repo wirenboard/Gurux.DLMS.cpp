@@ -563,3 +563,73 @@ const char* CGXDLMSConverter::ToString(DLMS_LOCAL_PORT_RESPONSE_TIME value)
     }
     return "Unknown response time";
 }
+
+const char* CGXDLMSConverter::ToString(DLMS_GSM_STATUS value)
+{
+    const char* str;
+    switch (value)
+    {
+    case DLMS_GSM_STATUS_NONE:
+        str = "None";
+        break;
+    case DLMS_GSM_STATUS_HOME_NETWORK:
+        str = "HomeNetwork";
+        break;
+    case DLMS_GSM_STATUS_SEARCHING:
+        str = "Searching";
+        break;
+    case DLMS_GSM_STATUS_DENIED:
+        str = "Denied";
+        break;
+    case DLMS_GSM_STATUS_UNKNOWN:
+        str = "Unknown";
+        break;
+    case DLMS_GSM_STATUS_ROAMING:
+        str = "Roaming";
+        break;
+    }
+    return str;
+};
+
+const char* CGXDLMSConverter::ToString(DLMS_GSM_CIRCUIT_SWITCH_STATUS value)
+{
+    const char* str;
+    switch (value)
+    {
+    case DLMS_GSM_CIRCUIT_SWITCH_STATUS_INACTIVE:
+        str = "Inactive";
+        break;
+    case DLMS_GSM_CIRCUIT_SWITCH_STATUS_INCOMING_CALL:
+        str = "Incoming call";
+        break;
+    case DLMS_GSM_CIRCUIT_SWITCH_STATUS_ACTIVE:
+        str = "Active";
+        break;
+    }
+    return str;
+};
+
+
+const char* CGXDLMSConverter::ToString(DLMS_GSM_PACKET_SWITCH_STATUS value)
+{
+    const char* str;
+    switch (value)
+    {
+    case DLMS_GSM_PACKET_SWITCH_STATUS_INACTIVE:
+        str = "Inactive";
+        break;
+    case DLMS_GSM_PACKET_SWITCH_STATUS_GPRS:
+        str = "GPRS";
+        break;
+    case DLMS_GSM_PACKET_SWITCH_STATUS_EDGE:
+        str = "EDGE";
+        break;
+    case DLMS_GSM_PACKET_SWITCH_STATUS_UMTS:
+        str = "UMTS";
+        break;
+    case DLMS_GSM_PACKET_SWITCH_STATUS_HSDPA:
+        str = "HSDPA";
+        break;
+    }
+    return str;
+};

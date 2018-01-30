@@ -808,6 +808,7 @@ typedef enum
     DLMS_OBJECT_TYPE_PPP_SETUP = 44,
     DLMS_OBJECT_TYPE_GPRS_SETUP = 45,
     DLMS_OBJECT_TYPE_SMTP_SETUP = 46,
+    DLMS_OBJECT_TYPE_GSM_DIAGNOSTIC = 47,
     DLMS_OBJECT_TYPE_REGISTER_TABLE = 61,
     DLMS_OBJECT_TYPE_STATUS_MAPPING = 63,
     DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP = 64,
@@ -2122,5 +2123,82 @@ typedef enum {
     */
     GX_TRACE_LEVEL_VERBOSE
 }GX_TRACE_LEVEL;
+
+/**
+* Defines the GSM status.
+*/
+typedef enum {
+    /**
+    * Not registered.
+    */
+    DLMS_GSM_STATUS_NONE,
+    /**
+    * Registered, home network.
+    */
+    DLMS_GSM_STATUS_HOME_NETWORK,
+    /**
+    * Not registered, but MT is currently searching a new operator to register
+    * to.
+    */
+    DLMS_GSM_STATUS_SEARCHING,
+    /**
+    * Registration denied.
+    */
+    DLMS_GSM_STATUS_DENIED,
+    /**
+    * Unknown.
+    */
+    DLMS_GSM_STATUS_UNKNOWN,
+    /**
+    * Registered, roaming.
+    */
+    DLMS_GSM_STATUS_ROAMING
+}DLMS_GSM_STATUS;
+
+
+/**
+* GSM circuit switced status.
+*/
+typedef enum {
+    /**
+    * Inactive.
+    */
+    DLMS_GSM_CIRCUIT_SWITCH_STATUS_INACTIVE,
+    /**
+    * Incoming call.
+    */
+    DLMS_GSM_CIRCUIT_SWITCH_STATUS_INCOMING_CALL,
+    /**
+    * Active.
+    */
+    DLMS_GSM_CIRCUIT_SWITCH_STATUS_ACTIVE
+}DLMS_GSM_CIRCUIT_SWITCH_STATUS;
+
+
+/**
+* Packet switched status of the modem.
+*/
+typedef enum {
+    /**
+    * Inactive
+    */
+    DLMS_GSM_PACKET_SWITCH_STATUS_INACTIVE,
+    /**
+    * GPRS
+    */
+    DLMS_GSM_PACKET_SWITCH_STATUS_GPRS,
+    /**
+    * EDGE
+    */
+    DLMS_GSM_PACKET_SWITCH_STATUS_EDGE,
+    /**
+    * UMTS
+    */
+    DLMS_GSM_PACKET_SWITCH_STATUS_UMTS,
+    /**
+    * HSDPA
+    */
+    DLMS_GSM_PACKET_SWITCH_STATUS_HSDPA
+}DLMS_GSM_PACKET_SWITCH_STATUS;
 
 #endif //ENUMS_H

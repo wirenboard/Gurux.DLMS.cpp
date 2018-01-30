@@ -70,6 +70,7 @@
 #include "../include/GXDLMSMBusMasterPortSetup.h"
 #include "../include/GXDLMSMessageHandler.h"
 #include "../include/GXDLMSPushSetup.h"
+#include "../include/GXDLMSGSMDiagnostic.h"
 
 // Reserved for internal use.
 CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
@@ -162,6 +163,8 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
         return new CGXDLMSMessageHandler();
     case DLMS_OBJECT_TYPE_PUSH_SETUP:
         return new CGXDLMSPushSetup();
+    case DLMS_OBJECT_TYPE_GSM_DIAGNOSTIC:
+        return new CGXDLMSGSMDiagnostic();
     default:
 #ifdef _DEBUG
         printf("Unknown object: %d\r\n", type);

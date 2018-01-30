@@ -77,5 +77,13 @@ public:
     //Get optical port response time as a std::string.
     static const char* ToString(DLMS_LOCAL_PORT_RESPONSE_TIME value);
 
+    //GSM status to string.
+    static const char* ToString(DLMS_GSM_STATUS value);
+
+    //GSM circuit switced status to string.
+    static const char* ToString(DLMS_GSM_CIRCUIT_SWITCH_STATUS value);
+
+    // Packet switched status to the string.
+    static const char* ToString(DLMS_GSM_PACKET_SWITCH_STATUS value);
 };
 #endif //GXDLMSCONVERTER_H
