@@ -347,7 +347,7 @@ int CGXDLMSGSMDiagnostic::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
         {
             std::vector<CGXDLMSVariant> tmp = (std::vector<CGXDLMSVariant>) it->Arr;
             GXAdjacentCell* ac = new GXAdjacentCell();
-            ac->SetCellId(tmp[0].ToString());
+            ac->SetCellId(tmp[0].ToInteger());
             ac->SetSignalQuality(tmp[1].ToInteger());
             m_AdjacentCells.push_back(ac);
         }

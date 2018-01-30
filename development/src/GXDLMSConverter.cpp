@@ -587,6 +587,8 @@ const char* CGXDLMSConverter::ToString(DLMS_GSM_STATUS value)
     case DLMS_GSM_STATUS_ROAMING:
         str = "Roaming";
         break;
+    default:
+        str = NULL;
     }
     return str;
 };
@@ -605,6 +607,8 @@ const char* CGXDLMSConverter::ToString(DLMS_GSM_CIRCUIT_SWITCH_STATUS value)
     case DLMS_GSM_CIRCUIT_SWITCH_STATUS_ACTIVE:
         str = "Active";
         break;
+    default:
+        str = NULL;
     }
     return str;
 };
@@ -630,6 +634,8 @@ const char* CGXDLMSConverter::ToString(DLMS_GSM_PACKET_SWITCH_STATUS value)
     case DLMS_GSM_PACKET_SWITCH_STATUS_HSDPA:
         str = "HSDPA";
         break;
+    default:
+        str = NULL;
     }
     return str;
 };

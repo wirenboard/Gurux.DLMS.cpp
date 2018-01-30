@@ -41,9 +41,9 @@ class GXAdjacentCell
 {
 private:
     /**
-    * Two byte cell ID.
+    * Four byte cell ID.
     */
-    std::string m_CellId;
+    unsigned long m_CellId;
 
     /**
     * Signal quality.
@@ -51,15 +51,15 @@ private:
     unsigned char m_SignalQuality;
 public:
     /**
-    * @return Two byte cell ID.
+    * @return Four byte cell ID.
     */
-    std::string GetCellId();
+    unsigned long GetCellId();
 
     /**
     * @param value
-    *            Two byte cell ID.
+    *            Four byte cell ID.
     */
-    void SetCellId(std::string& value);
+    void SetCellId(unsigned long value);
 
     /**
     * @return Signal quality.

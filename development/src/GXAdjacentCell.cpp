@@ -34,11 +34,11 @@
 
 #include "../include/GXAdjacentCell.h"
 
-std::string GXAdjacentCell::GetCellId() {
+unsigned long GXAdjacentCell::GetCellId() {
     return m_CellId;
 }
 
-void GXAdjacentCell::SetCellId(std::string& value) {
+void GXAdjacentCell::SetCellId(unsigned long value) {
     m_CellId = value;
 }
 
