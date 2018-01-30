@@ -343,7 +343,12 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
 {
     Close();
     unsigned short baudRate;
-    unsigned char parity, stopBits, dataBits, byteSize;
+#if defined(_WIN32) || defined(_WIN64)
+    unsigned char parity;
+#else //Linux
+    int parity;
+#endif
+    unsigned char stopBits, dataBits, byteSize;
     std::string port;
     port = settings;
     std::vector< std::string > tmp = GXHelpers::Split(port, ':');
@@ -357,23 +362,43 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         tmp2 = tmp[2].substr(1, tmp[2].size() - 2);
         if (tmp2.compare("None") == 0)
         {
+#if defined(_WIN32) || defined(_WIN64)
             parity = NOPARITY;
+#else //Linux
+            parity = 0;
+#endif
         }
         else if (tmp2.compare("Odd") == 0)
         {
+#if defined(_WIN32) || defined(_WIN64)
             parity = ODDPARITY;
+#else //Linux
+            parity = PARENB | PARODD;
+#endif
         }
         else if (tmp2.compare("Even") == 0)
         {
+#if defined(_WIN32) || defined(_WIN64)
             parity = EVENPARITY;
+#else //Linux
+            parity = PARENB | PARENB;
+#endif
         }
         else if (tmp2.compare("Mark") == 0)
         {
+#if defined(_WIN32) || defined(_WIN64)
             parity = MARKPARITY;
+#else //Linux
+            parity = PARENB | PARODD | CMSPAR;
+#endif
         }
         else if (tmp2.compare("Space") == 0)
         {
+#if defined(_WIN32) || defined(_WIN64)
             parity = SPACEPARITY;
+#else //Linux
+            parity = PARENB | CMSPAR;
+#endif
         }
         else
         {
@@ -386,12 +411,14 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
     {
 #if defined(_WIN32) || defined(_WIN64)
         baudRate = 9600;
-#else
-        baudRate = B9600;
-#endif
-        dataBits = 8;
         parity = NOPARITY;
         stopBits = ONESTOPBIT;
+#else
+        baudRate = B9600;
+        parity = 0;
+        stopBits = 0;
+#endif
+        dataBits = 8;
     }
 
     CGXByteBuffer reply;
@@ -422,14 +449,10 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
     dcb.fAbortOnError = 1;
     if (iec)
     {
-#if defined(_WIN32) || defined(_WIN64)
         dcb.BaudRate = 300;
-#else
-        baudRate = B300;
-#endif
-        dcb.ByteSize = 7;
         dcb.StopBits = ONESTOPBIT;
         dcb.Parity = EVENPARITY;
+        dcb.ByteSize = 7;
     }
     else
     {
@@ -445,7 +468,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
 #else //#if defined(__LINUX__)
     struct termios options;
     // read/write | not controlling term | don't wait for DCD line signal.
-    m_hComPort = open(port, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    m_hComPort = open(port.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (m_hComPort == -1) // if open is unsuccessful.
     {
         printf("Failed to Open port.\r");
@@ -483,6 +506,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         {
             // 8n1, see termios.h for more information
             options.c_cflag = CS8 | CREAD | CLOCAL;
+            options.c_cflag |= parity;
             /*
             options.c_cflag &= ~PARENB
             options.c_cflag &= ~CSTOPB
@@ -664,21 +688,11 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
             return DLMS_ERROR_CODE_SEND_FAILED;
         }
 #endif
+        //It's ok if this fails.
+        Read('\n', reply);
 #if defined(_WIN32) || defined(_WIN64)//Windows
-        //This sleep is in standard. Do not remove.
-        Sleep(1000);
         dcb.BaudRate = baudRate;
-        if ((ret = GXSetCommState(m_hComPort, &dcb)) != 0)
-        {
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
         printf("New baudrate %d\r\n", (int)dcb.BaudRate);
-        len = 6;
-        if ((ret = Read('\n', reply)) != 0)
-        {
-            printf("Read %d\r\n", ret);
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
         dcb.ByteSize = 8;
         dcb.StopBits = ONESTOPBIT;
         dcb.Parity = NOPARITY;
@@ -686,9 +700,9 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         {
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
+        //Some meters need this sleep. Do not remove.
+        Sleep(1000);
 #else
-        //This sleep is in standard. Do not remove.
-        usleep(1000000);
         // 8n1, see termios.h for more information
         options.c_cflag = CS8 | CREAD | CLOCAL;
         //Set Baud Rates
@@ -699,6 +713,8 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
             printf("Failed to Open port. tcsetattr failed.\r");
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
+        //Some meters need this sleep. Do not remove.
+        usleep(1000000);
 #endif
     }
     return DLMS_ERROR_CODE_OK;

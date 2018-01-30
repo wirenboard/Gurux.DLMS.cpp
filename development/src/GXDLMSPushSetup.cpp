@@ -290,7 +290,7 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
         buff.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         buff.SetUInt8(3);
         tmp = GetService();
-        if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT8, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_ENUM, tmp)) != 0)
         {
             return ret;
         }
@@ -304,7 +304,7 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
         }
 
         tmp = GetMessage();
-        if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT8, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_ENUM, tmp)) != 0)
         {
             return ret;
         }

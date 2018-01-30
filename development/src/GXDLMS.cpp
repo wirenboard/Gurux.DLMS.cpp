@@ -2512,34 +2512,40 @@ int CGXDLMS::GetTcpData(
     }
     int pos = buff.GetPosition();
     unsigned short value;
-    // Get version
-    if ((ret = buff.GetUInt16(&value)) != 0)
+    data.SetComplete(false);
+    while (buff.GetPosition() != buff.GetSize())
     {
-        return ret;
-    }
-    if (value != 1)
-    {
-        //Unknown version.
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
-
-    // Check TCP/IP addresses.
-    CheckWrapperAddress(settings, buff);
-    // Get length.
-    if ((ret = buff.GetUInt16(&value)) != 0)
-    {
-        return ret;
-    }
-    bool compleate = !((buff.GetSize() - buff.GetPosition()) < value);
-    data.SetComplete(compleate);
-    if (!compleate)
-    {
-        buff.SetPosition(pos);
-        return DLMS_ERROR_CODE_FALSE;
-    }
-    else
-    {
-        data.SetPacketLength(buff.GetPosition() + value);
+        // Get version
+        if ((ret = buff.GetUInt16(&value)) != 0)
+        {
+            return DLMS_ERROR_CODE_OK;
+        }
+        if (value == 1)
+        {
+            // Check TCP/IP addresses.
+            CheckWrapperAddress(settings, buff);
+            // Get length.
+            if ((ret = buff.GetUInt16(&value)) != 0)
+            {
+                return ret;
+            }
+            bool compleate = !((buff.GetSize() - buff.GetPosition()) < value);
+            data.SetComplete(compleate);
+            if (!compleate)
+            {
+                buff.SetPosition(pos);
+                return DLMS_ERROR_CODE_FALSE;
+            }
+            else
+            {
+                data.SetPacketLength(buff.GetPosition() + value);
+            }
+            break;
+        }
+        else
+        {
+            buff.SetPosition(buff.GetPosition() - 1);
+        }
     }
     return DLMS_ERROR_CODE_OK;
 }
