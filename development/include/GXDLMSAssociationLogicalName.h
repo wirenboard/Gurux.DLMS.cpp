@@ -43,7 +43,7 @@ class CGXDLMSAssociationLogicalName : public CGXDLMSObject
 {
 private:
 
-    DLMS_DLMS_ASSOCIATION_STATUS m_AssociationStatus;
+    DLMS_ASSOCIATION_STATUS m_AssociationStatus;
     CGXDLMSObjectCollection m_ObjectList;
     unsigned char m_ClientSAP;
     unsigned short m_ServerSAP;
@@ -145,9 +145,9 @@ public:
         std::vector<CGXByteBuffer>& reply);
 
 
-    DLMS_DLMS_ASSOCIATION_STATUS GetAssociationStatus();
+    DLMS_ASSOCIATION_STATUS GetAssociationStatus();
 
-    void SetAssociationStatus(DLMS_DLMS_ASSOCIATION_STATUS value);
+    void SetAssociationStatus(DLMS_ASSOCIATION_STATUS value);
 
     std::string GetSecuritySetupReference();
     void SetSecuritySetupReference(std::string value);

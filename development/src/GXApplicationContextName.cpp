@@ -35,14 +35,18 @@
 #include "../include/GXApplicationContextName.h"
 #include "../include/GXDLMSVariant.h"
 
-std::string CGXApplicationContextName::GetLogicalName()
+/// <summary>
+/// Constructor
+/// </summary>
+CGXApplicationContextName::CGXApplicationContextName()
 {
-    return m_LogicalName;
-}
-
-void CGXApplicationContextName::SetLogicalName(std::string value)
-{
-    m_LogicalName = value;
+    m_JointIsoCtt = 2;
+    m_Country = 16;
+    m_CountryName = 756;
+    m_IdentifiedOrganization = 5;
+    m_DlmsUA = 8;
+    m_ApplicationContext = 1;
+    m_ContextId = DLMS_APPLICATION_CONTEXT_NAME_LOGICAL_NAME;
 }
 
 unsigned char CGXApplicationContextName::GetJointIsoCtt()
@@ -99,11 +103,11 @@ void CGXApplicationContextName::SetApplicationContext(unsigned char value)
     m_ApplicationContext = value;
 }
 
-unsigned char CGXApplicationContextName::GetContextId()
+DLMS_APPLICATION_CONTEXT_NAME CGXApplicationContextName::GetContextId()
 {
     return m_ContextId;
 }
-void CGXApplicationContextName::SetContextId(unsigned char value)
+void CGXApplicationContextName::SetContextId(DLMS_APPLICATION_CONTEXT_NAME value)
 {
     m_ContextId = value;
 }

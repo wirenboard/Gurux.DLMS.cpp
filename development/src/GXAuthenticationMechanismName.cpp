@@ -38,9 +38,13 @@
 
 CGXAuthenticationMechanismName::CGXAuthenticationMechanismName()
 {
+    m_JointIsoCtt = 2;
+    m_Country = 16;
+    m_CountryName = 756;
+    m_IdentifiedOrganization = 5;
+    m_DlmsUA = 8;
+    m_AuthenticationMechanismName = 2;
     m_MechanismId = DLMS_AUTHENTICATION_NONE;
-    m_JointIsoCtt = m_Country = m_CountryName = 0;
-    m_IdentifiedOrganization = m_DlmsUA = m_AuthenticationMechanismName = 0;
 }
 
 int CGXAuthenticationMechanismName::GetJointIsoCtt()

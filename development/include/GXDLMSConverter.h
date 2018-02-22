@@ -69,7 +69,7 @@ public:
     static const char* ToString(DLMS_SECURITY_SUITE value);
 
     //Get Logical Name association status as a std::string.
-    static const char* ToString(DLMS_DLMS_ASSOCIATION_STATUS value);
+    static const char* ToString(DLMS_ASSOCIATION_STATUS value);
 
     //Get optical port protocol mode as a std::string.
     static const char* ToString(DLMS_OPTICAL_PROTOCOL_MODE value);

@@ -40,8 +40,8 @@ CGXDLMSContextType::CGXDLMSContextType()
 {
     m_Conformance = (DLMS_CONFORMANCE)0;
     m_MaxReceivePduSize = 0;
-    m_MaxSendPpuSize = 0;
-    m_DlmsVersionNumber = 0;
+    m_MaxSendPduSize = 0;
+    m_DlmsVersionNumber = 6;
     m_QualityOfService = 0;
 }
 
@@ -63,13 +63,13 @@ void CGXDLMSContextType::SetMaxReceivePduSize(int value)
     m_MaxReceivePduSize = value;
 }
 
-int CGXDLMSContextType::GetMaxSendPpuSize()
+int CGXDLMSContextType::GetMaxSendPduSize()
 {
-    return m_MaxSendPpuSize;
+    return m_MaxSendPduSize;
 }
-void CGXDLMSContextType::SetMaxSendPpuSize(int value)
+void CGXDLMSContextType::SetMaxSendPduSize(int value)
 {
-    m_MaxSendPpuSize = value;
+    m_MaxSendPduSize = value;
 }
 
 int CGXDLMSContextType::GetDlmsVersionNumber()
@@ -106,7 +106,7 @@ std::string CGXDLMSContextType::ToString()
     bb.SetInt8(' ');
     bb.AddIntAsString(m_MaxReceivePduSize);
     bb.SetInt8(' ');
-    bb.AddIntAsString(m_MaxSendPpuSize);
+    bb.AddIntAsString(m_MaxSendPduSize);
     bb.SetInt8(' ');
     bb.AddIntAsString(m_DlmsVersionNumber);
     bb.SetInt8(' ');

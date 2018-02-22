@@ -367,9 +367,15 @@ int CGXDLMSDemandRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     if (e.GetIndex() == 4)
     {
         e.GetValue().Clear();
-        e.GetValue().vt = DLMS_DATA_TYPE_STRUCTURE;
-        e.GetValue().Arr.push_back(m_Scaler);
-        e.GetValue().Arr.push_back(m_Unit);
+        e.SetByteArray(true);
+        CGXByteBuffer buff;
+        buff.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+        buff.SetUInt8(2);
+        buff.SetUInt8(DLMS_DATA_TYPE_INT8);
+        buff.SetUInt8(m_Scaler);
+        buff.SetUInt8(DLMS_DATA_TYPE_ENUM);
+        buff.SetUInt8(m_Unit);
+        e.SetValue(buff);
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 5)

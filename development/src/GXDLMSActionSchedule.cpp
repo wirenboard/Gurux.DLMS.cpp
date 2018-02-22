@@ -41,7 +41,7 @@
  Constructor.
 */
 CGXDLMSActionSchedule::CGXDLMSActionSchedule() :
-    CGXDLMSActionSchedule("", 0)
+    CGXDLMSActionSchedule("0.0.15.0.0.255", 0)
 {
 }
 

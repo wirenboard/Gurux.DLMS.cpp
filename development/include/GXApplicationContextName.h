@@ -47,11 +47,10 @@ private:
     unsigned char m_IdentifiedOrganization;
     unsigned char m_DlmsUA;
     unsigned char m_ApplicationContext;
-    unsigned char m_ContextId;
+    DLMS_APPLICATION_CONTEXT_NAME m_ContextId;
 public:
-
-    std::string GetLogicalName();
-    void SetLogicalName(std::string value);
+    // Constructor
+    CGXApplicationContextName();
 
     unsigned char GetJointIsoCtt();
     void SetJointIsoCtt(unsigned char value);
@@ -71,8 +70,8 @@ public:
     unsigned char GetApplicationContext();
     void SetApplicationContext(unsigned char value);
 
-    unsigned char GetContextId();
-    void SetContextId(unsigned char value);
+    DLMS_APPLICATION_CONTEXT_NAME GetContextId();
+    void SetContextId(DLMS_APPLICATION_CONTEXT_NAME value);
 
     std::string ToString();
 };

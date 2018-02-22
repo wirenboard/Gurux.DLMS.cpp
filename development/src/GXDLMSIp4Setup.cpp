@@ -48,7 +48,7 @@
 
 //Constructor.
 CGXDLMSIp4Setup::CGXDLMSIp4Setup() :
-    CGXDLMSIp4Setup("", 0)
+    CGXDLMSIp4Setup("0.0.25.1.0.255", 0)
 {
 }
 

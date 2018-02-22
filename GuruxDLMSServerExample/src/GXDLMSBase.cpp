@@ -461,7 +461,7 @@ void AddOpticalPortSetup(CGXDLMSObjectCollection& items)
 */
 void AddDemandRegister(CGXDLMSObjectCollection& items)
 {
-    CGXDLMSDemandRegister* pDr = new CGXDLMSDemandRegister("0.0.1.0.0.255");
+    CGXDLMSDemandRegister* pDr = new CGXDLMSDemandRegister("1.0.31.4.0.255");
     pDr->SetCurrentAvarageValue(10);
     pDr->SetLastAvarageValue(20);
     pDr->SetStatus(1);
@@ -477,7 +477,7 @@ void AddDemandRegister(CGXDLMSObjectCollection& items)
 */
 void AddRegisterMonitor(CGXDLMSObjectCollection& items, CGXDLMSRegister* pRegister)
 {
-    CGXDLMSRegisterMonitor* pRm = new CGXDLMSRegisterMonitor("0.0.1.0.0.255");
+    CGXDLMSRegisterMonitor* pRm = new CGXDLMSRegisterMonitor("0.0.16.1.0.255");
     CGXDLMSVariant threshold;
     vector<CGXDLMSVariant> thresholds;
     threshold.Add("Gurux1", 6);
@@ -506,7 +506,7 @@ void AddRegisterMonitor(CGXDLMSObjectCollection& items, CGXDLMSRegister* pRegist
 */
 void AddActionSchedule(CGXDLMSObjectCollection& items)
 {
-    CGXDLMSActionSchedule* pActionS = new CGXDLMSActionSchedule("0.0.1.0.0.255");
+    CGXDLMSActionSchedule* pActionS = new CGXDLMSActionSchedule();
     pActionS->SetExecutedScriptLogicalName("1.2.3.4.5.6");
     pActionS->SetExecutedScriptSelector(1);
     pActionS->SetType(DLMS_SINGLE_ACTION_SCHEDULE_TYPE1);

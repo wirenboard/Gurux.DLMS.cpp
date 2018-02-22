@@ -510,17 +510,17 @@ const char* CGXDLMSConverter::ToString(DLMS_SECURITY_SUITE value)
     return "Unknown security suite";
 }
 
-const char* CGXDLMSConverter::ToString(DLMS_DLMS_ASSOCIATION_STATUS value)
+const char* CGXDLMSConverter::ToString(DLMS_ASSOCIATION_STATUS value)
 {
     switch (value)
     {
-    case DLMS_DLMS_ASSOCIATION_STATUS_NON_ASSOCIATED:
+    case DLMS_ASSOCIATION_STATUS_NON_ASSOCIATED:
         return "NonAssociated";
         break;
-    case DLMS_DLMS_ASSOCIATION_STATUS_ASSOCIATION_PENDING:
+    case DLMS_ASSOCIATION_STATUS_ASSOCIATION_PENDING:
         return "AssociationPending";
         break;
-    case DLMS_DLMS_ASSOCIATION_STATUS_ASSOCIATED:
+    case DLMS_ASSOCIATION_STATUS_ASSOCIATED:
         return "Associated";
         break;
     default:

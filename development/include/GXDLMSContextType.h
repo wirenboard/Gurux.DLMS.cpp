@@ -43,7 +43,7 @@ class CGXDLMSContextType
 private:
     DLMS_CONFORMANCE m_Conformance;
     int m_MaxReceivePduSize;
-    int m_MaxSendPpuSize;
+    int m_MaxSendPduSize;
     int m_DlmsVersionNumber;
     int m_QualityOfService;
     CGXByteBuffer m_CypheringInfo;
@@ -68,8 +68,8 @@ public:
     int GetMaxPduSize();
     void SetMaxReceivePduSize(int value);
 
-    int GetMaxSendPpuSize();
-    void SetMaxSendPpuSize(int value);
+    int GetMaxSendPduSize();
+    void SetMaxSendPduSize(int value);
 
     int GetDlmsVersionNumber();
     void SetDlmsVersionNumber(int value);

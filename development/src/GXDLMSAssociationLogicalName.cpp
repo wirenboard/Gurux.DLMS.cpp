@@ -268,9 +268,11 @@ CGXDLMSAssociationLogicalName::CGXDLMSAssociationLogicalName() :
 CGXDLMSAssociationLogicalName::CGXDLMSAssociationLogicalName(std::string ln) :
     CGXDLMSObject(DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME, ln, 0)
 {
-    m_AssociationStatus = DLMS_DLMS_ASSOCIATION_STATUS_NON_ASSOCIATED;
+    m_AssociationStatus = DLMS_ASSOCIATION_STATUS_NON_ASSOCIATED;
     m_Secret.AddString("Gurux");
     m_Version = 2;
+    m_ClientSAP = 0;
+    m_ServerSAP = 0;
 }
 
 CGXDLMSObjectCollection& CGXDLMSAssociationLogicalName::GetObjectList()
@@ -341,12 +343,12 @@ void CGXDLMSAssociationLogicalName::SetCurrentUser(std::pair<unsigned char, std:
     m_CurrentUser = value;
 }
 
-DLMS_DLMS_ASSOCIATION_STATUS CGXDLMSAssociationLogicalName::GetAssociationStatus()
+DLMS_ASSOCIATION_STATUS CGXDLMSAssociationLogicalName::GetAssociationStatus()
 {
     return m_AssociationStatus;
 }
 
-void CGXDLMSAssociationLogicalName::SetAssociationStatus(DLMS_DLMS_ASSOCIATION_STATUS value)
+void CGXDLMSAssociationLogicalName::SetAssociationStatus(DLMS_ASSOCIATION_STATUS value)
 {
     m_AssociationStatus = value;
 }
@@ -577,10 +579,12 @@ int CGXDLMSAssociationLogicalName::Invoke(CGXDLMSSettings& settings, CGXDLMSValu
             }
             e.SetValue(serverChallenge);
             settings.SetConnected(true);
+            m_AssociationStatus = DLMS_ASSOCIATION_STATUS_ASSOCIATED;
         }
         else
         {
             settings.SetConnected(false);
+            m_AssociationStatus = DLMS_ASSOCIATION_STATUS_NON_ASSOCIATED;
         }
     }
     else if (e.GetIndex() == 2)
@@ -660,7 +664,7 @@ int CGXDLMSAssociationLogicalName::GetValue(CGXDLMSSettings& settings, CGXDLMSVa
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         //Add count
         data.SetUInt8(2);
-        data.SetUInt8(DLMS_DATA_TYPE_UINT8);
+        data.SetUInt8(DLMS_DATA_TYPE_INT8);
         data.SetUInt8(m_ClientSAP);
         data.SetUInt8(DLMS_DATA_TYPE_UINT16);
         data.SetUInt16(m_ServerSAP);
@@ -705,7 +709,7 @@ int CGXDLMSAssociationLogicalName::GetValue(CGXDLMSSettings& settings, CGXDLMSVa
         bb.SubArray(1, 3, bb2);
         CGXDLMSVariant conformance = bb2;
         CGXDLMSVariant rx = m_XDLMSContextInfo.GetMaxPduSize();
-        CGXDLMSVariant tx = m_XDLMSContextInfo.GetMaxSendPpuSize();
+        CGXDLMSVariant tx = m_XDLMSContextInfo.GetMaxSendPduSize();
         CGXDLMSVariant version = m_XDLMSContextInfo.GetDlmsVersionNumber();
         CGXDLMSVariant quality = m_XDLMSContextInfo.GetQualityOfService();
         CGXDLMSVariant info = m_XDLMSContextInfo.GetCypheringInfo();
@@ -874,7 +878,7 @@ int CGXDLMSAssociationLogicalName::SetValue(CGXDLMSSettings& settings, CGXDLMSVa
                 {
                     return ret;
                 }
-                m_ApplicationContextName.SetContextId(val);
+                m_ApplicationContextName.SetContextId((DLMS_APPLICATION_CONTEXT_NAME)val);
             }
             else
             {
@@ -992,7 +996,7 @@ int CGXDLMSAssociationLogicalName::SetValue(CGXDLMSSettings& settings, CGXDLMSVa
                 {
                     return ret;
                 }
-                m_ApplicationContextName.SetContextId(val);
+                m_ApplicationContextName.SetContextId((DLMS_APPLICATION_CONTEXT_NAME) val);
             }
         }
         else
@@ -1003,7 +1007,7 @@ int CGXDLMSAssociationLogicalName::SetValue(CGXDLMSSettings& settings, CGXDLMSVa
             m_ApplicationContextName.SetIdentifiedOrganization(e.GetValue().Arr[3].ToInteger());
             m_ApplicationContextName.SetDlmsUA(e.GetValue().Arr[4].ToInteger());
             m_ApplicationContextName.SetApplicationContext(e.GetValue().Arr[5].ToInteger());
-            m_ApplicationContextName.SetContextId(e.GetValue().Arr[6].ToInteger());
+            m_ApplicationContextName.SetContextId((DLMS_APPLICATION_CONTEXT_NAME)e.GetValue().Arr[6].ToInteger());
         }
     }
     else if (e.GetIndex() == 5)
@@ -1012,7 +1016,7 @@ int CGXDLMSAssociationLogicalName::SetValue(CGXDLMSSettings& settings, CGXDLMSVa
         {
             m_XDLMSContextInfo.SetConformance((DLMS_CONFORMANCE)e.GetValue().Arr[0].ToInteger());
             m_XDLMSContextInfo.SetMaxReceivePduSize(e.GetValue().Arr[1].ToInteger());
-            m_XDLMSContextInfo.SetMaxSendPpuSize(e.GetValue().Arr[2].ToInteger());
+            m_XDLMSContextInfo.SetMaxSendPduSize(e.GetValue().Arr[2].ToInteger());
             m_XDLMSContextInfo.SetDlmsVersionNumber(e.GetValue().Arr[3].ToInteger());
             m_XDLMSContextInfo.SetQualityOfService(e.GetValue().Arr[4].ToInteger());
             CGXByteBuffer tmp;
@@ -1201,7 +1205,7 @@ int CGXDLMSAssociationLogicalName::SetValue(CGXDLMSSettings& settings, CGXDLMSVa
     }
     else if (e.GetIndex() == 8)
     {
-        m_AssociationStatus = (DLMS_DLMS_ASSOCIATION_STATUS)e.GetValue().ToInteger();
+        m_AssociationStatus = (DLMS_ASSOCIATION_STATUS)e.GetValue().ToInteger();
     }
     else if (e.GetIndex() == 9)
     {
