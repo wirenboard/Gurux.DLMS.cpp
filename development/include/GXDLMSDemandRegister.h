@@ -37,6 +37,10 @@
 
 #include "GXDLMSObject.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSDemandRegister
+*/
 class CGXDLMSDemandRegister : public CGXDLMSObject
 {
     CGXDLMSVariant m_CurrentAvarageValue;

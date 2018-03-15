@@ -38,6 +38,10 @@
 #include "GXDLMSObject.h"
 #include "GXDLMSSpecialDay.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSSpecialDaysTable
+*/
 class CGXDLMSSpecialDaysTable : public CGXDLMSObject
 {
     std::vector<CGXDLMSSpecialDay*> m_Entries;

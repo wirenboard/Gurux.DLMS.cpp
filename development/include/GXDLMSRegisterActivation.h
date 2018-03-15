@@ -40,6 +40,10 @@
 #include "GXHelpers.h"
 #include "GXDLMSObjectDefinition.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSRegisterActivation
+*/
 class CGXDLMSRegisterActivation : public CGXDLMSObject
 {
     std::vector<CGXDLMSObjectDefinition> m_RegisterAssignment;

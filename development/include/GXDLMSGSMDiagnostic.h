@@ -39,6 +39,10 @@
 #include "GXAdjacentCell.h"
 #include "GXDLMSGSMCellInfo.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSGSMDiagnostic
+*/
 class CGXDLMSGSMDiagnostic : public CGXDLMSObject
 {
     /**

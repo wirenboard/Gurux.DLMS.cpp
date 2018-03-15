@@ -39,6 +39,10 @@
 #include "GXDLMSPushObject.h"
 #include "GXDLMSCaptureObject.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSPushSetup
+*/
 class CGXDLMSPushSetup : public CGXDLMSObject
 {
 private:

@@ -1035,6 +1035,9 @@ void CGXDLMSBase::PostWrite(std::vector<CGXDLMSValueEventArg*>& args)
 {
 }
 
+//In this example we wait 5 seconds before image is verified or activated.
+time_t imageActionStartTime;
+
 void HandleImageTransfer(CGXDLMSValueEventArg* e)
 {
     CGXDLMSImageTransfer* i = (CGXDLMSImageTransfer*)e->GetTarget();
@@ -1042,9 +1045,10 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
     FILE *f;
     if (e->GetIndex() == 1)
     {
+        i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_NOT_INITIATED);
         if (e->GetParameters().Arr.size() != 2)
         {
-            e->SetError(DLMS_ERROR_CODE_HARDWARE_FAULT);
+            e->SetError(DLMS_ERROR_CODE_UNMATCH_TYPE);
             return;
         }
         imageSize = e->GetParameters().Arr[1].ToInteger();
@@ -1054,13 +1058,13 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
         strncat(IMAGEFILE, (char*)e->GetParameters().Arr[0].byteArr, (int)e->GetParameters().Arr[0].GetSize());
         strcat(IMAGEFILE, ".bin");
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
-        printf("Updating image %s Size: %d", IMAGEFILE, imageSize);
+        printf("Updating image %s Size: %d\n", IMAGEFILE, imageSize);
 #endif
         f = fopen(IMAGEFILE, "wb");
         if (!f)
         {
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
-            printf("Unable to open file %s", IMAGEFILE);
+            printf("Unable to open file %s\n", IMAGEFILE);
 #endif
             e->SetError(DLMS_ERROR_CODE_HARDWARE_FAULT);
             return;
@@ -1072,14 +1076,15 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
     {
         if (e->GetParameters().Arr.size() != 2)
         {
-            e->SetError(DLMS_ERROR_CODE_HARDWARE_FAULT);
+            e->SetError(DLMS_ERROR_CODE_UNMATCH_TYPE);
             return;
         }
+        i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_INITIATED);
         f = fopen(IMAGEFILE, "ab");
         if (!f)
         {
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
-            printf("Unable to open file %s", IMAGEFILE);
+            printf("Unable to open file %s\n", IMAGEFILE);
 #endif
             e->SetError(DLMS_ERROR_CODE_HARDWARE_FAULT);
             return;
@@ -1089,8 +1094,9 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
         fclose(f);
         if (ret != e->GetParameters().Arr[1].GetSize())
         {
-            e->SetError(DLMS_ERROR_CODE_HARDWARE_FAULT);
+            e->SetError(DLMS_ERROR_CODE_UNMATCH_TYPE);
         }
+        imageActionStartTime = time(NULL);
         return;
     }
     //Verifies the integrity of the Image before activation.
@@ -1101,7 +1107,7 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
         if (!f)
         {
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
-            printf("Unable to open file %s", IMAGEFILE);
+            printf("Unable to open file %s\n", IMAGEFILE);
 #endif
             e->SetError(DLMS_ERROR_CODE_HARDWARE_FAULT);
             return;
@@ -1112,16 +1118,48 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
         if (size != imageSize)
         {
             i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_VERIFICATION_FAILED);
+            e->SetError(DLMS_ERROR_CODE_OTHER_REASON);
         }
         else
         {
-            i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_VERIFICATION_SUCCESSFUL);
+            //Wait 5 seconds before image is verified.
+            if (time(NULL) - imageActionStartTime < 5)
+            {
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
+                printf("Image verification is on progress.\n");
+#endif
+                e->SetError(DLMS_ERROR_CODE_TEMPORARY_FAILURE);
+            }
+            else
+            {
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
+                printf("Image is verificated");
+#endif
+                i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_VERIFICATION_SUCCESSFUL);
+                imageActionStartTime = time(NULL);
+            }
         }
     }
     //Activates the Image.
     else if (e->GetIndex() == 4)
     {
-
+        i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_ACTIVATION_INITIATED);
+        //Wait 5 seconds before image is activated.
+        if (time(NULL) - imageActionStartTime < 5)
+        {
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
+            printf("Image activation is on progress.\n");
+#endif
+            e->SetError(DLMS_ERROR_CODE_TEMPORARY_FAILURE);
+        }
+        else
+        {
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
+            printf("Image is activated.");
+#endif
+            i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_ACTIVATION_SUCCESSFUL);
+            imageActionStartTime = time(NULL);
+        }
     }
 }
 
@@ -1151,7 +1189,7 @@ void Capture(CGXDLMSProfileGeneric* pg)
 #else
     FILE* f = fopen(DATAFILE, "a");
 #endif
-    for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it = pg->GetCaptureObjects().begin(); 
+    for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it = pg->GetCaptureObjects().begin();
         it != pg->GetCaptureObjects().end(); ++it)
     {
         if (first)
@@ -1175,7 +1213,7 @@ void Capture(CGXDLMSProfileGeneric* pg)
             value = values.at(it->second->GetAttributeIndex() - 1);
             if (value == "")
             {
-                char tmp[20]; 
+                char tmp[20];
                 // Generate random value here.
                 sprintf(tmp, "%d", ++cnt);
                 value = tmp;

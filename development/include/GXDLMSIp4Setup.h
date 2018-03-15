@@ -38,6 +38,10 @@
 #include "GXDLMSObject.h"
 #include "GXDLMSIp4SetupIpOption.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSIp4Setup
+*/
 class CGXDLMSIp4Setup : public CGXDLMSObject
 {
     std::string m_DataLinkLayerReference;

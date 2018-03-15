@@ -221,17 +221,16 @@ int CGXDLMSImageTransfer::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg
     //Image transfer initiate
     if (e.GetIndex() == 1)
     {
-        m_ImageTransferStatus = DLMS_IMAGE_TRANSFER_STATUS_NOT_INITIATED;
         m_ImageFirstNotTransferredBlockNumber = 0;
         m_ImageTransferredBlocksStatus = "";
-        std::string imageIdentifier;
-        imageIdentifier.append(e.GetParameters().Arr[0].byteArr, e.GetParameters().Arr[0].byteArr + e.GetParameters().Arr[0].GetSize());
+        unsigned long size = (unsigned long) e.GetParameters().Arr[0].GetSize();
+        unsigned char * imageIdentifier = e.GetParameters().Arr[0].byteArr;
         int ImageSize = e.GetParameters().Arr[1].ToInteger();
         m_ImageTransferStatus = DLMS_IMAGE_TRANSFER_STATUS_INITIATED;
         CGXDLMSImageActivateInfo *item = NULL;
         for (std::vector<CGXDLMSImageActivateInfo*>::iterator it = m_ImageActivateInfo.begin(); it != m_ImageActivateInfo.end(); ++it)
         {
-            if ((*it)->GetIdentification() == imageIdentifier)
+            if ((*it)->GetIdentification().Compare(imageIdentifier, size) == 0)
             {
                 item = *it;
                 break;
@@ -243,7 +242,9 @@ int CGXDLMSImageTransfer::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg
             m_ImageActivateInfo.push_back(item);
         }
         item->SetSize(ImageSize);
-        item->SetIdentification(imageIdentifier);
+        CGXByteBuffer tmp;
+        tmp.Set(imageIdentifier, size);
+        item->SetIdentification(tmp);
         int cnt = ImageSize / m_ImageBlockSize;
         if (ImageSize % m_ImageBlockSize != 0)
         {
@@ -267,13 +268,11 @@ int CGXDLMSImageTransfer::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg
     //Image verify
     else if (e.GetIndex() == 3)
     {
-        m_ImageTransferStatus = DLMS_IMAGE_TRANSFER_STATUS_VERIFICATION_SUCCESSFUL;
         return 0;
     }
     //Image activate.
     else if (e.GetIndex() == 4)
     {
-        m_ImageTransferStatus = DLMS_IMAGE_TRANSFER_STATUS_ACTIVATION_SUCCESSFUL;
         return 0;
     }
     else
@@ -369,21 +368,29 @@ int CGXDLMSImageTransfer::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
         e.SetByteArray(true);
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount((unsigned long)m_ImageActivateInfo.size(), data); //Count
-        int ret;
-        CGXDLMSVariant size;
-        for (std::vector<CGXDLMSImageActivateInfo*>::iterator it = m_ImageActivateInfo.begin(); it != m_ImageActivateInfo.end(); ++it)
+        //ImageActivateInfo is returned only after verification is succeeded.
+        if (m_ImageTransferStatus != DLMS_IMAGE_TRANSFER_STATUS_VERIFICATION_SUCCESSFUL)
         {
-            data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
-            data.SetUInt8(3);//Item count.
-            size = (*it)->GetSize();
-            CGXDLMSVariant id((unsigned char*)(*it)->GetIdentification().c_str(), (int)(*it)->GetIdentification().size(), DLMS_DATA_TYPE_OCTET_STRING);
-            CGXDLMSVariant signature((unsigned char*)(*it)->GetSignature().c_str(), (int)(*it)->GetSignature().size(), DLMS_DATA_TYPE_OCTET_STRING);
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT32, size)) != 0 ||
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, id)) != 0 ||
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, signature)) != 0)
+            data.SetUInt8(0);
+        }
+        else
+        {
+            GXHelpers::SetObjectCount((unsigned long)m_ImageActivateInfo.size(), data); //Count
+            int ret;
+            CGXDLMSVariant size;
+            for (std::vector<CGXDLMSImageActivateInfo*>::iterator it = m_ImageActivateInfo.begin(); it != m_ImageActivateInfo.end(); ++it)
             {
-                return ret;
+                data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+                data.SetUInt8(3);//Item count.
+                size = (*it)->GetSize();
+                CGXDLMSVariant id((*it)->GetIdentification());
+                CGXDLMSVariant signature((*it)->GetSignature());
+                if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT32, size)) != 0 ||
+                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, id)) != 0 ||
+                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, signature)) != 0)
+                {
+                    return ret;
+                }
             }
         }
         e.SetValue(data);
@@ -434,10 +441,11 @@ int CGXDLMSImageTransfer::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
             {
                 CGXDLMSImageActivateInfo* item = new CGXDLMSImageActivateInfo();
                 item->SetSize((*it).Arr[0].ToInteger());
-                CGXDLMSClient::ChangeType((*it).Arr[1], DLMS_DATA_TYPE_STRING, tmp);
-                item->SetIdentification(tmp.ToString());
-                CGXDLMSClient::ChangeType((*it).Arr[2], DLMS_DATA_TYPE_STRING, tmp);
-                item->SetSignature(tmp.ToString());
+                CGXByteBuffer id, sic;
+                id.Set((*it).Arr[1].byteArr, (*it).Arr[1].GetSize());
+                sic.Set((*it).Arr[2].byteArr, (*it).Arr[2].GetSize());
+                item->SetIdentification(id);
+                item->SetSignature(sic);
                 m_ImageActivateInfo.push_back(item);
             }
         }

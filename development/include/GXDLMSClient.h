@@ -306,6 +306,17 @@ public:
         std::vector<CGXByteBuffer>& reply);
 
     /**
+    Generates the keep alive message.
+ 
+    Keepalive message is needed only HDLC framing.
+    For keepalive we are reading logical name for Association object.
+    This is done because all the meters can't handle HDLC keep alive message.
+    */
+    int GetKeepAlive(
+        std::vector<CGXByteBuffer>& reply);
+
+
+    /**
     * Generates a read message.
     *
     * name : Short or Logical Name.

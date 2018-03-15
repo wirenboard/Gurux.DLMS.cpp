@@ -40,6 +40,10 @@
 #include "GXDLMSWeekProfile.h"
 #include "GXDLMSDayProfile.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSActivityCalendar
+*/
 class CGXDLMSActivityCalendar : public CGXDLMSObject
 {
     std::string m_CalendarNameActive;

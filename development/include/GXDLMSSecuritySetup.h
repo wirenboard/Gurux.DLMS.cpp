@@ -37,6 +37,10 @@
 
 #include "GXDLMSObject.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSSecuritySetup
+*/
 class CGXDLMSSecuritySetup : public CGXDLMSObject
 {
     unsigned char m_SecurityPolicy;

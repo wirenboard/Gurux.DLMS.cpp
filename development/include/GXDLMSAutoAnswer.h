@@ -76,6 +76,10 @@ enum AUTO_ANSWER_STATUS
     AUTO_ANSWER_STATUS_LOCKED = 2
 };
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSAutoAnswer
+*/
 class CGXDLMSAutoAnswer : public CGXDLMSObject
 {
     int m_NumberOfRingsInListeningWindow, m_NumberOfRingsOutListeningWindow;

@@ -56,6 +56,10 @@ enum PPP_AUTHENTICATION_TYPE
     PPP_AUTHENTICATION_TYPE_CHAP = 2
 };
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSPppSetup
+*/
 class CGXDLMSPppSetup : public CGXDLMSObject
 {
     std::vector<CGXDLMSPppSetupIPCPOption> m_IPCPOptions;

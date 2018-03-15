@@ -39,6 +39,10 @@
 #include "GXDLMSEmergencyProfile.h"
 #include "GXDLMSActionItem.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSLimiter
+*/
 class CGXDLMSLimiter : public CGXDLMSObject
 {
     CGXDLMSObject* m_MonitoredValue;

@@ -38,6 +38,10 @@
 #include "GXDLMSObject.h"
 #include "GXDLMSAutoAnswer.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSAutoConnect
+*/
 class CGXDLMSAutoConnect : public CGXDLMSObject
 {
     AUTO_CONNECT_MODE m_Mode;

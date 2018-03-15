@@ -35,6 +35,10 @@
 #ifndef GXDLMSTCPUDPSETUP_H
 #define GXDLMSTCPUDPSETUP_H
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSTcpUdpSetup
+*/
 class CGXDLMSTcpUdpSetup : public CGXDLMSObject
 {
     int m_Port;

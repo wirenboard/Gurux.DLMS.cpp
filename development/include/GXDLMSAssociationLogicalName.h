@@ -39,6 +39,10 @@
 #include "GXDLMSContextType.h"
 #include "GXAuthenticationMechanismName.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSAssociationLogicalName
+*/
 class CGXDLMSAssociationLogicalName : public CGXDLMSObject
 {
 private:

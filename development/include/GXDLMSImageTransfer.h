@@ -38,6 +38,10 @@
 #include "GXDLMSObject.h"
 #include "GXDLMSImageActivateInfo.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSImageTransfer
+*/
 class CGXDLMSImageTransfer : public CGXDLMSObject
 {
     long m_ImageBlockSize;

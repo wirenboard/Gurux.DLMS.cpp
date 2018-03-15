@@ -51,6 +51,7 @@ CGXDLMSIecHdlcSetup::CGXDLMSIecHdlcSetup(std::string ln, unsigned short sn) :
     m_InactivityTimeout = 120;
     m_DeviceAddress = 0;
     m_InterCharachterTimeout = 30;
+    m_Version = 1;
 }
 
 //LN Constructor.

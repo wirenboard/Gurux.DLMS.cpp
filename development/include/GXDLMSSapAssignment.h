@@ -37,6 +37,10 @@
 
 #include "GXDLMSObject.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSSapAssignment
+*/
 class CGXDLMSSapAssignment : public CGXDLMSObject
 {
     std::map<int, std::string > m_SapAssignmentList;

@@ -36,6 +36,10 @@
 
 #include "GXDLMSObject.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSRegister
+*/
 class CGXDLMSRegister : public CGXDLMSObject
 {
 protected:

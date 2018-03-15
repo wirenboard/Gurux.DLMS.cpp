@@ -58,8 +58,8 @@ class CGXDLMSObject : public IGXDLMSBase
     DLMS_OBJECT_TYPE m_ObjectType;
     char m_AttributeIndex;
     unsigned short m_DataIndex;
-    unsigned short m_Version;
 protected:
+    unsigned short m_Version;
     std::map<int, time_t> m_ReadTimes;
     unsigned short m_SN;
     unsigned char m_LN[6];

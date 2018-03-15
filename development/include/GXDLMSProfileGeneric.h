@@ -71,6 +71,10 @@ enum GX_SORT_METHOD
 
 class CGXDLMSServer;
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSProfileGeneric
+*/
 class CGXDLMSProfileGeneric : public CGXDLMSObject
 {
 private:

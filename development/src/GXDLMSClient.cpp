@@ -932,12 +932,22 @@ int CGXDLMSClient::GetObjectsRequest(std::vector<CGXByteBuffer>& reply)
     if (GetUseLogicalNameReferencing())
     {
         name = "0.0.40.0.0.255";
+        return Read(name, DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME, 2, reply);
     }
-    else
+    name = (short)0xFA00;
+    return Read(name, DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME, 2, reply);
+}
+
+int CGXDLMSClient::GetKeepAlive(std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant name;
+    if (GetUseLogicalNameReferencing())
     {
-        name = (short)0xFA00;
+        name = "0.0.40.0.0.255";
+        return Read(name, DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME, 1, reply);
     }
-    return Read(name, DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME, 2, reply);
+    name = (short)0xFA00;
+    return Read(name, DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME, 1, reply);
 }
 
 int CGXDLMSClient::Read(CGXDLMSObject* pObject, int attributeOrdinal, std::vector<CGXByteBuffer>& reply)

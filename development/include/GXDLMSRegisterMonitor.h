@@ -38,6 +38,10 @@
 #include "GXDLMSMonitoredValue.h"
 #include "GXDLMSActionSet.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSRegisterMonitor
+*/
 class CGXDLMSRegisterMonitor : public CGXDLMSObject
 {
     std::vector<CGXDLMSActionSet*> m_Actions;

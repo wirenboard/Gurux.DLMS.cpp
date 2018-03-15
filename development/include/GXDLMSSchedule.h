@@ -38,6 +38,10 @@
 #include "GXDLMSObject.h"
 #include "GXDLMSScheduleEntry.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSSchedule
+*/
 class CGXDLMSSchedule : public CGXDLMSObject
 {
     std::vector<CGXDLMSScheduleEntry> m_Entries;

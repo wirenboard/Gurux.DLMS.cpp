@@ -39,6 +39,10 @@
 #include "GXDateTime.h"
 #include "GXDLMSScriptAction.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSMessageHandler
+*/
 class CGXDLMSMessageHandler : public CGXDLMSObject
 {
     std::vector<std::pair<CGXDateTime, CGXDateTime> > m_ListeningWindow;

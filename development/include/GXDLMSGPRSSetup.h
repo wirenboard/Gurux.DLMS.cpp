@@ -38,6 +38,10 @@
 #include "GXDLMSObject.h"
 #include "GXDLMSQualityOfService.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSGPRSSetup
+*/
 class CGXDLMSGPRSSetup : public CGXDLMSObject
 {
 private:

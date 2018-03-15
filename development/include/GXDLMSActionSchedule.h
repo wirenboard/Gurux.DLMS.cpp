@@ -37,6 +37,10 @@
 
 #include "GXDLMSObject.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSActionSchedule
+*/
 class CGXDLMSActionSchedule : public CGXDLMSObject
 {
     std::string m_ExecutedScriptLogicalName;

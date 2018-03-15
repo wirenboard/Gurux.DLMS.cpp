@@ -38,6 +38,10 @@
 #include "GXDLMSObject.h"
 #include "GXDLMSModemInitialisation.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSModemConfiguration
+*/
 class CGXDLMSModemConfiguration : public CGXDLMSObject
 {
     std::vector<CGXDLMSModemInitialisation> m_InitialisationStrings;

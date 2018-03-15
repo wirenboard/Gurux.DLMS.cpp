@@ -37,6 +37,10 @@
 
 #include "GXDLMSObject.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSMBusSlavePortSetup
+*/
 class CGXDLMSMBusSlavePortSetup : public CGXDLMSObject
 {
     DLMS_BAUD_RATE m_DefaultBaud;

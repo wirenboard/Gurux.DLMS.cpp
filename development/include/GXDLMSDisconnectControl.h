@@ -37,6 +37,10 @@
 
 #include "GXDLMSObject.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSDisconnectControl
+*/
 class CGXDLMSDisconnectControl : public CGXDLMSObject
 {
     bool m_OutputState;

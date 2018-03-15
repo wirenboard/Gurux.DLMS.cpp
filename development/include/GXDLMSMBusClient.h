@@ -37,6 +37,10 @@
 
 #include "GXDLMSObject.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSMBusClient
+*/
 class CGXDLMSMBusClient : public CGXDLMSObject
 {
     long m_CapturePeriod;

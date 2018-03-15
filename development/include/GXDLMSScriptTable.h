@@ -38,6 +38,10 @@
 #include "GXDLMSObject.h"
 #include "GXDLMSScript.h"
 
+/**
+Online help:
+http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSScriptTable
+*/
 class CGXDLMSScriptTable : public CGXDLMSObject
 {
     std::vector<CGXDLMSScript*> m_Scripts;
