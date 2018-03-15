@@ -2218,7 +2218,7 @@ int CGXDLMSServer::HandleRequest(
     m_ReceivedData.Clear();
 
     if (first || m_Info.GetCommand() == DLMS_COMMAND_SNRM ||
-        m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER && m_Info.GetCommand() == DLMS_COMMAND_AARQ)
+        (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER && m_Info.GetCommand() == DLMS_COMMAND_AARQ))
     {
         // Check is data send to this server.
         if (!IsTarget(m_Settings.GetServerAddress(), m_Settings.GetClientAddress()))
