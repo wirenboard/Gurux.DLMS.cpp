@@ -93,6 +93,18 @@ void CGXDLMSDisconnectControl::SetControlMode(DLMS_CONTROL_MODE value)
     m_ControlMode = value;
 }
 
+int CGXDLMSDisconnectControl::RemoteDisconnect(CGXDLMSClient* client, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 1, data, reply);
+}
+
+int CGXDLMSDisconnectControl::RemoteReconnect(CGXDLMSClient* client, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 1, data, reply);
+}
+
 // Returns amount of attributes.
 int CGXDLMSDisconnectControl::GetAttributeCount()
 {

@@ -909,6 +909,12 @@ typedef enum
     DLMS_COMMAND_METHOD_RESPONSE = 0xC7,
 
     /**
+    HDLC Disconnect Mode.
+    Responder for Disconnect Mode request.
+    */
+    DLMS_COMMAND_DISCONNECT_MODE = 0x1f,
+
+    /**
      * Command rejected.
      */
     DLMS_COMMAND_REJECTED = 0x97,

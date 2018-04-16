@@ -75,6 +75,17 @@ public:
     DLMS_CONTROL_MODE GetControlMode();
     void SetControlMode(DLMS_CONTROL_MODE value);
 
+    // Forces the disconnect control object into 'disconnected' state 
+    // if remote disconnection is enabled(control mode > 0).
+    int RemoteDisconnect(CGXDLMSClient* client, std::vector<CGXByteBuffer>& reply);
+    
+    // Forces the disconnect control object into the 'ready_for_reconnection'
+    // state if a direct remote reconnection is disabled(control_mode = 1, 3, 5, 6). 
+    // Forces the disconnect control object into the 'connected' state if 
+    // a direct remote reconnection is enabled(control_mode = 2, 4).
+    int RemoteReconnect(CGXDLMSClient* client, std::vector<CGXByteBuffer>& reply);
+    
+
     // Returns amount of attributes.
     int GetAttributeCount();
 

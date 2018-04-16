@@ -316,7 +316,7 @@ int CGXDLMS::GetHdlcFrame(
     // Add BOP
     reply.SetUInt8(HDLC_FRAME_START_END);
     frameSize = settings.GetLimits().GetMaxInfoTX();
-    frameSize -= 11;
+    frameSize -= (unsigned short)(10 + secondaryAddress.GetSize());
     // If no data
     if (data == NULL || data->GetSize() == 0)
     {
@@ -821,7 +821,8 @@ int CGXDLMS::GetLnMessages(
         frame = 0x10;
     }
     else if (p.GetCommand() == DLMS_COMMAND_DATA_NOTIFICATION ||
-        p.GetCommand() == DLMS_COMMAND_EVENT_NOTIFICATION) {
+        p.GetCommand() == DLMS_COMMAND_EVENT_NOTIFICATION)
+    {
         frame = 0x13;
     }
     do
@@ -942,7 +943,8 @@ int CGXDLMS::GetSNPdu(
         cnt = p.GetData()->GetSize() - p.GetData()->GetPosition();
     }
     // Add command.
-    if (p.GetCommand() == DLMS_COMMAND_INFORMATION_REPORT) {
+    if (p.GetCommand() == DLMS_COMMAND_INFORMATION_REPORT)
+    {
         reply.SetUInt8(p.GetCommand());
         // Add date time.
         if (p.GetTime() == NULL)
@@ -1159,7 +1161,7 @@ int CGXDLMS::GetHdlcData(
     }
     if ((frame & 0xF0) != 0xA0)
     {
-        // If same data.
+        reply.SetPosition(reply.GetPosition() - 1);
         return GetHdlcData(server, settings, reply, data, frame);
     }
     // Check frame length.
@@ -1187,7 +1189,8 @@ int CGXDLMS::GetHdlcData(
     }
     if (ch != HDLC_FRAME_START_END)
     {
-        return DLMS_ERROR_CODE_NOT_REPLY;
+        reply.SetPosition(reply.GetPosition() - 2);
+        return GetHdlcData(server, settings, reply, data, frame);
     }
 
     // Check addresses.
@@ -1199,6 +1202,8 @@ int CGXDLMS::GetHdlcData(
             // If echo,
             return GetHdlcData(server, settings, reply, data, frame);
         }
+        reply.SetPosition(packetStartID + 1);
+        ret = GetHdlcData(server, settings, reply, data, frame);
         return ret;
     }
 
@@ -1231,6 +1236,10 @@ int CGXDLMS::GetHdlcData(
     }
     if (crc != crcRead)
     {
+        if (reply.GetSize() - reply.GetPosition() > 8)
+        {
+            return GetHdlcData(server, settings, reply, data, frame);
+        }
         return DLMS_ERROR_CODE_WRONG_CRC;
     }
     // Check that packet CRC match only if there is a data part.
@@ -2049,7 +2058,8 @@ int CGXDLMS::GetPdu(
     // Get data only blocks if SN is used. This is faster.
     if (cmd == DLMS_COMMAND_READ_RESPONSE
         && data.GetCommandType() == DLMS_SINGLE_READ_RESPONSE_DATA_BLOCK_RESULT
-        && (data.GetMoreData() &  DLMS_DATA_REQUEST_TYPES_FRAME) != 0) {
+        && (data.GetMoreData() &  DLMS_DATA_REQUEST_TYPES_FRAME) != 0)
+    {
         return 0;
     }
 
@@ -2101,7 +2111,8 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
     {
         if (settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC && data.GetData().GetSize() != 0)
         {
-            if (reply.GetPosition() != reply.GetSize()) {
+            if (reply.GetPosition() != reply.GetSize())
+            {
                 reply.SetPosition(reply.GetPosition() + 3);
             }
         }
@@ -2249,7 +2260,8 @@ int CGXDLMS::HandleGetResponse(
         {
             return ret;
         }
-        for (unsigned short pos = 0; pos != (unsigned short)count; ++pos) {
+        for (unsigned short pos = 0; pos != (unsigned short)count; ++pos)
+        {
             // Result
             if ((ret = data.GetUInt8(&ch)) != 0)
             {
@@ -2411,7 +2423,8 @@ int CGXDLMS::HandleReadResponse(
             return DLMS_ERROR_CODE_FALSE;
         }
         // Get status code. Status code is begin of each PDU.
-        if (first) {
+        if (first)
+        {
             if ((ret = reply.GetData().GetUInt8(&ch)) != 0)
             {
                 return ret;
@@ -2419,7 +2432,8 @@ int CGXDLMS::HandleReadResponse(
             reply.SetCommandType(ch);
             type = (DLMS_SINGLE_READ_RESPONSE)ch;
         }
-        else {
+        else
+        {
             type = (DLMS_SINGLE_READ_RESPONSE)reply.GetCommandType();
         }
         switch (type)
@@ -2437,7 +2451,8 @@ int CGXDLMS::HandleReadResponse(
                 if (reply.GetData().GetPosition() == reply.GetReadPosition())
                 {
                     // If multiple values remove command.
-                    if (cnt != 1 && reply.GetTotalCount() == 0) {
+                    if (cnt != 1 && reply.GetTotalCount() == 0)
+                    {
                         ++index;
                     }
                     reply.SetTotalCount(0);
@@ -2866,7 +2881,7 @@ int CGXDLMS::GetActionInfo(DLMS_OBJECT_TYPE objectType, unsigned char& value, un
     case DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP:
         value = 0x30;
         count = 8;
-    break;
+        break;
     default:
         count = value = 0;
         break;

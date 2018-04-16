@@ -1436,19 +1436,18 @@ int CGXDLMSClient::ReadRowsByEntry(
     CGXDLMSVariant tmp = index;
     GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT32, tmp);
     // Add Count
-    tmp = count;
-    GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT32, tmp);
-    // Read all columns.
-    if (GetUseLogicalNameReferencing())
+    if (count == 0)
     {
-        tmp = 1;
-        GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT16, tmp);
+        tmp = count;
     }
     else
     {
-        tmp = 0;
-        GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT16, tmp);
+        tmp = index + count - 1;
     }
+    GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT32, tmp);
+    tmp = 1;
+    // Read all columns.
+    GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT16, tmp);
     tmp = 0;
     GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT16, tmp);
     CGXDLMSVariant name = pg->GetName();

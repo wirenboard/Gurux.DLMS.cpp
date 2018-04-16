@@ -2014,7 +2014,7 @@ int CGXDLMSServer::HandleCommand(
         //Get next frame.
         break;
     default:
-        //Invalid command.
+        return DLMS_ERROR_CODE_INVALID_COMMAND;
         break;
     }
     if (ret == 0)
@@ -2208,6 +2208,11 @@ int CGXDLMSServer::HandleRequest(
         {
             ret = 0;
         }
+        else
+        {
+            ret = CGXDLMS::GetHdlcFrame(m_Settings, DLMS_COMMAND_REJECTED, NULL, reply);
+            m_ReceivedData.SetSize(0);
+        }
         return ret;
     }
     // If all data is not received yet.
@@ -2216,6 +2221,12 @@ int CGXDLMSServer::HandleRequest(
         return 0;
     }
     m_ReceivedData.Clear();
+    if (m_Info.GetCommand() == DLMS_COMMAND_DISC && !m_Settings.IsConnected())
+    {
+        ret = CGXDLMS::GetHdlcFrame(m_Settings, DLMS_COMMAND_DISCONNECT_MODE, NULL, reply);
+        m_Info.Clear();
+        return ret;
+    }
 
     if (first || m_Info.GetCommand() == DLMS_COMMAND_SNRM ||
         (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER && m_Info.GetCommand() == DLMS_COMMAND_AARQ))
@@ -2239,6 +2250,11 @@ int CGXDLMSServer::HandleRequest(
         if (m_Transaction != NULL)
         {
             m_Info.SetCommand(m_Transaction->GetCommand());
+        }
+        else if (m_ReplyData.GetSize() == 0)
+        {
+            m_DataReceived = (long)time(NULL);
+            return CGXDLMS::GetHdlcFrame(m_Settings, m_Settings.GetReceiverReady(), NULL, reply);
         }
     }
     // Check inactivity time out.
@@ -2271,6 +2287,11 @@ int CGXDLMSServer::HandleRequest(
         }
     }
     ret = HandleCommand(connectionInfo, m_Info.GetCommand(), m_Info.GetData(), reply);
+    if (ret != 0)
+    {
+        ret = CGXDLMS::GetHdlcFrame(m_Settings, DLMS_COMMAND_REJECTED, NULL, reply);
+        m_ReceivedData.SetSize(0);
+    }
     m_Info.Clear();
     m_DataReceived = (long)time(NULL);
     return ret;

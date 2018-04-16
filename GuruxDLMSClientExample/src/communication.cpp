@@ -348,7 +348,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
 #else //Linux
     int parity;
 #endif
-    unsigned char stopBits, dataBits, byteSize;
+    unsigned char stopBits, dataBits = 8;
     std::string port;
     port = settings;
     std::vector< std::string > tmp = GXHelpers::Split(port, ':');
@@ -457,7 +457,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
     else
     {
         dcb.BaudRate = baudRate;
-        dcb.ByteSize = byteSize;
+        dcb.ByteSize = dataBits;
         dcb.StopBits = stopBits;
         dcb.Parity = parity;
     }

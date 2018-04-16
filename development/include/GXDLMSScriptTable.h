@@ -61,6 +61,9 @@ public:
 
     std::vector<CGXDLMSScript*>& GetScripts();
 
+    //Executes selected script.
+    int Execute(CGXDLMSClient* client, CGXDLMSScript* script, std::vector<CGXByteBuffer>& reply);
+
     // Returns amount of attributes.
     int GetAttributeCount();
 

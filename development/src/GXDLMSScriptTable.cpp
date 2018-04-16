@@ -33,6 +33,7 @@
 //---------------------------------------------------------------------------
 
 #include "../include/GXDLMSScriptTable.h"
+#include "../include/GXDLMSClient.h"
 #include <sstream>
 
 //Constructor.
@@ -66,6 +67,13 @@ CGXDLMSScriptTable::~CGXDLMSScriptTable()
 std::vector<CGXDLMSScript*>& CGXDLMSScriptTable::GetScripts()
 {
     return m_Scripts;
+}
+
+int CGXDLMSScriptTable::Execute(CGXDLMSClient* client, CGXDLMSScript* script, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data(script->GetID());
+    data.vt = DLMS_DATA_TYPE_UINT16;
+    return client->Method(this, 1, data, reply);
 }
 
 // Returns amount of attributes.
