@@ -146,7 +146,7 @@ CGXDLMSObjectCollection& CGXDLMSClient::GetObjects()
 int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
 {
     int ret;
-    m_Settings.SetConnected(false);
+    m_Settings.SetConnected(DLMS_CONNECTION_STATE_NONE);
     packets.clear();
     m_IsAuthenticationRequired = false;
     // SNRM request is not used in network connections.
@@ -606,7 +606,7 @@ int CGXDLMSClient::ParseAAREResponse(CGXByteBuffer& reply)
         //Invalid DLMS version number.
         return DLMS_ERROR_CODE_INVALID_VERSION_NUMBER;
     }
-    m_Settings.SetConnected(true);
+    m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() | DLMS_CONNECTION_STATE_DLMS));
     return 0;
 }
 
@@ -868,7 +868,7 @@ int CGXDLMSClient::ReleaseRequest(std::vector<CGXByteBuffer>& packets)
     CGXByteBuffer buff;
     packets.clear();
     // If connection is not established, there is no need to send DisconnectRequest.
-    if (!m_Settings.IsConnected())
+    if ((m_Settings.GetConnected() & DLMS_CONNECTION_STATE_DLMS) == 0)
     {
         return 0;
     }
@@ -889,10 +889,7 @@ int CGXDLMSClient::ReleaseRequest(std::vector<CGXByteBuffer>& packets)
         CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_RELEASE_REQUEST, 0xFF, 0xFF, NULL, &buff);
         ret = CGXDLMS::GetSnMessages(p, packets);
     }
-    if (GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER)
-    {
-        m_Settings.SetConnected(false);
-    }
+    m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() & ~DLMS_CONNECTION_STATE_DLMS));
     return ret;
 }
 
@@ -902,22 +899,15 @@ int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets)
     CGXByteBuffer reply;
     packets.clear();
     m_Settings.SetMaxReceivePDUSize(0xFFFF);
-    // If connection is not established, there is no need to send DisconnectRequest.
-    if (!m_Settings.IsConnected())
-    {
-        return 0;
-    }
-    if (GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC)
+    if (GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC && (m_Settings.GetConnected() & DLMS_CONNECTION_STATE_HDLC) != 0)
     {
         ret = CGXDLMS::GetHdlcFrame(m_Settings, DLMS_COMMAND_DISC, NULL, reply);
         packets.push_back(reply);
         return ret;
+    }else
+    {
+        ret = ReleaseRequest(packets);
     }
-    CGXByteBuffer bb(2);
-    bb.SetUInt8(DLMS_COMMAND_RELEASE_REQUEST);
-    bb.SetUInt8(0x0);
-    ret = CGXDLMS::GetWrapperFrame(m_Settings, bb, reply);
-    packets.push_back(reply);
     return ret;
 }
 

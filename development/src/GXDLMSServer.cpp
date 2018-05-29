@@ -355,7 +355,7 @@ void CGXDLMSServer::Reset(bool connected)
     }
     m_Settings.SetCount(0);
     m_Settings.SetIndex(0);
-    m_Settings.SetConnected(false);
+    m_Settings.SetConnected(DLMS_CONNECTION_STATE_NONE);
     m_ReceivedData.Clear();
     m_ReplyData.Clear();
     if (!connected)
@@ -462,7 +462,7 @@ int CGXDLMSServer::HandleAarqRequest(
             else
             {
                 Connected(connectionInfo);
-                m_Settings.SetConnected(true);
+                m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() | DLMS_CONNECTION_STATE_DLMS));
             }
         }
     }
@@ -518,7 +518,6 @@ int CGXDLMSServer::HandleAarqRequest(
         m_ReplyData.Set(LLC_REPLY_BYTES, 3);
     }
     // Generate AARE packet.
-    m_Settings.ResetFrameSequence();
     return CGXAPDU::GenerateAARE(m_Settings, m_ReplyData, result, diagnostic, m_Settings.GetCipher(), &error, NULL);
 }
 
@@ -916,7 +915,7 @@ int CGXDLMSServer::HandleSetRequest(CGXByteBuffer& data)
     CGXDataInfo i;
     CGXByteBuffer bb;
     // Return error if connection is not established.
-    if (!m_Settings.IsConnected())
+    if ((m_Settings.GetConnected() && DLMS_CONNECTION_STATE_DLMS) == 0)
     {
         GenerateConfirmedServiceError(DLMS_CONFIRMED_SERVICE_ERROR_INITIATE_ERROR,
             DLMS_SERVICE_ERROR_SERVICE, DLMS_SERVICE_UNSUPPORTED,
@@ -1301,7 +1300,7 @@ int CGXDLMSServer::HandleGetRequest(
     CGXByteBuffer& data)
 {
     // Return error if connection is not established.
-    if (!m_Settings.IsConnected())
+    if ((m_Settings.GetConnected() && DLMS_CONNECTION_STATE_DLMS) == 0)
     {
         GenerateConfirmedServiceError(DLMS_CONFIRMED_SERVICE_ERROR_INITIATE_ERROR,
             DLMS_SERVICE_ERROR_SERVICE, DLMS_SERVICE_UNSUPPORTED,
@@ -1436,10 +1435,9 @@ int GetReadData(CGXDLMSSettings& settings,
             {
                 data.SetUInt8(DLMS_SINGLE_READ_RESPONSE_DATA);
             }
-            // If action.
-            if ((*e)->IsAction())
+            if ((*e)->IsByteArray())
             {
-                ret = GXHelpers::SetData(data, value.vt, value);
+                data.Set(value.byteArr, value.GetSize());
             }
             else
             {
@@ -1498,8 +1496,8 @@ int CGXDLMSServer::HandleRead(
         e->SetParameters(params);
     }
     // Return error if connection is not established.
-    if (!m_Settings.IsConnected()
-        && (!e->IsAction() || e->GetTarget()->GetShortName() != 0xFA00 || e->GetIndex() != 8))
+    if (m_Settings.GetConnected() == DLMS_CONNECTION_STATE_NONE &&
+        (!e->IsAction() || e->GetTarget()->GetShortName() != 0xFA00 || e->GetIndex() != 8))
     {
         GenerateConfirmedServiceError(
             DLMS_CONFIRMED_SERVICE_ERROR_INITIATE_ERROR, DLMS_SERVICE_ERROR_SERVICE,
@@ -1809,7 +1807,7 @@ int CGXDLMSServer::HandleReadRequest(CGXByteBuffer& data)
 int CGXDLMSServer::HandleWriteRequest(CGXByteBuffer& data)
 {
     // Return error if connection is not established.
-    if (!m_Settings.IsConnected())
+    if ((m_Settings.GetConnected() && DLMS_CONNECTION_STATE_DLMS) == 0)
     {
         GenerateConfirmedServiceError(DLMS_CONFIRMED_SERVICE_ERROR_INITIATE_ERROR,
             DLMS_SERVICE_ERROR_SERVICE,
@@ -1974,6 +1972,11 @@ int CGXDLMSServer::HandleCommand(
 {
     int ret = 0;
     unsigned char frame = 0;
+    if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC && m_ReplyData.GetSize() != 0)
+    {
+        //Get next frame.
+        frame = m_Settings.GetNextSend(false);
+    }
     switch (cmd)
     {
     case DLMS_COMMAND_SET_REQUEST:
@@ -1996,6 +1999,7 @@ int CGXDLMSServer::HandleCommand(
         break;
     case DLMS_COMMAND_SNRM:
         ret = HandleSnrmRequest(m_Settings, data, m_ReplyData);
+        m_Settings.SetConnected(DLMS_CONNECTION_STATE_HDLC);
         frame = DLMS_COMMAND_UA;
         break;
     case DLMS_COMMAND_AARQ:
@@ -2003,10 +2007,20 @@ int CGXDLMSServer::HandleCommand(
         break;
     case DLMS_COMMAND_RELEASE_REQUEST:
         ret = HandleReleaseRequest(data);
+        m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() & ~DLMS_CONNECTION_STATE_DLMS));
+        Disconnected(connectionInfo);
         break;
     case DLMS_COMMAND_DISC:
         ret = GenerateDisconnectRequest(m_Settings, m_ReplyData);
-        m_Settings.SetConnected(false);
+        if (m_Settings.GetConnected() > DLMS_CONNECTION_STATE_NONE)
+        {
+            if (m_Settings.GetConnected() == DLMS_CONNECTION_STATE_DLMS)
+            {
+                Disconnected(connectionInfo);
+            }
+            m_Settings.SetConnected(DLMS_CONNECTION_STATE_NONE);
+        }
+        m_Settings.SetConnected(DLMS_CONNECTION_STATE_NONE);
         Disconnected(connectionInfo);
         frame = DLMS_COMMAND_UA;
         break;
@@ -2143,7 +2157,7 @@ int CGXDLMSServer::HandleMethodRequest(
     CGXDLMSLNParameters p(&m_Settings, invokeId, DLMS_COMMAND_METHOD_RESPONSE, 1, NULL, &bb, error);
     ret = CGXDLMS::GetLNPdu(p, m_ReplyData);
     // If High level authentication fails.
-    if (!m_Settings.IsConnected() && obj->GetObjectType() == DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME && id == 1)
+    if ((m_Settings.GetConnected() && DLMS_CONNECTION_STATE_DLMS) == 0 && obj->GetObjectType() == DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME && id == 1)
     {
         InvalidConnection(connectionInfo);
     }
@@ -2221,7 +2235,7 @@ int CGXDLMSServer::HandleRequest(
         return 0;
     }
     m_ReceivedData.Clear();
-    if (m_Info.GetCommand() == DLMS_COMMAND_DISC && !m_Settings.IsConnected())
+    if (m_Info.GetCommand() == DLMS_COMMAND_DISC && m_Settings.GetConnected() == DLMS_CONNECTION_STATE_NONE)
     {
         ret = CGXDLMS::GetHdlcFrame(m_Settings, DLMS_COMMAND_DISCONNECT_MODE, NULL, reply);
         m_Info.Clear();

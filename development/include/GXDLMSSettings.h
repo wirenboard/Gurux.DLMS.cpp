@@ -61,7 +61,7 @@ const unsigned short MAX_RECEIVE_PDU_SIZE = 0xFFFF;
 class CGXDLMSSettings
 {
     //Is connection made for the server.
-    bool m_Connected;
+    DLMS_CONNECTION_STATE m_Connected;
 
     // Is custom challenges used. If custom challenge is used new challenge is
     // not generated if it is Set. This is for debugging purposes.
@@ -311,10 +311,10 @@ public:
     void SetUseCustomChallenge(bool value);
 
     //Get is connection made for the server.
-    bool IsConnected();
+    DLMS_CONNECTION_STATE GetConnected();
 
     //Set is connection made for the server.
-    void SetConnected(bool value);
+    void SetConnected(DLMS_CONNECTION_STATE value);
 
     /**
     * Cipher interface that is used to cipher PDU.

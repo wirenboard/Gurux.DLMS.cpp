@@ -77,6 +77,11 @@ public:
 
     void SetDestinations(std::vector< std::string >& value);
 
+    //Initiates the connection process.
+    int Connect(CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
+
+
     // Returns amount of attributes.
     int GetAttributeCount();
 

@@ -1492,8 +1492,12 @@ static int SetUtfString(CGXByteBuffer& buff, CGXDLMSVariant& value)
 
 int GXHelpers::SetLogicalName(const char* name, CGXDLMSVariant& value)
 {
-    unsigned char ln[6];
-    int ret = SetLogicalName(name, ln);
+    unsigned char ln[6] = {0};
+    int ret = 0;
+    if (name != NULL && *name != '\0')
+    {
+        ret = SetLogicalName(name, ln);
+    }
     if (ret == 0)
     {
         value.Clear();

@@ -76,6 +76,14 @@ int CGXDLMSScriptTable::Execute(CGXDLMSClient* client, CGXDLMSScript* script, st
     return client->Method(this, 1, data, reply);
 }
 
+int CGXDLMSScriptTable::Execute(CGXDLMSClient* client, unsigned short scriptId, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data(scriptId);
+    data.vt = DLMS_DATA_TYPE_UINT16;
+    return client->Method(this, 1, data, reply);
+}
+
+
 // Returns amount of attributes.
 int CGXDLMSScriptTable::GetAttributeCount()
 {

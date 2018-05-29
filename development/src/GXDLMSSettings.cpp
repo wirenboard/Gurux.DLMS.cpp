@@ -38,7 +38,7 @@ CGXDLMSSettings::CGXDLMSSettings(bool isServer)
 {
     m_CustomChallenges = false;
     m_BlockIndex = 1;
-    m_Connected = false;
+    m_Connected = DLMS_CONNECTION_STATE_NONE;
     m_DlmsVersionNumber = DLMS_VERSION;
     m_Server = isServer;
     ResetFrameSequence();
@@ -135,46 +135,6 @@ void CGXDLMSSettings::ResetFrameSequence()
     }
 }
 
-bool CGXDLMSSettings::CheckFrame(unsigned char frame)
-{
-    // If U frame.
-    if ((frame & 0x3) == 3)
-    {
-        ResetFrameSequence();
-        return true;
-    }
-    // If S -frame
-    if ((frame & 0x3) == 1)
-    {
-        if ((frame & 0xE0) == ((m_ReceiverFrame) & 0xE0))
-        {
-            m_ReceiverFrame = frame;
-            return true;
-        }
-        return true;
-    }
-
-    // If I frame sent.
-    if ((m_SenderFrame & 0x1) == 0)
-    {
-        if ((frame & 0xE0) == ((m_ReceiverFrame + 0x20) & 0xE0)
-            && (frame & 0xE) == ((m_ReceiverFrame + 2) & 0xE))
-        {
-            m_ReceiverFrame = frame;
-            return true;
-        }
-    }
-    else if (frame == m_ReceiverFrame
-        || ((frame & 0xE0) == (m_ReceiverFrame & 0xE0)
-            && (frame & 0xE) == ((m_ReceiverFrame + 2) & 0xE)))
-    {
-        // If S-frame sent.
-        m_ReceiverFrame = frame;
-        return true;
-    }
-    return true;
-}
-
 // Increase receiver sequence.
 //
 // @param value
@@ -193,6 +153,53 @@ static unsigned char IncreaseReceiverSequence(unsigned char value)
 static unsigned char IncreaseSendSequence(unsigned char value)
 {
     return (unsigned char)((value & 0xF0) | ((value + 0x2) & 0xE));
+}
+
+bool CGXDLMSSettings::CheckFrame(unsigned char frame)
+{
+    //If notify
+    if (frame == 0x13)
+    {
+        return true;
+    }
+    // If U frame.
+    if ((frame & 0x3) == 3)
+    {
+        if (frame == 0x73 || frame == 0x93)
+        {
+            ResetFrameSequence();
+        }
+        return true;
+    }
+    // If S -frame
+    if ((frame & 0x3) == 1)
+    {
+        m_ReceiverFrame = IncreaseReceiverSequence(m_ReceiverFrame);
+        return true;
+    }
+
+    //Handle I-frame.
+    unsigned char expected;
+    if ((m_SenderFrame & 0x1) == 0)
+    {
+        expected = IncreaseReceiverSequence(IncreaseSendSequence(m_ReceiverFrame));
+        if (frame == expected)
+        {
+            m_ReceiverFrame = frame;
+            return true;
+        }
+    }
+    //If answer for RR.
+    else
+    {
+        expected = IncreaseSendSequence(m_ReceiverFrame);
+        if (frame == expected)
+        {
+            m_ReceiverFrame = frame;
+            return true;
+        }
+    }
+    return false;
 }
 
 unsigned char CGXDLMSSettings::GetNextSend(unsigned char first)
@@ -395,12 +402,12 @@ void CGXDLMSSettings::SetUseCustomChallenge(bool value)
     m_CustomChallenges = value;
 }
 
-bool CGXDLMSSettings::IsConnected()
+DLMS_CONNECTION_STATE CGXDLMSSettings::GetConnected()
 {
     return m_Connected;
 }
 
-void CGXDLMSSettings::SetConnected(bool value)
+void CGXDLMSSettings::SetConnected(DLMS_CONNECTION_STATE value)
 {
     m_Connected = value;
 }

@@ -578,12 +578,12 @@ int CGXDLMSAssociationLogicalName::Invoke(CGXDLMSSettings& settings, CGXDLMSValu
                 return ret;
             }
             e.SetValue(serverChallenge);
-            settings.SetConnected(true);
+            settings.SetConnected((DLMS_CONNECTION_STATE) (settings.GetConnected() | DLMS_CONNECTION_STATE_HDLC));
             m_AssociationStatus = DLMS_ASSOCIATION_STATUS_ASSOCIATED;
         }
         else
         {
-            settings.SetConnected(false);
+            settings.SetConnected((DLMS_CONNECTION_STATE) (settings.GetConnected() & ~DLMS_CONNECTION_STATE_HDLC));
             m_AssociationStatus = DLMS_ASSOCIATION_STATUS_NON_ASSOCIATED;
         }
     }

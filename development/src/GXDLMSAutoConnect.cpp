@@ -103,6 +103,12 @@ void CGXDLMSAutoConnect::SetDestinations(std::vector< std::string >& value)
     m_Destinations = value;
 }
 
+int CGXDLMSAutoConnect::Connect(CGXDLMSClient* client, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 1, data, reply);
+}
+
 // Returns amount of attributes.
 int CGXDLMSAutoConnect::GetAttributeCount()
 {
@@ -112,7 +118,7 @@ int CGXDLMSAutoConnect::GetAttributeCount()
 // Returns amount of methods.
 int CGXDLMSAutoConnect::GetMethodCount()
 {
-    return 0;
+    return 1;
 }
 
 void CGXDLMSAutoConnect::GetValues(std::vector<std::string>& values)

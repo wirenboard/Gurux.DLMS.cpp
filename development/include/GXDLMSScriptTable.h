@@ -64,6 +64,9 @@ public:
     //Executes selected script.
     int Execute(CGXDLMSClient* client, CGXDLMSScript* script, std::vector<CGXByteBuffer>& reply);
 
+    //Executes selected script by ID.
+    int Execute(CGXDLMSClient* client, unsigned short scriptId, std::vector<CGXByteBuffer>& reply);
+
     // Returns amount of attributes.
     int GetAttributeCount();
 

@@ -337,11 +337,11 @@ int CGXDLMSAssociationShortName::Invoke(CGXDLMSSettings& settings, CGXDLMSValueE
                 return ret;
             }
             e.SetValue(serverChallenge);
-            settings.SetConnected(true);
+            settings.SetConnected((DLMS_CONNECTION_STATE)(settings.GetConnected() | DLMS_CONNECTION_STATE_HDLC));
         }
         else
         {
-            settings.SetConnected(false);
+            settings.SetConnected((DLMS_CONNECTION_STATE)(settings.GetConnected() & ~DLMS_CONNECTION_STATE_HDLC));
             return 0;
         }
     }
@@ -394,7 +394,8 @@ int CGXDLMSAssociationShortName::GetValue(CGXDLMSSettings& settings, CGXDLMSValu
     {
         e.SetByteArray(true);
         CGXByteBuffer data;
-        CGXDLMSVariant tmp = m_SecuritySetupReference;
+        CGXDLMSVariant tmp;
+        GXHelpers::SetLogicalName(m_SecuritySetupReference.c_str(), tmp);
         GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
         e.SetValue(data);
     }
