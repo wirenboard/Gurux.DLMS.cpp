@@ -51,23 +51,26 @@ LIBDIR   = lib
 SOURCES  := $(wildcard $(SRCDIR)/*.cpp)
 INCLUDES := $(wildcard $(SRCDIR)/*.h)
 OBJECTS  := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
-rm       = rm -f
+rm       = rm -rf
+mkdir    = mkdir -p
 
 $(LIBDIR)/$(TARGET): $(OBJECTS)
+	@$(mkdir) $(LIBDIR)
 	@$(LINKER) $@ $(LFLAGS) $(OBJECTS)
 	@echo "Linking complete!"
 
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp
+	@$(mkdir) $(OBJDIR)
 	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo "Compiled "$<" successfully!"
 
 .PHONEY: clean
 clean:
-	@$(rm) $(OBJECTS)
+	@$(rm) $(OBJDIR)
 	@echo "Cleanup complete!" 
 	@echo $(OBJECTS)
 
 .PHONEY: remove
 remove: clean
-	@$(rm) $(LIBDIR)/$(TARGET)
+	@$(rm) $(LIBDIR)
 	@echo "Executable removed!"
