@@ -608,5 +608,16 @@ public:
     static int  GetServerAddress(unsigned long logicalAddress,
         unsigned long physicalAddress,
         unsigned char addressSize = 0);
+
+    /**
+    * @return Protocol version.
+    */
+    char* GetProtocolVersion();
+
+    /**
+    * @param value
+    *            Protocol version.
+    */
+    void SetProtocolVersion(char* value);
 };
 #endif //GXDLMSCLIENT_H

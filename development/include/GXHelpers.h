@@ -197,5 +197,17 @@ public:
     */
     static int GetDataTypeSize(DLMS_DATA_TYPE type);
 
+    /**
+    * Convert Bit string to DLMS bytes.
+    *
+    * buff
+    *            Byte buffer where data is write.
+    * value
+    *            Added value.
+    */
+    static int SetBitString(CGXByteBuffer& buff, CGXDLMSVariant& value, bool addCount);
+
+    //Reserved for internal use.
+    static void ToBitString(CGXByteBuffer& sb, unsigned char value, int count);
 };
 #endif //GXHELPERS_H

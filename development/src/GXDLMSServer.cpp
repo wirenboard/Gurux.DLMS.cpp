@@ -353,6 +353,7 @@ void CGXDLMSServer::Reset(bool connected)
         delete m_Transaction;
         m_Transaction = NULL;
     }
+    m_Settings.SetProtocolVersion(NULL);
     m_Settings.SetCount(0);
     m_Settings.SetIndex(0);
     m_Settings.SetConnected(DLMS_CONNECTION_STATE_NONE);

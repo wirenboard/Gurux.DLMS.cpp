@@ -56,6 +56,7 @@ CGXDLMSSettings::CGXDLMSSettings(bool isServer)
     m_Index = 0;
     m_Count = 0;
     m_ProposedConformance = m_NegotiatedConformance = (DLMS_CONFORMANCE)0;
+    m_ProtocolVersion = NULL;
 }
 
 //Destructor.
@@ -515,3 +516,25 @@ void CGXDLMSSettings::SetProposedConformance(DLMS_CONFORMANCE value)
 {
     m_ProposedConformance = value;
 }
+
+char* CGXDLMSSettings::GetProtocolVersion()
+{
+    return m_ProtocolVersion;
+}
+
+void CGXDLMSSettings::SetProtocolVersion(const char* value)
+{
+    if (m_ProtocolVersion != NULL)
+    {
+        delete m_ProtocolVersion;
+        m_ProtocolVersion = NULL;
+    }
+    if (value != NULL)
+    {
+        int len = strlen(value);
+        m_ProtocolVersion = new char[len + 1];
+        memcpy(m_ProtocolVersion, value, len);
+        m_ProtocolVersion[len] = 0;
+    }
+}
+

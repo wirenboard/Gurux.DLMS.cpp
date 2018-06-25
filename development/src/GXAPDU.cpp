@@ -100,6 +100,15 @@ int GenerateApplicationContextName(
     CGXByteBuffer& data,
     CGXCipher* cipher)
 {
+    //ProtocolVersion
+    if (settings.GetProtocolVersion() != NULL)
+    {
+        data.SetUInt8(BER_TYPE_CONTEXT | PDU_TYPE_PROTOCOL_VERSION);
+        data.SetUInt8(2);
+        data.SetUInt8((unsigned char) (8 - strlen(settings.GetProtocolVersion())));
+        CGXDLMSVariant tmp = settings.GetProtocolVersion();
+        GXHelpers::SetBitString(data, tmp, false);
+    }
     // Application context name tag
     data.SetUInt8((BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_APPLICATION_CONTEXT_NAME));
     // Len
@@ -828,6 +837,29 @@ int handleResultComponent(DLMS_SOURCE_DIAGNOSTIC value)
     return ret;
 }
 
+int ParseProtocolVersion(CGXDLMSSettings& settings,
+    CGXByteBuffer& buff)
+{
+    unsigned char cnt, unusedBits, value;
+    int ret;
+    if ((ret = buff.GetUInt8(&cnt)) != 0)
+    {
+        return ret;
+    }
+    if ((ret = buff.GetUInt8(&unusedBits)) != 0)
+    {
+        return ret;
+    }
+    if ((ret = buff.GetUInt8(&value)) != 0)
+    {
+        return ret;
+    }
+    CGXByteBuffer sb;
+    GXHelpers::ToBitString(sb, value, 8 - unusedBits);
+    settings.SetProtocolVersion(sb.ToString().c_str());
+    return 0;
+}
+
 int CGXAPDU::ParsePDU(
     CGXDLMSSettings& settings,
     CGXCipher* cipher,
@@ -1068,6 +1100,9 @@ int CGXAPDU::ParsePDU(
                 diagnostic = DLMS_SOURCE_DIAGNOSTIC_NO_REASON_GIVEN;
                 return 0;
             }
+            break;
+        case BER_TYPE_CONTEXT: //0x80
+            ParseProtocolVersion(settings, buff);
             break;
         default:
             // Unknown tags.

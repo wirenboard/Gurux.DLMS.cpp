@@ -904,7 +904,8 @@ int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets)
         ret = CGXDLMS::GetHdlcFrame(m_Settings, DLMS_COMMAND_DISC, NULL, reply);
         packets.push_back(reply);
         return ret;
-    }else
+    }
+    else
     {
         ret = ReleaseRequest(packets);
     }
@@ -1556,4 +1557,14 @@ int  CGXDLMSClient::GetServerAddress(unsigned long logicalAddress,
         return logicalAddress << 14 | physicalAddress;
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
+}
+
+char* CGXDLMSClient::GetProtocolVersion()
+{
+    return m_Settings.GetProtocolVersion();
+}
+
+void CGXDLMSClient::SetProtocolVersion(char* value)
+{
+    m_Settings.SetProtocolVersion(value);
 }

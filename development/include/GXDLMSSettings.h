@@ -161,6 +161,10 @@ class CGXDLMSSettings
     */
     DLMS_CONFORMANCE m_NegotiatedConformance;
 
+    /**
+    *  Protocol version.
+    */
+    char* m_ProtocolVersion;
 public:
     // Constructor.
     CGXDLMSSettings(bool isServer);
@@ -397,6 +401,17 @@ public:
     *            Functionality.
     */
     void SetProposedConformance(DLMS_CONFORMANCE value);
+
+    /**
+    * @return Protocol version.
+    */
+    char* GetProtocolVersion();
+
+    /**
+    * @param value
+    *            Protocol version.
+    */
+    void SetProtocolVersion(const char* value);
 };
 
 #endif //GXDLMSSETTINGS_H
