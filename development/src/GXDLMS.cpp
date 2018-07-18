@@ -288,7 +288,7 @@ int CGXDLMS::GetHdlcFrame(
 {
     reply.Clear();
     unsigned short frameSize;
-    int ret, len = 0;
+    int ret, len;
     CGXByteBuffer primaryAddress, secondaryAddress;
     if (settings.IsServer())
     {
@@ -300,6 +300,7 @@ int CGXDLMS::GetHdlcFrame(
         {
             return ret;
         }
+        len = secondaryAddress.GetSize();
     }
     else
     {
@@ -311,15 +312,17 @@ int CGXDLMS::GetHdlcFrame(
         {
             return ret;
         }
+        len = primaryAddress.GetSize();
     }
 
     // Add BOP
     reply.SetUInt8(HDLC_FRAME_START_END);
     frameSize = settings.GetLimits().GetMaxInfoTX();
-    frameSize -= (unsigned short)(10 + secondaryAddress.GetSize());
+    frameSize -= (unsigned short)(10 + len);
     // If no data
     if (data == NULL || data->GetSize() == 0)
     {
+        len = 0;
         reply.SetUInt8(0xA0);
     }
     else if (data->GetSize() - data->GetPosition() <= frameSize)
