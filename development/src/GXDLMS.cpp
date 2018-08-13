@@ -300,7 +300,6 @@ int CGXDLMS::GetHdlcFrame(
         {
             return ret;
         }
-        len = secondaryAddress.GetSize();
     }
     else
     {
@@ -312,13 +311,15 @@ int CGXDLMS::GetHdlcFrame(
         {
             return ret;
         }
-        len = primaryAddress.GetSize();
     }
 
     // Add BOP
     reply.SetUInt8(HDLC_FRAME_START_END);
     frameSize = settings.GetLimits().GetMaxInfoTX();
-    frameSize -= (unsigned short)(10 + len);
+    if (data != NULL && data->GetPosition() == 0)
+    {
+        frameSize -= 3;
+    }
     // If no data
     if (data == NULL || data->GetSize() == 0)
     {

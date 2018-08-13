@@ -1083,7 +1083,52 @@ typedef enum
     /*
     * Event Notification request.
     */
-    DLMS_COMMAND_EVENT_NOTIFICATION = 0xC2
+    DLMS_COMMAND_EVENT_NOTIFICATION = 0xC2,
+
+    /**
+    * Ded get request.
+    */
+    DLMS_COMMAND_DED_GET_REQUEST = 0xD0,
+
+    /**
+    * Ded get response.
+    */
+    DLMS_COMMAND_DED_GET_RESPONSE = 0xD4,
+
+    /**
+    * Ded set request.
+    */
+    DLMS_COMMAND_DED_SET_REQUEST = 0xD1,
+
+    /**
+    * Ded set response.
+    */
+    DLMS_COMMAND_DED_SET_RESPONSE = 0xD5,
+
+    /**
+    * Ded event notification request.
+    */
+    DLMS_COMMAND_DED_EVENT_NOTIFICATION = 0xD2,
+
+    /**
+    * Ded method request.
+    */
+    DLMS_COMMAND_DED_METHOD_REQUEST = 0xD3,
+
+    /**
+    * Ded method response.
+    */
+    DLMS_COMMAND_DED_METHOD_RESPONSE = 0xD7,
+
+    /**
+    * Request message from client to gateway.
+    */
+    DLMS_COMMAND_GATEWAY_REQUEST = 0xE6,
+
+    /**
+    * Response message from gateway to client.
+    */
+    DLMS_COMMAND_GATEWAY_RESPONSE = 0xE7
 } DLMS_COMMAND;
 
 typedef enum
