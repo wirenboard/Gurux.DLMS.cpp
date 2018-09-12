@@ -179,6 +179,16 @@ int CGXDLMSExtendedRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
         e.GetValue().Arr.push_back(m_Unit);
         return DLMS_ERROR_CODE_OK;
     }
+    if (e.GetIndex() == 4)
+    {
+        e.SetValue(m_Status);
+        return DLMS_ERROR_CODE_OK;
+    }
+    if (e.GetIndex() == 5)
+    {
+        e.SetValue(m_CaptureTime);
+        return DLMS_ERROR_CODE_OK;
+    }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
 

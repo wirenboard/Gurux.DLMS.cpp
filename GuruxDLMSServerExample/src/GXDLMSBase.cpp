@@ -87,7 +87,7 @@
 using namespace std;
 #if defined(_WIN32) || defined(_WIN64)//Windows
 TCHAR DATAFILE[FILENAME_MAX];
-TCHAR IMAGEFILE[FILENAME_MAX];
+char IMAGEFILE[FILENAME_MAX];
 #else
 char DATAFILE[FILENAME_MAX];
 char IMAGEFILE[FILENAME_MAX];
@@ -641,7 +641,7 @@ int CGXDLMSBase::Init(int port, GX_TRACE_LEVEL trace)
 
 #if defined(_WIN32) || defined(_WIN64)//Windows
     FILE* f;
-    fopen_s(&f, DATAFILE, _T("w"));
+    _tfopen_s(&f, DATAFILE, _T("w"));
 #else
     FILE* f = fopen(DATAFILE, "w");
 #endif
@@ -751,7 +751,7 @@ void GetProfileGenericDataByEntry(CGXDLMSProfileGeneric* p, long index, long cou
     {
 #if defined(_WIN32) || defined(_WIN64)//Windows
         FILE* f;
-        fopen_s(&f, DATAFILE, _T("r"));
+        _tfopen_s(&f, DATAFILE, _T("r"));
 #else
         FILE* f = fopen(DATAFILE, "r");
 #endif
@@ -814,7 +814,7 @@ void GetProfileGenericDataByRange(CGXDLMSValueEventArg* e)
     CGXDLMSClient::ChangeType(bb, DLMS_DATA_TYPE_DATETIME, end);
 #if defined(_WIN32) || defined(_WIN64)//Windows
     FILE* f;
-    fopen_s(&f, DATAFILE, _T("r"));
+    _tfopen_s(&f, DATAFILE, _T("r"));
 #else
     FILE* f = fopen(DATAFILE, "r");
 #endif
@@ -853,7 +853,7 @@ int GetProfileGenericDataCount() {
     int ch;
 #if defined(_WIN32) || defined(_WIN64)//Windows
     FILE* f;
-    fopen_s(&f, DATAFILE, _T("r"));
+    _tfopen_s(&f, DATAFILE, _T("r"));
 #else
     FILE* f = fopen(DATAFILE, "r");
 #endif
@@ -1055,12 +1055,12 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
         char *p = strrchr(IMAGEFILE, '\\');
         ++p;
         *p = '\0';
-        strncat(IMAGEFILE, (char*)e->GetParameters().Arr[0].byteArr, (int)e->GetParameters().Arr[0].GetSize());
-        strcat(IMAGEFILE, ".bin");
+        strncat_s(IMAGEFILE, (char*)e->GetParameters().Arr[0].byteArr, (int)e->GetParameters().Arr[0].GetSize());
+        strcat_s(IMAGEFILE, ".bin");
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
         printf("Updating image %s Size: %d\n", IMAGEFILE, imageSize);
 #endif
-        f = fopen(IMAGEFILE, "wb");
+        fopen_s(&f, IMAGEFILE, "wb");
         if (!f)
         {
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
@@ -1080,7 +1080,7 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
             return;
         }
         i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_INITIATED);
-        f = fopen(IMAGEFILE, "ab");
+        fopen_s(&f, IMAGEFILE, "ab");
         if (!f)
         {
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
@@ -1103,7 +1103,7 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
     else if (e->GetIndex() == 3)
     {
         i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_VERIFICATION_INITIATED);
-        f = fopen(IMAGEFILE, "rb");
+        fopen_s(&f, IMAGEFILE, "rb");
         if (!f)
         {
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
@@ -1185,7 +1185,7 @@ void Capture(CGXDLMSProfileGeneric* pg)
     int cnt = GetProfileGenericDataCount();
 #if defined(_WIN32) || defined(_WIN64)//Windows
     FILE* f;
-    fopen_s(&f, DATAFILE, _T("a"));
+    _tfopen_s(&f, DATAFILE, _T("a"));
 #else
     FILE* f = fopen(DATAFILE, "a");
 #endif
@@ -1215,7 +1215,7 @@ void Capture(CGXDLMSProfileGeneric* pg)
             {
                 char tmp[20];
                 // Generate random value here.
-                sprintf(tmp, "%d", ++cnt);
+                sprintf_s(tmp, "%d", ++cnt);
                 value = tmp;
             }
         }
@@ -1233,7 +1233,7 @@ void HandleProfileGenericActions(CGXDLMSValueEventArg* it)
         // Profile generic clear is called. Clear data.
 #if defined(_WIN32) || defined(_WIN64)//Windows
         FILE* f;
-        fopen_s(&f, DATAFILE, _T("w"));
+        _tfopen_s(&f, DATAFILE, _T("w"));
 #else
         FILE* f = fopen(DATAFILE, "w");
 #endif

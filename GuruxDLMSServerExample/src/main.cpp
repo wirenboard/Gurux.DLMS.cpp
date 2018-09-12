@@ -134,9 +134,9 @@ int main(int argc, char* argv[])
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
     char *p = _tcsrchr(DATAFILE, '\\');
     *p = '\0';
-    strcpy(IMAGEFILE, DATAFILE);
+    strcpy_s(IMAGEFILE, DATAFILE);
     //Add empty file name. This is removed when data is updated.
-    strcat(IMAGEFILE, "\\empty.bin");
+    strcat_s(IMAGEFILE, "\\empty.bin");
     strcat_s(DATAFILE, "\\data.csv");
 #else
     char *p = strrchr(DATAFILE, '/');
