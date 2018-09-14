@@ -40,43 +40,94 @@
 #include <vector>
 #include <assert.h>
 
+#if defined(_WIN32) || defined(_WIN64)//Windows
+#include <windows.h>
+#endif
+
 //Get UTC offset in minutes.
-void GetUtcOffset(int& hours, int& minutes)
+void GetUtcOffset(struct tm* timeptr, int& hours, int& minutes, int& deviation)
 {
+    short addH = 1, addMin = 0;
     time_t zero = 24 * 60 * 60L;
     struct tm tm;
-
     // local time for Jan 2, 1900 00:00 UTC
-#if _MSC_VER > 1000
+#if defined(_WIN32) || defined(_WIN64)//Windows
+    TIME_ZONE_INFORMATION tz;
+#if _MSC_VER > 1000    
     localtime_s(&tm, &zero);
 #else
     tm = *localtime(&zero);
 #endif
+    GetTimeZoneInformation(&tz);
+    if (tz.DaylightBias % 60 == 0)
+    {
+        addH = (short)(-tz.DaylightBias / 60);
+    }
+    else
+    {
+        addH = (short)(-tz.DaylightBias / 60);
+        addMin = (short)(-tz.DaylightBias % 60);
+    }
+#else
+    tm = *localtime(&zero);
+    short gmtoff = (short)(tm.tm_gmtoff / 60);
+    addH = (short)(gmtoff / 60);
+    addMin = (short)(gmtoff % 60);
+#endif
+    deviation = addH * 60 + addMin;
     hours = tm.tm_hour;
-
+    if (timeptr != NULL && timeptr->tm_isdst)
+    {
+        hours += addH;
+    }
     //If the local time is the "day before" the UTC, subtract 24 hours from the hours to get the UTC offset
     if (tm.tm_mday < 2)
     {
         hours -= 24;
     }
     minutes = tm.tm_min;
+    if (timeptr != NULL && timeptr->tm_isdst)
+    {
+        minutes += addMin;
+    }
 }
 
 static time_t GetUtcTime(struct tm * timeptr)
 {
     /* gets the epoch time relative to the local time zone,
     and then adds the appropriate number of seconds to make it UTC */
-    int hours, minutes;
-    GetUtcOffset(hours, minutes);
+    int hours, minutes, deviation;
+    GetUtcOffset(timeptr, hours, minutes, deviation);
     return mktime(timeptr) + (hours * 3600) + (minutes * 60);
+}
+
+short CGXDateTime::GetCurrentTimeZone()
+{
+    int hours, minutes, deviation;
+    GetUtcOffset(NULL, hours, minutes, deviation);
+    return -(hours * 60 + minutes);
+}
+
+char CGXDateTime::GetCurrentDeviation()
+{
+    int hours, minutes, deviation;
+    GetUtcOffset(NULL, hours, minutes, deviation);
+    return deviation;
 }
 
 
 // Constructor.
 CGXDateTime::CGXDateTime()
 {
-    int hours, minutes;
-    GetUtcOffset(hours, minutes);
+    int hours, minutes, deviation;
+    struct tm dt;
+    time_t tm1 = time(NULL);
+#if _MSC_VER > 1000
+    localtime_s(&dt, &tm1);
+#else
+    dt = *localtime(&tm1);
+#endif
+    GetUtcOffset(&dt, hours, minutes, deviation);
     m_Deviation = -(hours * 60 + minutes);
     m_Skip = DATETIME_SKIPS_NONE;
     memset(&m_Value, 0xFF, sizeof(m_Value));
@@ -87,31 +138,58 @@ CGXDateTime::CGXDateTime()
 // Constructor.
 CGXDateTime::CGXDateTime(struct tm& value)
 {
-    int hours, minutes;
-    GetUtcOffset(hours, minutes);
+    int hours, minutes, deviation;
+    GetUtcOffset(&value, hours, minutes, deviation);
     m_Deviation = -(hours * 60 + minutes);
     m_Value = value;
     m_Skip = DATETIME_SKIPS_NONE;
     m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
-    m_Status = DLMS_CLOCK_STATUS_OK;
+    if (value.tm_isdst)
+    {
+        m_Status = DLMS_CLOCK_STATUS_DAYLIGHT_SAVE_ACTIVE;
+    }
+    else
+    {
+        m_Status = DLMS_CLOCK_STATUS_OK;
+    }
 }
 
 // Constructor.
 CGXDateTime::CGXDateTime(struct tm* value)
 {
-    int hours, minutes;
-    GetUtcOffset(hours, minutes);
+    int hours, minutes, deviation;
+    GetUtcOffset(value, hours, minutes, deviation);
     m_Deviation = -(hours * 60 + minutes);
     m_Value = *value;
     m_Skip = DATETIME_SKIPS_NONE;
     m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
-    m_Status = DLMS_CLOCK_STATUS_OK;
+    if (value->tm_isdst)
+    {
+        m_Status = DLMS_CLOCK_STATUS_DAYLIGHT_SAVE_ACTIVE;
+    }
+    else
+    {
+        m_Status = DLMS_CLOCK_STATUS_OK;
+    }
 }
 
 CGXDateTime::CGXDateTime(int year, int month, int day, int hour, int minute, int second, int millisecond)
 {
-    int hours, minutes;
-    GetUtcOffset(hours, minutes);
+    int hours, minutes, deviation;
+    struct tm dt;
+    dt.tm_year = year;
+    dt.tm_mon = month;
+    dt.tm_mday = day;
+    dt.tm_hour = hour;
+    dt.tm_min = minute;
+    dt.tm_sec = second;
+    time_t tm1 = time(NULL);
+#if _MSC_VER > 1000
+    localtime_s(&dt, &tm1);
+#else
+    dt = *localtime(&tm1);
+#endif
+    GetUtcOffset(&dt, hours, minutes, deviation);
     Init(year, month, day, hour, minute, second, millisecond, -(hours * 60 + minutes));
 }
 
@@ -321,10 +399,10 @@ int GetDateFormat(GXDLMS_DATE_FORMAT& format, char& separator)
                 }
                 lastPos = pos + 1;
             }
+            }
         }
-    }
     return ret;
-}
+    }
 
 
 std::string CGXDateTime::ToString()
@@ -454,42 +532,42 @@ std::string CGXDateTime::ToString()
             if (ba.GetSize() != 0)
             {
                 ba.SetUInt8(' ');
-            }
+        }
 #if _MSC_VER > 1000
             sprintf_s(buff, 50, "%.2d", m_Value.tm_hour);
 #else
             sprintf(buff, "%.2d", m_Value.tm_hour);
 #endif
             ba.AddString(buff);
-        }
+    }
         //Add minutes.
         if (m_Value.tm_min != -1 && (m_Skip & DATETIME_SKIPS_MINUTE) == 0)
         {
             if (ba.GetSize() != 0)
             {
                 ba.SetUInt8(':');
-            }
+        }
 #if _MSC_VER > 1000
             sprintf_s(buff, 50, "%.2d", m_Value.tm_min);
 #else
             sprintf(buff, "%.2d", m_Value.tm_min);
 #endif
             ba.AddString(buff);
-        }
+}
         //Add seconds.
         if (m_Value.tm_sec != -1 && (m_Skip & DATETIME_SKIPS_SECOND) == 0)
         {
             if (ba.GetSize() != 0)
             {
                 ba.SetUInt8(':');
-            }
+        }
 #if _MSC_VER > 1000
             sprintf_s(buff, 50, "%.2d", m_Value.tm_sec);
 #else
             sprintf(buff, "%.2d", m_Value.tm_sec);
 #endif
             ba.AddString(buff);
-        }
+}
         return ba.ToString();
     }
     //If value is not set return empty std::string.
@@ -597,13 +675,13 @@ int CGXDateTime::ToLocalTime(struct tm& localTime)
         if (t == -1)
         {
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
+    }
 #if _MSC_VER > 1000
         localtime_s(&localTime, &t);
 #else
         localTime = *localtime(&t);
 #endif
-    }
+}
     return 0;
 }
 
@@ -671,7 +749,8 @@ long CGXDateTime::GetDifference(struct tm& start, CGXDateTime& to)
             {
                 diff += (to.m_Value.tm_mday - start.tm_mday) * 24 * 60 * 60000L;
             }
-            else {
+            else
+            {
                 diff = ((DaysInMonth(start.tm_year,
                     start.tm_mon)
                     - start.tm_mday

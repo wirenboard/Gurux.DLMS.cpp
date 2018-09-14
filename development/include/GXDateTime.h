@@ -168,5 +168,10 @@ public:
     //Convert value to local time.
     int ToLocalTime(struct tm& localTime);
 
+    //Get currect timezone.
+    static short GetCurrentTimeZone();
+
+    //Get currect deviation.
+    static char GetCurrentDeviation();    
 };
 #endif //GXDATETIME_H

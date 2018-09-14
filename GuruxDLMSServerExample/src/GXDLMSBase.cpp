@@ -178,7 +178,7 @@ void ListenerThread(void* pVoid)
                 bb.SetSize(bb.GetSize() + ret);
                 if (server->m_Trace == GX_TRACE_LEVEL_VERBOSE)
                 {
-                    printf("-> %s\r\n", bb.ToHexString().c_str());
+                    printf("RX:\t%s\r\n", bb.ToHexString().c_str());
                 }
                 if (server->HandleRequest(bb, reply) != 0)
                 {
@@ -195,7 +195,7 @@ void ListenerThread(void* pVoid)
                 {
                     if (server->m_Trace == GX_TRACE_LEVEL_VERBOSE)
                     {
-                        printf("<- %s\r\n", reply.ToHexString().c_str());
+                        printf("TX:\t%s\r\n", reply.ToHexString().c_str());
                     }
                     if (send(socket, (const char*)reply.GetData(), reply.GetSize() - reply.GetPosition(), 0) == -1)
                     {
@@ -613,6 +613,8 @@ int CGXDLMSBase::Init(int port, GX_TRACE_LEVEL trace)
     pClock->SetBegin(begin);
     CGXDateTime end(-1, 3, 1, -1, -1, -1, -1);
     pClock->SetEnd(end);
+    pClock->SetTimeZone(CGXDateTime::GetCurrentTimeZone());
+    pClock->SetDeviation(CGXDateTime::GetCurrentDeviation());
     GetItems().push_back(pClock);
     ///////////////////////////////////////////////////////////////////////
     //Add profile generic (historical data) object.
@@ -1055,12 +1057,21 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
         char *p = strrchr(IMAGEFILE, '\\');
         ++p;
         *p = '\0';
+#if defined(_WIN32) || defined(_WIN64)//If Windows 
         strncat_s(IMAGEFILE, (char*)e->GetParameters().Arr[0].byteArr, (int)e->GetParameters().Arr[0].GetSize());
         strcat_s(IMAGEFILE, ".bin");
+#else
+        strncat(IMAGEFILE, (char*)e->GetParameters().Arr[0].byteArr, (int)e->GetParameters().Arr[0].GetSize());
+        strcat(IMAGEFILE, ".bin");
+#endif
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
         printf("Updating image %s Size: %d\n", IMAGEFILE, imageSize);
 #endif
+#if defined(_WIN32) || defined(_WIN64)//If Windows 
         fopen_s(&f, IMAGEFILE, "wb");
+#else
+        f = fopen(IMAGEFILE, "wb");
+#endif
         if (!f)
         {
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
@@ -1080,7 +1091,11 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
             return;
         }
         i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_INITIATED);
+#if defined(_WIN32) || defined(_WIN64)//If Windows 
         fopen_s(&f, IMAGEFILE, "ab");
+#else
+        f = fopen(IMAGEFILE, "ab");
+#endif
         if (!f)
         {
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
@@ -1103,7 +1118,11 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
     else if (e->GetIndex() == 3)
     {
         i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_VERIFICATION_INITIATED);
+#if defined(_WIN32) || defined(_WIN64)//If Windows 
         fopen_s(&f, IMAGEFILE, "rb");
+#else
+        f = fopen(IMAGEFILE, "rb");
+#endif
         if (!f)
         {
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
@@ -1183,11 +1202,11 @@ void Capture(CGXDLMSProfileGeneric* pg)
     std::string value;
     unsigned char first = 1;
     int cnt = GetProfileGenericDataCount();
-#if defined(_WIN32) || defined(_WIN64)//Windows
     FILE* f;
+#if defined(_WIN32) || defined(_WIN64)//Windows
     _tfopen_s(&f, DATAFILE, _T("a"));
 #else
-    FILE* f = fopen(DATAFILE, "a");
+    f = fopen(DATAFILE, "a");
 #endif
     for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it = pg->GetCaptureObjects().begin();
         it != pg->GetCaptureObjects().end(); ++it)
@@ -1215,7 +1234,11 @@ void Capture(CGXDLMSProfileGeneric* pg)
             {
                 char tmp[20];
                 // Generate random value here.
+#if defined(_WIN32) || defined(_WIN64)//If Windows 
                 sprintf_s(tmp, "%d", ++cnt);
+#else
+                sprintf(tmp, "%d", ++cnt);
+#endif
                 value = tmp;
             }
         }
@@ -1230,12 +1253,12 @@ void HandleProfileGenericActions(CGXDLMSValueEventArg* it)
     CGXDLMSProfileGeneric* pg = (CGXDLMSProfileGeneric*)it->GetTarget();
     if (it->GetIndex() == 1)
     {
+        FILE* f;
         // Profile generic clear is called. Clear data.
 #if defined(_WIN32) || defined(_WIN64)//Windows
-        FILE* f;
         _tfopen_s(&f, DATAFILE, _T("w"));
 #else
-        FILE* f = fopen(DATAFILE, "w");
+        f = fopen(DATAFILE, "w");
 #endif
         fclose(f);
     }

@@ -79,7 +79,7 @@ int GetAuthenticationString(
         GXHelpers::SetObjectCount(callingAuthenticationValue->GetSize(), data);
         if (callingAuthenticationValue->GetSize() != 0)
         {
-            data.Set(callingAuthenticationValue);
+            data.Set(callingAuthenticationValue, callingAuthenticationValue->GetSize());
         }
     }
     return 0;
@@ -105,7 +105,7 @@ int GenerateApplicationContextName(
     {
         data.SetUInt8(BER_TYPE_CONTEXT | PDU_TYPE_PROTOCOL_VERSION);
         data.SetUInt8(2);
-        data.SetUInt8((unsigned char) (8 - strlen(settings.GetProtocolVersion())));
+        data.SetUInt8((unsigned char)(8 - strlen(settings.GetProtocolVersion())));
         CGXDLMSVariant tmp = settings.GetProtocolVersion();
         GXHelpers::SetBitString(data, tmp, false);
     }

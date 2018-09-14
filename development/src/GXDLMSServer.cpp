@@ -2157,10 +2157,19 @@ int CGXDLMSServer::HandleMethodRequest(
     }
     CGXDLMSLNParameters p(&m_Settings, invokeId, DLMS_COMMAND_METHOD_RESPONSE, 1, NULL, &bb, error);
     ret = CGXDLMS::GetLNPdu(p, m_ReplyData);
-    // If High level authentication fails.
-    if ((m_Settings.GetConnected() && DLMS_CONNECTION_STATE_DLMS) == 0 && obj->GetObjectType() == DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME && id == 1)
+    if (obj->GetObjectType() == DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME && id == 1)
     {
-        InvalidConnection(connectionInfo);
+        if (((CGXDLMSAssociationLogicalName*)obj)->GetAssociationStatus() == DLMS_ASSOCIATION_STATUS_ASSOCIATED)
+        {
+            Connected(connectionInfo);
+            m_Settings.SetConnected((DLMS_CONNECTION_STATE) (m_Settings.GetConnected() | DLMS_CONNECTION_STATE_DLMS));
+        }
+        else
+        {
+            // If High level authentication fails.
+            InvalidConnection(connectionInfo);
+            m_Settings.SetConnected((DLMS_CONNECTION_STATE) (m_Settings.GetConnected() & ~DLMS_CONNECTION_STATE_DLMS));
+        }
     }
     return ret;
 }
