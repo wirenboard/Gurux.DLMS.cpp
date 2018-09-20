@@ -79,7 +79,7 @@ int GetAuthenticationString(
         GXHelpers::SetObjectCount(callingAuthenticationValue->GetSize(), data);
         if (callingAuthenticationValue->GetSize() != 0)
         {
-            data.Set(callingAuthenticationValue, callingAuthenticationValue->GetSize());
+            data.Set(callingAuthenticationValue->GetData(), callingAuthenticationValue->GetSize());
         }
     }
     return 0;

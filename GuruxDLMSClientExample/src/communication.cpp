@@ -443,6 +443,10 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     dcb.DCBlength = sizeof(DCB);
+    if ((ret = GXGetCommState(m_hComPort, &dcb)) != 0)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
     dcb.fBinary = 1;
     dcb.fOutX = dcb.fInX = 0;
     //Abort all reads and writes on Error.
@@ -540,7 +544,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         len = (int)strlen(buff);
         if (m_Trace > GX_TRACE_LEVEL_WARNING)
         {
-            printf("\r\n<-");
+            printf("\r\nTX: ");
             for (pos = 0; pos != len; ++pos)
             {
                 printf("%.2X ", buff[pos]);
@@ -598,55 +602,55 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         {
         case '0':
 #if defined(_WIN32) || defined(_WIN64)
-        baudRate = 300;
+            baudRate = 300;
 #else
-        baudRate = B300;
+            baudRate = B300;
 #endif
-        break;
+            break;
         case '1':
 #if defined(_WIN32) || defined(_WIN64)
-        baudRate = 600;
+            baudRate = 600;
 #else
-        baudRate = B600;
+            baudRate = B600;
 #endif
-        break;
+            break;
         case '2':
 #if defined(_WIN32) || defined(_WIN64)
-        baudRate = 1200;
+            baudRate = 1200;
 #else
-        baudRate = B1200;
+            baudRate = B1200;
 #endif
-        break;
+            break;
         case '3':
 #if defined(_WIN32) || defined(_WIN64)
-        baudRate = 2400;
+            baudRate = 2400;
 #else
-        baudRate = B2400;
+            baudRate = B2400;
 #endif
-        break;
+            break;
         case '4':
 #if defined(_WIN32) || defined(_WIN64)
-        baudRate = 4800;
+            baudRate = 4800;
 #else
-        baudRate = B4800;
+            baudRate = B4800;
 #endif
-        break;
+            break;
         case '5':
 #if defined(_WIN32) || defined(_WIN64)
-        baudRate = 9600;
+            baudRate = 9600;
 #else
-        baudRate = B9600;
+            baudRate = B9600;
 #endif
-        break;
+            break;
         case '6':
 #if defined(_WIN32) || defined(_WIN64)
-        baudRate = 19200;
+            baudRate = 19200;
 #else
-        baudRate = B19200;
+            baudRate = B19200;
 #endif
-        break;
+            break;
         default:
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         //Send ACK
         buff[0] = 0x06;
@@ -660,7 +664,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         reply.Clear();
         if (m_Trace > GX_TRACE_LEVEL_WARNING)
         {
-            printf("\r\n<-");
+            printf("\r\nTX: ");
             for (pos = 0; pos != len; ++pos)
             {
                 printf("%.2X ", buff[pos]);
@@ -776,7 +780,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         return DLMS_ERROR_CODE_OK;
     }
     Now(tmp);
-    tmp = "<- " + tmp;
+    tmp = "TX: " + tmp;
     tmp += "\t" + data.ToHexString();
     if (m_Trace > GX_TRACE_LEVEL_INFO)
     {
@@ -791,6 +795,8 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         BOOL bRes = ::WriteFile(m_hComPort, data.GetData(), len, &sendSize, &m_osWrite);
         if (!bRes)
         {
+            COMSTAT comstat;
+            unsigned long RecieveErrors;
             DWORD err = GetLastError();
             //If error occurs...
             if (err != ERROR_IO_PENDING)
@@ -798,7 +804,17 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
                 return DLMS_ERROR_CODE_SEND_FAILED;
             }
             //Wait until data is actually sent
-            ::WaitForSingleObject(m_osWrite.hEvent, INFINITE);
+            ret = WaitForSingleObject(m_osWrite.hEvent, m_WaitTime);
+            if (ret != 0)
+            {
+                DWORD err = GetLastError();
+                return DLMS_ERROR_CODE_SEND_FAILED;
+            }
+            //Read bytes in output buffer. Some USB converts require this.
+            if (!ClearCommError(m_hComPort, &RecieveErrors, &comstat))
+            {
+                return DLMS_ERROR_CODE_SEND_FAILED;
+            }
         }
 #else //If Linux
         ret = write(m_hComPort, data.GetData(), len);
@@ -832,7 +848,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             if (tmp.size() == 0)
             {
                 Now(tmp);
-                tmp = "-> " + tmp + "\t";
+                tmp = "RX: " + tmp + "\t";
             }
             else
             {
@@ -856,7 +872,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             if (tmp.size() == 0)
             {
                 Now(tmp);
-                tmp = "-> " + tmp + "\t";
+                tmp = "RX: " + tmp + "\t";
             }
             else
             {
@@ -1204,7 +1220,7 @@ int CGXCommunication::ReadScalerAndUnits()
 
 int CGXCommunication::GetProfileGenericColumns()
 {
-    int ret;
+    int ret = 0;
     std::string ln;
     std::string value;
     //Read columns.
