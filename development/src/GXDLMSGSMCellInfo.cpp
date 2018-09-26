@@ -35,6 +35,14 @@
 #include "../include/GXDLMSGSMCellInfo.h"
 #include <sstream>
 
+CGXDLMSGSMCellInfo::CGXDLMSGSMCellInfo()
+{
+    m_CellId = 0;
+    m_LocationId = 0;
+    m_SignalQuality = 0;
+    m_Ber = 0;
+}
+
 unsigned int CGXDLMSGSMCellInfo::GetCellId()
 {
     return m_CellId;
@@ -82,8 +90,8 @@ std::string CGXDLMSGSMCellInfo::ToString()
     sb << ", ";
     sb << m_LocationId;
     sb << ", ";
-    sb << m_SignalQuality;
+    sb << (int)m_SignalQuality;
     sb << ", ";
-    sb << m_Ber;
+    sb << (int)m_Ber;
     return sb.str();
 }

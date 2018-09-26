@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\GXAdjacentCell.cpp" />
+    <ClCompile Include="..\src\GXDLMSCertificateInfo.cpp" />
     <ClCompile Include="..\src\GXDLMSGSMCellInfo.cpp" />
     <ClCompile Include="..\src\GXAPDU.cpp" />
     <ClCompile Include="..\src\GXApplicationContextName.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="..\include\GXDLMSAutoAnswer.h" />
     <ClInclude Include="..\include\GXDLMSAutoConnect.h" />
     <ClInclude Include="..\include\GXDLMSCaptureObject.h" />
+    <ClInclude Include="..\include\GXDLMSCertificateInfo.h" />
     <ClInclude Include="..\include\GXDLMSClient.h" />
     <ClInclude Include="..\include\GXDLMSClock.h" />
     <ClInclude Include="..\include\GXDLMSConnectionEventArgs.h" />

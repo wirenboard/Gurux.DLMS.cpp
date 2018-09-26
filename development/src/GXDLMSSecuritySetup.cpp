@@ -98,13 +98,21 @@ void CGXDLMSSecuritySetup::SetServerSystemTitle(CGXByteBuffer& value)
 // Returns amount of attributes.
 int CGXDLMSSecuritySetup::GetAttributeCount()
 {
-    return 5;
+    if (GetVersion() == 0)
+    {
+        return 5;
+    }
+    return 6;
 }
 
 // Returns amount of methods.
 int CGXDLMSSecuritySetup::GetMethodCount()
 {
-    return 2;
+    if (GetVersion() == 0)
+    {
+        return 2;
+    }
+    return 8;
 }
 
 void CGXDLMSSecuritySetup::GetValues(std::vector<std::string>& values)
@@ -119,6 +127,36 @@ void CGXDLMSSecuritySetup::GetValues(std::vector<std::string>& values)
     values.push_back(str);
     str = m_ServerSystemTitle.ToHexString();
     values.push_back(str);
+    if (GetVersion() > 0)
+    {
+        std::stringstream sb;
+        bool empty = true;
+        for (std::vector<CGXDLMSCertificateInfo*>::iterator it = m_Certificates.begin(); it != m_Certificates.end(); ++it)
+        {
+            if (empty)
+            {
+                empty = false;
+            }
+            else
+            {
+                sb << ',';
+            }
+            sb << '[';
+            sb << (int)(*it)->GetEntity();
+            sb << ' ';
+            sb << (int)(*it)->GetType();
+            sb << ' ';
+            sb << (*it)->GetSerialNumber();
+            sb << ' ';
+            sb << (*it)->GetIssuer();
+            sb << ' ';
+            sb << (*it)->GetSubject();
+            sb << ' ';
+            sb << (*it)->GetSubjectAltName();
+            sb << ']';
+        }
+        values.push_back(sb.str());
+    }
 }
 
 void CGXDLMSSecuritySetup::GetAttributeIndexToRead(std::vector<int>& attributes)
@@ -138,18 +176,18 @@ void CGXDLMSSecuritySetup::GetAttributeIndexToRead(std::vector<int>& attributes)
     {
         attributes.push_back(3);
     }
+    //ClientSystemTitle
+    if (CanRead(4))
+    {
+        attributes.push_back(4);
+    }
+    //ServerSystemTitle
+    if (CanRead(5))
+    {
+        attributes.push_back(5);
+    }
     if (GetVersion() > 0)
     {
-        //ClientSystemTitle
-        if (CanRead(4))
-        {
-            attributes.push_back(4);
-        }
-        //ServerSystemTitle
-        if (CanRead(5))
-        {
-            attributes.push_back(5);
-        }
         //Certificates
         if (CanRead(6))
         {
@@ -179,6 +217,10 @@ int CGXDLMSSecuritySetup::GetDataType(int index, DLMS_DATA_TYPE& type)
     else if (index == 5)
     {
         type = DLMS_DATA_TYPE_OCTET_STRING;
+    }
+    else if (index == 6 && GetVersion() > 0)
+    {
+        type = DLMS_DATA_TYPE_ARRAY;
     }
     else
     {
@@ -219,6 +261,26 @@ int CGXDLMSSecuritySetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     {
         e.GetValue().Add(m_ServerSystemTitle.GetData(), m_ServerSystemTitle.GetSize());
     }
+    else if (e.GetIndex() == 6)
+    {
+        CGXByteBuffer bb;
+        bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
+        GXHelpers::SetObjectCount((unsigned long) m_Certificates.size(), bb);
+        for (std::vector<CGXDLMSCertificateInfo*>::iterator it = m_Certificates.begin(); it != m_Certificates.end(); ++it)
+        {
+            bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+            GXHelpers::SetObjectCount(6, bb);
+            bb.SetUInt8(DLMS_DATA_TYPE_ENUM);
+            bb.SetUInt8((*it)->GetEntity());
+            bb.SetUInt8(DLMS_DATA_TYPE_ENUM);
+            bb.SetUInt8((*it)->GetType());
+            bb.AddString((*it)->GetSerialNumber());
+            bb.AddString((*it)->GetIssuer());
+            bb.AddString((*it)->GetSubject());
+            bb.AddString((*it)->GetSubjectAltName());
+        }
+        e.SetValue(bb);
+    }
     else
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
@@ -249,9 +311,32 @@ int CGXDLMSSecuritySetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     {
         m_ServerSystemTitle.Set(e.GetValue().byteArr, e.GetValue().size);
     }
+    else if (e.GetIndex() == 6)
+    {
+        m_Certificates.clear();
+        if (e.GetValue().vt != DLMS_DATA_TYPE_NONE)        
+        {
+            for (std::vector<CGXDLMSVariant >::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
+            {
+                CGXDLMSCertificateInfo* info = new CGXDLMSCertificateInfo();
+                info->SetEntity((DLMS_CERTIFICATE_ENTITY)it->Arr[0].ToInteger());
+                info->SetType ((DLMS_CERTIFICATE_TYPE)it->Arr[1].ToInteger());
+                info->SetSerialNumber(it->Arr[2].ToString());
+                info->SetIssuer(it->Arr[3].ToString());
+                info->SetSubject(it->Arr[4].ToString());
+                info->SetSubjectAltName(it->Arr[5].ToString());
+                m_Certificates.push_back(info);
+            }
+        }
+    }
     else
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     return DLMS_ERROR_CODE_OK;
+}
+
+std::vector<CGXDLMSCertificateInfo*>& CGXDLMSSecuritySetup::GetCertificates()
+{
+    return m_Certificates;
 }

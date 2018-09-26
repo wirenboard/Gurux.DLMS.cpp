@@ -58,6 +58,8 @@ private:
     unsigned char m_Ber;
 
 public:
+    //Constructor.
+    CGXDLMSGSMCellInfo();
     /**
     * @return Two byte cell ID.
     */

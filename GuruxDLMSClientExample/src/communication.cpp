@@ -974,7 +974,7 @@ int CGXCommunication::GetAssociationView()
     CGXReplyData reply;
     if ((ret = m_Parser->GetObjectsRequest(data)) != 0 ||
         (ret = ReadDataBlock(data, reply)) != 0 ||
-        (ret = m_Parser->ParseObjects(reply.GetData(), false)) != 0)
+        (ret = m_Parser->ParseObjects(reply.GetData(), true)) != 0)
     {
         printf("GetObjects failed %d.\r\n", ret);
         return ret;
@@ -1335,9 +1335,9 @@ int CGXCommunication::GetReadOut()
                 WriteValue(m_Trace, buff);
                 WriteValue(m_Trace, value.c_str());
                 WriteValue(m_Trace, "\r\n");
+                }
             }
         }
-    }
     return ret;
 }
 

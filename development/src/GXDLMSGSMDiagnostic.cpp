@@ -41,18 +41,19 @@ CGXDLMSGSMDiagnostic::CGXDLMSGSMDiagnostic() :
 {
 }
 
-//SN Constructor.
-CGXDLMSGSMDiagnostic::CGXDLMSGSMDiagnostic(std::string ln, unsigned short sn) :
-    CGXDLMSObject(DLMS_OBJECT_TYPE_GSM_DIAGNOSTIC, ln, sn)
-{
-
-}
-
 //LN Constructor.
 CGXDLMSGSMDiagnostic::CGXDLMSGSMDiagnostic(std::string ln) :
     CGXDLMSGSMDiagnostic(ln, 0)
 {
+}
 
+//SN Constructor.
+CGXDLMSGSMDiagnostic::CGXDLMSGSMDiagnostic(std::string ln, unsigned short sn) :
+    CGXDLMSObject(DLMS_OBJECT_TYPE_GSM_DIAGNOSTIC, ln, sn)
+{
+    m_Status = DLMS_GSM_STATUS_NONE;
+    m_CircuitSwitchStatus = DLMS_GSM_CIRCUIT_SWITCH_STATUS_INACTIVE;
+    m_PacketSwitchStatus = DLMS_GSM_PACKET_SWITCH_STATUS_INACTIVE;
 }
 
 CGXDLMSGSMDiagnostic::~CGXDLMSGSMDiagnostic()
@@ -121,7 +122,7 @@ void CGXDLMSGSMDiagnostic::SetCaptureTime(CGXDateTime& value)
 // Returns amount of attributes.
 int CGXDLMSGSMDiagnostic::GetAttributeCount()
 {
-    return 9;
+    return 8;
 }
 
 // Returns amount of methods.
@@ -212,23 +213,33 @@ int CGXDLMSGSMDiagnostic::GetDataType(int index, DLMS_DATA_TYPE& type)
     switch (index)
     {
     case 1:
-        return DLMS_DATA_TYPE_OCTET_STRING;
+        type = DLMS_DATA_TYPE_OCTET_STRING;
+        break;
     case 2:
-        return DLMS_DATA_TYPE_STRING;
+        type = DLMS_DATA_TYPE_STRING;
+        break;
     case 3:
-        return DLMS_DATA_TYPE_ENUM;
+        type = DLMS_DATA_TYPE_ENUM;
+        break;
     case 4:
-        return DLMS_DATA_TYPE_ENUM;
+        type = DLMS_DATA_TYPE_ENUM;
+        break;
     case 5:
-        return DLMS_DATA_TYPE_ENUM;
+        type = DLMS_DATA_TYPE_ENUM;
+        break;
     case 6:
-        return DLMS_DATA_TYPE_STRUCTURE;
+        type = DLMS_DATA_TYPE_STRUCTURE;
+        break;
     case 7:
-        return DLMS_DATA_TYPE_ARRAY;
+        type = DLMS_DATA_TYPE_ARRAY;
+        break;
     case 8:
-        return DLMS_DATA_TYPE_DATETIME;
+        type = DLMS_DATA_TYPE_DATETIME;
+        break;
+    default:
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    return DLMS_ERROR_CODE_OK;
 }
 
 // Returns value of given attribute.

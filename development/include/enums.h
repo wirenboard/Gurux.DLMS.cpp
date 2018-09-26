@@ -2292,4 +2292,51 @@ typedef enum {
     //Connection is made for DLMS level.
     DLMS_CONNECTION_STATE_DLMS = 2
 }DLMS_CONNECTION_STATE;
+
+
+/**
+ * Certificate entity.
+ */
+typedef enum {
+    /**
+     * Certificate entity is server
+     */
+    DLMS_CERTIFICATE_ENTITY_SERVER = 0,
+    /**
+     * Certificate entity is client
+     */
+    DLMS_CERTIFICATE_ENTITY_CLIENT = 1,
+    /**
+     * Certificate entity is certification authority
+     */
+    DLMS_CERTIFICATE_ENTITY_CERTIFICATION_AUTHORITY = 2,
+    /**
+     * Certificate entity is other.
+     */
+    OTHER = 3
+}DLMS_CERTIFICATE_ENTITY;
+
+
+/**
+ * Certificate type.
+ */
+typedef enum {
+    /**
+     * Certificate type is digital signature.
+     */
+    DLMS_CERTIFICATE_TYPE_DIGITAL_SIGNATURE = 0,
+    /**
+     * Certificate type is key agreement.
+     */
+    DLMS_CERTIFICATE_TYPE_KEY_AGREEMENT = 1,
+    /**
+     * Certificate type is TLS.
+     */
+    DLMS_CERTIFICATE_TYPE_TLS = 2,
+    /**
+     * Certificate type is other.
+     */
+    DLMS_CERTIFICATE_TYPE_OTHER = 3
+}DLMS_CERTIFICATE_TYPE;
+
 #endif //ENUMS_H

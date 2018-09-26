@@ -36,6 +36,7 @@
 #define GXDLMSDLMS_SECURITYSETUP_H
 
 #include "GXDLMSObject.h"
+#include "GXDLMSCertificateInfo.h"
 
 /**
 Online help:
@@ -47,6 +48,7 @@ class CGXDLMSSecuritySetup : public CGXDLMSObject
     DLMS_SECURITY_SUITE m_SecuritySuite;
     CGXByteBuffer m_ServerSystemTitle;
     CGXByteBuffer m_ClientSystemTitle;
+    std::vector<CGXDLMSCertificateInfo*> m_Certificates;
 public:
     //Constructor.
     CGXDLMSSecuritySetup();
@@ -94,5 +96,8 @@ public:
 
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+
+    //Get certificates.
+    std::vector<CGXDLMSCertificateInfo*>& GetCertificates();
 };
 #endif //GXDLMSDLMS_SECURITYSETUP_H

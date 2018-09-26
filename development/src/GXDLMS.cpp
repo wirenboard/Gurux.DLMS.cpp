@@ -851,15 +851,7 @@ int CGXDLMS::GetLnMessages(
                 ret = GetHdlcFrame(*p.GetSettings(), frame, &reply, tmp);
                 if (ret == 0 && reply.GetPosition() != reply.GetSize())
                 {
-                    if (p.GetSettings()->IsServer() || p.GetCommand() == DLMS_COMMAND_SET_REQUEST ||
-                        p.GetCommand() == DLMS_COMMAND_METHOD_REQUEST)
-                    {
-                        frame = 0;
-                    }
-                    else
-                    {
-                        frame = p.GetSettings()->GetNextSend(0);
-                    }
+                    frame = p.GetSettings()->GetNextSend(0);
                 }
             }
             if (ret != 0)

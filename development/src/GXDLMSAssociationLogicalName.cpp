@@ -404,6 +404,31 @@ void CGXDLMSAssociationLogicalName::GetValues(std::vector<std::string>& values)
     {
         values.push_back(m_SecuritySetupReference);
     }
+    if (GetVersion() > 1)
+    {
+        std::stringstream sb;
+        bool empty = true;
+        for (std::vector<std::pair<unsigned char, std::string> >::iterator it = m_UserList.begin(); it != m_UserList.end(); ++it)
+        {
+            if (empty)
+            {
+                empty = false;
+            }
+            else
+            {
+                sb << ',';
+            }
+            sb << (int)it->first;
+            sb << ':';
+            sb << it->second;
+        }
+        values.push_back(sb.str());
+        sb.clear();
+        sb << (int) m_CurrentUser.first;
+        sb << ':';
+        sb << m_CurrentUser.second;
+        values.push_back(sb.str());
+    }
 }
 
 void CGXDLMSAssociationLogicalName::GetAttributeIndexToRead(std::vector<int>& attributes)
@@ -518,11 +543,13 @@ int CGXDLMSAssociationLogicalName::GetDataType(int index, DLMS_DATA_TYPE& type)
     {
         if (index == 10)
         {
-            return DLMS_DATA_TYPE_ARRAY;
+            type = DLMS_DATA_TYPE_ARRAY;
+            return DLMS_ERROR_CODE_OK;
         }
         if (index == 11)
         {
-            return DLMS_DATA_TYPE_STRUCTURE;
+            type = DLMS_DATA_TYPE_STRUCTURE;
+            return DLMS_ERROR_CODE_OK;
         }
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
@@ -578,12 +605,12 @@ int CGXDLMSAssociationLogicalName::Invoke(CGXDLMSSettings& settings, CGXDLMSValu
                 return ret;
             }
             e.SetValue(serverChallenge);
-            settings.SetConnected((DLMS_CONNECTION_STATE) (settings.GetConnected() | DLMS_CONNECTION_STATE_HDLC));
+            settings.SetConnected((DLMS_CONNECTION_STATE)(settings.GetConnected() | DLMS_CONNECTION_STATE_HDLC));
             m_AssociationStatus = DLMS_ASSOCIATION_STATUS_ASSOCIATED;
         }
         else
         {
-            settings.SetConnected((DLMS_CONNECTION_STATE) (settings.GetConnected() & ~DLMS_CONNECTION_STATE_HDLC));
+            settings.SetConnected((DLMS_CONNECTION_STATE)(settings.GetConnected() & ~DLMS_CONNECTION_STATE_HDLC));
             m_AssociationStatus = DLMS_ASSOCIATION_STATUS_NON_ASSOCIATED;
         }
     }
@@ -996,7 +1023,7 @@ int CGXDLMSAssociationLogicalName::SetValue(CGXDLMSSettings& settings, CGXDLMSVa
                 {
                     return ret;
                 }
-                m_ApplicationContextName.SetContextId((DLMS_APPLICATION_CONTEXT_NAME) val);
+                m_ApplicationContextName.SetContextId((DLMS_APPLICATION_CONTEXT_NAME)val);
             }
         }
         else
