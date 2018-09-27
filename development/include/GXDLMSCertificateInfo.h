@@ -36,7 +36,6 @@
 #define GXDLMSCERTIFICATEINFO_H
 
 #include "enums.h"
-#include <tchar.h>
 
 class CGXDLMSCertificateInfo
 {
