@@ -265,7 +265,7 @@ int CGXDLMSSecuritySetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     {
         CGXByteBuffer bb;
         bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount((unsigned long) m_Certificates.size(), bb);
+        GXHelpers::SetObjectCount((unsigned long)m_Certificates.size(), bb);
         for (std::vector<CGXDLMSCertificateInfo*>::iterator it = m_Certificates.begin(); it != m_Certificates.end(); ++it)
         {
             bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
@@ -314,17 +314,22 @@ int CGXDLMSSecuritySetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     else if (e.GetIndex() == 6)
     {
         m_Certificates.clear();
-        if (e.GetValue().vt != DLMS_DATA_TYPE_NONE)        
+        if (e.GetValue().vt != DLMS_DATA_TYPE_NONE)
         {
+            std::string tmp;
             for (std::vector<CGXDLMSVariant >::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 CGXDLMSCertificateInfo* info = new CGXDLMSCertificateInfo();
                 info->SetEntity((DLMS_CERTIFICATE_ENTITY)it->Arr[0].ToInteger());
-                info->SetType ((DLMS_CERTIFICATE_TYPE)it->Arr[1].ToInteger());
-                info->SetSerialNumber(it->Arr[2].ToString());
-                info->SetIssuer(it->Arr[3].ToString());
-                info->SetSubject(it->Arr[4].ToString());
-                info->SetSubjectAltName(it->Arr[5].ToString());
+                info->SetType((DLMS_CERTIFICATE_TYPE)it->Arr[1].ToInteger());
+                tmp = it->Arr[2].ToString();
+                info->SetSerialNumber(tmp);
+                tmp = it->Arr[3].ToString();
+                info->SetIssuer(tmp);
+                tmp = it->Arr[4].ToString();
+                info->SetSubject(tmp);
+                tmp = it->Arr[5].ToString();
+                info->SetSubjectAltName(tmp);
                 m_Certificates.push_back(info);
             }
         }
