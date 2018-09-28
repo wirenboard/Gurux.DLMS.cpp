@@ -854,7 +854,7 @@ int GetOctetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDL
     }
     else
     {
-        value.byteArr = new unsigned char[len];
+        value.byteArr = (unsigned char*)malloc(len);
         if ((ret = buff.Get(value.byteArr, len)) != 0)
         {
             return ret;
@@ -960,15 +960,20 @@ int GetInt32(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 //Reserved for internal use.
 void GXHelpers::ToBitString(CGXByteBuffer& sb, unsigned char value, int count)
 {
-    if (count > 0) {
-        if (count > 8) {
+    if (count > 0)
+    {
+        if (count > 8)
+        {
             count = 8;
         }
-        for (int pos = 7; pos != 8 - count - 1; --pos) {
-            if ((value & (1 << pos)) != 0) {
+        for (int pos = 7; pos != 8 - count - 1; --pos)
+        {
+            if ((value & (1 << pos)) != 0)
+            {
                 sb.SetInt8('1');
             }
-            else {
+            else
+            {
                 sb.SetInt8('0');
             }
         }
@@ -1492,7 +1497,7 @@ static int SetUtfString(CGXByteBuffer& buff, CGXDLMSVariant& value)
 
 int GXHelpers::SetLogicalName(const char* name, CGXDLMSVariant& value)
 {
-    unsigned char ln[6] = {0};
+    unsigned char ln[6] = { 0 };
     int ret = 0;
     if (name != NULL && *name != '\0')
     {
@@ -1790,7 +1795,8 @@ bool GXHelpers::StringCompare(const char* c1, const char* c2)
 int GXHelpers::GetDataTypeSize(DLMS_DATA_TYPE type)
 {
     int size = -1;
-    switch (type) {
+    switch (type)
+    {
     case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
         size = 1;
         break;
