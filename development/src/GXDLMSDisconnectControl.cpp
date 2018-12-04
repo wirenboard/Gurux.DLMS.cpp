@@ -102,7 +102,7 @@ int CGXDLMSDisconnectControl::RemoteDisconnect(CGXDLMSClient* client, std::vecto
 int CGXDLMSDisconnectControl::RemoteReconnect(CGXDLMSClient* client, std::vector<CGXByteBuffer>& reply)
 {
     CGXDLMSVariant data((char)0);
-    return client->Method(this, 1, data, reply);
+    return client->Method(this, 2, data, reply);
 }
 
 // Returns amount of attributes.

@@ -37,7 +37,7 @@
 
 //Constructor.
 CGXDLMSGSMDiagnostic::CGXDLMSGSMDiagnostic() :
-    CGXDLMSGSMDiagnostic("", 0)
+    CGXDLMSGSMDiagnostic("0.0.25.6.0.255", 0)
 {
 }
 
@@ -54,6 +54,7 @@ CGXDLMSGSMDiagnostic::CGXDLMSGSMDiagnostic(std::string ln, unsigned short sn) :
     m_Status = DLMS_GSM_STATUS_NONE;
     m_CircuitSwitchStatus = DLMS_GSM_CIRCUIT_SWITCH_STATUS_INACTIVE;
     m_PacketSwitchStatus = DLMS_GSM_PACKET_SWITCH_STATUS_INACTIVE;
+    m_Version = 1;
 }
 
 CGXDLMSGSMDiagnostic::~CGXDLMSGSMDiagnostic()
@@ -245,7 +246,7 @@ int CGXDLMSGSMDiagnostic::GetDataType(int index, DLMS_DATA_TYPE& type)
 // Returns value of given attribute.
 int CGXDLMSGSMDiagnostic::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
-    CGXDLMSVariant cellId, locationId, signalQuality, ber;
+    CGXDLMSVariant cellId, locationId, signalQuality, ber, mcc, mnc, channel;
     CGXByteBuffer bb;
     int ret;
     CGXDLMSVariant tmp;
@@ -273,17 +274,29 @@ int CGXDLMSGSMDiagnostic::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     case 6:
         e.SetByteArray(true);
         bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
-        bb.SetUInt8(4);
+        bb.SetUInt8(m_Version == 0 ? 4 : 7);
         cellId = m_CellInfo.GetCellId();
         locationId = m_CellInfo.GetLocationId();
         signalQuality = m_CellInfo.GetSignalQuality();
         ber = m_CellInfo.GetBer();
-        if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT32, cellId)) != 0 ||
+        if ((ret = GXHelpers::SetData(bb, m_Version == 0 ? DLMS_DATA_TYPE_UINT16 : DLMS_DATA_TYPE_UINT32, cellId)) != 0 ||
             (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT16, locationId)) != 0 ||
             (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT8, signalQuality)) != 0 ||
             (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT8, ber)) != 0)
         {
             return ret;
+        }
+        if (m_Version > 0)
+        {
+            mcc = m_CellInfo.GetMobileCountryCode();
+            mnc = m_CellInfo.GetMobileNetworkCode();
+            channel = m_CellInfo.GetChannelNumber();
+            if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT16, mcc)) != 0 ||
+                (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT16, mnc)) != 0 ||
+                (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT32, channel)) != 0)
+            {
+                return ret;
+            }
         }
         e.SetValue(bb);
         break;
@@ -296,7 +309,7 @@ int CGXDLMSGSMDiagnostic::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
             bb.SetUInt8(2);
             cellId = (*it)->GetCellId();
             signalQuality = (*it)->GetSignalQuality();
-            if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT32, cellId)) != 0 ||
+            if ((ret = GXHelpers::SetData(bb, m_Version == 0 ? DLMS_DATA_TYPE_UINT16 : DLMS_DATA_TYPE_UINT32, cellId)) != 0 ||
                 (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT8, locationId)) != 0)
             {
                 return ret;
@@ -350,6 +363,12 @@ int CGXDLMSGSMDiagnostic::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
             m_CellInfo.SetLocationId(tmp[1].ToInteger());
             m_CellInfo.SetSignalQuality(tmp[2].ToInteger());
             m_CellInfo.SetBer(tmp[3].ToInteger());
+            if (m_Version > 0)
+            {
+                m_CellInfo.SetMobileCountryCode(tmp[4].ToInteger());
+                m_CellInfo.SetMobileNetworkCode(tmp[5].ToInteger());
+                m_CellInfo.SetChannelNumber(tmp[6].ToInteger());
+            }
         }
         break;
     case 7:

@@ -323,12 +323,12 @@ void CGXDLMSAssociationLogicalName::SetSecret(CGXByteBuffer& value)
     m_Secret = value;
 }
 
-std::vector<std::pair<unsigned char, std::string>>& CGXDLMSAssociationLogicalName::GetUserList()
+std::vector<std::pair<unsigned char, std::string> >& CGXDLMSAssociationLogicalName::GetUserList()
 {
     return m_UserList;
 }
 
-void CGXDLMSAssociationLogicalName::SetUserList(std::vector<std::pair<unsigned char, std::string>>& value)
+void CGXDLMSAssociationLogicalName::SetUserList(std::vector<std::pair<unsigned char, std::string> >& value)
 {
     m_UserList = value;
 }
@@ -732,9 +732,10 @@ int CGXDLMSAssociationLogicalName::GetValue(CGXDLMSSettings& settings, CGXDLMSVa
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(6);
         CGXByteBuffer bb, bb2;
+        CGXDLMSVariant conformance;
         bb.SetUInt32(m_XDLMSContextInfo.GetConformance());
-        bb.SubArray(1, 3, bb2);
-        CGXDLMSVariant conformance = bb2;
+        bb.Move(1, 0, 3);
+        conformance = bb;
         CGXDLMSVariant rx = m_XDLMSContextInfo.GetMaxPduSize();
         CGXDLMSVariant tx = m_XDLMSContextInfo.GetMaxSendPduSize();
         CGXDLMSVariant version = m_XDLMSContextInfo.GetDlmsVersionNumber();
@@ -1041,12 +1042,18 @@ int CGXDLMSAssociationLogicalName::SetValue(CGXDLMSSettings& settings, CGXDLMSVa
     {
         if (e.GetValue().vt == DLMS_DATA_TYPE_STRUCTURE)
         {
-            m_XDLMSContextInfo.SetConformance((DLMS_CONFORMANCE)e.GetValue().Arr[0].ToInteger());
+            CGXByteBuffer tmp;
+            CGXDLMSVariant val = e.GetValue().Arr[0];
+            GXHelpers::SetBitString(tmp, val, true);
+            tmp.SetUInt8(0, 0);
+            unsigned long v;
+            tmp.GetUInt32(&v);
+            m_XDLMSContextInfo.SetConformance((DLMS_CONFORMANCE) v);
             m_XDLMSContextInfo.SetMaxReceivePduSize(e.GetValue().Arr[1].ToInteger());
             m_XDLMSContextInfo.SetMaxSendPduSize(e.GetValue().Arr[2].ToInteger());
             m_XDLMSContextInfo.SetDlmsVersionNumber(e.GetValue().Arr[3].ToInteger());
             m_XDLMSContextInfo.SetQualityOfService(e.GetValue().Arr[4].ToInteger());
-            CGXByteBuffer tmp;
+            tmp.Clear();
             tmp.Set(e.GetValue().Arr[5].byteArr, e.GetValue().Arr[5].GetSize());
             m_XDLMSContextInfo.SetCypheringInfo(tmp);
         }

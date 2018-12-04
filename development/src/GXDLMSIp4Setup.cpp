@@ -38,13 +38,13 @@
 
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
 #include <Winsock.h> //Add support for sockets
-#else
+#endif
+#if defined(__linux__)//linux includes
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #endif
-
 
 //Constructor.
 CGXDLMSIp4Setup::CGXDLMSIp4Setup() :
@@ -342,6 +342,7 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         {
             return 0;
         }
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
         struct sockaddr_in add;
         add.sin_addr.s_addr = inet_addr(m_IPAddress.c_str());
         //If address is give as name
@@ -355,6 +356,7 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
             add.sin_addr = *(in_addr*)(void*)Hostent->h_addr_list[0];
         };
         e.SetValue((unsigned long)add.sin_addr.s_addr);
+#endif //defined(_WIN32) || defined(_WIN64) || defined(__linux__)
     }
     else if (e.GetIndex() == 4)
     {

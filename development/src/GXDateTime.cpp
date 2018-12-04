@@ -68,7 +68,8 @@ void GetUtcOffset(struct tm* timeptr, int& hours, int& minutes, int& deviation)
         addH = (short)(-tz.DaylightBias / 60);
         addMin = (short)(-tz.DaylightBias % 60);
     }
-#else
+#endif
+#if defined(__linux__)
     tm = *localtime(&zero);
     short gmtoff = (short)(tm.tm_gmtoff / 60);
     addH = (short)(gmtoff / 60);

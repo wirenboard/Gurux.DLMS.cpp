@@ -294,6 +294,10 @@ public:
     // Invoke ID.
     void SetInvokeID(int value);
 
+
+    // Update invoke ID.
+    void UpdateInvokeId(unsigned char value);
+
     /**
        * @return Invoke ID.
        */

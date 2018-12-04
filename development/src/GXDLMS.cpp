@@ -1808,6 +1808,7 @@ int CGXDLMS::HandledGloResponse(
     //If all frames are read.
     if ((data.GetMoreData() & DLMS_DATA_REQUEST_TYPES_FRAME) == 0)
     {
+        int ret;
         DLMS_SECURITY security;
         data.GetData().SetPosition(data.GetData().GetPosition() - 1);
         CGXByteBuffer bb;
@@ -1815,7 +1816,10 @@ int CGXDLMS::HandledGloResponse(
         bb.Set(&tmp, data.GetData().GetPosition(), data.GetData().GetSize() - data.GetData().GetPosition());
         data.GetData().SetPosition(index);
         data.GetData().SetSize(index);
-        settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(), bb, security);
+        if ((ret = settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(), bb, security)) != 0)
+        {
+            return ret;
+        }
         data.GetData().Set(&bb);
         data.SetCommand(DLMS_COMMAND_NONE);
         GetPdu(settings, data);
@@ -2533,10 +2537,10 @@ int CGXDLMS::GetTcpData(
         }
         if (value == 1)
         {
-            // Check TCP/IP addresses.
-            CheckWrapperAddress(settings, buff);
-            // Get length.
-            if ((ret = buff.GetUInt16(&value)) != 0)
+            // Check TCP/IP addresses.            
+            if ((ret = CheckWrapperAddress(settings, buff)) != 0 ||
+                // Get length.
+                (ret = buff.GetUInt16(&value)) != 0)
             {
                 return ret;
             }

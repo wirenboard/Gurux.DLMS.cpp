@@ -374,6 +374,24 @@ void CGXDLMSSettings::SetInvokeID(int value)
     m_InvokeID = value;
 }
 
+void CGXDLMSSettings::UpdateInvokeId(unsigned char value) {
+    if ((value & 0x80) != 0) {
+        m_Priority = DLMS_PRIORITY_HIGH;
+    }
+    else {
+        m_Priority = DLMS_PRIORITY_NORMAL;
+    }
+    if ((value & 0x40) != 0) {
+        m_ServiceClass = DLMS_SERVICE_CLASS_CONFIRMED;
+    }
+    else 
+    {
+        m_ServiceClass = DLMS_SERVICE_CLASS_UN_CONFIRMED;
+    }
+    m_InvokeID = (unsigned char)(value & 0xF);
+}
+
+
 unsigned long CGXDLMSSettings::GetLongInvokeID()
 {
     return m_LongInvokeID;

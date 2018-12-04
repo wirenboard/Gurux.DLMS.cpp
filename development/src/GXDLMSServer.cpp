@@ -933,6 +933,7 @@ int CGXDLMSServer::HandleSetRequest(CGXByteBuffer& data)
     {
         return ret;
     }
+    m_Settings.UpdateInvokeId(invoke);
     CGXDLMSLNParameters p(&m_Settings, invoke, DLMS_COMMAND_SET_RESPONSE, type, NULL, NULL, 0);
     if (type == DLMS_SET_COMMAND_TYPE_NORMAL || type == DLMS_SET_COMMAND_TYPE_FIRST_DATABLOCK)
     {
@@ -1321,6 +1322,7 @@ int CGXDLMSServer::HandleGetRequest(
     {
         return ret;
     }
+    m_Settings.UpdateInvokeId(invokeID);
     // GetRequest normal
     if (type == DLMS_GET_COMMAND_TYPE_NORMAL)
     {
@@ -2078,6 +2080,7 @@ int CGXDLMSServer::HandleMethodRequest(
     {
         return ret;
     }
+    m_Settings.UpdateInvokeId(invokeId);
     // CI
     if ((ret = data.GetUInt16(&tmp)) != 0)
     {
@@ -2162,13 +2165,13 @@ int CGXDLMSServer::HandleMethodRequest(
         if (((CGXDLMSAssociationLogicalName*)obj)->GetAssociationStatus() == DLMS_ASSOCIATION_STATUS_ASSOCIATED)
         {
             Connected(connectionInfo);
-            m_Settings.SetConnected((DLMS_CONNECTION_STATE) (m_Settings.GetConnected() | DLMS_CONNECTION_STATE_DLMS));
+            m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() | DLMS_CONNECTION_STATE_DLMS));
         }
         else
         {
             // If High level authentication fails.
             InvalidConnection(connectionInfo);
-            m_Settings.SetConnected((DLMS_CONNECTION_STATE) (m_Settings.GetConnected() & ~DLMS_CONNECTION_STATE_DLMS));
+            m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() & ~DLMS_CONNECTION_STATE_DLMS));
         }
     }
     return ret;
