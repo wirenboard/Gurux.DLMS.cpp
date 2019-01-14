@@ -57,6 +57,8 @@ class CGXDLMSServer
     friend class CGXDLMSValueEventArg;
     friend class CGXDLMSAssociationLogicalName;
     friend class CGXDLMSAssociationShortName;
+    friend class CGXDLMSLNCommandHandler;
+    friend class CGXDLMSSNCommandHandler;
 private:
     long m_DataReceived;
     CGXDLMSIecHdlcSetup* m_Hdlc;
@@ -89,65 +91,7 @@ private:
     * @return Returns returned UA packet.
     */
     int HandleSnrmRequest(CGXDLMSSettings& settings, CGXByteBuffer& data, CGXByteBuffer& reply);
-
-    /**
-    * Handle get request normal command.
-    *
-    * @param data
-    *            Received data.
-    */
-    int GetRequestNormal(CGXByteBuffer& data, unsigned char invokeID);
-
-    /**
-    * Handle get request next data block command.
-    *
-    * @param data
-    *            Received data.
-    */
-    int GetRequestNextDataBlock(CGXByteBuffer& data, unsigned char invokeID);
-
-    /**
-     * Handle get request with list command.
-     *
-     * @param data
-     *            Received data.
-     */
-    int GetRequestWithList(CGXByteBuffer& data, unsigned char invokeID);
-
-    int HandleSetRequest(
-        CGXByteBuffer& data,
-        short type,
-        CGXDLMSLNParameters& p);
-
-    int HanleSetRequestWithDataBlock(
-        CGXByteBuffer& data,
-        CGXDLMSLNParameters& p);
-
-    /**
-    * Handle read Block in blocks.
-    *
-    * @param data
-    *            Received data.
-    */
-    int HandleReadBlockNumberAccess(
-        CGXByteBuffer& data);
-
-    int HandleReadDataBlockAccess(
-        DLMS_COMMAND command,
-        CGXByteBuffer& data,
-        int cnt);
-
-    int ReturnSNError(
-        DLMS_COMMAND cmd,
-        DLMS_ERROR_CODE error);
-
-    int HandleRead(
-        DLMS_VARIABLE_ACCESS_SPECIFICATION type,
-        CGXByteBuffer& data,
-        CGXDLMSValueEventCollection& list,
-        std::vector<CGXDLMSValueEventArg*>& reads,
-        std::vector<CGXDLMSValueEventArg*>& actions);
-
+ 
     /**
     * Reset settings when connection is made or close.
     *
@@ -155,6 +99,22 @@ private:
     *            Is co3nnected.
     */
     void Reset(bool connected);
+
+    /**
+    * Generate confirmed service error.
+    *
+    * @param service
+    *            Confirmed service error.
+    * @param type
+    *            Service error.
+    * @param code
+    *            code
+    * @return
+    */
+    void GenerateConfirmedServiceError(
+        DLMS_CONFIRMED_SERVICE_ERROR service,
+        DLMS_SERVICE_ERROR type,
+        unsigned char code, CGXByteBuffer& data);
 
     /**
     * Handle received command.
@@ -173,50 +133,7 @@ private:
     int HandleAarqRequest(
         CGXByteBuffer& data,
         CGXDLMSConnectionEventArgs& connectionInfo);
-
-    /**
-     * Handle Set request.
-     *
-     * @return Reply to the client.
-     */
-    int HandleSetRequest(
-        CGXByteBuffer& data);
-
-    /**
-    * Handle Get request.
-    *
-    * @return Reply to the client.
-    */
-    int HandleGetRequest(
-        CGXByteBuffer& data);
-
-    /**
-    * Handle read request.
-    */
-    int HandleReadRequest(
-        CGXByteBuffer& data);
-
-    /**
-    * Handle write request.
-    *
-    * @param reply
-    *            Received data from the client.
-    * @return Reply.
-    */
-    int HandleWriteRequest(
-        CGXByteBuffer& data);
-
-    /**
-    * Handle action request.
-    *
-    * @param reply
-    *            Received data from the client.
-    * @return Reply.
-    */
-    int HandleMethodRequest(
-        CGXByteBuffer& data,
-        CGXDLMSConnectionEventArgs& connectionInfo);
-
+ 
     /**
     * Count how many rows can fit to one PDU.
     *
@@ -661,13 +578,6 @@ public:
         unsigned short size,
         CGXByteBuffer& reply);
 
-
-    /**
-    * Find Short Name object.
-    *
-    * @param sn
-    */
-    int FindSNObject(int sn, CGXSNInfo& i);
 
     /**
     * Server will tell what functionality is available for the client.

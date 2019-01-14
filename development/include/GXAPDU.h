@@ -40,6 +40,7 @@
 #include "errorcodes.h"
 #include "GXHelpers.h"
 #include "GXDLMSSettings.h"
+#include "GXDLMSTranslatorStructure.h"
 
 const unsigned char LOGICAL_NAME_OBJECT_ID[7] = { 0x60, 0x85, 0x74, 0x05, 0x08, 0x01, 0x01 };
 const unsigned char SHORT_NAME_OBJECT_ID[7] = { 0x60, 0x85, 0x74, 0x05, 0x08, 0x01, 0x02 };
@@ -57,6 +58,7 @@ const unsigned char SHORT_NAME_OBJECT_ID_WITH_CIPHERING[7] = { 0x60, 0x85, 0x74,
 /////////////////////////////////////////////////////////////////////////////
 class CGXAPDU
 {
+    friend class CGXDLMSTranslator;
 private:
     /////////////////////////////////////////////////////////////////////////////
     // Constructor.
@@ -64,7 +66,30 @@ private:
     CGXAPDU()
     {
     }
+    static int ParsePDU2(
+        CGXDLMSSettings& settings,
+        CGXCipher* cipher,
+        CGXByteBuffer& buff,
+        DLMS_ASSOCIATION_RESULT& result,
+        DLMS_SOURCE_DIAGNOSTIC& diagnostic,
+        CGXDLMSTranslatorStructure* xml);    
+    
+    static int Parse(bool initiateRequest,
+        CGXDLMSSettings& settings,
+        CGXCipher* cipher,
+        CGXByteBuffer& data,
+        CGXDLMSTranslatorStructure* xml,
+        unsigned char tag);
 public:
+
+    /**
+     * Parse User Information from PDU.
+     */
+    static int ParseUserInformation(
+        CGXDLMSSettings& settings,
+        CGXCipher* cipher,
+        CGXByteBuffer& data,
+        CGXDLMSTranslatorStructure* xml);
 
     /**
      * Generates Aarq.
@@ -97,7 +122,8 @@ public:
         CGXCipher* cipher,
         CGXByteBuffer& buff,
         DLMS_ASSOCIATION_RESULT &result,
-        DLMS_SOURCE_DIAGNOSTIC& diagnostic);
+        DLMS_SOURCE_DIAGNOSTIC& diagnostic,
+        CGXDLMSTranslatorStructure* xml);
 
     /**
      * Server generates AARE message.
@@ -110,6 +136,18 @@ public:
         CGXCipher* cipher,
         CGXByteBuffer *errorData,
         CGXByteBuffer *encryptedData);
+
+    static int GetUserInformation(
+        CGXDLMSSettings& settings,
+        CGXCipher* cipher,
+        CGXByteBuffer& data);
+
+    static int ParseInitiate(
+        bool initiateRequest,
+        CGXDLMSSettings& settings,
+        CGXCipher* cipher,
+        CGXByteBuffer& data,
+        CGXDLMSTranslatorStructure* xml);
 };
 
 #endif //GXAPDU_H

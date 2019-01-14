@@ -117,7 +117,7 @@ void CGXDLMSNotify::SetInvokeID(unsigned char value)
 
 int CGXDLMSNotify::GetData(CGXByteBuffer& reply, CGXReplyData& data)
 {
-    return CGXDLMS::GetData(m_Settings, reply, data);
+    return CGXDLMS::GetData(m_Settings, reply, data, NULL);
 }
 
 int CGXDLMSNotify::AddData(

@@ -178,6 +178,12 @@ public:
     //Get byte array as hex std::string.
     std::string ToHexString();
 
+    //Get byte array as hex std::string.
+    std::string ToHexString(bool addSpaces);
+    
+    //Get byte array as hex std::string.
+    std::string ToHexString(unsigned long position, unsigned long count, bool addSpaces);
+
     //Add integer value to byte array as a std::string.
     void AddIntAsString(int value);
 

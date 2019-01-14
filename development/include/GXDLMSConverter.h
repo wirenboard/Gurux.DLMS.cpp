@@ -85,5 +85,29 @@ public:
 
     // Packet switched status to the string.
     static const char* ToString(DLMS_GSM_PACKET_SWITCH_STATUS value);
+
+    //Convert authentication enum value to string.
+    static const char* ToString(DLMS_AUTHENTICATION value);
+
+    //Convert authentication string to enum value.
+    static DLMS_AUTHENTICATION ValueOfAuthentication(const char* value);
+
+    //Convert association enum value to string.
+    static const char* ToString(DLMS_ASSOCIATION_RESULT value);
+
+    //Convert association string to enum value.
+    static DLMS_ASSOCIATION_RESULT ValueOfAssociation(const char* value);
+
+    //Convert source diagnostic enum value to string.
+    static const char* ToString(DLMS_SOURCE_DIAGNOSTIC value);
+
+    //Convert source diagnostic string to enum value.
+    static DLMS_SOURCE_DIAGNOSTIC ValueOfSourceDiagnostic(const char* value);
+
+    //Convert security enum value to string.
+    static const char* ToString(DLMS_SECURITY value);
+
+    //Convert object type enum value to string.
+    static const char* ToString(DLMS_OBJECT_TYPE type);
 };
 #endif //GXDLMSCONVERTER_H

@@ -47,6 +47,41 @@ class GXHelpers
     * @return Byte value of hex char value.
     */
     static unsigned char GetValue(char c);
+
+    static int GetCompactArrayItem(
+        CGXByteBuffer& buff,
+        std::vector< CGXDLMSVariant>& dt,
+        std::vector< CGXDLMSVariant>& list,
+        int len);
+
+    static int GetCompactArrayItem(
+        CGXByteBuffer& buff,
+        DLMS_DATA_TYPE dt,
+        std::vector< CGXDLMSVariant>& list,
+        int len);
+
+    static int GetDataTypes(
+        CGXByteBuffer& buff,
+        std::vector<CGXDLMSVariant>& cols,
+        int len);
+    static int AppendDataTypeAsXml(
+        std::vector<CGXDLMSVariant>& cols,
+        CGXDataInfo info);
+
+
+    /**
+     * Get compact array value from DLMS data.
+     *
+     * @param buff
+     *            Received DLMS data.
+     * @param info
+     *            Data info.
+     * @return parsed UInt16 value.
+     */
+    static int GetCompactArray(
+        CGXByteBuffer& buff,
+        CGXDataInfo& info,
+        CGXDLMSVariant& value);
 public:
 
     /**
@@ -145,29 +180,21 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     // Trim from start.
     /////////////////////////////////////////////////////////////////////////////
-    static std::string &ltrim(std::string& s);
+    static std::string& ltrim(std::string& s);
 
     /////////////////////////////////////////////////////////////////////////////
     // Trim from end.
     /////////////////////////////////////////////////////////////////////////////
-    static inline std::string &rtrim(std::string& s)
-    {
-        s.erase(std::find_if(s.rbegin(), s.rend(),
-            std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
-        return s;
-    }
+    static std::string& rtrim(std::string& s);
 
     /////////////////////////////////////////////////////////////////////////////
     // Trim from both ends
     /////////////////////////////////////////////////////////////////////////////
-    static inline std::string &trim(std::string& s)
-    {
-        return ltrim(rtrim(s));
-    }
+    static std::string& trim(std::string& s);
 
     static std::string BytesToHex(unsigned char* pBytes, int count);
 
-    static std::string BytesToHex(unsigned char* pBytes, int count, char separator);
+    static std::string BytesToHex(unsigned char* pBytes, int count, char addSpaces);
 
     /**
      * Convert std::string to byte array.
@@ -209,5 +236,7 @@ public:
 
     //Reserved for internal use.
     static void ToBitString(CGXByteBuffer& sb, unsigned char value, int count);
+
+    static std::string GeneralizedTime(struct tm* date);
 };
 #endif //GXHELPERS_H

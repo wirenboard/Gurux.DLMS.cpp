@@ -54,7 +54,8 @@ class CGXDLMSValueEventArg
     friend class CGXDLMSProfileGeneric;
     friend class CGXDLMSAssociationLogicalName;
     friend class CGXDLMSAssociationShortName;
-
+    friend class CGXDLMSLNCommandHandler;
+    friend class CGXDLMSSNCommandHandler;
 private:
     /**
     * CGXDLMSVariant value.

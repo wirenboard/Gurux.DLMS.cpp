@@ -37,17 +37,17 @@
 CGXReplyData::CGXReplyData(
     DLMS_DATA_REQUEST_TYPES more,
     DLMS_COMMAND cmd,
-    CGXByteBuffer& buff,
+    CGXByteBuffer* buff,
     bool complete)
 {
     Clear();
     m_DataType = DLMS_DATA_TYPE_NONE;
     m_MoreData = more;
     m_Command = cmd;
-    m_CommandType = 0;
-    m_Data = buff;
+    m_CommandType = 0;   
     m_Complete = complete;
     m_Time = NULL;
+    m_pData = buff;
 }
 
 CGXReplyData::CGXReplyData()
@@ -102,7 +102,7 @@ void CGXReplyData::SetCommand(DLMS_COMMAND value)
 
 void CGXReplyData::SetData(CGXByteBuffer& value)
 {
-    m_Data = value;
+    m_pData = &value;
 }
 
 void CGXReplyData::SetComplete(bool value)
@@ -117,10 +117,11 @@ void CGXReplyData::SetTotalCount(int value)
 
 void CGXReplyData::Clear()
 {
+    m_Data.Clear();
+    m_pData = &m_Data;
     m_Time = NULL;
     m_MoreData = DLMS_DATA_REQUEST_TYPES_NONE;
     m_Command = DLMS_COMMAND_NONE;
-    m_Data.Clear();
     m_Complete = false;
     m_Peek = false;
     m_TotalCount = 0;
@@ -129,7 +130,15 @@ void CGXReplyData::Clear()
     m_PacketLength = 0;
     m_DataType = DLMS_DATA_TYPE_NONE;
     m_CipherIndex = 0;
-    m_Gbt = false;
+    m_pXml = NULL;
+    m_InvokeId = 0;
+    m_BlockNumber = 0;
+    m_BlockNumberAck = 0;
+    m_Streaming = false;
+    m_WindowSize = 0;
+    m_ClientAddress = 0;
+    m_ServerAddress = 0;
+    m_CommandType = 0;
 }
 
 bool CGXReplyData::IsMoreData()
@@ -162,10 +171,9 @@ unsigned char CGXReplyData::GetCommandType()
     return m_CommandType;
 }
 
-
 CGXByteBuffer& CGXReplyData::GetData()
 {
-    return m_Data;
+    return *m_pData;
 }
 
 bool CGXReplyData::IsComplete()
@@ -207,16 +215,6 @@ void CGXReplyData::SetCipherIndex(unsigned short value)
     m_CipherIndex = value;
 }
 
-bool CGXReplyData::GetGbt()
-{
-    return m_Gbt;
-}
-
-void CGXReplyData::SetGbt(bool value)
-{
-    m_Gbt = value;
-}
-
 struct tm* CGXReplyData::GetTime()
 {
     return m_Time;
@@ -240,4 +238,15 @@ void CGXReplyData::SetTime(struct tm* value)
         }
         memcpy(m_Time, value, sizeof(struct tm));
     }
+}
+
+CGXDLMSTranslatorStructure* CGXReplyData::GetXml()
+{
+    return m_pXml;
+}
+
+
+void CGXReplyData::SetXml(CGXDLMSTranslatorStructure* value)
+{
+    m_pXml = value;
 }

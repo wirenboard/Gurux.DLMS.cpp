@@ -97,23 +97,23 @@ const char* CGXDLMSConverter::GetErrorMessage(int error)
         return "Access Error : Device reports Read-Write denied.";
     case DLMS_ERROR_CODE_UNDEFINED_OBJECT:
         return "Access Error : Device reports a undefined object.";
-    case DLMS_ERROR_CODE_INCONSISTENT_OBJECT:
+    case DLMS_ERROR_CODE_INCONSISTENT_CLASS:
         return "Access Error : Device reports a inconsistent Class or Object.";
     case DLMS_ERROR_CODE_UNAVAILABLE_OBJECT:
         return "Access Error : Device reports a unavailable object.";
     case DLMS_ERROR_CODE_UNMATCH_TYPE:
         return "Access Error : Device reports a unmatched type.";
-    case DLMS_ERROR_CODE_VIOLATED:
+    case DLMS_ERROR_CODE_ACCESS_VIOLATED:
         return "Access Error : Device reports scope of access violated.";
-    case DLMS_ERROR_CODE_BLOCK_UNAVAILABLE:
+    case DLMS_ERROR_CODE_DATA_BLOCK_UNAVAILABLE:
         return "Access Error : Data Block Unavailable.";
-    case DLMS_ERROR_CODE_READ_ABORTED:
+    case DLMS_ERROR_CODE_LONG_GET_OR_READ_ABORTED:
         return "Access Error : Long Get Or Read Aborted.";
-    case DLMS_ERROR_CODE_READ_IN_PROGRESS:
-        return "Access Error : No Long Get Or Read In Progress.";
-    case DLMS_ERROR_CODE_WRITE_ABORTED:
-        return "Access Error : Long Set Or Write Aborted.";
     case DLMS_ERROR_CODE_NO_LONG_GET_OR_READ_IN_PROGRESS:
+        return "Access Error : No Long Get Or Read In Progress.";
+    case DLMS_ERROR_CODE_LONG_SET_OR_WRITE_ABORTED:
+        return "Access Error : Long Set Or Write Aborted.";
+    case DLMS_ERROR_CODE_NO_LONG_SET_OR_WRITE_IN_PROGRESS:
         return "Access Error : No Long Set Or Write In Progress.";
     case DLMS_ERROR_CODE_DATA_BLOCK_NUMBER_INVALID:
         return "Access Error : Data Block Number Invalid.";
@@ -639,3 +639,356 @@ const char* CGXDLMSConverter::ToString(DLMS_GSM_PACKET_SWITCH_STATUS value)
     }
     return str;
 };
+
+const char* CGXDLMSConverter::ToString(DLMS_AUTHENTICATION value)
+{
+    const char* str;
+    switch (value)
+    {
+    case DLMS_AUTHENTICATION_HIGH:
+        str = "High";
+        break;
+    case DLMS_AUTHENTICATION_HIGH_GMAC:
+        str = "HighGMac";
+        break;
+    case DLMS_AUTHENTICATION_HIGH_MD5:
+        str = "HighMd5";
+        break;
+    case DLMS_AUTHENTICATION_HIGH_SHA1:
+        str = "HighSha1";
+        break;
+    case DLMS_AUTHENTICATION_HIGH_SHA256:
+        str = "HighSha256";
+        break;
+    case DLMS_AUTHENTICATION_LOW:
+        str = "Low";
+        break;
+    case DLMS_AUTHENTICATION_NONE:
+        str = "None";
+        break;
+    default:
+        str = "UNKNOWN";
+        break;
+    }
+    return str;
+}
+
+DLMS_AUTHENTICATION CGXDLMSConverter::ValueOfAuthentication(const char* value) {
+    DLMS_AUTHENTICATION v;
+    if (strcmp(value, "None") == 0)
+    {
+        v = DLMS_AUTHENTICATION_NONE;
+    }
+    else if (strcmp(value, "Low") == 0)
+    {
+        v = DLMS_AUTHENTICATION_LOW;
+    }
+    else if (strcmp(value, "High") == 0)
+    {
+        v = DLMS_AUTHENTICATION_HIGH;
+    }
+    else if (strcmp(value, "HighMd5") == 0)
+    {
+        v = DLMS_AUTHENTICATION_HIGH_MD5;
+    }
+    else if (strcmp(value, "HighSha1") == 0)
+    {
+        v = DLMS_AUTHENTICATION_HIGH_SHA1;
+    }
+    else if (strcmp(value, "HighSha256") == 0)
+    {
+        v = DLMS_AUTHENTICATION_HIGH_SHA256;
+    }
+    else if (strcmp(value, "HighGMac") == 0)
+    {
+        v = DLMS_AUTHENTICATION_HIGH_GMAC;
+    }
+    else {
+        v = (DLMS_AUTHENTICATION)-1;
+    }
+    return v;
+}
+
+//Convert association enum value to string.
+const char* CGXDLMSConverter::ToString(DLMS_ASSOCIATION_RESULT value)
+{
+    const char* str;
+    switch (value)
+    {
+    case DLMS_ASSOCIATION_RESULT_ACCEPTED:
+        str = "ACCEPTED";
+        break;
+    case DLMS_ASSOCIATION_RESULT_PERMANENT_REJECTED:
+        str = "PERMANENT_REJECTED";
+        break;
+    case DLMS_ASSOCIATION_RESULT_TRANSIENT_REJECTED:
+        str = "TRANSIENT_REJECTED";
+        break;
+    default:
+        str = "UNKNOWN";
+        break;
+    }
+    return str;
+}
+
+DLMS_ASSOCIATION_RESULT CGXDLMSConverter::ValueOfAssociation(const char* value)
+{
+    DLMS_ASSOCIATION_RESULT v;
+    if (strcmp(value, "Accepted") == 0)
+    {
+        v = DLMS_ASSOCIATION_RESULT_ACCEPTED;
+    }
+    else if (strcmp(value, "PERMANENT_REJECTED") == 0)
+    {
+        v = DLMS_ASSOCIATION_RESULT_PERMANENT_REJECTED;
+    }
+    else if (strcmp(value, "TRANSIENT_REJECTED") == 0)
+    {
+        v = DLMS_ASSOCIATION_RESULT_TRANSIENT_REJECTED;
+    }
+    else {
+        v = (DLMS_ASSOCIATION_RESULT)-1;
+    }
+    return v;
+}
+
+const char* CGXDLMSConverter::ToString(DLMS_SOURCE_DIAGNOSTIC value)
+{
+    const char* str;
+    switch (value)
+    {
+    case DLMS_SOURCE_DIAGNOSTIC_NONE:
+        str = "NONE";
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED:
+        str = "APPLICATION_CONTEXT_NAME_NOT_SUPPORTED";
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLING_AP_TITLE_NOT_RECOGNIZED:
+        str = "APPLICATION_CALLING_AP_TITLE_NOT_RECOGNIZED";
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_NO_REASON_GIVEN:
+        str = "NO_REASON_GIVEN";
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLING_AP_INVOCATION_IDENTIFIER_NOT_RECOGNIZED:
+        str = "APPLICATION_CALLING_AP_INVOCATION_IDENTIFIER_NOT_RECOGNIZED";
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLING_AE_QUALIFIER_NOT_RECOGNIZED:
+        str = "APPLICATION_CALLING_AE_QUALIFIER_NOT_RECOGNIZED ";
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLING_AE_INVOCATION_IDENTIFIER_NOT_RECOGNIZED:
+        str = "APPLICATION_CALLING_AE_INVOCATION_IDENTIFIER_NOT_RECOGNIZED";
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLED_AP_TITLE_NOT_RECOGNIZED:
+        str = "APPLICATION_CALLED_AP_TITLE_NOT_RECOGNIZED";
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLED_AP_INVOCATION_IDENTIFIER_NOT_RECOGNIZED:
+        str = "APPLICATION_CALLED_AP_INVOCATION_IDENTIFIER_NOT_RECOGNIZED";
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLED_AE_QUALIFIER_NOT_RECOGNIZED:
+        str = "APPLICATION_CALLED_AE_QUALIFIER_NOT_RECOGNIZED";
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLED_AE_INVOCATION_IDENTIFIER_NOT_RECOGNIZED:
+        str = "APPLICATION_CALLED_AE_INVOCATION_IDENTIFIER_NOT_RECOGNIZED";
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_MECHANISM_NAME_NOT_RECOGNISED:
+        str = "AUTHENTICATION_MECHANISM_NAME_NOT_RECOGNISED";
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_MECHANISM_NAME_REQUIRED:
+        str = "AUTHENTICATION_MECHANISM_NAME_REQUIRED";
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_FAILURE:
+        str = "AUTHENTICATION_FAILURE";
+        break;
+    case DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_REQUIRED:
+        str = "AUTHENTICATION_REQUIRED";
+        break;
+    default:
+        str = "UNKNOWN";
+        break;
+    }
+    return str;
+}
+
+DLMS_SOURCE_DIAGNOSTIC CGXDLMSConverter::ValueOfSourceDiagnostic(const char* value)
+{
+    DLMS_SOURCE_DIAGNOSTIC v;
+    if (strcmp(value, "NONE") == 0)
+    {
+        v = DLMS_SOURCE_DIAGNOSTIC_NONE;
+    }
+    else if (strcmp(value, "APPLICATION_CONTEXT_NAME_NOT_SUPPORTED") == 0)
+    {
+        v = DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED;
+    }
+    else if (strcmp(value, "APPLICATION_CALLING_AP_TITLE_NOT_RECOGNIZED") == 0)
+    {
+        v = DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLING_AP_TITLE_NOT_RECOGNIZED;
+    }
+    else if (strcmp(value, "NO_REASON_GIVEN") == 0)
+    {
+        v = DLMS_SOURCE_DIAGNOSTIC_NO_REASON_GIVEN;
+    }
+    else if (strcmp(value, "APPLICATION_CALLING_AP_INVOCATION_IDENTIFIER_NOT_RECOGNIZED") == 0)
+    {
+        v = DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLING_AP_INVOCATION_IDENTIFIER_NOT_RECOGNIZED;
+    }
+    else if (strcmp(value, "APPLICATION_CALLING_AE_QUALIFIER_NOT_RECOGNIZED") == 0)
+    {
+        v = DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLING_AE_QUALIFIER_NOT_RECOGNIZED;
+    }
+    else if (strcmp(value, "APPLICATION_CALLING_AE_INVOCATION_IDENTIFIER_NOT_RECOGNIZED") == 0)
+    {
+        v = DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLING_AE_INVOCATION_IDENTIFIER_NOT_RECOGNIZED;
+    }
+    else if (strcmp(value, "APPLICATION_CALLED_AP_TITLE_NOT_RECOGNIZED") == 0)
+    {
+        v = DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLED_AP_TITLE_NOT_RECOGNIZED;
+    }
+    else if (strcmp(value, "APPLICATION_CALLED_AP_INVOCATION_IDENTIFIER_NOT_RECOGNIZED") == 0)
+    {
+        v = DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLED_AP_INVOCATION_IDENTIFIER_NOT_RECOGNIZED;
+    }
+    else if (strcmp(value, "APPLICATION_CALLED_AE_QUALIFIER_NOT_RECOGNIZED") == 0)
+    {
+        v = DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLED_AE_QUALIFIER_NOT_RECOGNIZED;
+    }
+    else if (strcmp(value, "APPLICATION_CALLED_AE_INVOCATION_IDENTIFIER_NOT_RECOGNIZED") == 0)
+    {
+        v = DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLED_AE_INVOCATION_IDENTIFIER_NOT_RECOGNIZED;
+    }
+    else if (strcmp(value, "AUTHENTICATION_MECHANISM_NAME_NOT_RECOGNISED") == 0)
+    {
+        v = DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_MECHANISM_NAME_NOT_RECOGNISED;
+    }
+    else if (strcmp(value, "AUTHENTICATION_MECHANISM_NAME_REQUIRED") == 0)
+    {
+        v = DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_MECHANISM_NAME_REQUIRED;
+    }
+    else if (strcmp(value, "AUTHENTICATION_FAILURE") == 0)
+    {
+        v = DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_FAILURE;
+    }
+    else if (strcmp(value, "AUTHENTICATION_REQUIRED") == 0)
+    {
+        v = DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_REQUIRED;
+    }
+    else {
+        v = (DLMS_SOURCE_DIAGNOSTIC)-1;
+    }
+    return v;
+}
+
+const char* CGXDLMSConverter::ToString(DLMS_SECURITY value)
+{
+    switch (value)
+    {
+    case DLMS_SECURITY_NONE:
+        return "None";
+    case DLMS_SECURITY_AUTHENTICATION:
+        return "Authentication";
+    case DLMS_SECURITY_ENCRYPTION:
+        return "Encryption";
+    case DLMS_SECURITY_AUTHENTICATION_ENCRYPTION:
+        return "AuthenticationEncryption";
+    default:
+        break;
+    }
+    return "Invalid";
+}
+
+const char* CGXDLMSConverter::ToString(DLMS_OBJECT_TYPE type)
+{
+    switch (type)
+    {
+    case DLMS_OBJECT_TYPE_ACTION_SCHEDULE:
+        return "GXDLMSActionSchedule";
+    case DLMS_OBJECT_TYPE_ACTIVITY_CALENDAR:
+        return "GXDLMSActivityCalendar";
+    case DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME:
+        return "GXDLMSAssociationLogicalName";
+    case DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME:
+        return "GXDLMSAssociationShortName";
+    case DLMS_OBJECT_TYPE_AUTO_ANSWER:
+        return "GXDLMSAutoAnswer";
+    case DLMS_OBJECT_TYPE_AUTO_CONNECT:
+        return "GXDLMSAutoConnect";
+    case DLMS_OBJECT_TYPE_CLOCK:
+        return "GXDLMSClock";
+    case DLMS_OBJECT_TYPE_DATA:
+        return "GXDLMSData";
+    case DLMS_OBJECT_TYPE_DEMAND_REGISTER:
+        return "GXDLMSDemandRegister";
+    case DLMS_OBJECT_TYPE_MAC_ADDRESS_SETUP:
+        return "GXDLMSMacAddressSetup";
+    case DLMS_OBJECT_TYPE_EXTENDED_REGISTER:
+        return "GXDLMSExtendedRegister";
+    case DLMS_OBJECT_TYPE_GPRS_SETUP:
+        return "GXDLMSGprsSetup";
+    case DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP:
+        return "GXDLMSSecuritySetup";
+    case DLMS_OBJECT_TYPE_IEC_HDLC_SETUP:
+        return "GXDLMSHdlcSetup";
+    case DLMS_OBJECT_TYPE_IEC_LOCAL_PORT_SETUP:
+        return "GXDLMSIECOpticalPortSetup";
+    case DLMS_OBJECT_TYPE_IEC_TWISTED_PAIR_SETUP:
+        return "GXDLMSIEC_TWISTED_PAIR_SETUP";
+    case DLMS_OBJECT_TYPE_IP4_SETUP:
+        return "GXDLMSIp4Setup";
+    case DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP:
+        return "GXDLMSMBusSlavePortSetup";
+    case DLMS_OBJECT_TYPE_IMAGE_TRANSFER:
+        return "GXDLMSImageTransfer";
+    case DLMS_OBJECT_TYPE_DISCONNECT_CONTROL:
+        return "GXDLMSDisconnectControl";
+    case DLMS_OBJECT_TYPE_LIMITER:
+        return "GXDLMSLimiter";
+    case DLMS_OBJECT_TYPE_MBUS_CLIENT:
+        return "GXDLMSMBusClient";
+    case DLMS_OBJECT_TYPE_MODEM_CONFIGURATION:
+        return "GXDLMSModemConfiguration";
+    case DLMS_OBJECT_TYPE_PPP_SETUP:
+        return "GXDLMSPppSetup";
+    case DLMS_OBJECT_TYPE_PROFILE_GENERIC:
+        return "GXDLMSProfileGeneric";
+    case DLMS_OBJECT_TYPE_REGISTER:
+        return "GXDLMSRegister";
+    case DLMS_OBJECT_TYPE_REGISTER_ACTIVATION:
+        return "GXDLMSRegisterActivation";
+    case DLMS_OBJECT_TYPE_REGISTER_MONITOR:
+        return "GXDLMSRegisterMonitor";
+    case DLMS_OBJECT_TYPE_REGISTER_TABLE:
+        return "GXDLMSRegisterTable";
+    case DLMS_OBJECT_TYPE_ZIG_BEE_SAS_STARTUP:
+        return "GXDLMSZigBeeSasStartup";
+    case DLMS_OBJECT_TYPE_ZIG_BEE_SAS_JOIN:
+        return "GXDLMSZigBeeSasJoin";
+    case DLMS_OBJECT_TYPE_ZIG_BEE_SAS_APS_FRAGMENTATION:
+        return "GXDLMSZigBeeSasApsFragmentation";
+    case DLMS_OBJECT_TYPE_ZIG_BEE_NETWORK_CONTROL:
+        return "GXDLMSZigBeeNetworkControl";
+    case DLMS_OBJECT_TYPE_SAP_ASSIGNMENT:
+        return "GXDLMSSapAssignment";
+    case DLMS_OBJECT_TYPE_SCHEDULE:
+        return "GXDLMSSchedule";
+    case DLMS_OBJECT_TYPE_SCRIPT_TABLE:
+        return "GXDLMSScriptTable";
+    case DLMS_OBJECT_TYPE_SMTP_SETUP:
+        return "GXDLMSSMTPSetup";
+    case DLMS_OBJECT_TYPE_SPECIAL_DAYS_TABLE:
+        return "GXDLMSSpecialDaysTable";
+    case DLMS_OBJECT_TYPE_STATUS_MAPPING:
+        return "GXDLMSStatusMapping";
+    case DLMS_OBJECT_TYPE_TCP_UDP_SETUP:
+        return "GXDLMSTcpUdpSetup";
+    case DLMS_OBJECT_TYPE_UTILITY_TABLES:
+        return "GXDLMSUtilityTables";
+    case DLMS_OBJECT_TYPE_MBUS_MASTER_PORT_SETUP:
+        return "GXDLMSMBusMasterPortSetup";
+    case DLMS_OBJECT_TYPE_MESSAGE_HANDLER:
+        return "GXDLMSMessageHandler";
+    case DLMS_OBJECT_TYPE_PUSH_SETUP:
+        return "GXDLMSPushSetup";
+    default:
+        return "Manufacture spesific.";
+    }
+}

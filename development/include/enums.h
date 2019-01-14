@@ -58,6 +58,7 @@
 #endif
 
 const unsigned char HDLC_FRAME_START_END = 0x7E;
+const unsigned long DATA_TYPE_OFFSET = 0xFF0000;
 const char AARQ_TAG = 0x60;
 const char AARE_TAG = 0x61;
 
@@ -931,9 +932,9 @@ typedef enum
     DLMS_COMMAND_DISCONNECT_MODE = 0x1f,
 
     /**
-     * Command rejected.
+     * HDLC Unacceptable Frame.
      */
-    DLMS_COMMAND_REJECTED = 0x97,
+    DLMS_COMMAND_UNACCEPTABLE_FRAME = 0x97,
 
     /**
      * SNRM request.
@@ -958,7 +959,7 @@ typedef enum
     /**
      * Disconnect request for HDLC framing.
      */
-    DLMS_COMMAND_DISC = 0x53,
+    DLMS_COMMAND_DISCONNECT_REQUEST = 0x53,
 
     /**
      * Release request.
@@ -1591,7 +1592,7 @@ typedef enum
     /**
      * Task error.
      */
-    DLMS_SERVICE_ERROR_TAS = 8,
+    DLMS_SERVICE_ERROR_TASK = 8,
     /**
      * Other error describes manufacturer specific error code.
      */
@@ -2346,5 +2347,79 @@ typedef enum {
      */
     DLMS_CERTIFICATE_TYPE_OTHER = 3
 }DLMS_CERTIFICATE_TYPE;
+
+typedef enum
+{
+    //Simple XML format.
+    DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML,
+    //Standard XML format.
+    DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML
+}DLMS_TRANSLATOR_OUTPUT_TYPE;
+
+// RequestTypes enumerates the replies of the server to a client's request,
+// indicating the request type.
+typedef enum
+{
+    // Client closes connection as normal.
+    DLMS_RELEASE_REQUEST_REASON_NORMAL = 0,
+    // Client closes connection as urgent.
+    DLMS_RELEASE_REQUEST_REASON_URGENT = 1,
+    // Client closes connection user defined reason.
+    DLMS_RELEASE_REQUEST_REASON_USER_DEFINED = 30
+}DLMS_RELEASE_REQUEST_REASON;
+
+// RequestTypes enumerates the replies of the server to a client's request,
+// indicating the request type.
+typedef enum
+{
+    // Client closes connection as normal.
+    DLMS_RELEASE_RESPONSE_REASON_NORMAL = 0,
+    // Connection is not finished.
+    DLMS_RELEASE_RESPONSE_REASON_NOTFINISHED = 1,
+    // Client closes connection user defined reason.
+    DLMS_RELEASE_RESPONSE_REASON_USERDEFINED = 30
+}DLMS_RELEASE_RESPONSE_REASON;
+
+// Enumerates Access Service types.
+typedef enum
+{
+    // Get request or response.
+    DLMS_ACCESS_SERVICE_COMMAND_TYPE_GET = 1,
+    // Set request or response.
+    DLMS_ACCESS_SERVICE_COMMAND_TYPE_SET = 2,
+    // Action request or response.
+    DLMS_ACCESS_SERVICE_COMMAND_TYPE_ACTION = 3
+}DLMS_ACCESS_SERVICE_COMMAND_TYPE;
+
+// Enumerates Set request types.
+typedef enum {
+    // Normal Set.
+    DLMS_SET_REQUEST_TYPE_NORMAL = 1,
+    // Set with first data block.
+    DLMS_SET_REQUEST_TYPE_FIRST_DATA_BLOCK = 2,
+    // Set with data block.
+    DLMS_SET_REQUEST_TYPE_WITH_DATA_BLOCK = 3,
+    // Set with list.
+    DLMS_SET_REQUEST_TYPE_WITH_LIST = 4,
+    // Set with list and first data block.
+    DLMS_SET_REQUEST_TYPE_WITH_LIST_AND_WITH_FIRST_DATA_BLOCK = 5
+}DLMS_SET_REQUEST_TYPE;
+
+// Enumerates Action request types.
+typedef enum
+{
+    // Normal action.
+    DLMS_ACTION_REQUEST_TYPE_NORMAL = 1,
+    // Next block.
+    DLMS_ACTION_REQUEST_TYPE_NEXT_BLOCK = 2,
+    // Action with list.
+    DLMS_ACTION_REQUEST_TYPE_WITH_LIST = 3,
+    // Action with first block.
+    DLMS_ACTION_REQUEST_TYPE_WITH_FIRST_BLOCK = 4,
+    // Action with list and first block.
+    DLMS_ACTION_REQUEST_TYPE_WITH_LIST_AND_FIRST_BLOCK = 5,
+    // Action with block.
+    DLMS_ACTION_REQUEST_TYPE_WITH_BLOCK = 6
+}DLMS_ACTION_REQUEST_TYPE;
 
 #endif //ENUMS_H

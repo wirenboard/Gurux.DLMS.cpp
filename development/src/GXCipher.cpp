@@ -1317,3 +1317,13 @@ void CGXCipher::Reset()
 {
 
 }
+
+CGXByteBuffer& CGXCipher::GetDedicatedKey()
+{
+    return m_DedicatedKey;
+}
+
+void CGXCipher::SetDedicatedKey(CGXByteBuffer& value)
+{
+    m_DedicatedKey = value;
+}

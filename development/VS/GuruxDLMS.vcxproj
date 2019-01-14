@@ -167,6 +167,7 @@
     <ClCompile Include="..\src\GXDLMSIp4SetupIpOption.cpp" />
     <ClCompile Include="..\src\GXDLMSLimiter.cpp" />
     <ClCompile Include="..\src\GXDLMSLimits.cpp" />
+    <ClCompile Include="..\src\GXDLMSLNCommandHandler.cpp" />
     <ClCompile Include="..\src\GXDLMSLNParameters.cpp" />
     <ClCompile Include="..\src\GXDLMSMacAddressSetup.cpp" />
     <ClCompile Include="..\src\GXDLMSMBusClient.cpp" />
@@ -205,10 +206,13 @@
     <ClCompile Include="..\src\GXDLMSSettings.cpp" />
     <ClCompile Include="..\src\GXDLMSSha1.cpp" />
     <ClCompile Include="..\src\GXDLMSSha256.cpp" />
+    <ClCompile Include="..\src\GXDLMSSNCommandHandler.cpp" />
     <ClCompile Include="..\src\GXDLMSSNParameters.cpp" />
     <ClCompile Include="..\src\GXDLMSSpecialDay.cpp" />
     <ClCompile Include="..\src\GXDLMSSpecialDaysTable.cpp" />
     <ClCompile Include="..\src\GXDLMSTcpUdpSetup.cpp" />
+    <ClCompile Include="..\src\GXDLMSTranslator.cpp" />
+    <ClCompile Include="..\src\GXDLMSTranslatorStructure.cpp" />
     <ClCompile Include="..\src\GXDLMSValueEventArg.cpp" />
     <ClCompile Include="..\src\GXDLMSVariant.cpp" />
     <ClCompile Include="..\src\GXDLMSWeekProfile.cpp" />
@@ -269,6 +273,7 @@
     <ClInclude Include="..\include\GXDLMSIp4SetupIpOption.h" />
     <ClInclude Include="..\include\GXDLMSLimiter.h" />
     <ClInclude Include="..\include\GXDLMSLimits.h" />
+    <ClInclude Include="..\include\GXDLMSLNCommandHandler.h" />
     <ClInclude Include="..\include\GXDLMSLNParameters.h" />
     <ClInclude Include="..\include\GXDLMSLongTransaction.h" />
     <ClInclude Include="..\include\GXDLMSMacAddressSetup.h" />
@@ -308,15 +313,17 @@
     <ClInclude Include="..\include\GXDLMSSettings.h" />
     <ClInclude Include="..\include\GXDLMSSha1.h" />
     <ClInclude Include="..\include\GXDLMSSha256.h" />
+    <ClInclude Include="..\include\GXDLMSSNCommandHandler.h" />
     <ClInclude Include="..\include\GXDLMSSNParameters.h" />
     <ClInclude Include="..\include\GXDLMSSpecialDay.h" />
     <ClInclude Include="..\include\GXDLMSSpecialDaysTable.h" />
     <ClInclude Include="..\include\GXDLMSTcpUdpSetup.h" />
+    <ClInclude Include="..\include\GXDLMSTranslator.h" />
+    <ClInclude Include="..\include\GXDLMSTranslatorStructure.h" />
     <ClInclude Include="..\include\GXDLMSValueEventArg.h" />
     <ClInclude Include="..\include\GXDLMSValueEventCollection.h" />
     <ClInclude Include="..\include\GXDLMSVariant.h" />
     <ClInclude Include="..\include\GXDLMSWeekProfile.h" />
-    <ClInclude Include="..\include\GXGMac.h" />
     <ClInclude Include="..\include\GXHelpers.h" />
     <ClInclude Include="..\include\GXReplyData.h" />
     <ClInclude Include="..\include\GXSecure.h" />
@@ -327,6 +334,10 @@
     <ClInclude Include="..\include\GXTime.h" />
     <ClInclude Include="..\include\IGXDLMSBase.h" />
     <ClInclude Include="..\include\OBiscodes.h" />
+    <ClInclude Include="..\include\TranslatorGeneralTags.h" />
+    <ClInclude Include="..\include\TranslatorSimpleTags.h" />
+    <ClInclude Include="..\include\TranslatorStandardTags.h" />
+    <ClInclude Include="..\include\TranslatorTags.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\README.md" />

@@ -75,6 +75,9 @@ private:
     */
     CGXByteBuffer m_AuthenticationKey;
 
+    // Dedicated key.
+    CGXByteBuffer m_DedicatedKey;
+
     /**
      * Frame counter. AKA Invocation counter.
      */
@@ -319,5 +322,17 @@ public:
     void SetFrameCounter(unsigned long value);
 
     void Reset();
+
+    /**
+    * @return Dedicated key.
+    */
+    CGXByteBuffer& GetDedicatedKey();
+
+    /**
+     * @param value
+     *            Dedicated key.
+     */
+    void SetDedicatedKey(CGXByteBuffer& value);
+
 };
 #endif //GXCIPHER_H

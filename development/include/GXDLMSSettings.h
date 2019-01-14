@@ -151,6 +151,16 @@ class CGXDLMSSettings
      */
     CGXCipher* m_Cipher;
 
+    /*
+   * Block number acknowledged in GBT.
+   */
+    int m_BlockNumberAck;
+
+    /*
+     * GBT window size.
+     */
+    unsigned char m_WindowSize;
+
     /**
     * Proposed conformance block. Client asks this funtionality.
     */
@@ -165,6 +175,14 @@ class CGXDLMSSettings
     *  Protocol version.
     */
     char* m_ProtocolVersion;
+
+    unsigned char m_UserId;
+
+    unsigned char m_QualityOfService;
+
+    // DLMS Standard says that Time zone is from normal time to UTC in minutes.
+    // If meter is configured to use UTC time (UTC to normal time) set this to true.
+    bool m_UseUtc2NormalTime;
 public:
     // Constructor.
     CGXDLMSSettings(bool isServer);
@@ -289,10 +307,10 @@ public:
     void SetServiceClass(DLMS_SERVICE_CLASS value);
 
     // Invoke ID.
-    int GetInvokeID();
+    unsigned char GetInvokeID();
 
     // Invoke ID.
-    void SetInvokeID(int value);
+    void SetInvokeID(unsigned char value);
 
 
     // Update invoke ID.
@@ -416,6 +434,58 @@ public:
     *            Protocol version.
     */
     void SetProtocolVersion(const char* value);
+
+    // DLMS Standard says that Time zone is from normal time to UTC in minutes.
+    // If meter is configured to use UTC time (UTC to normal time) set this to true.
+    bool GetUseUtc2NormalTime();
+
+    // DLMS Standard says that Time zone is from normal time to UTC in minutes.
+    // If meter is configured to use UTC time (UTC to normal time) set this to true.
+    void SetUseUtc2NormalTime(bool value);
+
+    // User ID.
+    unsigned char GetUserID();
+
+    // User ID.
+    void SetUserID(unsigned char value);
+
+    // Quality of service.
+    unsigned char GetQualityOfService();
+
+    // Quality of service.
+    void SetQualityOfService(unsigned char value);
+
+    /*
+    * Block number acknowledged in GBT.
+    */
+    int GetBlockNumberAck()
+    {
+        return m_BlockNumberAck;
+    }
+
+    /**
+     * Block number acknowledged in GBT.
+     */
+    void SetBlockNumberAck(int value)
+    {
+        m_BlockNumberAck = value;
+    }
+
+    /*
+    * GBT window size.
+    */
+    unsigned char GetWindowSize()
+    {
+        return m_WindowSize;
+    }
+
+    /*
+     * GBT window size.
+    */
+    void SetWindowSize(unsigned char value)
+    {
+        m_WindowSize = value;
+    }
 };
 
 #endif //GXDLMSSETTINGS_H

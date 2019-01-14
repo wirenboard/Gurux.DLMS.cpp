@@ -34,7 +34,7 @@
 
 #include "../include/GXDLMSObjectDefinition.h"
 #include <sstream>
-#include "../include/GXDLMSObjectFactory.h"
+#include "../include/GXDLMSConverter.h"
 
 CGXDLMSObjectDefinition::CGXDLMSObjectDefinition()
 {
@@ -53,7 +53,7 @@ CGXDLMSObjectDefinition::CGXDLMSObjectDefinition(DLMS_OBJECT_TYPE classId, std::
 std::string CGXDLMSObjectDefinition::ToString()
 {
     std::stringstream sb;
-    sb << CGXDLMSObjectFactory::ObjectTypeToString(m_ClassId).c_str();
+    sb << CGXDLMSConverter::ToString(m_ClassId);
     sb << " ";
     sb << m_LogicalName.c_str();
     return sb.str();

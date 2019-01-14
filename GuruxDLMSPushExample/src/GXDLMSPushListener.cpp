@@ -56,13 +56,17 @@
 
 #include "../include/GXDLMSPushListener.h"
 #include "../../development/include/GXDLMSData.h"
+#include "../../development/include/GXDLMSTranslator.h"
 
 using namespace std;
 
 void ListenerThread(void* pVoid)
 {
     CGXByteBuffer reply;
+    // Client used to parse received data.
+    CGXDLMSClient cl(true, -1, -1, DLMS_AUTHENTICATION_NONE, NULL, DLMS_INTERFACE_TYPE_WRAPPER);
     CGXDLMSPushListener* server = (CGXDLMSPushListener*) pVoid;
+
     sockaddr_in add = {0};
     int ret;
     char tmp[10];
@@ -85,6 +89,7 @@ void ListenerThread(void* pVoid)
     * several data blocks.
     */
     CGXReplyData data;
+    CGXReplyData notify;
 
     while(server->IsConnected())
     {
@@ -142,7 +147,7 @@ void ListenerThread(void* pVoid)
                     break;
                 }
                 bb.SetSize(bb.GetSize() + ret);
-                if (server->GetData(bb, data) != 0)
+                if ((ret = cl.GetData(bb, data, notify)) != 0 && ret != DLMS_ERROR_CODE_FALSE)
                 {
 #if defined(_WIN32) || defined(_WIN64)//If Windows
                     closesocket(socket);
@@ -154,19 +159,38 @@ void ListenerThread(void* pVoid)
                 }
 
                 // If all data is received.
-                if (data.IsComplete() && !data.IsMoreData())
+                if (notify.IsComplete() && !notify.IsMoreData())
                 {
-                    std::vector<std::string> values;
-                    std::vector<std::pair<CGXDLMSObject*, unsigned char> > list;
-                    ret = server->ParsePush(data.GetValue().Arr, list);
-                    // Print received data.
-                    for (std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = list.begin(); it != list.end(); ++it)
+                    //Show data as XML.
+                    string xml;
+                    CGXDLMSTranslator t(DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML);
+                    t.DataToXml(notify.GetData(), xml);
+                    printf(xml.c_str());
+                    //Example is sending list of push messages in first parameter.
+                    if (notify.GetValue().vt == DLMS_DATA_TYPE_STRUCTURE)
                     {
-                        // Print LN and value.
-                        it->first->GetValues(values);
-                        printf("%s : %s\r\n", it->first->GetName().ToString().c_str(), values.at(it->second - 1).c_str());
+                        std::vector<std::pair<CGXDLMSObject*, unsigned char> > objects;
+                        ret = cl.ParsePushObjects(notify.GetValue().Arr[0].Arr, objects);
+                        //Remove first item because it's not needed anymore.
+                        objects.erase(objects.begin());
+                        //Update clock.
+                        int Valueindex = 1;
+                        std::vector<std::string> values;
+                        for(std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = objects.begin(); it != objects.end(); ++it)
+                        {
+                            values.clear();
+                            cl.UpdateValue(*it->first, it->second, notify.GetValue().Arr[Valueindex]);
+                            ++Valueindex;
+                            //Print value
+                            std::string ln;
+                            it->first->GetLogicalName(ln);
+                            it->first->GetValues(values);
+                            printf("%s %s %d: %s\r\n", CGXDLMSConverter::ToString(it->first->GetObjectType()), ln.c_str(), it->second, values.at(it->second-1).c_str());
+                        }
                     }
-                    data.Clear();
+                    printf("Server address: %d Client Address: %d\r\n", notify.GetServerAddress(), notify.GetClientAddress());
+                    notify.Clear();
+                    bb.Trim();                  
                 }
             }
         }

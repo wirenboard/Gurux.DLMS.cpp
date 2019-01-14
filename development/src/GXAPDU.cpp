@@ -33,6 +33,9 @@
 //---------------------------------------------------------------------------
 
 #include "../include/GXAPDU.h"
+#include "../include/TranslatorSimpleTags.h"
+#include "../include/TranslatorStandardTags.h"
+#include "../include/GXDLMSConverter.h"
 
 /**
  * Retrieves the string that indicates the level of authentication, if any.
@@ -263,77 +266,54 @@ int CGXAPDU::GenerateUserInformation(
     return 0;
 }
 
+void GetConformance(unsigned long value, CGXDLMSTranslatorStructure* xml)
+{
+    std::string str;
+    unsigned long tmp = 1;
+    if (xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
+    {
+        for (char it = 0; it != 24; ++it)
+        {
+            if ((tmp & value) != 0)
+            {
+                CTranslatorSimpleTags::ConformanceToString((DLMS_CONFORMANCE)tmp, str);
+                xml->AppendLine(TRANSLATOR_GENERAL_TAGS_CONFORMANCE_BIT, "Name", str);
+            }
+            tmp = tmp << 1;
+        }
+    }
+    else
+    {
+        for (char it = 0; it != 24; ++it)
+        {
+            if ((tmp & value) != 0)
+            {
+                CTranslatorStandardTags::ConformanceToString((DLMS_CONFORMANCE)tmp, str);
+                str.append(" ");
+                xml->Append(str);
+            }
+            tmp = tmp << 1;
+        }
+    }
+}
 
-
-/**
- * Parse User Information from PDU.
- */
-int ParseUserInformation(
+int CGXAPDU::Parse(bool initiateRequest,
     CGXDLMSSettings& settings,
     CGXCipher* cipher,
-    CGXByteBuffer& data)
+    CGXByteBuffer& data,
+    CGXDLMSTranslatorStructure* xml,
+    unsigned char tag)
 {
     int ret;
-    unsigned short pduSize;
-    unsigned char ch, len, tag;
-    if ((ret = data.GetUInt8(&len)) != 0)
-    {
-        return ret;
-    }
-    if (data.GetSize() - data.GetPosition() < len)
-    {
-        return DLMS_ERROR_CODE_OUTOFMEMORY;
-    }
-    // Encoding the choice for user information
-    if ((ret = data.GetUInt8(&tag)) != 0)
-    {
-        return ret;
-    }
-    if (tag != 0x4)
-    {
-        return DLMS_ERROR_CODE_INVALID_TAG;
-    }
-    if ((ret = data.GetUInt8(&len)) != 0)
-    {
-        return ret;
-    }
-    // Tag for xDLMS-Initate.response
-    if ((ret = data.GetUInt8(&tag)) != 0)
-    {
-        return ret;
-    }
-    if (tag == DLMS_COMMAND_GLO_INITIATE_RESPONSE)
-    {
-        data.SetPosition(data.GetPosition() - 1);
-        DLMS_SECURITY security = DLMS_SECURITY_NONE;
-        if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(), data, security)) != 0)
-        {
-            return ret;
-        }
-        cipher->SetSecurity(security);
-        if ((ret = data.GetUInt8(&tag)) != 0)
-        {
-            return ret;
-        }
-    }
-    else if (tag == DLMS_COMMAND_GLO_INITIATE_REQUEST)
-    {
-        data.SetPosition(data.GetPosition() - 1);
-        // InitiateRequest
-        DLMS_SECURITY security = DLMS_SECURITY_NONE;
-        if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(), data, security)) != 0)
-        {
-            return ret;
-        }
-        cipher->SetSecurity(security);
-        if ((ret = data.GetUInt8(&tag)) != 0)
-        {
-            return ret;
-        }
-    }
+    unsigned char ch, len;
+    std::string str;
     bool response = tag == DLMS_COMMAND_INITIATE_RESPONSE;
     if (response)
     {
+        if (xml != NULL)
+        {
+            xml->AppendStartTag(DLMS_COMMAND_INITIATE_RESPONSE);
+        }
         // Optional usage field of the negotiated quality of service
         // component
         if ((ret = data.GetUInt8(&tag)) != 0)
@@ -342,22 +322,35 @@ int ParseUserInformation(
         }
         if (tag != 0)
         {
-            if ((ret = data.GetUInt8(&len)) != 0)
+            if ((ret = data.GetUInt8(&tag)) != 0)
             {
                 return ret;
             }
-            data.SetPosition(data.GetPosition() + len);
+            settings.SetQualityOfService(tag);
+            if (xml != NULL)
+            {
+                //NegotiatedQualityOfService
+                std::string str;
+                xml->IntegerToHex((long)tag, 2, str);
+                xml->AppendLine(TRANSLATOR_GENERAL_TAGS_NEGOTIATED_QUALITY_OF_SERVICE, "", str);
+            }
         }
     }
     else if (tag == DLMS_COMMAND_INITIATE_REQUEST)
     {
-        // Optional usage field of the negotiated quality of service
-        // component
+        if (xml != NULL)
+        {
+            xml->AppendStartTag(DLMS_COMMAND_INITIATE_REQUEST);
+        }
+        //Optional usage field of dedicated key.
         if ((ret = data.GetUInt8(&tag)) != 0)
         {
             return ret;
         }
-        // CtoS.
+        if (settings.GetCipher() != NULL)
+        {
+            settings.GetCipher()->GetDedicatedKey().Clear();
+        }
         if (tag != 0)
         {
             if ((ret = data.GetUInt8(&len)) != 0)
@@ -365,8 +358,16 @@ int ParseUserInformation(
                 return ret;
             }
             CGXByteBuffer tmp;
-            tmp.Set(&data, data.GetPosition());
-            settings.SetCtoSChallenge(tmp);
+            tmp.Set(&data, data.GetPosition(), len);
+            if (settings.GetCipher() != NULL)
+            {
+                settings.GetCipher()->SetDedicatedKey(tmp);
+            }
+            if (xml != NULL)
+            {
+                str = tmp.ToHexString(false);
+                xml->AppendLine(TRANSLATOR_GENERAL_TAGS_DEDICATED_KEY, "", str);
+            }
         }
         // Optional usage field of the negotiated quality of service
         // component
@@ -374,14 +375,26 @@ int ParseUserInformation(
         {
             return ret;
         }
-        // Skip if used.
         if (tag != 0)
         {
-            if ((ret = data.GetUInt8(&len)) != 0)
+            if ((ret = data.GetUInt8(&tag)) != 0)
             {
                 return ret;
             }
-            data.SetPosition(data.GetPosition() + len);
+            settings.SetQualityOfService(tag);
+            if (xml != NULL && (initiateRequest || xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML))
+            {
+                xml->IntegerToHex((long)tag, 2, str);
+                xml->AppendLine(TRANSLATOR_GENERAL_TAGS_PROPOSED_QUALITY_OF_SERVICE, "", str);
+            }
+        }
+        else
+        {
+            if (xml != NULL && xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML)
+            {
+                str = "true";
+                xml->AppendLine(TRANSLATOR_GENERAL_TAGS_RESPONSE_ALLOWED, "", str);
+            }
         }
         // Optional usage field of the proposed quality of service component
         if ((ret = data.GetUInt8(&tag)) != 0)
@@ -395,21 +408,108 @@ int ParseUserInformation(
             {
                 return ret;
             }
-            data.SetPosition(data.GetPosition() + len);
+            settings.SetQualityOfService(len);
+            if (xml != NULL && xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
+            {
+                xml->IntegerToHex((long)len, 2, str);
+                xml->AppendLine(TRANSLATOR_GENERAL_TAGS_PROPOSED_QUALITY_OF_SERVICE, "", str);
+            }
+
         }
+    }
+    else if (tag == DLMS_COMMAND_CONFIRMED_SERVICE_ERROR)
+    {
+        if (xml != NULL)
+        {
+            xml->AppendStartTag(DLMS_COMMAND_CONFIRMED_SERVICE_ERROR);
+            if (xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML)
+            {
+                if ((ret = data.GetUInt8(&ch)) != 0)
+                {
+                    return ret;
+                }
+                xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_INITIATE_ERROR);
+                if ((ret = data.GetUInt8(&ch)) != 0)
+                {
+                    return ret;
+                }
+                DLMS_SERVICE_ERROR type = (DLMS_SERVICE_ERROR)ch;
+                std::string str = CTranslatorStandardTags::ServiceErrorToString(type);
+                if ((ret = data.GetUInt8(&ch)) != 0)
+                {
+                    return ret;
+                }
+                std::string value = CTranslatorStandardTags::GetServiceErrorValue(type, ch);
+                xml->AppendLine("x:" + str, "", value);
+                xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_INITIATE_ERROR);
+            }
+            else
+            {
+                if ((ret = data.GetUInt8(&ch)) != 0)
+                {
+                    return ret;
+                }
+                xml->IntegerToHex((long)ch, 2, str);
+                xml->AppendLine(DLMS_TRANSLATOR_TAGS_SERVICE, "", str);
+                if ((ret = data.GetUInt8(&ch)) != 0)
+                {
+                    return ret;
+                }
+                DLMS_SERVICE_ERROR type = (DLMS_SERVICE_ERROR)ch;
+                xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_SERVICE_ERROR);
+                if ((ret = data.GetUInt8(&ch)) != 0)
+                {
+                    return ret;
+                }
+                std::string str1 = CTranslatorSimpleTags::ServiceErrorToString(type);
+                str = CTranslatorSimpleTags::GetServiceErrorValue(type, ch);
+                xml->AppendLine(str1, "", str);
+                xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_SERVICE_ERROR);
+            }
+            xml->AppendEndTag(DLMS_COMMAND_CONFIRMED_SERVICE_ERROR);
+            return 0;
+        }
+
+        if ((ret = data.GetUInt8(&ch)) != 0)
+        {
+            return ret;
+        }
+        DLMS_CONFIRMED_SERVICE_ERROR service = (DLMS_CONFIRMED_SERVICE_ERROR)ch;
+        if ((ret = data.GetUInt8(&ch)) != 0)
+        {
+            return ret;
+        }
+        DLMS_SERVICE_ERROR type = (DLMS_SERVICE_ERROR)ch;
+        if ((ret = data.GetUInt8(&ch)) != 0)
+        {
+            return ret;
+        }
+        return service << 16 | type << 8 | ch;
     }
     else
     {
+        if (xml != NULL)
+        {
+            xml->AppendComment("Error: Failed to decrypt data.");
+            data.SetPosition(data.GetSize());
+            return 0;
+        }
         return DLMS_ERROR_CODE_INVALID_TAG;
     }
     // Get DLMS version number.
-    if (settings.IsServer())
+    if (!response)
     {
         if ((ret = data.GetUInt8(&ch)) != 0)
         {
             return ret;
         }
         settings.SetDLMSVersion(ch);
+        //ProposedDlmsVersionNumber
+        if (xml != NULL && (initiateRequest || xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML))
+        {
+            xml->IntegerToHex((long)ch, 2, str);
+            xml->AppendLine(TRANSLATOR_GENERAL_TAGS_PROPOSED_DLMS_VERSION_NUMBER, "", str);
+        }
     }
     else
     {
@@ -421,6 +521,11 @@ int ParseUserInformation(
         {
             //Invalid DLMS version number.
             return DLMS_ERROR_CODE_INVALID_VERSION_NUMBER;
+        }
+        if (xml != NULL && (initiateRequest || xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML))
+        {
+            xml->IntegerToHex((long)ch, 2, str);
+            xml->AppendLine(TRANSLATOR_GENERAL_TAGS_NEGOTIATED_DLMS_VERSION_NUMBER, "", str);
         }
     }
 
@@ -451,6 +556,7 @@ int ParseUserInformation(
     {
         return ret;
     }
+    unsigned short pduSize;
     unsigned long v;
     unsigned char tmp[3];
     CGXByteBuffer bb(4);
@@ -460,26 +566,54 @@ int ParseUserInformation(
     bb.GetUInt32(&v);
     if (settings.IsServer())
     {
-        v &= settings.GetProposedConformance();
-        settings.SetNegotiatedConformance((DLMS_CONFORMANCE)v);
+        if (xml != NULL)
+        {
+            xml->AppendStartTag(TRANSLATOR_GENERAL_TAGS_PROPOSED_CONFORMANCE);
+            GetConformance(v, xml);
+        }
+        else
+        {
+            v &= settings.GetProposedConformance();
+            settings.SetNegotiatedConformance((DLMS_CONFORMANCE)v);
+        }
     }
     else
     {
+        if (xml != NULL)
+        {
+            xml->AppendStartTag(TRANSLATOR_GENERAL_TAGS_NEGOTIATED_CONFORMANCE);
+            GetConformance(v, xml);
+        }
         settings.SetNegotiatedConformance((DLMS_CONFORMANCE)v);
     }
 
-    if (settings.IsServer())
+    if (!response)
     {
         if ((ret = data.GetUInt16(&pduSize)) != 0)
         {
             return ret;
+        }
+        settings.SetMaxReceivePDUSize(pduSize);
+        if (xml != NULL)
+        {
+            // ProposedConformance closing
+            if (xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
+            {
+                xml->AppendEndTag(TRANSLATOR_GENERAL_TAGS_PROPOSED_CONFORMANCE);
+            }
+            else if (initiateRequest)
+            {
+                xml->Append(TRANSLATOR_GENERAL_TAGS_PROPOSED_CONFORMANCE, false);
+            }
+            // ProposedMaxPduSize
+            xml->IntegerToHex((long)pduSize, 4, str);
+            xml->AppendLine(TRANSLATOR_GENERAL_TAGS_PROPOSED_MAX_PDU_SIZE, "", str);
         }
         //If client asks too high PDU.
         if (pduSize > settings.GetMaxServerPDUSize())
         {
             pduSize = settings.GetMaxServerPDUSize();
         }
-        settings.SetMaxReceivePDUSize(pduSize);
     }
     else
     {
@@ -488,6 +622,21 @@ int ParseUserInformation(
             return ret;
         }
         settings.SetMaxReceivePDUSize(pduSize);
+        if (xml != NULL)
+        {
+            // NegotiatedConformance closing
+            if (xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
+            {
+                xml->AppendEndTag(TRANSLATOR_GENERAL_TAGS_NEGOTIATED_CONFORMANCE);
+            }
+            else if (initiateRequest)
+            {
+                xml->Append(TRANSLATOR_GENERAL_TAGS_NEGOTIATED_CONFORMANCE, false);
+            }
+            // NegotiatedMaxPduSize
+            xml->IntegerToHex((long)pduSize, 4, str);
+            xml->AppendLine(TRANSLATOR_GENERAL_TAGS_NEGOTIATED_MAX_PDU_SIZE, "", str);
+        }
     }
     if (response)
     {
@@ -496,6 +645,14 @@ int ParseUserInformation(
         if ((ret = data.GetUInt16(&vaa)) != 0)
         {
             return ret;
+        }
+        if (xml != NULL)
+        {
+            if (initiateRequest || xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
+            {
+                xml->IntegerToHex((long)vaa, 4, str);
+                xml->AppendLine(TRANSLATOR_GENERAL_TAGS_VAA_NAME, "", str);
+            }
         }
         if (vaa == 0x0007)
         {
@@ -520,8 +677,193 @@ int ParseUserInformation(
             // Unknown VAA.
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
+        if (xml != NULL)
+        {
+            xml->AppendEndTag(DLMS_COMMAND_INITIATE_RESPONSE);
+        }
+    }
+    else if (xml != NULL)
+    {
+        xml->AppendEndTag(DLMS_COMMAND_INITIATE_REQUEST);
     }
     return 0;
+}
+
+int CGXAPDU::ParseInitiate(
+    bool initiateRequest,
+    CGXDLMSSettings& settings,
+    CGXCipher* cipher,
+    CGXByteBuffer& data,
+    CGXDLMSTranslatorStructure* xml)
+{
+    int ret;
+    int originalPos;
+    unsigned char tag;
+    unsigned long cnt;
+    CGXByteBuffer encrypted;
+    // Tag for xDLMS-Initate.response
+    if ((ret = data.GetUInt8(&tag)) != 0)
+    {
+        return ret;
+    }
+    if (tag == DLMS_COMMAND_GLO_INITIATE_RESPONSE)
+    {
+        if (xml != NULL)
+        {
+            std::string str;
+            originalPos = data.GetPosition();
+            if ((ret = GXHelpers::GetObjectCount(data, cnt)) != 0)
+            {
+                return ret;
+            }
+            encrypted.Set(&data, data.GetPosition(), data.Available());
+            if (cipher != NULL && xml->GetComments())
+            {
+                int pos = xml->GetXmlLength();
+                data.SetPosition(originalPos - 1);
+                DLMS_SECURITY security = DLMS_SECURITY_NONE;
+                if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(), data, security)) != 0)
+                {
+                    return ret;
+                }
+                cipher->SetSecurity(security);
+                if ((ret = data.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+                xml->StartComment("Decrypted data:");
+                str = "Security: ";
+                str.append(CGXDLMSConverter::ToString(security));
+                xml->AppendLine(str);
+                if (Parse(initiateRequest, settings, cipher, data, xml, tag) == 0)
+                {
+                    xml->EndComment();
+                }
+                else
+                {
+                    // It's OK if this fails.
+                    xml->SetXmlLength(pos);
+                }
+            }
+            str = encrypted.ToHexString(false);
+            xml->AppendLine(DLMS_COMMAND_GLO_INITIATE_RESPONSE, "", str);
+            return 0;
+        }
+        data.SetPosition(data.GetPosition() - 1);
+        DLMS_SECURITY security = DLMS_SECURITY_NONE;
+        if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(), data, security)) != 0)
+        {
+            return ret;
+        }
+        cipher->SetSecurity(security);
+        if ((ret = data.GetUInt8(&tag)) != 0)
+        {
+            return ret;
+        }
+    }
+    else if (tag == DLMS_COMMAND_GLO_INITIATE_REQUEST)
+    {
+        if (xml != NULL)
+        {
+            std::string str;
+            originalPos = data.GetPosition();
+            if ((ret = GXHelpers::GetObjectCount(data, cnt)) != 0)
+            {
+                return ret;
+            }
+            encrypted.Set(&data, data.GetPosition(), data.Available());
+            if (cipher != NULL && xml->GetComments())
+            {
+                int pos = xml->GetXmlLength();
+                data.SetPosition(originalPos - 1);
+                DLMS_SECURITY security = DLMS_SECURITY_NONE;
+                if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(), data, security)) != 0)
+                {
+                    return ret;
+                }
+                cipher->SetSecurity(security);
+                if ((ret = data.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+                xml->StartComment("Decrypted data:");
+                str = "Security: ";
+                str.append(CGXDLMSConverter::ToString(security));
+                xml->AppendLine(str);
+                if (Parse(initiateRequest, settings, cipher, data, xml, tag) == 0)
+                {
+                    xml->EndComment();
+                }
+                else
+                {
+                    // It's OK if this fails.
+                    xml->SetXmlLength(pos);
+                }
+            }
+            str = encrypted.ToHexString(false);
+            xml->AppendLine(DLMS_COMMAND_GLO_INITIATE_REQUEST, "", str);
+            return 0;
+        }
+        data.SetPosition(data.GetPosition() - 1);
+        // InitiateRequest
+        DLMS_SECURITY security = DLMS_SECURITY_NONE;
+        if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(), data, security)) != 0)
+        {
+            return ret;
+        }
+        cipher->SetSecurity(security);
+        if ((ret = data.GetUInt8(&tag)) != 0)
+        {
+            return ret;
+        }
+    }
+    return Parse(initiateRequest, settings, cipher, data, xml, tag);
+}
+
+/**
+ * Parse User Information from PDU.
+ */
+int CGXAPDU::ParseUserInformation(
+    CGXDLMSSettings& settings,
+    CGXCipher* cipher,
+    CGXByteBuffer& data,
+    CGXDLMSTranslatorStructure* xml)
+{
+    int ret;
+    unsigned char len, tag;
+    if ((ret = data.GetUInt8(&len)) != 0)
+    {
+        if (xml == NULL)
+        {
+            return ret;
+        }
+        xml->AppendComment("Error: Invalid data size.");
+    }
+    if (data.GetSize() - data.GetPosition() < len)
+    {
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
+    }
+    // Encoding the choice for user information
+    if ((ret = data.GetUInt8(&tag)) != 0)
+    {
+        return ret;
+    }
+    if (tag != 0x4)
+    {
+        return DLMS_ERROR_CODE_INVALID_TAG;
+    }
+    if ((ret = data.GetUInt8(&len)) != 0)
+    {
+        return ret;
+    }
+    if (xml != NULL && xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML)
+    {
+        std::string str = data.ToHexString(data.GetPosition(), len, false);
+        xml->AppendLine(DLMS_COMMAND_INITIATE_REQUEST, "", str);
+        data.SetPosition(data.GetPosition() + len);
+        return 0;
+    }
+    return ParseInitiate(false, settings, cipher, data, xml);
 }
 
 /**
@@ -534,10 +876,11 @@ int ParseUserInformation(
  */
 int ParseApplicationContextName(
     CGXDLMSSettings& settings,
-    CGXByteBuffer& buff)
+    CGXByteBuffer& buff,
+    CGXDLMSTranslatorStructure* xml)
 {
     int ret;
-    unsigned char len, ch;
+    unsigned char len, ch, name;
     // Get length.
     if ((ret = buff.GetUInt8(&len)) != 0)
     {
@@ -566,32 +909,104 @@ int ParseApplicationContextName(
     {
         return ret;
     }
-    if (settings.GetUseLogicalNameReferencing())
+
+    if ((ret = buff.GetUInt8(&ch)) != 0)
     {
-        if (buff.Compare((unsigned char*)LOGICAL_NAME_OBJECT_ID, sizeof(LOGICAL_NAME_OBJECT_ID)))
+        return ret;
+    }
+    if (ch != 0x60)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    if ((ret = buff.GetUInt8(&ch)) != 0)
+    {
+        return ret;
+    }
+    if (ch != 0x85)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    if ((ret = buff.GetUInt8(&ch)) != 0)
+    {
+        return ret;
+    }
+    if (ch != 0x74)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    if ((ret = buff.GetUInt8(&ch)) != 0)
+    {
+        return ret;
+    }
+    if (ch != 0x5)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    if ((ret = buff.GetUInt8(&ch)) != 0)
+    {
+        return ret;
+    }
+    if (ch != 0x8)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    if ((ret = buff.GetUInt8(&ch)) != 0)
+    {
+        return ret;
+    }
+    if (ch != 0x1)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+
+    if ((ret = buff.GetUInt8(&name)) != 0)
+    {
+        return ret;
+    }
+    if (xml != NULL)
+    {
+        std::string str;
+        settings.SetUseLogicalNameReferencing(name == 1 || name == 3);
+        if (xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
         {
-            return 0;
-        }
-        // If ciphering is used.
-        if (!buff.Compare((unsigned char*)LOGICAL_NAME_OBJECT_ID_WITH_CIPHERING, sizeof(LOGICAL_NAME_OBJECT_ID_WITH_CIPHERING)))
-        {
-            return DLMS_ERROR_CODE_FALSE;
+            if (name == 1)
+            {
+                str = "LN";
+            }
+            else if (name == 2)
+            {
+                str = "SN";
+            }
+            else if (name == 3)
+            {
+                str = "LN_WITH_CIPHERING";
+            }
+            else if (name == 4)
+            {
+                str = "SN_WITH_CIPHERING";
+            }
         }
         else
         {
+            str = std::to_string(name);
+        }
+        xml->AppendLine(TRANSLATOR_GENERAL_TAGS_APPLICATION_CONTEXT_NAME, "", str);
+        return 0;
+    }
+
+    if (settings.GetUseLogicalNameReferencing())
+    {
+        if (name == 1 || name == 3)
+        {
             return 0;
         }
+        return DLMS_ERROR_CODE_FALSE;
     }
-    if (buff.Compare((unsigned char*)SHORT_NAME_OBJECT_ID, sizeof(SHORT_NAME_OBJECT_ID)))
+    if (name == 2 || name == 4)
     {
         return 0;
     }
-    // If ciphering is used.
-    if (!buff.Compare((unsigned char*)SHORT_NAME_OBJECT_ID_WITH_CIPHERING, sizeof(SHORT_NAME_OBJECT_ID_WITH_CIPHERING)))
-    {
-        return DLMS_ERROR_CODE_FALSE;
-    }
-    return 0;
+    return DLMS_ERROR_CODE_FALSE;
 }
 
 int ValidateAare(
@@ -627,7 +1042,8 @@ int ValidateAare(
 
 int UpdatePassword(
     CGXDLMSSettings& settings,
-    CGXByteBuffer& buff)
+    CGXByteBuffer& buff,
+    CGXDLMSTranslatorStructure* xml)
 {
     CGXByteBuffer tmp;
     int ret;
@@ -658,6 +1074,43 @@ int UpdatePassword(
     else
     {
         settings.SetCtoSChallenge(tmp);
+    }
+    if (xml != NULL)
+    {
+        if (xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
+        {
+            std::string str;
+            if (settings.GetAuthentication() == DLMS_AUTHENTICATION_LOW)
+            {
+                str = settings.GetPassword().ToHexString(false);
+                xml->AppendLine(TRANSLATOR_GENERAL_TAGS_CALLING_AUTHENTICATION,
+                    "", str);
+            }
+            else
+            {
+                str = settings.GetCtoSChallenge().ToHexString(false);
+                xml->AppendLine(TRANSLATOR_GENERAL_TAGS_CALLING_AUTHENTICATION,
+                    "", str);
+            }
+        }
+        else
+        {
+            xml->AppendStartTag(TRANSLATOR_GENERAL_TAGS_CALLING_AUTHENTICATION);
+            xml->AppendStartTag(TRANSLATOR_GENERAL_TAGS_CHAR_STRING);
+            std::string str;
+            if (settings.GetAuthentication() == DLMS_AUTHENTICATION_LOW)
+            {
+                str = settings.GetPassword().ToHexString(false);
+                xml->Append(str);
+            }
+            else
+            {
+                str = settings.GetCtoSChallenge().ToHexString(false);
+                xml->Append(str);
+            }
+            xml->AppendEndTag(TRANSLATOR_GENERAL_TAGS_CHAR_STRING);
+            xml->AppendEndTag(TRANSLATOR_GENERAL_TAGS_CALLING_AUTHENTICATION);
+        }
     }
     return 0;
 }
@@ -733,7 +1186,7 @@ int UpdateAuthentication(
     return 0;
 }
 
-int GetUserInformation(
+int CGXAPDU::GetUserInformation(
     CGXDLMSSettings& settings,
     CGXCipher* cipher,
     CGXByteBuffer& data)
@@ -860,33 +1313,46 @@ int ParseProtocolVersion(CGXDLMSSettings& settings,
     return 0;
 }
 
-int CGXAPDU::ParsePDU(
+
+void AppendServerSystemTitleToXml(
+    CGXDLMSSettings& settings,
+    CGXDLMSTranslatorStructure* xml,
+    int tag)
+{
+    if (xml != NULL)
+    {
+        std::string str;
+        // RespondingAuthentication
+        if (xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
+        {
+            str = settings.GetStoCChallenge().ToHexString(false);
+            xml->AppendLine(tag, "", str);
+        }
+        else
+        {
+            xml->Append(tag, true);
+            xml->Append((int)TRANSLATOR_GENERAL_TAGS_CHAR_STRING, true);
+            str = settings.GetStoCChallenge().ToHexString(false);
+            xml->Append(str);
+            xml->Append((int)TRANSLATOR_GENERAL_TAGS_CHAR_STRING, false);
+            xml->Append(tag, false);
+            str = "\r\n";
+            xml->Append(str);
+        }
+    }
+}
+int CGXAPDU::ParsePDU2(
     CGXDLMSSettings& settings,
     CGXCipher* cipher,
     CGXByteBuffer& buff,
     DLMS_ASSOCIATION_RESULT& result,
-    DLMS_SOURCE_DIAGNOSTIC& diagnostic)
+    DLMS_SOURCE_DIAGNOSTIC& diagnostic,
+    CGXDLMSTranslatorStructure* xml)
 {
     CGXByteBuffer tmp;
-    unsigned long len2;
     unsigned char tag, len;
     int ret;
-    diagnostic = DLMS_SOURCE_DIAGNOSTIC_NONE;
-    // Get AARE tag and length
-    if ((ret = ValidateAare(settings, buff)) != 0)
-    {
-        return ret;
-    }
-    if ((ret = GXHelpers::GetObjectCount(buff, len2)) != 0)
-    {
-        return ret;
-    }
-    unsigned int size = buff.GetSize() - buff.GetPosition();
-    if (len2 > size)
-    {
-        //Encoding failed. Not enough data.
-        return DLMS_ERROR_CODE_OUTOFMEMORY;
-    }
+    std::string str;
     result = DLMS_ASSOCIATION_RESULT_ACCEPTED;
     while (buff.GetPosition() < buff.GetSize())
     {
@@ -899,7 +1365,7 @@ int CGXAPDU::ParsePDU(
             //0xA1
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_APPLICATION_CONTEXT_NAME:
         {
-            if ((ret = ParseApplicationContextName(settings, buff)) != 0)
+            if ((ret = ParseApplicationContextName(settings, buff, xml)) != 0)
             {
                 return DLMS_ERROR_CODE_REJECTED_PERMAMENT;
             }
@@ -916,30 +1382,68 @@ int CGXAPDU::ParsePDU(
             {
                 return DLMS_ERROR_CODE_INVALID_TAG;
             }
-            // Choice for result (INTEGER, universal)
-
-            if ((ret = buff.GetUInt8(&tag)) != 0)
+            if (settings.IsServer())
             {
-                return ret;
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+                if (tag != BER_TYPE_OCTET_STRING)
+                {
+                    return DLMS_ERROR_CODE_INVALID_TAG;
+                }
+                if ((ret = buff.GetUInt8(&len)) != 0)
+                {
+                    return ret;
+                }
+                CGXByteBuffer bb;
+                bb.Set(&buff, buff.GetPosition(), len);
+                settings.SetSourceSystemTitle(bb);
+                if (xml != NULL)
+                {
+                    //RespondingAPTitle
+                    str = bb.ToHexString(false);
+                    xml->AppendLine(DLMS_TRANSLATOR_TAGS_CALLED_AP_TITLE, "", str);
+                }
             }
-            if (tag != BER_TYPE_INTEGER)
+            else
             {
-                return DLMS_ERROR_CODE_INVALID_TAG;
+                // Choice for result (INTEGER, universal)
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+                if (tag != BER_TYPE_INTEGER)
+                {
+                    return DLMS_ERROR_CODE_INVALID_TAG;
+                }
+                // Get len.
+                if ((ret = buff.GetUInt8(&len)) != 0)
+                {
+                    return ret;
+                }
+                if (len != 1)
+                {
+                    return DLMS_ERROR_CODE_INVALID_TAG;
+                }
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+                result = (DLMS_ASSOCIATION_RESULT)tag;
+                if (xml != NULL)
+                {
+                    if (result != DLMS_ASSOCIATION_RESULT_ACCEPTED)
+                    {
+                        str = CGXDLMSConverter::ToString(result);
+                        xml->AppendComment(str);
+                    }
+                    std::string str;
+                    xml->IntegerToHex((unsigned long)result, 2, str);
+                    xml->AppendLine(TRANSLATOR_GENERAL_TAGS_ASSOCIATION_RESULT, "", str);
+                    xml->AppendStartTag(TRANSLATOR_GENERAL_TAGS_RESULT_SOURCE_DIAGNOSTIC);
+                }
             }
-            // Get len.
-            if ((ret = buff.GetUInt8(&len)) != 0)
-            {
-                return ret;
-            }
-            if (len != 1)
-            {
-                return DLMS_ERROR_CODE_INVALID_TAG;
-            }
-            if ((ret = buff.GetUInt8(&tag)) != 0)
-            {
-                return ret;
-            }
-            result = (DLMS_ASSOCIATION_RESULT)tag;
             break;
             // 0xA3 SourceDiagnostic
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLED_AE_QUALIFIER:
@@ -956,28 +1460,53 @@ int CGXAPDU::ParsePDU(
             {
                 return ret;
             }
-            // Result source diagnostic component.
-            if ((ret = buff.GetUInt8(&tag)) != 0)
+            if (settings.IsServer())
             {
-                return ret;
+                CGXByteBuffer calledAEQualifier;
+                calledAEQualifier.Set(&buff, buff.GetPosition(), len);
+                if (xml != NULL)
+                {
+                    str = calledAEQualifier.ToHexString(false);
+                    xml->AppendLine(DLMS_TRANSLATOR_TAGS_CALLED_AE_QUALIFIER, "", str);
+                }
             }
-            if (tag != BER_TYPE_INTEGER)
+            else
             {
-                return DLMS_ERROR_CODE_INVALID_TAG;
+                // Result source diagnostic component.
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+                if (tag != BER_TYPE_INTEGER)
+                {
+                    return DLMS_ERROR_CODE_INVALID_TAG;
+                }
+                if ((ret = buff.GetUInt8(&len)) != 0)
+                {
+                    return ret;
+                }
+                if (len != 1)
+                {
+                    return DLMS_ERROR_CODE_INVALID_TAG;
+                }
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+                diagnostic = (DLMS_SOURCE_DIAGNOSTIC)tag;
+                if (xml != NULL)
+                {
+                    if (diagnostic != DLMS_SOURCE_DIAGNOSTIC_NONE)
+                    {
+                        str = CGXDLMSConverter::ToString(diagnostic);
+                        xml->AppendComment(str);
+                    }
+                    std::string str;
+                    xml->IntegerToHex((long)diagnostic, 2, str);
+                    xml->AppendLine(TRANSLATOR_GENERAL_TAGS_ACSE_SERVICE_USER, "", str);
+                    xml->AppendEndTag(TRANSLATOR_GENERAL_TAGS_RESULT_SOURCE_DIAGNOSTIC);
+                }
             }
-            if ((ret = buff.GetUInt8(&len)) != 0)
-            {
-                return ret;
-            }
-            if (len != 1)
-            {
-                return DLMS_ERROR_CODE_INVALID_TAG;
-            }
-            if ((ret = buff.GetUInt8(&tag)) != 0)
-            {
-                return ret;
-            }
-            diagnostic = (DLMS_SOURCE_DIAGNOSTIC)tag;
             break;
             // 0xA4 Result
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLED_AP_INVOCATION_ID:
@@ -986,28 +1515,74 @@ int CGXAPDU::ParsePDU(
             {
                 return ret;
             }
-            if (len != 0xA)
+            if (settings.IsServer())
             {
-                return DLMS_ERROR_CODE_INVALID_TAG;
+                //Get len.
+                if (len != 0xA)
+                {
+                    return DLMS_ERROR_CODE_INVALID_TAG;
+                }
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+                //Choice for result (Universal, Integer)
+                if (tag != BER_TYPE_INTEGER)
+                {
+                    return DLMS_ERROR_CODE_INVALID_TAG;
+                }
+                if ((ret = buff.GetUInt8(&len)) != 0)
+                {
+                    return ret;
+                }
+                if (len != 1)
+                {
+                    return DLMS_ERROR_CODE_INVALID_TAG;
+                }
+                //Get value.
+                if ((ret = buff.GetUInt8(&len)) != 0)
+                {
+                    return ret;
+                }
+                if (xml != NULL)
+                {
+                    //RespondingAPTitle
+                    std::string str;
+                    xml->IntegerToHex((long)len, 2, str);
+                    xml->AppendLine(DLMS_TRANSLATOR_TAGS_CALLED_AP_INVOCATION_ID, "", str);
+                }
             }
-            // Choice for result (Universal, Octet string type)
-            if ((ret = buff.GetUInt8(&tag)) != 0)
+            else
             {
-                return ret;
+                if (len != 0xA)
+                {
+                    return DLMS_ERROR_CODE_INVALID_TAG;
+                }
+                // Choice for result (Universal, Octet string type)
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+                if (tag != BER_TYPE_OCTET_STRING)
+                {
+                    return DLMS_ERROR_CODE_INVALID_TAG;
+                }
+                // responding-AP-title-field
+                // Get len.
+                if ((ret = buff.GetUInt8(&len)) != 0)
+                {
+                    return ret;
+                }
+                tmp.Clear();
+                tmp.Set(&buff, buff.GetPosition(), len);
+                settings.SetSourceSystemTitle(tmp);
+                if (xml != NULL)
+                {
+                    //RespondingAPTitle
+                    str = tmp.ToHexString(false);
+                    xml->AppendLine(TRANSLATOR_GENERAL_TAGS_RESPONDING_AP_TITLE, "", str);
+                }
             }
-            if (tag != BER_TYPE_OCTET_STRING)
-            {
-                return DLMS_ERROR_CODE_INVALID_TAG;
-            }
-            // responding-AP-title-field
-            // Get len.
-            if ((ret = buff.GetUInt8(&len)) != 0)
-            {
-                return ret;
-            }
-            tmp.Clear();
-            tmp.Set(&buff, buff.GetPosition(), len);
-            settings.SetSourceSystemTitle(tmp);
             break;
             // 0xA6 Client system title.
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AP_TITLE:
@@ -1026,6 +1601,12 @@ int CGXAPDU::ParsePDU(
             tmp.Clear();
             tmp.Set(&buff, buff.GetPosition(), len);
             settings.SetSourceSystemTitle(tmp);
+            if (xml != NULL)
+            {
+                //CallingAPTitle
+                str = tmp.ToHexString(false);
+                xml->AppendLine(TRANSLATOR_GENERAL_TAGS_CALLING_AP_TITLE, "", str);
+            }
             break;
             // 0xAA Server system title.
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_SENDER_ACSE_REQUIREMENTS:
@@ -1044,6 +1625,164 @@ int CGXAPDU::ParsePDU(
             tmp.Clear();
             tmp.Set(&buff, buff.GetPosition(), len);
             settings.SetStoCChallenge(tmp);
+            AppendServerSystemTitleToXml(settings, xml, tag);
+            break;
+            //Client AEInvocationId.
+        case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AE_INVOCATION_ID://0xA9
+            if ((ret = buff.GetUInt8(&len)) != 0)
+            {
+                return ret;
+            }
+            if ((ret = buff.GetUInt8(&tag)) != 0)
+            {
+                return ret;
+            }
+            if ((ret = buff.GetUInt8(&len)) != 0)
+            {
+                return ret;
+            }
+            if ((ret = buff.GetUInt8(&tag)) != 0)
+            {
+                return ret;
+            }
+            settings.SetUserID(tag);
+            if (xml != NULL)
+            {
+                std::string str;
+                xml->IntegerToHex((long)tag, 2, str);
+                xml->AppendLine(TRANSLATOR_GENERAL_TAGS_CALLING_AE_INVOCATION_ID, "", str);
+            }
+            break;
+            //Client CalledAeInvocationId.
+        case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLED_AE_INVOCATION_ID://0xA5
+            if (settings.IsServer())
+            {
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+                if (tag != 3)
+                {
+                    return DLMS_ERROR_CODE_INVALID_TAG;
+                }
+                if ((ret = buff.GetUInt8(&len)) != 0)
+                {
+                    return ret;
+                }
+                if (len != 2)
+                {
+                    return DLMS_ERROR_CODE_INVALID_TAG;
+                }
+                if ((ret = buff.GetUInt8(&len)) != 0)
+                {
+                    return ret;
+                }
+                if (len != 1)
+                {
+                    return DLMS_ERROR_CODE_INVALID_TAG;
+                }
+                //Get value.
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+                if (xml != NULL)
+                {
+                    //CalledAEInvocationId
+                    std::string str;
+                    xml->IntegerToHex((long)tag, 2, str);
+                    xml->AppendLine(DLMS_TRANSLATOR_TAGS_CALLED_AE_INVOCATION_ID, "", str);
+                }
+            }
+            else
+            {
+                if ((ret = buff.GetUInt8(&len)) != 0)
+                {
+                    return ret;
+                }
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+                if ((ret = buff.GetUInt8(&len)) != 0)
+                {
+                    return ret;
+                }
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+                settings.SetUserID(tag);
+                if (xml != NULL)
+                {
+                    std::string str;
+                    xml->IntegerToHex((long)tag, 2, str);
+                    xml->AppendLine(TRANSLATOR_GENERAL_TAGS_CALLED_AE_INVOCATION_ID, "", str);
+                }
+            }
+            break;
+            //Server RespondingAEInvocationId.
+        case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | 7://0xA7
+            if ((ret = buff.GetUInt8(&len)) != 0)
+            {
+                return ret;
+            }
+            if ((ret = buff.GetUInt8(&tag)) != 0)
+            {
+                return ret;
+            }
+            if ((ret = buff.GetUInt8(&len)) != 0)
+            {
+                return ret;
+            }
+            if ((ret = buff.GetUInt8(&tag)) != 0)
+            {
+                return ret;
+            }
+            settings.SetUserID(tag);
+            if (xml != NULL)
+            {
+                xml->IntegerToHex((long)tag, 2, str);
+                xml->AppendLine(TRANSLATOR_GENERAL_TAGS_RESPONDING_AE_INVOCATION_ID, "", str);
+            }
+            break;
+        case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AP_INVOCATION_ID://0xA8
+            if ((ret = buff.GetUInt8(&len)) != 0)
+            {
+                return ret;
+            }
+            if (len != 3)
+            {
+                return DLMS_ERROR_CODE_INVALID_TAG;
+            }
+            if ((ret = buff.GetUInt8(&tag)) != 0)
+            {
+                return ret;
+            }
+            if (tag != 2)
+            {
+                return DLMS_ERROR_CODE_INVALID_TAG;
+            }
+            if ((ret = buff.GetUInt8(&len)) != 0)
+            {
+                return ret;
+            }
+            if (len != 1)
+            {
+                return DLMS_ERROR_CODE_INVALID_TAG;
+            }
+            //Get value.
+            if ((ret = buff.GetUInt8(&len)) != 0)
+            {
+                return ret;
+            }
+            if (xml != NULL)
+            {
+                //CallingApInvocationId
+                std::string str;
+                xml->IntegerToHex((long)len, 2, str);
+                xml->AppendLine(DLMS_TRANSLATOR_TAGS_CALLING_AP_INVOCATION_ID, "Value", str);
+            }
             break;
             //  0x8A or 0x88
         case BER_TYPE_CONTEXT | PDU_TYPE_SENDER_ACSE_REQUIREMENTS:
@@ -1057,18 +1796,24 @@ int CGXAPDU::ParsePDU(
             {
                 return DLMS_ERROR_CODE_INVALID_TAG;
             }
-            if ((ret = buff.GetUInt8(&tag)) != 0)
+            if ((ret = buff.GetUInt8(&len)) != 0)
             {
                 return ret;
             }
-            if (tag != BER_TYPE_OBJECT_DESCRIPTOR)
+            if (len != BER_TYPE_OBJECT_DESCRIPTOR)
             {
                 return DLMS_ERROR_CODE_INVALID_TAG;
             }
             //Get only value because client app is sending system title with LOW authentication.
-            if ((ret = buff.GetUInt8(&tag)) != 0)
+            if ((ret = buff.GetUInt8(&len)) != 0)
             {
                 return ret;
+            }
+            //SenderACSERequirements
+            if (xml != NULL)
+            {
+                str = "1";
+                xml->AppendLine(tag, "", str);
             }
             break;
             //  0x8B or 0x89
@@ -1078,10 +1823,23 @@ int CGXAPDU::ParsePDU(
             {
                 return ret;
             }
+            if (xml != NULL)
+            {
+                if (xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
+                {
+                    str = CGXDLMSConverter::ToString(settings.GetAuthentication());
+                    xml->AppendLine((unsigned long)tag, "", str);
+                }
+                else
+                {
+                    str = std::to_string(settings.GetAuthentication());
+                    xml->AppendLine((unsigned long)tag, "", str);
+                }
+            }
             break;
             // 0xAC
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AUTHENTICATION_VALUE:
-            if ((ret = UpdatePassword(settings, buff)) != 0)
+            if ((ret = UpdatePassword(settings, buff, xml)) != 0)
             {
                 return ret;
             }
@@ -1089,12 +1847,12 @@ int CGXAPDU::ParsePDU(
             // 0xBE
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_USER_INFORMATION:
             //Check result component. Some meters are returning invalid user-information if connection failed.
-            if (result != DLMS_ASSOCIATION_RESULT_ACCEPTED
+            if (xml == NULL && result != DLMS_ASSOCIATION_RESULT_ACCEPTED
                 && diagnostic != DLMS_SOURCE_DIAGNOSTIC_NONE)
             {
                 return handleResultComponent(diagnostic);
             }
-            if ((ret = ParseUserInformation(settings, cipher, buff)) != 0)
+            if ((ret = ParseUserInformation(settings, cipher, buff, xml)) != 0)
             {
                 result = DLMS_ASSOCIATION_RESULT_PERMANENT_REJECTED;
                 diagnostic = DLMS_SOURCE_DIAGNOSTIC_NO_REASON_GIVEN;
@@ -1119,7 +1877,76 @@ int CGXAPDU::ParsePDU(
     }
     //All meters don't send user-information if connection is failed.
     //For this reason result component is check again.
-    return handleResultComponent(diagnostic);
+    if (xml == NULL)
+    {
+        return handleResultComponent(diagnostic);
+    }
+    return 0;
+}
+
+int CGXAPDU::ParsePDU(
+    CGXDLMSSettings& settings,
+    CGXCipher* cipher,
+    CGXByteBuffer& buff,
+    DLMS_ASSOCIATION_RESULT& result,
+    DLMS_SOURCE_DIAGNOSTIC& diagnostic,
+    CGXDLMSTranslatorStructure* xml)
+{
+    CGXByteBuffer tmp;
+    unsigned long len;
+    int ret;
+    diagnostic = DLMS_SOURCE_DIAGNOSTIC_NONE;
+    // Get AARE tag and length
+    if ((ret = ValidateAare(settings, buff)) != 0)
+    {
+        return ret;
+    }
+    if ((ret = GXHelpers::GetObjectCount(buff, len)) != 0)
+    {
+        return ret;
+    }
+    unsigned int size = buff.GetSize() - buff.GetPosition();
+    if (len > size)
+    {
+        if (xml == NULL)
+        {
+            //Encoding failed. Not enough data.
+            return DLMS_ERROR_CODE_OUTOFMEMORY;
+        }
+        xml->AppendComment("Error: Invalid data size.");
+    }
+    //Opening tags
+    if (xml != NULL)
+    {
+        if (settings.IsServer())
+        {
+            xml->AppendStartTag(DLMS_COMMAND_AARQ);
+        }
+        else
+        {
+            xml->AppendStartTag(DLMS_COMMAND_AARE);
+        }
+    }
+    ret = ParsePDU2(
+        settings,
+        cipher,
+        buff,
+        result,
+        diagnostic,
+        xml);
+    //Closing tags
+    if (xml != NULL)
+    {
+        if (settings.IsServer())
+        {
+            xml->AppendEndTag(DLMS_COMMAND_AARQ);
+        }
+        else
+        {
+            xml->AppendEndTag(DLMS_COMMAND_AARE);
+        }
+    }
+    return ret;
 }
 
 /**

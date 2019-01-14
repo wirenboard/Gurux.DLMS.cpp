@@ -82,8 +82,10 @@ private:
     /////////////////////////////////////////////////////////////////////////////
     //
     /////////////////////////////////////////////////////////////////////////////
-    static int CheckWrapperAddress(CGXDLMSSettings& settings,
-        CGXByteBuffer& buff);
+    static int CheckWrapperAddress(
+        CGXDLMSSettings& settings,
+        CGXByteBuffer& buff,
+        CGXReplyData* notify);
 
     /////////////////////////////////////////////////////////////////////////////
     // Get value from data.
@@ -126,6 +128,11 @@ private:
     static int HandledGloResponse(
         CGXDLMSSettings& settings,
         CGXReplyData& data, int index);
+
+    static int HandleGeneralCiphering(
+        CGXDLMSSettings& settings,
+        CGXReplyData& data);
+
 public:
 
     /////////////////////////////////////////////////////////////////////////////
@@ -239,7 +246,8 @@ public:
         CGXDLMSSettings& settings,
         CGXByteBuffer& reply,
         CGXReplyData& data,
-        unsigned char& frame);
+        unsigned char& frame,
+        CGXReplyData* notify);
 
     /**
      * Get HDLC address from byte array.
@@ -269,7 +277,9 @@ public:
         bool server,
         CGXDLMSSettings& settings,
         CGXByteBuffer& reply,
-        int index);
+        int index,
+        unsigned long& source,
+        unsigned long& target);
 
     /////////////////////////////////////////////////////////////////////////////
     // Get data from TCP/IP frame.
@@ -281,7 +291,8 @@ public:
     static int GetTcpData(
         CGXDLMSSettings& settings,
         CGXByteBuffer& buff,
-        CGXReplyData& data);
+        CGXReplyData& data,
+        CGXReplyData* notify);
 
     /////////////////////////////////////////////////////////////////////////////
     // Handle read response and get data from block and/or update error status.
@@ -317,6 +328,10 @@ public:
     static int HandleSetResponse(
         CGXDLMSSettings& settings,
         CGXReplyData& data);
+
+    static int HandleAccessResponse(
+        CGXDLMSSettings& settings,
+        CGXReplyData& reply);
 
     /**
     * Handle data notification get data from block and/or update error status.
@@ -367,7 +382,8 @@ public:
     static int GetData(
         CGXDLMSSettings& settings,
         CGXByteBuffer& reply,
-        CGXReplyData& data);
+        CGXReplyData& data,
+        CGXReplyData* notify);
 
     /////////////////////////////////////////////////////////////////////////////
     // Get action info.
@@ -394,5 +410,7 @@ public:
 
     // Add HDLC parameter.
     static void AppendHdlcParameter(CGXByteBuffer& data, unsigned short value);
+
+    static int HandleConfirmedServiceError(CGXReplyData& data);
 };
 #endif //GXDLMS_H

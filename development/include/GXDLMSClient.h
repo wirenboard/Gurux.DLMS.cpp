@@ -45,6 +45,7 @@ class CGXDLMSClient
 {
 protected:
     CGXDLMSSettings m_Settings;
+    bool m_AutoIncreaseInvokeID;
 private:
     bool m_IsAuthenticationRequired;
     static void UpdateOBISCodes(CGXDLMSObjectCollection& objects);
@@ -124,6 +125,29 @@ public:
      *            Used service class.
      */
     void SetServiceClass(DLMS_SERVICE_CLASS value);
+
+
+    /**
+       * @return Invoke ID.
+    */
+    unsigned char GetInvokeID();
+
+    /**
+     * @param value
+     *            Invoke ID.
+     */
+    void SetInvokeID(unsigned char value);
+
+    /**
+     * @return Auto increase Invoke ID.
+     */
+    bool GetAutoIncreaseInvokeID();
+
+    /**
+     * @param value
+     *            Auto increase Invoke ID.
+     */
+    void SetAutoIncreaseInvokeID(bool value);
 
     CGXDLMSLimits& GetLimits();
 
@@ -211,6 +235,21 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     // Changes byte array received from the meter to given type.
     /////////////////////////////////////////////////////////////////////////////
+    // value: Byte array received from the meter.
+    // type: Wanted type.
+    // useUtc: Standard says that Time zone is from normal time to UTC in minutes. 
+    //         If meter is configured to use UTC time (UTC to normal time) 
+    //         set this to true.
+    // returns Value changed by type.
+    static int ChangeType(
+        CGXByteBuffer& value,
+        DLMS_DATA_TYPE type,
+        bool useUtc,
+        CGXDLMSVariant& newValue);
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Changes byte array received from the meter to given type.
+    /////////////////////////////////////////////////////////////////////////////
     // value Byte array received from the meter.
     // type Wanted type.
     // returns Value changed by type.
@@ -288,12 +327,34 @@ public:
     int DisconnectRequest(
         std::vector<CGXByteBuffer>& packets);
 
+    /**
+    * Removes the HDLC frame from the packet, and returns COSEM data only.
+    *
+    * @param reply
+    *            The received data from the device.
+    * @param data
+    *            The exported reply information.
+    * @return Is frame complete.
+    */
     int GetData(
         CGXByteBuffer& reply,
         CGXReplyData& data);
 
-    static std::string ObjectTypeToString(
-        DLMS_OBJECT_TYPE type);
+    /**
+    * Removes the HDLC frame from the packet, and returns COSEM data only.
+    *
+    * @param reply
+    *            The received data from the device.
+    * @param data
+    *            The exported reply information.
+    * @param notify
+    *            Information from the notify message.
+    * @return Is frame complete.
+    */
+    int GetData(
+        CGXByteBuffer& reply,
+        CGXReplyData& data,
+        CGXReplyData& notify);
 
     /**
     * Reads the Association view from the device. This method is used to get
@@ -307,7 +368,7 @@ public:
 
     /**
     Generates the keep alive message.
- 
+
     Keepalive message is needed only HDLC framing.
     For keepalive we are reading logical name for Association object.
     This is done because all the meters can't handle HDLC keep alive message.
@@ -619,5 +680,17 @@ public:
     *            Protocol version.
     */
     void SetProtocolVersion(char* value);
+
+    //Convert object type enum value to string.
+    static const std::string ObjectTypeToString(DLMS_OBJECT_TYPE type)
+    {
+        return CGXDLMSConverter::ToString(type);
+    }
+    
+    //Parse push objects.
+    int ParsePushObjects(
+        std::vector<CGXDLMSVariant>& data,
+        std::vector<std::pair<CGXDLMSObject*, unsigned char> >& items);
+
 };
 #endif //GXDLMSCLIENT_H

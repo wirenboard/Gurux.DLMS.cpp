@@ -36,6 +36,7 @@
 #include "../../development/include/GXDLMSConverter.h"
 #include "../../development/include/GXDLMSProfileGeneric.h"
 #include "../../development/include/GXDLMSDemandRegister.h"
+#include "../../development/include/GXDLMSTranslator.h"
 
 void CGXCommunication::WriteValue(GX_TRACE_LEVEL trace, std::string line)
 {
@@ -775,6 +776,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
     int ret;
     CGXByteBuffer bb;
     std::string tmp;
+    CGXReplyData notify;
     if (data.GetSize() == 0)
     {
         return DLMS_ERROR_CODE_OK;
@@ -839,6 +841,27 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
     tmp = "";
     do
     {
+        if (notify.GetData().GetSize() != 0)
+        {
+            //Handle notify.
+            if (!notify.IsMoreData())
+            {
+                //Show received push message as XML.
+                std::string xml;
+                CGXDLMSTranslator t(DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML);
+                if ((ret = t.DataToXml(notify.GetData(), xml)) != 0)
+                {
+                    printf("ERROR! DataToXml failed.");
+                }
+                else
+                {
+                    printf("%s\r\n", xml.c_str());
+                }
+                notify.Clear();
+            }
+            continue;
+        }
+
         if (m_hComPort != INVALID_HANDLE_VALUE)
         {
             if (Read(0x7E, bb) != 0)
@@ -880,7 +903,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             }
             tmp += GXHelpers::BytesToHex(m_Receivebuff, ret);
         }
-    } while ((ret = m_Parser->GetData(bb, reply)) == DLMS_ERROR_CODE_FALSE);
+    } while ((ret = m_Parser->GetData(bb, reply, notify)) == DLMS_ERROR_CODE_FALSE);
     tmp += "\r\n";
     if (m_Trace > GX_TRACE_LEVEL_INFO)
     {
@@ -1024,6 +1047,10 @@ int CGXCommunication::ReadList(
     int ret;
     CGXReplyData reply;
     std::vector<CGXByteBuffer> data;
+    if (list.size() == 0)
+    {
+        return 0;
+    }
     //Get values from the meter.
     if ((ret = m_Parser->ReadList(list, data)) != 0)
     {
@@ -1335,16 +1362,16 @@ int CGXCommunication::GetReadOut()
                 WriteValue(m_Trace, buff);
                 WriteValue(m_Trace, value.c_str());
                 WriteValue(m_Trace, "\r\n");
-                }
             }
         }
+    }
     return ret;
 }
 
 int CGXCommunication::GetProfileGenerics()
 {
     char buff[200];
-    int ret;
+    int ret = 0;
     std::string str;
     std::string value;
     //Find profile generics and read them.

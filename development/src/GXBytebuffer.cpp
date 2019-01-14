@@ -616,6 +616,20 @@ std::string CGXByteBuffer::ToHexString()
     return GXHelpers::BytesToHex(m_Data, m_Size);
 }
 
+std::string CGXByteBuffer::ToHexString(bool addSpaces)
+{
+    return GXHelpers::BytesToHex(m_Data, m_Size, addSpaces);
+}
+
+std::string CGXByteBuffer::ToHexString(unsigned long position, unsigned long count, bool addSpaces)
+{
+    if (m_Data == NULL || count == 0)
+    {
+        return "";
+    }
+    return GXHelpers::BytesToHex(m_Data + position, count, addSpaces);
+}
+
 void CGXByteBuffer::AddIntAsString(int value)
 {
     char buff[20];

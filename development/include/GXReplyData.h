@@ -38,77 +38,111 @@
 #include "GXDLMSConverter.h"
 #include "GXBytebuffer.h"
 #include "GXDLMSVariant.h"
+#include "GXDLMSTranslatorStructure.h"
+
 
 class CGXReplyData
 {
 private:
-    /**
+    /*
      * Is more data available.
      */
     DLMS_DATA_REQUEST_TYPES m_MoreData;
-    /**
+    /*
      * Received command.
      */
     DLMS_COMMAND m_Command;
 
-    /**
+    /*
     * Received command type.
     */
     unsigned char m_CommandType;
 
-    /**
+    /*
      * Received data.
      */
-    CGXByteBuffer m_Data;
-    /**
+    CGXByteBuffer  m_Data;
+    CGXByteBuffer* m_pData;
+    /*
      * Is frame complete.
      */
     bool m_Complete;
 
-    /**
+    /*
      * Read value.
      */
     CGXDLMSVariant m_DataValue;
 
-    /**
+    /*
      * Expected count of element in the array.
      */
     int m_TotalCount;
 
-    /**
+    /*
      * Last read position. This is used in peek to solve how far data is read.
      */
     unsigned long m_ReadPosition;
 
-    /**
+    /*
      * Packet Length.
      */
     int m_PacketLength;
 
-    /**
+    /*
      * Try Get value.
      */
     bool m_Peek;
 
     DLMS_DATA_TYPE m_DataType;
 
-    /**
+    /*
      * Cipher index is position where data is decrypted.
      */
     unsigned short m_CipherIndex;
 
-    /**
-    * Is received message General Block Transfer message.
-    */
-    bool m_Gbt;
-
-    /**
+    /*
      * Data notification date time.
      */
     struct tm* m_Time;
 
+    CGXDLMSTranslatorStructure* m_pXml;
+
+    /*
+    * Invoke ID.
+    */
+    long m_InvokeId;
+
+    /*
+     * GBT block number.
+     */
+    int m_BlockNumber;
+    /*
+     * GBT block number ACK.
+     */
+    int m_BlockNumberAck;
+    /*
+     * Is GBT streaming in use.
+     */
+    bool m_Streaming;
+    /*
+     * GBT Window size. This is for internal use.
+     */
+    unsigned char m_WindowSize;
+
+    /*
+     * Client address of the notification message. Notification message sets
+     * this.
+     */
+    unsigned short m_ClientAddress;
+
+    /*
+     * Server address of the notification message. Notification message sets
+     * this.
+     */
+    int m_ServerAddress;
+
 public:
-    /**
+    /*
      * Constructor.
      *
      * @param more
@@ -123,10 +157,10 @@ public:
     CGXReplyData(
         DLMS_DATA_REQUEST_TYPES more,
         DLMS_COMMAND cmd,
-        CGXByteBuffer& buff,
+        CGXByteBuffer* buff,
         bool complete);
 
-    /**
+    /*
      * Constructor.
      */
     CGXReplyData();
@@ -162,17 +196,17 @@ public:
 
     void SetTotalCount(int value);
 
-    /**
+    /*
      * Reset data values to default.
      */
     void Clear();
 
-    /**
+    /*
      * @return Is more data available.
      */
     bool IsMoreData();
 
-    /**
+    /*
      * Is more data available.
      *
      * @return Return None if more data is not available or Frame or Block type.
@@ -182,28 +216,28 @@ public:
     void SetMoreData(DLMS_DATA_REQUEST_TYPES value);
 
 
-    /**
+    /*
      * Get received command.
      *
      * @return Received command.
      */
     DLMS_COMMAND GetCommand();
 
-    /**
+    /*
      * Get received data.
      *
      * @return Received data.
      */
     CGXByteBuffer& GetData();
 
-    /**
+    /*
      * Is frame complete.
      *
      * @return Returns true if frame is complete or false if bytes is missing.
      */
     bool IsComplete();
 
-    /**
+    /*
      * Get total count of element in the array. If this method is used peek must
      * be Set true.
      *
@@ -213,7 +247,7 @@ public:
      */
     int GetTotalCount();
 
-    /**
+    /*
      * Get count of read elements. If this method is used peek must be Set true.
      *
      * @return Count of read elements.
@@ -222,7 +256,7 @@ public:
      */
     int GetCount();
 
-    /**
+    /*
      * Get is value try to peek.
      *
      * @return Is value try to peek.
@@ -231,7 +265,7 @@ public:
      */
     bool GetPeek();
 
-    /**
+    /*
      * Set is value try to peek.
      *
      * @param value
@@ -239,39 +273,164 @@ public:
      */
     void SetPeek(bool value);
 
-    /**
+    /*
      * @return Cipher index is position where data is decrypted.
      */
     unsigned short GetCipherIndex();
 
-    /**
+    /*
      * @param cipherIndex
      *            Cipher index is position where data is decrypted.
      */
     void SetCipherIndex(unsigned short value);
 
-    /**
-     * @return Is received message General Block Transfer message.
-     */
-    bool GetGbt();
-
-    /**
-     * @param Is
-     *            received message General Block Transfer message.
-     */
-    void SetGbt(bool value);
-
-    /**
+    /*
      * @return Data notification date time.
      */
     struct tm* GetTime();
 
 
-    /**
+    /*
      * @param time
      *            Data notification date time.
      */
     void SetTime(struct tm* value);
+
+    /*
+     * @return Data notification date time.
+     */
+    CGXDLMSTranslatorStructure* GetXml();
+
+
+    /*
+     * @param time
+     *            Data notification date time.
+     */
+    void SetXml(CGXDLMSTranslatorStructure* value);
+
+    /**
+    * Invoke ID.
+    */
+    long GetInvokeId()
+    {
+        return m_InvokeId;
+    }
+
+    /**
+     * Invoke ID.
+     */
+    void setInvokeId(long value)
+    {
+        m_InvokeId = value;
+    }
+
+    /*
+     * GBT block number.
+     */
+    int GetBlockNumber()
+    {
+        return m_BlockNumber;
+    }
+
+    /*
+     * GBT block number.
+     */
+    void SetBlockNumber(int value)
+    {
+        m_BlockNumber = value;
+    }
+
+    /**
+     * GBT block number ACK.
+     */
+    int GetBlockNumberAck()
+    {
+        return m_BlockNumberAck;
+    }
+
+    /**
+     * @param value
+     *            GBT block number ACK.
+     */
+    void SetBlockNumberAck(int value)
+    {
+        m_BlockNumberAck = value;
+    }
+
+    /**
+     * @return Is GBT streaming in use.
+     */
+    bool GetStreaming()
+    {
+        return m_Streaming;
+    }
+
+    /**
+     * Is GBT streaming in use.
+     */
+    void SetStreaming(bool value)
+    {
+        m_Streaming = value;
+    }
+
+    /**
+     * GBT Window size. This is for internal use.
+     */
+    unsigned char GetWindowSize() {
+        return m_WindowSize;
+    }
+
+    /**
+     * GBT Window size. This is for internal use.
+     */
+    void SetWindowSize(unsigned char value)
+    {
+        m_WindowSize = value;
+    }
+
+    /**
+     * Is GBT streaming.
+     */
+    bool IsStreaming()
+    {
+        return m_Streaming && (m_BlockNumberAck * m_WindowSize) + 1 > m_BlockNumber;
+    }
+
+    /**
+     * Client address of the notification message. Notification message
+     * sets this.
+     */
+    unsigned short GetClientAddress()
+    {
+        return m_ClientAddress;
+    }
+
+    /**
+     *            Client address of the notification message. Notification
+     *            message sets this.
+     */
+    void SetClientAddress(unsigned short value)
+    {
+        m_ClientAddress = value;
+    }
+
+    /*
+     * Server address of the notification message. Notification message
+     *         sets this.
+     */
+    int GetServerAddress()
+    {
+        return m_ServerAddress;
+    }
+
+    /*
+     *            Server address of the notification message. Notification
+     *            message sets this.
+     */
+    void SetServerAddress(int value)
+    {
+        m_ServerAddress = value;
+    }
 };
 
 #endif //GXREPLYDATA_H

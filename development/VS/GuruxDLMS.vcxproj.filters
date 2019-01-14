@@ -285,6 +285,18 @@
     <ClCompile Include="..\src\GXDLMSCertificateInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\GXDLMSTranslator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\GXDLMSTranslatorStructure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\GXDLMSLNCommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\GXDLMSSNCommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Enums.h">
@@ -560,9 +572,6 @@
     <ClInclude Include="..\include\chipperingenums.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\GXGMac.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\GXDLMSSecureClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -606,6 +615,30 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\GXDLMSCertificateInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GXDLMSTranslator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\TranslatorSimpleTags.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\TranslatorStandardTags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\TranslatorTags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\TranslatorGeneralTags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GXDLMSTranslatorStructure.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GXDLMSLNCommandHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GXDLMSSNCommandHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

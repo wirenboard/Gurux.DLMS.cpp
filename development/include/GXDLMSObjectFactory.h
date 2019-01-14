@@ -42,6 +42,5 @@ class CGXDLMSObjectFactory
 public:
     static CGXDLMSObject* CreateObject(DLMS_OBJECT_TYPE type);
     static CGXDLMSObject* CreateObject(DLMS_OBJECT_TYPE type, std::string ln);
-    static std::string ObjectTypeToString(DLMS_OBJECT_TYPE type);
 };
 #endif //GXDLMSOBJECTFACTORY_H
