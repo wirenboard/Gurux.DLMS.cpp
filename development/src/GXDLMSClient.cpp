@@ -581,7 +581,12 @@ int CGXDLMSClient::ChangeType(CGXByteBuffer& value, DLMS_DATA_TYPE type, bool us
 
 int CGXDLMSClient::ParseUAResponse(CGXByteBuffer& data)
 {
-    return CGXDLMS::ParseSnrmUaResponse(data, &m_Settings.GetLimits());
+    int ret = CGXDLMS::ParseSnrmUaResponse(data, &m_Settings.GetLimits());
+    if (ret == 0)
+    {
+        m_Settings.SetConnected(DLMS_CONNECTION_STATE_HDLC);
+    }
+    return ret;
 }
 
 int CGXDLMSClient::AARQRequest(std::vector<CGXByteBuffer>& packets)
