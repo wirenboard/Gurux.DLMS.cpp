@@ -58,7 +58,7 @@ enum PPP_AUTHENTICATION_TYPE
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSPppSetup
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSPppSetup
 */
 class CGXDLMSPppSetup : public CGXDLMSObject
 {

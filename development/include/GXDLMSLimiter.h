@@ -41,7 +41,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSLimiter
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSLimiter
 */
 class CGXDLMSLimiter : public CGXDLMSObject
 {

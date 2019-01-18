@@ -39,7 +39,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSDemandRegister
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSDemandRegister
 */
 class CGXDLMSDemandRegister : public CGXDLMSObject
 {

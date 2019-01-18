@@ -42,7 +42,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSActivityCalendar
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSActivityCalendar
 */
 class CGXDLMSActivityCalendar : public CGXDLMSObject
 {

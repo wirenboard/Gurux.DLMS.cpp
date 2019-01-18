@@ -172,6 +172,8 @@ public:
     static short GetCurrentTimeZone();
 
     //Get currect deviation.
-    static char GetCurrentDeviation();    
+    static char GetCurrentDeviation();  
+
+    unsigned long ToUnixTime();
 };
 #endif //GXDATETIME_H

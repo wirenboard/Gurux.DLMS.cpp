@@ -37,7 +37,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSTcpUdpSetup
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSTcpUdpSetup
 */
 class CGXDLMSTcpUdpSetup : public CGXDLMSObject
 {

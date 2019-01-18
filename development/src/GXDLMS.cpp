@@ -2590,17 +2590,10 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
     {
         return DLMS_ERROR_CODE_FALSE;
     }
-    GetDataFromFrame(reply, *target);
+    GetDataFromFrame(reply, *target, settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC);
     // If keepalive or get next frame request.
     if (frame != 0x13 && (frame & 0x1) != 0)
     {
-        if (settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC && data.GetData().GetSize() != 0)
-        {
-            if (reply.GetPosition() != reply.GetSize())
-            {
-                reply.SetPosition(reply.GetPosition() + 3);
-            }
-        }
         if (data.GetCommand() == DLMS_COMMAND_UNACCEPTABLE_FRAME)
         {
             return DLMS_ERROR_CODE_REJECTED;
@@ -3279,7 +3272,7 @@ int CGXDLMS::GetValueFromData(CGXDLMSSettings& settings, CGXReplyData& reply)
     return 0;
 }
 
-void CGXDLMS::GetDataFromFrame(CGXByteBuffer& reply, CGXReplyData& info)
+void CGXDLMS::GetDataFromFrame(CGXByteBuffer& reply, CGXReplyData& info, bool hdlc)
 {
     CGXByteBuffer& data = info.GetData();
     int offset = data.GetSize();
@@ -3288,6 +3281,11 @@ void CGXDLMS::GetDataFromFrame(CGXByteBuffer& reply, CGXReplyData& info)
     {
         data.Capacity(offset + cnt);
         data.Set(&reply, reply.GetPosition(), cnt);
+        if (hdlc)
+        {
+            reply.SetPosition(reply.GetPosition() + 3);
+        }
+
     }
     // Set position to begin of new data.
     data.SetPosition(offset);

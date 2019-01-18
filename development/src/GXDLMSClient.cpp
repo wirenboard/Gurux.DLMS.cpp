@@ -948,6 +948,7 @@ int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets)
     {
         ret = CGXDLMS::GetHdlcFrame(m_Settings, DLMS_COMMAND_DISCONNECT_REQUEST, NULL, reply);
         packets.push_back(reply);
+        m_Settings.SetConnected(DLMS_CONNECTION_STATE_NONE);
         return ret;
     }
     else
@@ -1012,7 +1013,7 @@ int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int a
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     m_Settings.ResetBlockIndex();
-    if (m_AutoIncreaseInvokeID) 
+    if (m_AutoIncreaseInvokeID)
     {
         m_Settings.SetInvokeID((unsigned char)((m_Settings.GetInvokeID() + 1) & 0xF));
     }
@@ -1197,7 +1198,7 @@ int CGXDLMSClient::Write(
         CGXDLMSVariant value = e.GetValue();
         int ret;
         m_Settings.ResetBlockIndex();
-        if (m_AutoIncreaseInvokeID) 
+        if (m_AutoIncreaseInvokeID)
         {
             m_Settings.SetInvokeID((unsigned char)((m_Settings.GetInvokeID() + 1) & 0xF));
         }
@@ -1212,22 +1213,7 @@ int CGXDLMSClient::Write(
             if ((ret = pObject->GetDataType(index, type)) != 0)
             {
                 return ret;
-            }
-            /*
-            if (value.vt != DLMS_DATA_TYPE_NONE)
-            {
-                if ((ret = pObject->GetDataType(index, type)) != 0)
-                {
-                    return ret;
-                }
-                if (value.vt != type)
-                {
-                    if ((ret = value.ChangeType(type)) != 0)
-                    {
-                        return ret;
-                    }
-                }
-            }*/
+            }           
             if ((ret = GXHelpers::SetData(data, type, value)) != 0)
             {
                 return ret;
@@ -1376,7 +1362,7 @@ int CGXDLMSClient::Method(CGXDLMSVariant name, DLMS_OBJECT_TYPE objectType,
 
     CGXByteBuffer bb, data;
     m_Settings.ResetBlockIndex();
-    if (m_AutoIncreaseInvokeID) 
+    if (m_AutoIncreaseInvokeID)
     {
         m_Settings.SetInvokeID((unsigned char)((m_Settings.GetInvokeID() + 1) & 0xF));
     }
@@ -1514,12 +1500,22 @@ int CGXDLMSClient::ReadRowsByRange(
     std::vector<CGXByteBuffer>& reply)
 {
     int ret;
+    bool unixTime = false;
     unsigned char LN[] = { 0, 0, 1, 0, 0, 255 };
+    DLMS_OBJECT_TYPE type = DLMS_OBJECT_TYPE_CLOCK;
+    unsigned char* pLn = LN;
     CGXByteBuffer buff(51);
     CGXDLMSVariant name = pg->GetName();
     if (pg == NULL)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    if (pg->GetCaptureObjects().size() != 0)
+    {
+        std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> kv = pg->GetCaptureObjects()[0];
+        type = kv.first->GetObjectType();
+        pLn = kv.first->m_LN;
+        unixTime = type == DLMS_OBJECT_TYPE_DATA;
     }
     pg->Reset();
     m_Settings.ResetBlockIndex();
@@ -1537,7 +1533,7 @@ int CGXDLMSClient::ReadRowsByRange(
     CGXDLMSVariant tmp = DLMS_OBJECT_TYPE_CLOCK;
     GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT16, tmp);
     // LN
-    CGXDLMSVariant ln(LN, 6, DLMS_DATA_TYPE_OCTET_STRING);
+    CGXDLMSVariant ln(pLn, 6, DLMS_DATA_TYPE_OCTET_STRING);
     GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, ln);
     // Add attribute index.
     tmp = 2;
@@ -1549,16 +1545,38 @@ int CGXDLMSClient::ReadRowsByRange(
         return ret;
     }
     // Add start time
-    tmp = start;
-    if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+    if (unixTime)
     {
-        return ret;
+        tmp = start.ToUnixTime();
+        if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT32, tmp)) != 0)
+        {
+            return ret;
+        }
+    }
+    else
+    {
+        tmp = start;
+        if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+        {
+            return ret;
+        }
     }
     // Add end time
-    tmp = end;
-    if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+    if (unixTime)
     {
-        return ret;
+        tmp = end.ToUnixTime();
+        if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT32, tmp)) != 0)
+        {
+            return ret;
+        }
+    }
+    else
+    {
+        tmp = end;
+        if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+        {
+            return ret;
+        }
     }
     // Add array of read columns. Read All...
     buff.SetUInt8(0x01);

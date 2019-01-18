@@ -128,7 +128,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\GXAdjacentCell.cpp" />
+    <ClCompile Include="..\src\GXChargePerUnitScaling.cpp" />
+    <ClCompile Include="..\src\GXChargeTable.cpp" />
+    <ClCompile Include="..\src\GXCommodity.cpp" />
+    <ClCompile Include="..\src\GXCreditChargeConfiguration.cpp" />
+    <ClCompile Include="..\src\GXCurrency.cpp" />
+    <ClCompile Include="..\src\GXDLMSAccount.cpp" />
     <ClCompile Include="..\src\GXDLMSCertificateInfo.cpp" />
+    <ClCompile Include="..\src\GXDLMSCharge.cpp" />
+    <ClCompile Include="..\src\GXDLMSCredit.cpp" />
     <ClCompile Include="..\src\GXDLMSGSMCellInfo.cpp" />
     <ClCompile Include="..\src\GXAPDU.cpp" />
     <ClCompile Include="..\src\GXApplicationContextName.cpp" />
@@ -183,6 +191,7 @@
     <ClCompile Include="..\src\GXDLMSObjectCollection.cpp" />
     <ClCompile Include="..\src\GXDLMSObjectDefinition.cpp" />
     <ClCompile Include="..\src\GXDLMSObjectFactory.cpp" />
+    <ClCompile Include="..\src\GXDLMSParameterMonitor.cpp" />
     <ClCompile Include="..\src\GXDLMSPppSetup.cpp" />
     <ClCompile Include="..\src\GXDLMSPppSetupIPCPOption.cpp" />
     <ClCompile Include="..\src\GXDLMSPppSetupLcpOption.cpp" />
@@ -210,7 +219,9 @@
     <ClCompile Include="..\src\GXDLMSSNParameters.cpp" />
     <ClCompile Include="..\src\GXDLMSSpecialDay.cpp" />
     <ClCompile Include="..\src\GXDLMSSpecialDaysTable.cpp" />
+    <ClCompile Include="..\src\GXDLMSTarget.cpp" />
     <ClCompile Include="..\src\GXDLMSTcpUdpSetup.cpp" />
+    <ClCompile Include="..\src\GXDLMSTokenGateway.cpp" />
     <ClCompile Include="..\src\GXDLMSTranslator.cpp" />
     <ClCompile Include="..\src\GXDLMSTranslatorStructure.cpp" />
     <ClCompile Include="..\src\GXDLMSValueEventArg.cpp" />
@@ -223,8 +234,11 @@
     <ClCompile Include="..\src\GXSNInfo.cpp" />
     <ClCompile Include="..\src\GXStandardObisCode.cpp" />
     <ClCompile Include="..\src\GXStandardObisCodeCollection.cpp" />
+    <ClCompile Include="..\src\GXTokenGatewayConfiguration.cpp" />
+    <ClCompile Include="..\src\GXUnitCharge.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\GXChargePerUnitScaling.h" />
     <ClInclude Include="..\include\chipperingenums.h" />
     <ClInclude Include="..\include\Enums.h" />
     <ClInclude Include="..\include\ErrorCodes.h" />
@@ -235,10 +249,15 @@
     <ClInclude Include="..\include\GXAuthentication.h" />
     <ClInclude Include="..\include\GXAuthenticationMechanismName.h" />
     <ClInclude Include="..\include\gxbytebuffer.h" />
+    <ClInclude Include="..\include\GXChargeTable.h" />
     <ClInclude Include="..\include\GXCipher.h" />
+    <ClInclude Include="..\include\GXCommodity.h" />
+    <ClInclude Include="..\include\GXCreditChargeConfiguration.h" />
+    <ClInclude Include="..\include\GXCurrency.h" />
     <ClInclude Include="..\include\GXDate.h" />
     <ClInclude Include="..\include\GXDateTime.h" />
     <ClInclude Include="..\include\GXDLMS.h" />
+    <ClInclude Include="..\include\GXDLMSAccount.h" />
     <ClInclude Include="..\include\GXDLMSActionItem.h" />
     <ClInclude Include="..\include\GXDLMSActionSchedule.h" />
     <ClInclude Include="..\include\GXDLMSActionSet.h" />
@@ -250,11 +269,13 @@
     <ClInclude Include="..\include\GXDLMSAutoConnect.h" />
     <ClInclude Include="..\include\GXDLMSCaptureObject.h" />
     <ClInclude Include="..\include\GXDLMSCertificateInfo.h" />
+    <ClInclude Include="..\include\GXDLMSCharge.h" />
     <ClInclude Include="..\include\GXDLMSClient.h" />
     <ClInclude Include="..\include\GXDLMSClock.h" />
     <ClInclude Include="..\include\GXDLMSConnectionEventArgs.h" />
     <ClInclude Include="..\include\GXDLMSContextType.h" />
     <ClInclude Include="..\include\GXDLMSConverter.h" />
+    <ClInclude Include="..\include\GXDLMSCredit.h" />
     <ClInclude Include="..\include\GXDLMSData.h" />
     <ClInclude Include="..\include\GXDLMSDayProfile.h" />
     <ClInclude Include="..\include\GXDLMSDayProfileAction.h" />
@@ -290,6 +311,7 @@
     <ClInclude Include="..\include\GXDLMSObjectCollection.h" />
     <ClInclude Include="..\include\GXDLMSObjectDefinition.h" />
     <ClInclude Include="..\include\GXDLMSObjectFactory.h" />
+    <ClInclude Include="..\include\GXDLMSParameterMonitor.h" />
     <ClInclude Include="..\include\GXDLMSPppSetup.h" />
     <ClInclude Include="..\include\GXDLMSPppSetupIPCPOption.h" />
     <ClInclude Include="..\include\GXDLMSPppSetupLcpOption.h" />
@@ -317,7 +339,9 @@
     <ClInclude Include="..\include\GXDLMSSNParameters.h" />
     <ClInclude Include="..\include\GXDLMSSpecialDay.h" />
     <ClInclude Include="..\include\GXDLMSSpecialDaysTable.h" />
+    <ClInclude Include="..\include\GXDLMSTarget.h" />
     <ClInclude Include="..\include\GXDLMSTcpUdpSetup.h" />
+    <ClInclude Include="..\include\GXDLMSTokenGateway.h" />
     <ClInclude Include="..\include\GXDLMSTranslator.h" />
     <ClInclude Include="..\include\GXDLMSTranslatorStructure.h" />
     <ClInclude Include="..\include\GXDLMSValueEventArg.h" />
@@ -332,6 +356,8 @@
     <ClInclude Include="..\include\GXStandardObisCode.h" />
     <ClInclude Include="..\include\GXStandardObisCodeCollection.h" />
     <ClInclude Include="..\include\GXTime.h" />
+    <ClInclude Include="..\include\GXTokenGatewayConfiguration.h" />
+    <ClInclude Include="..\include\GXUnitCharge.h" />
     <ClInclude Include="..\include\IGXDLMSBase.h" />
     <ClInclude Include="..\include\OBiscodes.h" />
     <ClInclude Include="..\include\TranslatorGeneralTags.h" />

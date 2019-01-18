@@ -39,7 +39,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSDisconnectControl
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSDisconnectControl
 */
 class CGXDLMSDisconnectControl : public CGXDLMSObject
 {

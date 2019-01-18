@@ -988,6 +988,18 @@ const char* CGXDLMSConverter::ToString(DLMS_OBJECT_TYPE type)
         return "GXDLMSMessageHandler";
     case DLMS_OBJECT_TYPE_PUSH_SETUP:
         return "GXDLMSPushSetup";
+    case DLMS_OBJECT_TYPE_ACCOUNT:
+        return "GXDLMSAccount";
+    case DLMS_OBJECT_TYPE_CREDIT:
+        return "GXDLMSCredit";
+    case DLMS_OBJECT_TYPE_CHARGE:
+        return "GXDLMSCharge";
+    case DLMS_OBJECT_TYPE_PARAMETER_MONITOR:
+        return "GXDLMSParameterMonitor";
+    case DLMS_OBJECT_TYPE_TOKEN_GATEWAY:
+        return "GXDLMSTokenGateway";
+    case DLMS_OBJECT_TYPE_GSM_DIAGNOSTIC:
+        return "GXDLMSGSMDiagnostic";
     default:
         return "Manufacture spesific.";
     }

@@ -40,7 +40,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSAutoConnect
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSAutoConnect
 */
 class CGXDLMSAutoConnect : public CGXDLMSObject
 {

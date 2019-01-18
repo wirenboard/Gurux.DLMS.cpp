@@ -91,7 +91,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             item->strVal = buff;
             item->vt = type;
             return DLMS_ERROR_CODE_OK;
-    }
+        }
         if (tmp.vt == DLMS_DATA_TYPE_UINT32)
         {
 #if _MSC_VER > 1000
@@ -102,7 +102,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             item->strVal = buff;
             item->vt = type;
             return DLMS_ERROR_CODE_OK;
-}
+        }
         if (tmp.vt == DLMS_DATA_TYPE_INT8)
         {
 #if _MSC_VER > 1000
@@ -255,7 +255,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
 #endif
             item->vt = type;
             return DLMS_ERROR_CODE_OK;
-    }
+        }
         if (type == DLMS_DATA_TYPE_UINT32)
         {
 #if _MSC_VER > 1000
@@ -386,9 +386,9 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
     }
     int fromSize = tmp.GetSize();
     int toSize = GetSize(type);
-    //If we try to change bigger valut to smaller check that value is not too big.
+    //If we try to change bigger value to smaller check that value is not too big.
     //Example Int16 to Int8.
-    if (fromSize > toSize)
+    if (fromSize > toSize && tmp.vt != DLMS_DATA_TYPE_FLOAT32 && tmp.vt != DLMS_DATA_TYPE_FLOAT64)
     {
         unsigned char* pValue = &tmp.bVal;
         for (int pos = toSize; pos != fromSize; ++pos)
@@ -400,14 +400,27 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
         }
     }
     item->Clear();
-    if (fromSize > toSize)
+    if (tmp.vt == DLMS_DATA_TYPE_FLOAT32)
     {
-        memcpy(&item->bVal, &tmp.bVal, toSize);
+        long long value = tmp.fltVal;
+        memcpy(&item->bVal, &value, toSize);
+    }
+    else if (tmp.vt == DLMS_DATA_TYPE_FLOAT64)
+    {
+        long long value = tmp.dblVal;
+        memcpy(&item->bVal, &value, toSize);
     }
     else
     {
-        memset(&item->bVal, 0, toSize);
-        memcpy(&item->bVal, &tmp.bVal, fromSize);
+        if (fromSize > toSize)
+        {
+            memcpy(&item->bVal, &tmp.bVal, toSize);
+        }
+        else
+        {
+            memset(&item->bVal, 0, toSize);
+            memcpy(&item->bVal, &tmp.bVal, fromSize);
+        }
     }
     item->vt = type;
     return DLMS_ERROR_CODE_OK;

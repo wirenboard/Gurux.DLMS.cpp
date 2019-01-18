@@ -71,6 +71,11 @@
 #include "../include/GXDLMSMessageHandler.h"
 #include "../include/GXDLMSPushSetup.h"
 #include "../include/GXDLMSGSMDiagnostic.h"
+#include "../include/GXDLMSAccount.h"
+#include "../include/GXDLMSCredit.h"
+#include "../include/GXDLMSCharge.h"
+#include "../include/GXDLMSParameterMonitor.h"
+#include "../include/GXDLMSTokenGateway.h"
 
 // Reserved for internal use.
 CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
@@ -165,6 +170,16 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
         return new CGXDLMSPushSetup();
     case DLMS_OBJECT_TYPE_GSM_DIAGNOSTIC:
         return new CGXDLMSGSMDiagnostic();
+    case DLMS_OBJECT_TYPE_ACCOUNT:
+        return new CGXDLMSAccount();
+    case DLMS_OBJECT_TYPE_CREDIT:
+        return new CGXDLMSCredit();
+    case DLMS_OBJECT_TYPE_CHARGE:
+        return new CGXDLMSCharge();
+    case DLMS_OBJECT_TYPE_PARAMETER_MONITOR:
+        return new CGXDLMSParameterMonitor();
+    case DLMS_OBJECT_TYPE_TOKEN_GATEWAY:
+        return new CGXDLMSTokenGateway();
     default:
 #ifdef _DEBUG
         printf("Unknown object: %d\r\n", type);

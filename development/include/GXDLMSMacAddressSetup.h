@@ -39,7 +39,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSMacAddressSetup
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSMacAddressSetup
 */
 class CGXDLMSMacAddressSetup : public CGXDLMSObject
 {

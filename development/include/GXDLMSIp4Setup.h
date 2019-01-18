@@ -40,7 +40,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSIp4Setup
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSIp4Setup
 */
 class CGXDLMSIp4Setup : public CGXDLMSObject
 {

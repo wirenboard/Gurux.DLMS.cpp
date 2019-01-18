@@ -39,7 +39,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSMBusMasterPortSetup
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSMBusMasterPortSetup
 */
 class CGXDLMSMBusMasterPortSetup : public CGXDLMSObject
 {

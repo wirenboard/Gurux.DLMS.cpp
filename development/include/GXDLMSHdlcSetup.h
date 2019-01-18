@@ -39,7 +39,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSIecHdlcSetup
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSIecHdlcSetup
 */
 class CGXDLMSIecHdlcSetup : public CGXDLMSObject
 {

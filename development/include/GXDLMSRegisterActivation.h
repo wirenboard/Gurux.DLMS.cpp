@@ -42,7 +42,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSRegisterActivation
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSRegisterActivation
 */
 class CGXDLMSRegisterActivation : public CGXDLMSObject
 {

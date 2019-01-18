@@ -788,3 +788,7 @@ long CGXDateTime::GetDifference(struct tm& start, CGXDateTime& to)
     }
     return diff;
 }
+unsigned long CGXDateTime::ToUnixTime()
+{
+    return (unsigned long) mktime(&m_Value);
+}

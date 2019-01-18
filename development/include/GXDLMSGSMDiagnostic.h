@@ -41,7 +41,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSGSMDiagnostic
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSGSMDiagnostic
 */
 class CGXDLMSGSMDiagnostic : public CGXDLMSObject
 {

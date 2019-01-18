@@ -40,7 +40,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSSchedule
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSSchedule
 */
 class CGXDLMSSchedule : public CGXDLMSObject
 {

@@ -39,7 +39,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSIECOpticalPortSetup
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSIECOpticalPortSetup
 */
 class CGXDLMSIECOpticalPortSetup : public CGXDLMSObject
 {

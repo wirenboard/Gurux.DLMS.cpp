@@ -41,7 +41,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSAssociationLogicalName
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSAssociationLogicalName
 */
 class CGXDLMSAssociationLogicalName : public CGXDLMSObject
 {

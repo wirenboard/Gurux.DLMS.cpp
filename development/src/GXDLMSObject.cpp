@@ -64,9 +64,17 @@ CGXDLMSObject::CGXDLMSObject(DLMS_OBJECT_TYPE type)
     Initialize(0, type, 0, NULL);
 }
 
-int CGXDLMSObject::GetLogicalName(CGXDLMSObject * target, CGXDLMSVariant& value)
+int CGXDLMSObject::GetLogicalName(CGXDLMSObject* target, CGXDLMSVariant& value)
 {
-    value.Add(target->m_LN, 6);
+    if (target == NULL)
+    {
+        unsigned char ln[6] = {0};
+        value.Add(ln, 6);
+    }
+    else
+    {
+        value.Add(target->m_LN, 6);
+    }
     value.vt = DLMS_DATA_TYPE_OCTET_STRING;
     return DLMS_ERROR_CODE_OK;
 }

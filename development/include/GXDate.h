@@ -81,12 +81,5 @@ public:
         SetSkip((DATETIME_SKIPS)(value.m_Skip | DATETIME_SKIPS_HOUR | DATETIME_SKIPS_MINUTE | DATETIME_SKIPS_SECOND | DATETIME_SKIPS_MS));
         return *this;
     }
-
-    CGXDate& operator=(CGXDateTime value)
-    {
-        SetValue(value.GetValue());
-        SetSkip((DATETIME_SKIPS)(value.m_Skip | DATETIME_SKIPS_HOUR | DATETIME_SKIPS_MINUTE | DATETIME_SKIPS_SECOND | DATETIME_SKIPS_MS));
-        return *this;
-    }
 };
 #endif //GXDATE_H

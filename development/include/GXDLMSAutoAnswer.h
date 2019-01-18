@@ -78,7 +78,7 @@ enum AUTO_ANSWER_STATUS
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSAutoAnswer
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSAutoAnswer
 */
 class CGXDLMSAutoAnswer : public CGXDLMSObject
 {

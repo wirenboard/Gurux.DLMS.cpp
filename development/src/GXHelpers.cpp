@@ -1519,7 +1519,7 @@ int GXHelpers::GetCompactArray(
         {
             CGXDLMSVariant row;
             row.vt = DLMS_DATA_TYPE_ARRAY;
-            for (unsigned long pos = 0; pos != (unsigned long) cols.size(); ++pos)
+            for (unsigned long pos = 0; pos != (unsigned long)cols.size(); ++pos)
             {
                 CGXDLMSVariant& tmp = cols.at(pos);
                 if (tmp.vt == DLMS_DATA_TYPE_STRUCTURE)
@@ -2091,6 +2091,40 @@ static int SetUtfString(CGXByteBuffer& buff, CGXDLMSVariant& value)
     return 0;
 }
 
+void GXHelpers::GetLogicalName(unsigned char* buff, std::string& ln)
+{
+    int dataSize;
+    char tmp[25];
+    //If Script Action target is not set it is null
+    if (buff == NULL)
+    {
+        ln.clear();
+        ln.append("0.0.0.0.0.0");
+    }
+    else
+    {
+#if _MSC_VER > 1000
+        dataSize = sprintf_s(tmp, 25, "%d.%d.%d.%d.%d.%d", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]) + 1;
+#else
+        dataSize = sprintf(tmp, "%d.%d.%d.%d.%d.%d", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]) + 1;
+#endif
+        if (dataSize > 25)
+        {
+            assert(0);
+        }
+        ln.clear();
+        ln.append(tmp, dataSize - 1);
+    }
+}
+
+void GXHelpers::GetLogicalName(CGXByteBuffer& buff, std::string& ln)
+{
+    unsigned char tmp[6];
+    buff.Get(tmp, 6);
+    GetLogicalName(tmp, ln);
+}
+
+
 int GXHelpers::SetLogicalName(const char* name, CGXDLMSVariant& value)
 {
     unsigned char ln[6] = { 0 };
@@ -2192,6 +2226,11 @@ int GXHelpers::SetBitString(CGXByteBuffer& buff, CGXDLMSVariant& value, bool add
     else if (value.vt == DLMS_DATA_TYPE_NONE)
     {
         buff.SetUInt8(0);
+    }
+    else if (value.vt == DLMS_DATA_TYPE_UINT8)
+    {
+        SetObjectCount(8, buff);
+        buff.SetUInt8(value.cVal);
     }
     else
     {

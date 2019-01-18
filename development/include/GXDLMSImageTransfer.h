@@ -40,7 +40,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSImageTransfer
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSImageTransfer
 */
 class CGXDLMSImageTransfer : public CGXDLMSObject
 {

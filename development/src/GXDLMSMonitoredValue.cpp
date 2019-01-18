@@ -77,6 +77,10 @@ void CGXDLMSMonitoredValue::SetAttributeIndex(int value)
 
 std::string CGXDLMSMonitoredValue::ToString()
 {
+    if (m_ObjectType == DLMS_OBJECT_TYPE_NONE)
+    {
+        return "";
+    }
     std::stringstream sb;
     sb << CGXDLMSConverter::ToString(m_ObjectType);
     sb << " ";

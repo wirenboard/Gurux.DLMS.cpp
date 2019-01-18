@@ -41,7 +41,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSPushSetup
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSPushSetup
 */
 class CGXDLMSPushSetup : public CGXDLMSObject
 {

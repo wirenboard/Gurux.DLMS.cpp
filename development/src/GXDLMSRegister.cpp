@@ -60,10 +60,8 @@ CGXDLMSRegister::CGXDLMSRegister(DLMS_OBJECT_TYPE type, std::string ln, unsigned
 
 //SN Constructor.
 CGXDLMSRegister::CGXDLMSRegister(std::string ln, unsigned short sn) :
-    CGXDLMSObject(DLMS_OBJECT_TYPE_REGISTER, ln, sn)
+    CGXDLMSRegister(DLMS_OBJECT_TYPE_REGISTER, ln, sn)
 {
-    m_Unit = 0;
-    m_Scaler = 0;
 }
 
 //LN Constructor.
@@ -204,10 +202,10 @@ int CGXDLMSRegister::GetDataType(int index, DLMS_DATA_TYPE& type)
 
 int CGXDLMSRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
+    int ret;
+    CGXDLMSVariant tmp;
     if (e.GetIndex() == 1)
     {
-        int ret;
-        CGXDLMSVariant tmp;
         if ((ret = GetLogicalName(this, tmp)) != 0)
         {
             return ret;
@@ -217,7 +215,29 @@ int CGXDLMSRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     if (e.GetIndex() == 2)
     {
-        e.SetValue(m_Value);
+        DLMS_DATA_TYPE dt;
+        if ((ret = CGXDLMSObject::GetDataType(2, dt)) != 0)
+        {
+            return ret;
+        }
+        tmp = m_Value;
+        if (m_Scaler != 0)
+        {
+            if (dt == DLMS_DATA_TYPE_NONE)
+            {
+                dt = m_Value.vt;
+            }
+            if ((ret = tmp.ChangeType(DLMS_DATA_TYPE_FLOAT64)) != 0)
+            {
+                return ret;
+            }
+            tmp = m_Value.dblVal / GetScaler();
+            if ((ret = tmp.ChangeType(dt)) != 0)
+            {
+                return ret;
+            }
+        }
+        e.SetValue(tmp);
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 3)
@@ -244,6 +264,7 @@ int CGXDLMSRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     else if (e.GetIndex() == 2)
     {
+        CGXDLMSObject::SetDataType(2, e.GetValue().vt);
         if (m_Scaler != 0)
         {
             double val = GetScaler();

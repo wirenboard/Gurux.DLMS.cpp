@@ -39,7 +39,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSSapAssignment
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSSapAssignment
 */
 class CGXDLMSSapAssignment : public CGXDLMSObject
 {

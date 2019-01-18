@@ -142,8 +142,7 @@ int CGXDLMSExtendedRegister::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     if (index == 4)
     {
-        type = DLMS_DATA_TYPE_OCTET_STRING;
-        return DLMS_ERROR_CODE_OK;
+        return CGXDLMSObject::GetDataType(index, type);
     }
     if (index == 5)
     {
@@ -155,29 +154,9 @@ int CGXDLMSExtendedRegister::GetDataType(int index, DLMS_DATA_TYPE& type)
 
 int CGXDLMSExtendedRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
-    if (e.GetIndex() == 1)
+    if (e.GetIndex() < 4)
     {
-        int ret;
-        CGXDLMSVariant tmp;
-        if ((ret = GetLogicalName(this, tmp)) != 0)
-        {
-            return ret;
-        }
-        e.SetValue(tmp);
-        return DLMS_ERROR_CODE_OK;
-    }
-    if (e.GetIndex() == 2)
-    {
-        e.SetValue(m_Value);
-        return DLMS_ERROR_CODE_OK;
-    }
-    if (e.GetIndex() == 3)
-    {
-        e.GetValue().Clear();
-        e.GetValue().vt = DLMS_DATA_TYPE_STRUCTURE;
-        e.GetValue().Arr.push_back(m_Scaler);
-        e.GetValue().Arr.push_back(m_Unit);
-        return DLMS_ERROR_CODE_OK;
+        return CGXDLMSRegister::GetValue(settings, e);
     }
     if (e.GetIndex() == 4)
     {

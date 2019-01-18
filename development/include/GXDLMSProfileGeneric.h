@@ -73,7 +73,7 @@ class CGXDLMSServer;
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSProfileGeneric
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSProfileGeneric
 */
 class CGXDLMSProfileGeneric : public CGXDLMSObject
 {

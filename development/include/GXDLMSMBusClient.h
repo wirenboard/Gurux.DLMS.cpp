@@ -39,7 +39,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSMBusClient
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSMBusClient
 */
 class CGXDLMSMBusClient : public CGXDLMSObject
 {

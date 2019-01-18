@@ -853,7 +853,12 @@ typedef enum
      * Configure the fragmentation feature of ZigBee PRO transport layer.
      */
     DLMS_OBJECT_TYPE_ZIG_BEE_SAS_APS_FRAGMENTATION = 103,
-    DLMS_OBJECT_TYPE_ZIG_BEE_NETWORK_CONTROL = 104
+    DLMS_OBJECT_TYPE_ZIG_BEE_NETWORK_CONTROL = 104,
+
+    DLMS_OBJECT_TYPE_ACCOUNT = 111,
+    DLMS_OBJECT_TYPE_CREDIT = 112,
+    DLMS_OBJECT_TYPE_CHARGE = 113,
+    DLMS_OBJECT_TYPE_TOKEN_GATEWAY = 115
 } DLMS_OBJECT_TYPE;
 
 /**
@@ -2270,6 +2275,207 @@ typedef enum {
     DLMS_GSM_PACKET_SWITCH_STATUS_CDMA
 }DLMS_GSM_PACKET_SWITCH_STATUS;
 
+/**
+  * Enumerates payment Modes.<br/>
+  * Online help:<br/>
+  * http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSAccount
+  */
+typedef enum
+{
+    /**
+    * Credit mode.
+    */
+    DLMS_ACCOUNT_PAYMENT_MODE_CREDIT = 1,
+    /**
+    * Prepayment mode.
+    */
+    DLMS_ACCOUNT_PAYMENT_MODE_PREPAYMENT = 2
+}DLMS_ACCOUNT_PAYMENT_MODE;
+
+/**
+* Enumerates account status modes.<br/>
+* Online help:<br/>
+* http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSAccount
+*/
+typedef enum
+{
+    /**
+    * New (inactive) account.
+    */
+    DLMS_ACCOUNT_STATUS_NEW_INACTIVE_ACCOUNT = 1,
+    /**
+    * Account active.
+    */
+    DLMS_ACCOUNT_STATUS_ACTIVE = 2,
+    /**
+    * Account closed.
+    */
+    DLMS_ACCOUNT_STATUS_CLOSED = 3
+}DLMS_ACCOUNT_STATUS;
+
+/**
+* Enumerates account credit status modes.<br/>
+* Online help:<br/>
+* http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSAccount
+*/
+typedef enum {
+    /**
+    * In credit.
+    */
+    DLMS_ACCOUNT_CREDIT_STATUS_IN_CREDIT = 0x80,
+
+    /**
+    * Low credit.
+    */
+    DLMS_ACCOUNT_CREDIT_STATUS_LOW_CREDIT = 0x40,
+
+    /**
+    * Next credit enabled.
+    */
+    DLMS_ACCOUNT_CREDIT_STATUS_NEXT_CREDIT_ENABLED = 0x20,
+
+    /**
+    * Next credit selectable.
+    */
+    DLMS_ACCOUNT_CREDIT_STATUS_NEXT_CREDIT_SELECTABLE = 0x10,
+
+    /**
+    * Credit reference list.
+    */
+    DLMS_ACCOUNT_CREDIT_STATUS_CREDIT_REFERENCE_LIST = 0x8,
+
+    /**
+    * Selectable credit in use.
+    */
+    DLMS_ACCOUNT_CREDIT_STATUS_SELECTABLE_CREDIT_IN_USE = 0x4,
+
+    /**
+    * Out of credit.
+    */
+    DLMS_ACCOUNT_CREDIT_STATUS_OUT_OF_CREDIT = 0x2,
+
+    /**
+    * Reserved.
+    */
+    DLMS_ACCOUNT_CREDIT_STATUS_RESERVED = 0x1
+}DLMS_ACCOUNT_CREDIT_STATUS;
+
+/**
+* Enumerates payment Modes.<br/>
+* Online help:<br/>
+* http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSAccount
+*/
+typedef enum {
+    /**
+    * Time.
+    */
+    DLMS_CURRENCY_TIME,
+    /**
+    * Consumption.
+    */
+    DLMS_CURRENCY_CONSUMPTION,
+    /**
+    * Monetary.
+    */
+    DLMS_CURRENCY_MONETARY
+}DLMS_CURRENCY;
+
+typedef enum
+{
+    DLMS_REQUIRED_PROTECTION_NONE = 0,
+    //Authenticated request.
+    DLMS_REQUIRED_PROTECTION_AUTHENTICATED_REQUEST = 0x4,
+    //Encrypted request.
+    DLMS_REQUIRED_PROTECTION_ENCRYPTED_REQUEST = 0x8,
+    //Digitally signed request
+    DLMS_REQUIRED_PROTECTION_DIGITALLY_SIGNED_REQUEST = 0x10,
+    //Authenticated response.
+    DLMS_REQUIRED_PROTECTION_AUTHENTICATED_RESPONSE = 0x20,
+    //Encrypted response.
+    DLMS_REQUIRED_PROTECTION_ENCRYPTED_RESPONSE = 0x40,
+    //Digitally signed response
+    DLMS_REQUIRED_PROTECTION_DIGITALLY_SIGNED_RESPONSE = 0x80,
+}DLMS_REQUIRED_PROTECTION;
+
+typedef enum
+{
+    /**
+    * None.
+    */
+    DLMS_CREDIT_COLLECTION_CONFIGURATION_NONE = 0,
+    /**
+     * Collect when supply disconnected.
+     */
+    DLMS_CREDIT_COLLECTION_CONFIGURATION_DISCONNECTED = 0x80,
+    /**
+     * Collect in load limiting periods.
+     */
+    DLMS_CREDIT_COLLECTION_CONFIGURATION_LOAD_LIMITING = 0x40,
+    /**
+     * Collect in friendly credit periods.
+     */
+    DLMS_CREDIT_COLLECTION_CONFIGURATION_FRIENDLY_CREDIT = 0x20
+}DLMS_CREDIT_COLLECTION_CONFIGURATION;
+
+// Enumerates payment Modes.
+typedef enum
+{
+    // Credit mode.
+    DLMS_PAYMENT_MODE_CREDIT = 1,
+
+    // Prepayment mode.
+    DLMS_PAYMENT_MODE_PREPAYMENT = 2
+}DLMS_PAYMENT_MODE;
+
+
+// Enumerates token status codes.
+//  Online help:<br/>
+//  http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSTokenGateway
+typedef enum
+{
+    // Token format result OK.
+    FORMAT_OK,
+
+    // Authentication result OK.
+    AUTHENTICATION_OK,
+
+    // Validation result OK.
+    VALIDATION_OK,
+
+    // Token execution result OK.
+    TOKEN_EXECUTION_OK,
+
+    // Token format failure.
+    DLMS_TOKEN_STATUS_CODE_TOKEN_FORMAT_FAILURE,
+
+    // Authentication failure.
+    DLMS_TOKEN_STATUS_CODE_AUTHENTICATION_FAILURE,
+
+    // Validation result failure.
+    DLMS_TOKEN_STATUS_CODE_VALIDATION_RESULT_FAILURE,
+
+    // Token execution result failure.
+    DLMS_TOKEN_STATUS_CODE_TOKEN_EXECUTION_RESULT_FAILURE,
+
+    // Token received and not yet processed.
+    DLMS_TOKEN_STATUS_CODE_TOKEN_RECEIVED
+}DLMS_TOKEN_STATUS_CODE;
+
+// Enumerates token delivery methods.
+//  Online help:<br/>
+//  http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSTokenGateway
+typedef enum
+{
+    // Via remote communications.
+    DLMS_TOKEN_DELIVERY_REMOTE,
+
+    // Via local communications.
+    DLMS_TOKEN_DELIVERY_LOCAL,
+
+    // Via manual entry.
+    DLMS_TOKEN_DELIVERY_MANUAL
+}DLMS_TOKEN_DELIVERY;
+
 /*
 * Enumerates application context name.
 */
@@ -2421,5 +2627,114 @@ typedef enum
     // Action with block.
     DLMS_ACTION_REQUEST_TYPE_WITH_BLOCK = 6
 }DLMS_ACTION_REQUEST_TYPE;
+
+/**
+ * Enumerates credit types.<br>
+ * Online help:<br>
+ * http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSCredit
+ */
+typedef enum
+{
+    /**
+     * Token credit.
+     */
+    DLMS_CREDIT_TYPE_TOKEN,
+    /**
+     * Reserved credit.
+     */
+    DLMS_CREDIT_TYPE_RESERVED,
+    /**
+     * Emergency credit.
+     */
+    DLMS_CREDIT_TYPE_EMERGENCY,
+    /**
+     * TimeBased credit.
+     */
+    DLMS_CREDIT_TYPE_TIME_BASED,
+    /**
+     * Consumption based credit.
+     */
+    DLMS_CREDIT_TYPE_CONSUMPTION_BASED
+}DLMS_CREDIT_TYPE;
+
+/**
+ * Enumerates credit status values.<br>
+ * Online help:<br>
+ * http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSCredit
+ */
+typedef enum
+{
+    /**
+    * Enabled state.
+    */
+    DLMS_CREDIT_STATUS_ENABLED,
+    /**
+     * Selectable state.
+     */
+    DLMS_CREDIT_STATUS_SELECTABLE,
+    /**
+     * Selected/Invoked state.
+     */
+    DLMS_CREDIT_STATUS_INVOKED,
+    /**
+     * In use state.
+     */
+    DLMS_CREDIT_STATUS_IN_USE,
+    /**
+     * Consumed state.
+     */
+    DLMS_CREDIT_STATUS_CONSUMED
+}DLMS_CREDIT_STATUS;
+
+/**
+ * Enumerated Credit configuration values.<br>
+ * Online help:<br>
+ * http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSAccount
+ */
+typedef enum
+{
+    /**
+      * Requires visual indication,
+      */
+    DLMS_CREDIT_CONFIGURATION_VISUAL = 0x10,
+    /**
+     * Requires confirmation before it can be selected/invoked
+     */
+    DLMS_CREDIT_CONFIGURATION_CONFIRMATION = 0x8,
+    /**
+     * Requires the credit amount to be paid back.
+     */
+    DLMS_CREDIT_CONFIGURATION_PAID_BACK = 0x4,
+    /**
+     * Resettable.
+     */
+    DLMS_CREDIT_CONFIGURATION_RESETTABLE = 0x2,
+    /**
+     * Able to receive credit amounts from tokens.
+     */
+    DLMS_CREDIT_CONFIGURATION_TOKENS = 0x1
+}DLMS_CREDIT_CONFIGURATION;
+
+
+/**
+ * Enumerates account credit status modes.<br>
+ * Online help:<br>
+ * http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSCharge
+ */
+typedef enum
+{
+    /**
+      * Consumption based collection.
+      */
+    DLMS_CHARGE_TYPE_CONSUMPTION_BASED_COLLECTION,
+    /**
+     * Time based collection.
+     */
+    DLMS_CHARGE_TYPE_TIME_BASED_COLLECTION,
+    /**
+     * Payment based collection.
+     */
+    DLMS_CHARGE_TYPE_PAYMENT_EVENT_BASED_COLLECTION
+}DLMS_CHARGE_TYPE;
 
 #endif //ENUMS_H

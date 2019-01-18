@@ -78,12 +78,5 @@ public:
         SetSkip((DATETIME_SKIPS)(value.m_Skip | DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY | DATETIME_SKIPS_DAYOFWEEK));
         return *this;
     }
-
-    CGXTime& operator=(CGXDateTime value)
-    {
-        SetValue(value.m_Value);
-        SetSkip((DATETIME_SKIPS)(value.m_Skip | DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY | DATETIME_SKIPS_DAYOFWEEK));
-        return *this;
-    }
 };
 #endif //GXTIME_H

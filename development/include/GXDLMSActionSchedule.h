@@ -39,7 +39,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSActionSchedule
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSActionSchedule
 */
 class CGXDLMSActionSchedule : public CGXDLMSObject
 {

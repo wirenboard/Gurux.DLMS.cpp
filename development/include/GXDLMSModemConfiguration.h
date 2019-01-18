@@ -40,7 +40,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSModemConfiguration
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSModemConfiguration
 */
 class CGXDLMSModemConfiguration : public CGXDLMSObject
 {

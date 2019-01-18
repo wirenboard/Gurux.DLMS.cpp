@@ -40,7 +40,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSSpecialDaysTable
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSSpecialDaysTable
 */
 class CGXDLMSSpecialDaysTable : public CGXDLMSObject
 {

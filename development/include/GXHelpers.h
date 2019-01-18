@@ -104,38 +104,9 @@ public:
         */
     static int GetData(CGXByteBuffer& data, CGXDataInfo& info, CGXDLMSVariant& value);
 
-    static void GetLogicalName(unsigned char* buff, std::string& ln)
-    {
-        int dataSize;
-        char tmp[25];
-        //If Script Action target is not set it is null
-        if (buff == NULL)
-        {
-            ln.clear();
-            ln.append("0.0.0.0.0.0");
-        }
-        else
-        {
-#if _MSC_VER > 1000
-            dataSize = sprintf_s(tmp, 25, "%d.%d.%d.%d.%d.%d", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]) + 1;
-#else
-            dataSize = sprintf(tmp, "%d.%d.%d.%d.%d.%d", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]) + 1;
-#endif
-            if (dataSize > 25)
-            {
-                assert(0);
-            }
-            ln.clear();
-            ln.append(tmp, dataSize - 1);
-        }
-    }
+    static void GetLogicalName(unsigned char* buff, std::string& ln);
 
-    static void GetLogicalName(CGXByteBuffer& buff, std::string& ln)
-    {
-        unsigned char tmp[6];
-        buff.Get(tmp, 6);
-        GetLogicalName(tmp, ln);
-    }
+    static void GetLogicalName(CGXByteBuffer& buff, std::string& ln);
 
     /////////////////////////////////////////////////////////////////////////////
     //Set logical name from std::string.

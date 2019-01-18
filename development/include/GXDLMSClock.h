@@ -39,7 +39,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSClock
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSClock
 */
 class CGXDLMSClock : public CGXDLMSObject
 {

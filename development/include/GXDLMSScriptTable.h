@@ -40,7 +40,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSScriptTable
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSScriptTable
 */
 class CGXDLMSScriptTable : public CGXDLMSObject
 {

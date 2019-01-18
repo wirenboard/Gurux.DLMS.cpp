@@ -40,7 +40,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSSecuritySetup
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSSecuritySetup
 */
 class CGXDLMSSecuritySetup : public CGXDLMSObject
 {

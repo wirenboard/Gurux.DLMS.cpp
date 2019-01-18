@@ -296,6 +296,7 @@ int CGXDLMSRegisterActivation::SetValue(CGXDLMSSettings& settings, CGXDLMSValueE
     }
     else if (e.GetIndex() == 4)
     {
+        m_ActiveMask.Clear();
         m_ActiveMask.Set(e.GetValue().byteArr, e.GetValue().size);
     }
     else

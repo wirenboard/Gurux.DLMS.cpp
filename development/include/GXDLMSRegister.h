@@ -38,7 +38,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSRegister
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSRegister
 */
 class CGXDLMSRegister : public CGXDLMSObject
 {

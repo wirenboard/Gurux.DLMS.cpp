@@ -41,7 +41,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSMessageHandler
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSMessageHandler
 */
 class CGXDLMSMessageHandler : public CGXDLMSObject
 {

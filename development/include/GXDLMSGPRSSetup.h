@@ -40,7 +40,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSGPRSSetup
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSGPRSSetup
 */
 class CGXDLMSGPRSSetup : public CGXDLMSObject
 {

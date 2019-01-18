@@ -39,7 +39,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSAssociationShortName
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSAssociationShortName
 */
 class CGXDLMSAssociationShortName : public CGXDLMSObject
 {

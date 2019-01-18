@@ -300,13 +300,11 @@ int CGXDLMSDemandRegister::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     if (index == 2)
     {
-        type = m_CurrentAvarageValue.vt;
-        return DLMS_ERROR_CODE_OK;
+        return CGXDLMSObject::GetDataType(index, type);
     }
     if (index == 3)
     {
-        type = m_LastAvarageValue.vt;
-        return DLMS_ERROR_CODE_OK;
+        return CGXDLMSObject::GetDataType(index, type);
     }
     if (index == 4)
     {
@@ -343,10 +341,10 @@ int CGXDLMSDemandRegister::GetDataType(int index, DLMS_DATA_TYPE& type)
 
 int CGXDLMSDemandRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
+    int ret;
+    CGXDLMSVariant tmp;
     if (e.GetIndex() == 1)
     {
-        int ret;
-        CGXDLMSVariant tmp;
         if ((ret = GetLogicalName(this, tmp)) != 0)
         {
             return ret;
@@ -356,12 +354,56 @@ int CGXDLMSDemandRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     if (e.GetIndex() == 2)
     {
-        e.SetValue(m_CurrentAvarageValue);
+        tmp = m_CurrentAvarageValue;
+        if (m_Scaler != 0)
+        {
+            DLMS_DATA_TYPE dt;
+            if ((ret = CGXDLMSObject::GetDataType(2, dt)) != 0)
+            {
+                return ret;
+            }
+            if (dt == DLMS_DATA_TYPE_NONE)
+            {
+                dt = m_CurrentAvarageValue.vt;
+            }
+            if ((ret = tmp.ChangeType(DLMS_DATA_TYPE_FLOAT64)) != 0)
+            {
+                return ret;
+            }
+            tmp = m_CurrentAvarageValue.dblVal / GetScaler();
+            if ((ret = tmp.ChangeType(dt)) != 0)
+            {
+                return ret;
+            }
+        }
+        e.SetValue(tmp);
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 3)
     {
-        e.SetValue(m_LastAvarageValue);
+        tmp = m_LastAvarageValue;
+        if (m_Scaler != 0)
+        {
+            DLMS_DATA_TYPE dt;
+            if ((ret = CGXDLMSObject::GetDataType(2, dt)) != 0)
+            {
+                return ret;
+            }
+            if (dt == DLMS_DATA_TYPE_NONE)
+            {
+                dt = m_LastAvarageValue.vt;
+            }
+            if ((ret = tmp.ChangeType(DLMS_DATA_TYPE_FLOAT64)) != 0)
+            {
+                return ret;
+            }
+            tmp = m_LastAvarageValue.dblVal / GetScaler();
+            if ((ret = tmp.ChangeType(dt)) != 0)
+            {
+                return ret;
+            }
+        }
+        e.SetValue(tmp);
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 4)
@@ -408,12 +450,17 @@ int CGXDLMSDemandRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
 
 int CGXDLMSDemandRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
+    int ret;
     if (e.GetIndex() == 1)
     {
         return SetLogicalName(this, e.GetValue());
     }
     else if (e.GetIndex() == 2)
     {
+        if ((ret = CGXDLMSObject::SetDataType(2, e.GetValue().vt)) != 0)
+        {
+            return ret;
+        }
         if (m_Scaler != 0)
         {
             SetCurrentAvarageValue(CGXDLMSVariant(e.GetValue().ToDouble() * GetScaler()));
@@ -425,6 +472,10 @@ int CGXDLMSDemandRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     else if (e.GetIndex() == 3)
     {
+        if ((ret = CGXDLMSObject::SetDataType(3, e.GetValue().vt)) != 0)
+        {
+            return ret;
+        }
         if (m_Scaler != 0)
         {
             SetLastAvarageValue(CGXDLMSVariant(e.GetValue().ToDouble() * GetScaler()));

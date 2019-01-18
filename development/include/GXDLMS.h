@@ -102,10 +102,12 @@ private:
     /////////////////////////////////////////////////////////////////////////////
     // reply : Received data that includes HDLC frame.
     // info : Reply data.
+    // hdlc : Is HDLC framing used.
     /////////////////////////////////////////////////////////////////////////////
     static void GetDataFromFrame(
         CGXByteBuffer& reply,
-        CGXReplyData& info);
+        CGXReplyData& info,
+        bool hdlc);
 
     /**
     * Handle read response data block result.

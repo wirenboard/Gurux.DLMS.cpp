@@ -40,7 +40,7 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSRegisterMonitor
+http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSRegisterMonitor
 */
 class CGXDLMSRegisterMonitor : public CGXDLMSObject
 {
