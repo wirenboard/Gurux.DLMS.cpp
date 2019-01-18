@@ -402,12 +402,12 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
     item->Clear();
     if (tmp.vt == DLMS_DATA_TYPE_FLOAT32)
     {
-        long long value = tmp.fltVal;
+        long long value = (long long) tmp.fltVal;
         memcpy(&item->bVal, &value, toSize);
     }
     else if (tmp.vt == DLMS_DATA_TYPE_FLOAT64)
     {
-        long long value = tmp.dblVal;
+        long long value = (long long) tmp.dblVal;
         memcpy(&item->bVal, &value, toSize);
     }
     else
