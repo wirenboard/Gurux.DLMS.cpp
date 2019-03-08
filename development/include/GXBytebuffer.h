@@ -41,6 +41,7 @@
 const unsigned char VECTOR_CAPACITY = 50;
 class CGXByteBuffer
 {
+    friend class CGXCipher;
     unsigned char* m_Data;
     unsigned long m_Capacity;
     unsigned long m_Size;
@@ -180,7 +181,7 @@ public:
 
     //Get byte array as hex std::string.
     std::string ToHexString(bool addSpaces);
-    
+
     //Get byte array as hex std::string.
     std::string ToHexString(unsigned long position, unsigned long count, bool addSpaces);
 

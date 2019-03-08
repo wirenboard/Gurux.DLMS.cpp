@@ -37,21 +37,6 @@
 
 #include "GXBytebuffer.h"
 
-//This is reserved for internal use to save block info.
-class CGXGMacBlock
-{
-public:
-    unsigned long c0;
-    unsigned long c1;
-    unsigned long c2;
-    unsigned long c3;
-    // How many bytes are not crypted/encrypted.
-    int bytesRemaining;
-    long totalLength;
-    CGXByteBuffer tag;
-    CGXGMacBlock();
-};
-
 class CGXCipher
 {
 private:
@@ -84,114 +69,77 @@ private:
     unsigned long m_FrameCounter;
 
 
-    /**
-    * Working key is counted only once from block cipher key.
-    */
-    unsigned long* m_WorkingKey;
-    CGXByteBuffer m_H;
-    CGXByteBuffer m_J0;
-    CGXByteBuffer m_S;
-    CGXByteBuffer m_Counter;
-    unsigned long* m_mArray;
-
-    static int GetRounds(
-        CGXCipher* settings);
-
-    /**
-    * Count GHash.
-    */
-    static void GetGHash(
-        CGXCipher* settings,
-        CGXByteBuffer *aad);
-
-    /**
-    * Generate AES keys.
-    *
-    */
-    static int GenerateKey(
-        CGXCipher* settings);
-
-    static void MultiplyH(
-        CGXCipher* settings,
-        unsigned char* value);
-
     static int GetAuthenticatedData(
         DLMS_SECURITY security,
         CGXByteBuffer& authenticationKey,
         CGXByteBuffer& plainText,
         CGXByteBuffer& result);
 
-    /**
-    * Encrypt data block.
-    *
-    */
-    static void EncryptBlock(
-        CGXCipher* settings,
-        CGXGMacBlock *block);
-
     void Init(
         unsigned char* systemTitle,
         unsigned char count);
 
-    static int Init(
-        CGXCipher* settings,
-        CGXByteBuffer& aad,
-        CGXByteBuffer& iv,
-        unsigned long frameCounter,
-        CGXByteBuffer& systemTitle,
-        CGXByteBuffer& bufBlock,
-        CGXGMacBlock& block);
+    static int Int(unsigned long* rk,
+        const unsigned char* cipherKey,
+        unsigned short keyBits);
 
-    /**
-    * Write bytes to decrypt/encrypt.
-    *
-    * @param input
+    /*
+    * Make xor for 128 bits.
     */
-    static void Write(
-        CGXCipher *settings,
-        CGXByteBuffer *data,
-        CGXByteBuffer *bufBlock,
-        CGXGMacBlock *block,
-        CGXByteBuffer* output);
+    static void Xor(
+        unsigned char *dst,
+        const unsigned char *src);
 
-    static int Init2(
-        CGXCipher* settings);
+    static void shift_right_block(unsigned char *v);
 
-    /**
-    * Process encrypting/decrypting.
-    *
-    * @return
+    static void MultiplyH(
+        const unsigned char *x,
+        const unsigned char* y,
+        unsigned char * z);
+
+    /*
+    * Count GHash.
     */
-    static int FlushFinalBlock(
-        DLMS_SECURITY security,
-        CGXCipher *settings,
-        CGXByteBuffer *aad,
-        CGXByteBuffer *bufBlock,
-        CGXGMacBlock *block,
-        CGXByteBuffer *output);
+    static void CGXCipher::GetGHash(
+        const unsigned char *h,
+        const unsigned char *x,
+        int xlen,
+        unsigned char *y);
 
-    /**
-    * Reset
-    */
-    static void Reset(
-        CGXCipher *settings,
-        CGXByteBuffer *aad);
+    static void CGXCipher::Init_j0(
+        const unsigned char* iv,
+        unsigned char len,
+        const unsigned char* H,
+        unsigned char* J0);
 
-    static int ProcessBlock(
-        CGXCipher* settings,
-        CGXByteBuffer* input,
-        unsigned long inOffset,
-        CGXByteBuffer* output,
-        unsigned long outOffset,
-        CGXGMacBlock *block);
+    static void Inc32(unsigned char *block);
+    static void Gctr(
+        unsigned long *aes,
+        const unsigned char *icb,
+        const unsigned char *x,
+        int xlen,
+        unsigned char *y);
 
-    static void gCTRBlock(
-        CGXCipher *settings,
-        CGXByteBuffer *buf,
-        int bufCount,
-        CGXGMacBlock *block,
-        CGXByteBuffer *output);
+    static void AesGcmGctr(
+        unsigned long *aes,
+        const unsigned char *J0,
+        const unsigned char *in,
+        int len,
+        unsigned char *out);
 
+    static void AesGcmGhash(
+        const unsigned char *H,
+        const unsigned char *aad,
+        int aad_len,
+        const unsigned char *crypt,
+        int crypt_len,
+        unsigned char *S);
+
+    static void AesEncrypt(
+        const unsigned long* rk,
+        int Nr,
+        const unsigned char* pt,
+        unsigned char* ct);
 public:
     /**
     * Constructor.
@@ -234,6 +182,7 @@ public:
         unsigned long frameCounter,
         unsigned char tag,
         CGXByteBuffer& systemTitle,
+        CGXByteBuffer& key,
         CGXByteBuffer& plainText,
         CGXByteBuffer& encrypted);
 
@@ -249,6 +198,7 @@ public:
       */
     int Decrypt(
         CGXByteBuffer& title,
+        CGXByteBuffer& key,
         CGXByteBuffer& data,
         DLMS_SECURITY& security);
 

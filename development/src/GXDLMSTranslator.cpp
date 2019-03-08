@@ -512,7 +512,9 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
             if (st->GetSize() != 0)
             {
                 DLMS_SECURITY security = DLMS_SECURITY_NONE;
-                if ((ret = settings.GetCipher()->Decrypt(*st, value, security)) != 0)
+                if ((ret = settings.GetCipher()->Decrypt(*st, value,
+                    settings.GetCipher()->GetBlockCipherKey(),
+                    security)) != 0)
                 {
                     // It's OK if this fails. Ciphering settings are not correct.
                     xml->SetXmlLength(len2);
@@ -555,7 +557,9 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
             if (st.GetSize() != 0)
             {
                 data.GetData().SetPosition(data.GetData().GetPosition() - 1);
-                if (settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(), data.GetData(), security) == 0)
+                if (settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(), data.GetData(),
+                    settings.GetCipher()->GetBlockCipherKey(),
+                    security) == 0)
                 {
                     xml->StartComment("Decrypt data: " + data.GetData().ToHexString());
                     CGXByteBuffer& bb = data.GetData();
@@ -572,7 +576,9 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
                 st = settings.GetSourceSystemTitle();
                 if (st.GetSize() != 0)
                 {
-                    if (settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(), data.GetData(), security) == 0)
+                    if (settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(), data.GetData(),
+                        settings.GetCipher()->GetBlockCipherKey(),
+                        security) == 0)
                     {
                         xml->StartComment("Decrypt data: " + data.GetData().ToHexString());
                         ret = PduToXml(xml, data.GetData(), omitDeclaration, omitNameSpace, false, output);

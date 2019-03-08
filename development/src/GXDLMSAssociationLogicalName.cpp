@@ -681,6 +681,7 @@ int CGXDLMSAssociationLogicalName::GetValue(CGXDLMSSettings& settings, CGXDLMSVa
         e.SetByteArray(true);
         CGXByteBuffer buff;
         ret = GetObjects(settings, e, buff);
+        ret = 0;
         e.SetValue(buff);
         return ret;
     }

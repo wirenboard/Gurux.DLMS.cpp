@@ -351,7 +351,7 @@ int CGXDLMSAccount::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         break;
     case 9:
         bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(m_CreditReferences.size(), bb);
+        GXHelpers::SetObjectCount((unsigned long) m_CreditReferences.size(), bb);
         for (std::vector<std::string>::iterator it = m_CreditReferences.begin(); it != m_CreditReferences.end(); ++it)
         {
             bb.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
@@ -366,7 +366,7 @@ int CGXDLMSAccount::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         break;
     case 10:
         bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(m_ChargeReferences.size(), bb);
+        GXHelpers::SetObjectCount((unsigned long)m_ChargeReferences.size(), bb);
         for (std::vector<std::string>::iterator it = m_ChargeReferences.begin(); it != m_ChargeReferences.end(); ++it)
         {
             bb.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
@@ -381,7 +381,7 @@ int CGXDLMSAccount::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         break;
     case 11:
         bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(m_CreditChargeConfigurations.size(), bb);
+        GXHelpers::SetObjectCount((unsigned long)m_CreditChargeConfigurations.size(), bb);
         for (std::vector<CGXCreditChargeConfiguration>::iterator it = m_CreditChargeConfigurations.begin(); it != m_CreditChargeConfigurations.end(); ++it)
         {
             bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
@@ -410,7 +410,7 @@ int CGXDLMSAccount::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         break;
     case 12:
         bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(m_TokenGatewayConfigurations.size(), bb);
+        GXHelpers::SetObjectCount((unsigned long)m_TokenGatewayConfigurations.size(), bb);
         for (std::vector<CGXTokenGatewayConfiguration>::iterator it = m_TokenGatewayConfigurations.begin(); it != m_TokenGatewayConfigurations.end(); ++it)
         {
             bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);

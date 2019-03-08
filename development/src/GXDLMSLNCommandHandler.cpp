@@ -78,13 +78,14 @@ void AppendMethodDescriptor(CGXDLMSTranslatorStructure* xml, int ci, unsigned ch
 }
 
 int CGXDLMSLNCommandHandler::GetRequestNormal(
-    CGXDLMSSettings settings,
+    CGXDLMSSettings& settings,
     unsigned char invokeID,
     CGXDLMSServer* server,
     CGXByteBuffer& data,
     CGXByteBuffer* replyData,
     CGXDLMSTranslatorStructure* xml)
 {
+    int ret;
     CGXByteBuffer bb;
     DLMS_ERROR_CODE status = DLMS_ERROR_CODE_OK;
     settings.SetCount(0);
@@ -92,7 +93,6 @@ int CGXDLMSLNCommandHandler::GetRequestNormal(
     settings.ResetBlockIndex();
     CGXDLMSValueEventCollection arr;
     unsigned char attributeIndex;
-    int ret;
     unsigned char *ln;
     // CI
     unsigned short tmp;
@@ -212,7 +212,6 @@ int CGXDLMSLNCommandHandler::GetRequestNormal(
         }
     }
     CGXDLMSLNParameters p(&settings, invokeID, DLMS_COMMAND_GET_RESPONSE, 1, NULL, &bb, status);
-
     ret = CGXDLMS::GetLNPdu(p, *replyData);
     if (settings.GetCount() != settings.GetIndex()
         || bb.GetSize() != bb.GetPosition())
@@ -228,7 +227,7 @@ int CGXDLMSLNCommandHandler::GetRequestNormal(
 }
 
 int CGXDLMSLNCommandHandler::GetRequestNextDataBlock(
-    CGXDLMSSettings settings,
+    CGXDLMSSettings& settings,
     unsigned char invokeID,
     CGXDLMSServer* server,
     CGXByteBuffer& data,
@@ -325,7 +324,7 @@ int CGXDLMSLNCommandHandler::GetRequestNextDataBlock(
 }
 
 int CGXDLMSLNCommandHandler::GetRequestWithList(
-    CGXDLMSSettings settings,
+    CGXDLMSSettings& settings,
     unsigned char invokeID,
     CGXDLMSServer* server,
     CGXByteBuffer& data,
@@ -543,7 +542,6 @@ int CGXDLMSLNCommandHandler::HandleGetRequest(
     }
     return ret;
 }
-
 
 int CGXDLMSLNCommandHandler::HandleSetRequestNormal(
     CGXDLMSSettings& settings,

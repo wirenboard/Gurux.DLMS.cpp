@@ -176,11 +176,18 @@ int GetInitiateRequest(
 {
     // Tag for xDLMS-Initiate request
     data.SetUInt8(DLMS_COMMAND_INITIATE_REQUEST);
-    // Usage field for the response allowed component.
-
-    // Usage field for dedicated-key component. Not used
-    data.SetUInt8(0x00);
-
+    // Usage field for dedicated-key component.
+    if (settings.GetCipher() == NULL || settings.GetCipher()->GetDedicatedKey().GetSize() == 0)
+    {
+        data.SetUInt8(0x00);
+    }
+    else
+    {
+        data.SetUInt8(0x1);
+        CGXByteBuffer& dedKey = settings.GetCipher()->GetDedicatedKey();
+        GXHelpers::SetObjectCount(dedKey.GetSize(), data);
+        data.Set(&dedKey, 0, settings.GetCipher()->GetDedicatedKey().GetSize());
+    }
     // encoding of the response-allowed component (bool DEFAULT TRUE)
     // usage flag (FALSE, default value TRUE conveyed)
     data.SetUInt8(0);
@@ -240,16 +247,30 @@ int CGXAPDU::GenerateUserInformation(
         }
         else
         {
+            unsigned char cmd = DLMS_COMMAND_GLO_INITIATE_REQUEST;
             CGXByteBuffer tmp, crypted;
+            CGXByteBuffer& key = cipher->GetBlockCipherKey();
             if ((ret = GetInitiateRequest(settings, cipher, tmp)) != 0)
             {
                 return ret;
             }
+            if ((settings.GetProposedConformance() & DLMS_CONFORMANCE_GENERAL_PROTECTION) != 0)
+            {
+                if (settings.GetCipher()->GetDedicatedKey().GetSize() == 0)
+                {
+                    cmd = DLMS_COMMAND_GENERAL_GLO_CIPHERING;
+                }
+                else
+                {
+                    cmd = DLMS_COMMAND_GENERAL_DED_CIPHERING;
+                }
+            }
             if ((ret = cipher->Encrypt(cipher->GetSecurity(),
                 DLMS_COUNT_TYPE_PACKET,
                 settings.GetCipher()->GetFrameCounter(),
-                DLMS_COMMAND_GLO_INITIATE_REQUEST,
+                cmd,
                 cipher->GetSystemTitle(),
+                key,
                 tmp,
                 crypted)) != 0)
             {
@@ -722,7 +743,8 @@ int CGXAPDU::ParseInitiate(
                 int pos = xml->GetXmlLength();
                 data.SetPosition(originalPos - 1);
                 DLMS_SECURITY security = DLMS_SECURITY_NONE;
-                if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(), data, security)) != 0)
+                if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(),
+                    settings.GetCipher()->GetBlockCipherKey(), data, security)) != 0)
                 {
                     return ret;
                 }
@@ -751,7 +773,8 @@ int CGXAPDU::ParseInitiate(
         }
         data.SetPosition(data.GetPosition() - 1);
         DLMS_SECURITY security = DLMS_SECURITY_NONE;
-        if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(), data, security)) != 0)
+        if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(),
+            settings.GetCipher()->GetBlockCipherKey(), data, security)) != 0)
         {
             return ret;
         }
@@ -777,7 +800,8 @@ int CGXAPDU::ParseInitiate(
                 int pos = xml->GetXmlLength();
                 data.SetPosition(originalPos - 1);
                 DLMS_SECURITY security = DLMS_SECURITY_NONE;
-                if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(), data, security)) != 0)
+                if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(),
+                    settings.GetCipher()->GetBlockCipherKey(), data, security)) != 0)
                 {
                     return ret;
                 }
@@ -807,7 +831,8 @@ int CGXAPDU::ParseInitiate(
         data.SetPosition(data.GetPosition() - 1);
         // InitiateRequest
         DLMS_SECURITY security = DLMS_SECURITY_NONE;
-        if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(), data, security)) != 0)
+        if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(),
+            settings.GetCipher()->GetBlockCipherKey(), data, security)) != 0)
         {
             return ret;
         }
@@ -1226,6 +1251,7 @@ int CGXAPDU::GetUserInformation(
             settings.GetCipher()->GetFrameCounter(),
             DLMS_COMMAND_GLO_INITIATE_RESPONSE,
             cipher->GetSystemTitle(),
+            cipher->GetAuthenticationKey(),
             tmp,
             data);
     }

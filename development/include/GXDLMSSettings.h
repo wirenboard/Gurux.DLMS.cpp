@@ -48,7 +48,7 @@ const unsigned char SERVER_START_SENDER_FRAME_SEQUENCE = 0x1E;
 const unsigned char SERVER_START_RECEIVER_FRAME_SEQUENCE = 0xFE;
 
 // Client sender frame sequence starting number.
-const unsigned char CLIENT_START_SENDER_FRAME_SEQUENCE = 0x10;
+const unsigned char CLIENT_START_SENDER_FRAME_SEQUENCE = 0xFE;
 
 // Client receiver frame sequence starting number.
 const unsigned char CLIENT_START_RCEIVER_FRAME_SEQUENCE = 0xE;

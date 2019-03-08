@@ -36,17 +36,6 @@
 #include "../include/chipperingenums.h"
 #include "../include/GXHelpers.h"
 
-// Consts.
-const unsigned char BLOCK_SIZE = 16;
-static unsigned char TAG_SIZE = 0x10;
-
-CGXGMacBlock::CGXGMacBlock()
-{
-    c0 = c1 = c2 = c3 = 0;
-    bytesRemaining = 0;
-    totalLength = 0;
-}
-
 void CGXCipher::Init(
     unsigned char* systemTitle,
     unsigned char count)
@@ -63,7 +52,6 @@ void CGXCipher::Init(
     };
     m_FrameCounter = 0;
     m_Security = DLMS_SECURITY_NONE;
-    m_WorkingKey = m_mArray = NULL;
     m_SystemTitle.Set(systemTitle, count);
     m_BlockCipherKey.Set(BLOCKCIPHERKEY, sizeof(BLOCKCIPHERKEY));
     m_AuthenticationKey.Set(AUTHENTICATIONKEY, sizeof(AUTHENTICATIONKEY));
@@ -71,7 +59,7 @@ void CGXCipher::Init(
 
 CGXCipher::CGXCipher(CGXByteBuffer& systemTitle)
 {
-    Init((unsigned char*)systemTitle.GetData(), (unsigned char)systemTitle.GetSize());
+    Init((unsigned char*)systemTitle.m_Data, (unsigned char)systemTitle.m_Size);
 }
 
 CGXCipher::CGXCipher(const char* systemTitle)
@@ -86,247 +74,8 @@ CGXCipher::CGXCipher(unsigned char* systemTitle, unsigned char count)
 
 CGXCipher::~CGXCipher()
 {
-    if (m_WorkingKey != NULL)
-    {
-        free(m_WorkingKey);
-        m_WorkingKey = NULL;
-    }
-    if (m_mArray != NULL)
-    {
-        free(m_mArray);
-        m_mArray = NULL;
-    }
 }
 
-static void SetUInt32ByIndexLE(CGXByteBuffer* arr, int index, unsigned long item)
-{
-    arr->SetUInt8(index, item & 0xFF);
-    arr->SetUInt8(index + 1, (item >> 8) & 0xFF);
-    arr->SetUInt8(index + 2, (item >> 16) & 0xFF);
-    arr->SetUInt8(index + 3, (item >> 24) & 0xFF);
-}
-
-static void PackBlock(
-    CGXCipher* settings,
-    CGXByteBuffer* bytes,
-    int offset,
-    CGXGMacBlock *block)
-{
-    SetUInt32ByIndexLE(bytes, offset, block->c0);
-    SetUInt32ByIndexLE(bytes, offset + 4, block->c1);
-    SetUInt32ByIndexLE(bytes, offset + 8, block->c2);
-    SetUInt32ByIndexLE(bytes, offset + 12, block->c3);
-}
-
-int GetUInt32ByIndexLE(
-    CGXByteBuffer *arr,
-    unsigned long index,
-    unsigned long* value)
-{
-    if (index + 4 > arr->GetSize())
-    {
-        return DLMS_ERROR_CODE_OUTOFMEMORY;
-    }
-    *value = ((unsigned char*)arr->GetData())[index + 3] << 24 |
-        ((unsigned char*)arr->GetData())[index + 2] << 16 |
-        ((unsigned char*)arr->GetData())[index + 1] << 8 |
-        ((unsigned char*)arr->GetData())[index];
-    return 0;
-}
-
-static int UnPackBlock(
-    CGXCipher* settings,
-    CGXByteBuffer* bytes,
-    int offset,
-    CGXGMacBlock *block)
-{
-    int ret;
-    if ((ret = GetUInt32ByIndexLE(bytes, offset, &block->c0)) != 0)
-    {
-        return ret;
-    }
-    if ((ret = GetUInt32ByIndexLE(bytes, offset + 4, &block->c1)) != 0)
-    {
-        return ret;
-    }
-    if ((ret = GetUInt32ByIndexLE(bytes, offset + 8, &block->c2)) != 0)
-    {
-        return ret;
-    }
-    if ((ret = GetUInt32ByIndexLE(bytes, offset + 12, &block->c3)) != 0)
-    {
-        return ret;
-    }
-    return ret;
-}
-
-int CGXCipher::ProcessBlock(
-    CGXCipher* settings,
-    CGXByteBuffer* input,
-    unsigned long inOffset,
-    CGXByteBuffer* output,
-    unsigned long outOffset,
-    CGXGMacBlock *block)
-{
-    if ((inOffset + (32 / 2)) > input->GetSize())
-    {
-        //Input buffer too short.
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
-
-    if ((outOffset + (32 / 2)) > output->GetSize())
-    {
-        // output buffer too short.
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
-
-    UnPackBlock(settings, input, inOffset, block);
-    if (settings->m_Encrypt)
-    {
-        EncryptBlock(settings, block);
-    }
-    else
-    {
-        //DecryptBlock(settings, block);
-    }
-    PackBlock(settings, output, outOffset, block);
-    return 0;
-}
-
-static unsigned long* GetCell(unsigned long *start, int row, int col)
-{
-    return start + 4 * row + col;
-}
-
-
-/**
-* Shift block to right.
-*
-* @param block
-*            Block list.
-* @param count
-*            Blocks to shift.
-*/
-static void ShiftRight(
-    unsigned long* block,
-    int count)
-{
-    int i, bit = 0;
-    for (i = 0; i < 4; ++i)
-    {
-        unsigned long b = block[i];
-        block[i] = (b >> count) | bit;
-        bit = b << (32 - count);
-    }
-}
-
-/**
-    * Make Xor for 128 bits.
-    *
-    * @param block
-    *            block.
-    * @param val
-    */
-static void Xor128(
-    unsigned long* block,
-    unsigned long* value)
-{
-    int pos;
-    for (pos = 0; pos != 4; ++pos)
-    {
-        block[pos] ^= value[pos];
-    }
-}
-
-static void MultiplyP(
-    unsigned long* x)
-{
-    unsigned char lsb = (x[3] & 1) != 0;
-    ShiftRight(x, 1);
-    if (lsb)
-    {
-        x[0] ^= 0xe1000000L;
-    }
-}
-
-static void MultiplyP8(
-    unsigned long* x)
-{
-    char pos;
-    unsigned long lsw = x[3];
-    ShiftRight(x, 8);
-    for (pos = 0; pos != 8; ++pos)
-    {
-        if ((lsw & (1 << pos)) != 0)
-        {
-            x[0] ^= ((0xe1000000L >> (7 - pos)) & 0xFFFFFFFF);
-        }
-    }
-}
-
-int CGXCipher::Init2(
-    CGXCipher* settings)
-{
-    unsigned long *tmp;
-    int pos, pos1, pos2, k, ret;
-    //If array is not created yet.
-    if (settings->m_mArray == 0)
-    {
-        //Array must set to zero.
-        settings->m_mArray = (unsigned long*)calloc(1, sizeof(unsigned long) * 32 * 16 * 4);
-        if ((ret = settings->m_H.GetUInt128(0, (unsigned char*)GetCell(settings->m_mArray, 1 * 16, 8 * 4))) != 0)
-        {
-            return ret;
-        }
-
-        for (pos = 4; pos >= 1; pos >>= 1)
-        {
-            tmp = GetCell(settings->m_mArray, 1 * 16, pos * 4);
-            memcpy(tmp, GetCell(settings->m_mArray, 1 * 16, (pos + pos) * 4), 4 * sizeof(long));
-            MultiplyP(tmp);
-        }
-
-        tmp = GetCell(settings->m_mArray, 0 * 16, 8 * 4);
-        memcpy(tmp, GetCell(settings->m_mArray, 1 * 16, 1 * 4), 4 * sizeof(long));
-        MultiplyP(tmp);
-
-        for (pos = 4; pos >= 1; pos >>= 1)
-        {
-            tmp = GetCell(settings->m_mArray, 0 * 16, pos * 4);
-            memcpy(tmp, GetCell(settings->m_mArray, 0 * 16, (pos + pos) * 4), 4 * sizeof(long));
-            MultiplyP(tmp);
-        }
-
-        for (pos1 = 0;;)
-        {
-            for (pos2 = 2; pos2 < 16; pos2 += pos2)
-            {
-                for (k = 1; k < pos2; ++k)
-                {
-                    tmp = GetCell(settings->m_mArray, pos1 * 16, (pos2 + k) * 4);
-                    memcpy(tmp, GetCell(settings->m_mArray, pos1 * 16, pos2 * 4), 4 * sizeof(long));
-                    Xor128(tmp, GetCell(settings->m_mArray, pos1 * 16, k * 4));
-                }
-            }
-
-            if (++pos1 == 32)
-            {
-                return 0;
-            }
-
-            if (pos1 > 1)
-            {
-                for (pos = 8; pos > 0; pos >>= 1)
-                {
-                    tmp = GetCell(settings->m_mArray, pos1 * 16, pos * 4);
-                    memcpy(tmp, GetCell(settings->m_mArray, (pos1 - 2) * 16, pos * 4), 4 * sizeof(long));
-                    MultiplyP8(tmp);
-                }
-            }
-        }
-    }
-    return 0;
-}
 
 int CGXCipher::GetAuthenticatedData(
     DLMS_SECURITY security,
@@ -339,7 +88,7 @@ int CGXCipher::GetAuthenticatedData(
     {
         result.SetUInt8(security);
         result.Set(&authenticationKey, 0, -1);
-        result.Set(plainText.GetData() + plainText.GetPosition(),
+        result.Set(plainText.m_Data + plainText.GetPosition(),
             plainText.GetSize() - plainText.GetPosition());
     }
     else if (security == DLMS_SECURITY_ENCRYPTION)
@@ -357,319 +106,6 @@ int CGXCipher::GetAuthenticatedData(
     }
     return 0;
 }
-
-static unsigned int SubWord(unsigned int value)
-{
-    int tmp = S_BOX[value & 0xFF] & 0xFF;
-    tmp |= (((S_BOX[(value >> 8) & 0xFF]) & 0xFF) << 8) & 0xFF00;
-    tmp |= (((S_BOX[(value >> 16) & 0xFF]) & 0xFF) << 16) & 0xFF0000;
-    tmp |= (((S_BOX[(value >> 24) & 0xFF]) & 0xFF) << 24) & 0xFF000000;
-    return tmp;
-}
-
-
-/**
-* Shift value.
-*
-* @param r
-* @param shift
-* @return
-*/
-static unsigned int Shift(
-    unsigned long value,
-    unsigned long shift)
-{
-    return (value >> shift) | (value << (32 - shift));
-}
-
-/**
-* Initialise the key schedule from the user supplied key.
-*
-* @return
-*/
-static unsigned int starX(
-    unsigned int value)
-{
-    unsigned int m1, m2, m3;
-    m1 = (int)0x80808080;
-    m2 = 0x7f7f7f7f;
-    m3 = 0x0000001b;
-    return ((value & m2) << 1) ^ (((value & m1) >> 7) * m3);
-}
-
-static int ImixCol(unsigned int x)
-{
-    int f2 = starX(x);
-    int f4 = starX(f2);
-    int f8 = starX(f4);
-    int f9 = x ^ f8;
-    return f2 ^ f4 ^ f8 ^ Shift(f2 ^ f9, 8) ^ Shift(f4 ^ f9, 16)
-        ^ Shift(f9, 24);
-}
-
-/**
-* Convert uint32 to Big Endian byte array.
-*
-* @param value
-* @param buff
-* @param offset
-*/
-static void UInt32ToBE(unsigned int value, unsigned char* buff, int offset)
-{
-    buff[offset] = (value >> 24);
-    buff[offset + 1] = (value >> 16);
-    buff[offset + 2] = (value >> 8);
-    buff[offset + 3] = (value);
-}
-
-void CGXCipher::MultiplyH(
-    CGXCipher* settings,
-    unsigned char* value)
-{
-    int pos;
-    long tmp[4] = { 0 };
-    unsigned long* m;
-    for (pos = 0; pos != 16; ++pos)
-    {
-        m = GetCell(settings->m_mArray, 16 * (pos + pos), 4 * (value[pos] & 0x0f));
-        tmp[0] ^= m[0];
-        tmp[1] ^= m[1];
-        tmp[2] ^= m[2];
-        tmp[3] ^= m[3];
-        m = GetCell(settings->m_mArray, 16 * (pos + pos + 1), 4 * ((value[pos] & 0xf0) >> 4));
-        tmp[0] ^= m[0];
-        tmp[1] ^= m[1];
-        tmp[2] ^= m[2];
-        tmp[3] ^= m[3];
-    }
-
-    UInt32ToBE(tmp[0], value, 0);
-    UInt32ToBE(tmp[1], value, 4);
-    UInt32ToBE(tmp[2], value, 8);
-    UInt32ToBE(tmp[3], value, 12);
-}
-
-/**
-    * Make Xor for 128 bits.
-    *
-    * @param block
-    *            block.
-    * @param val
-    */
-void Xor(unsigned char* block, unsigned char* value)
-{
-    int pos;
-    for (pos = 0; pos != 16; ++pos)
-    {
-        block[pos] ^= value[pos];
-    }
-}
-
-/**
-* Count GHash.
-*/
-void CGXCipher::GetGHash(
-    CGXCipher* settings,
-    CGXByteBuffer *aad)
-{
-    unsigned long pos, cnt;
-    unsigned char x[16];
-    settings->m_S.Zero(0, 16);
-    for (pos = 0; pos < aad->GetSize(); pos += 16)
-    {
-        memset(x, 0, sizeof(x));
-        cnt = aad->GetSize() - pos;
-        if (cnt > 16)
-        {
-            cnt = 16;
-        }
-        memcpy(x, aad->GetData() + pos, cnt);
-        Xor(settings->m_S.GetData(), x);
-        MultiplyH(settings, settings->m_S.GetData());
-    }
-}
-
-
-/**
-* Encrypt data block.
-*
-*/
-void CGXCipher::EncryptBlock(
-    CGXCipher* settings,
-    CGXGMacBlock *block)
-{
-    int r, rounds;
-    unsigned int r0, r1, r2, r3;
-    block->c0 ^= *GetCell(settings->m_WorkingKey, 0, 0);
-    block->c1 ^= *GetCell(settings->m_WorkingKey, 0, 1);
-    block->c2 ^= *GetCell(settings->m_WorkingKey, 0, 2);
-    block->c3 ^= *GetCell(settings->m_WorkingKey, 0, 3);
-    rounds = GetRounds(settings);
-    for (r = 1; r < rounds - 1;)
-    {
-        r0 = AES[block->c0 & 0xFF];
-        r0 ^= Shift(AES[(block->c1 >> 8) & 0xFF], 24);
-        r0 ^= Shift(AES[(block->c2 >> 16) & 0xFF], 16);
-        r0 ^= Shift(AES[(block->c3 >> 24) & 0xFF], 8);
-        r0 ^= *GetCell(settings->m_WorkingKey, r, 0);
-
-        r1 = AES[block->c1 & 0xFF];
-        r1 ^= Shift(AES[(block->c2 >> 8) & 0xFF], 24);
-        r1 ^= Shift(AES[(block->c3 >> 16) & 0xFF], 16);
-        r1 ^= Shift(AES[(block->c0 >> 24) & 0xFF], 8);
-        r1 ^= *GetCell(settings->m_WorkingKey, r, 1);
-
-        r2 = AES[block->c2 & 0xFF];
-        r2 ^= Shift(AES[(block->c3 >> 8) & 0xFF], 24);
-        r2 ^= Shift(AES[(block->c0 >> 16) & 0xFF], 16);
-        r2 ^= Shift(AES[(block->c1 >> 24) & 0xFF], 8);
-        r2 ^= *GetCell(settings->m_WorkingKey, r, 2);
-
-        r3 = AES[block->c3 & 0xFF];
-        r3 ^= Shift(AES[(block->c0 >> 8) & 0xFF], 24);
-        r3 ^= Shift(AES[(block->c1 >> 16) & 0xFF], 16);
-        r3 ^= Shift(AES[(block->c2 >> 24) & 0xFF], 8);
-        r3 ^= *GetCell(settings->m_WorkingKey, r, 3);
-        ++r;
-        block->c0 = AES[r0 & 0xFF];
-        block->c0 ^= Shift(AES[(r1 >> 8) & 0xFF], 24);
-        block->c0 ^= Shift(AES[(r2 >> 16) & 0xFF], 16);
-        block->c0 ^= Shift(AES[(r3 >> 24) & 0xFF], 8);
-        block->c0 ^= *GetCell(settings->m_WorkingKey, r, 0);
-
-        block->c1 = AES[r1 & 0xFF];
-        block->c1 ^= Shift(AES[(r2 >> 8) & 0xFF], 24);
-        block->c1 ^= Shift(AES[(r3 >> 16) & 0xFF], 16);
-        block->c1 ^= Shift(AES[(r0 >> 24) & 0xFF], 8);
-        block->c1 ^= *GetCell(settings->m_WorkingKey, r, 1);
-
-        block->c2 = AES[r2 & 0xFF];
-        block->c2 ^= Shift(AES[(r3 >> 8) & 0xFF], 24);
-        block->c2 ^= Shift(AES[(r0 >> 16) & 0xFF], 16);
-        block->c2 ^= Shift(AES[(r1 >> 24) & 0xFF], 8);
-        block->c2 ^= *GetCell(settings->m_WorkingKey, r, 2);
-
-        block->c3 = AES[r3 & 0xFF];
-        block->c3 ^= Shift(AES[(r0 >> 8) & 0xFF], 24);
-        block->c3 ^= Shift(AES[(r1 >> 16) & 0xFF], 16);
-        block->c3 ^= Shift(AES[(r2 >> 24) & 0xFF], 8);
-        block->c3 ^= *GetCell(settings->m_WorkingKey, r, 3);
-        ++r;
-    }
-    r0 = AES[block->c0 & 0xFF];
-    r0 ^= Shift(AES[(block->c1 >> 8) & 0xFF], 24);
-    r0 ^= Shift(AES[(block->c2 >> 16) & 0xFF], 16);
-    r0 ^= Shift(AES[block->c3 >> 24], 8);
-    r0 ^= *GetCell(settings->m_WorkingKey, r, 0);
-    r1 = AES[block->c1 & 0xFF];
-    r1 ^= Shift(AES[(block->c2 >> 8) & 0xFF], 24);
-    r1 ^= Shift(AES[(block->c3 >> 16) & 0xFF], 16);
-    r1 ^= Shift(AES[block->c0 >> 24], 8);
-    r1 ^= *GetCell(settings->m_WorkingKey, r, 1);
-    r2 = AES[block->c2 & 0xFF];
-    r2 ^= Shift(AES[(block->c3 >> 8) & 0xFF], 24);
-    r2 ^= Shift(AES[(block->c0 >> 16) & 0xFF], 16);
-    r2 ^= Shift(AES[block->c1 >> 24], 8);
-    r2 ^= *GetCell(settings->m_WorkingKey, r, 2);
-    r3 = AES[block->c3 & 0xFF];
-    r3 ^= Shift(AES[(block->c0 >> 8) & 0xFF], 24);
-    r3 ^= Shift(AES[(block->c1 >> 16) & 0xFF], 16);
-    r3 ^= Shift(AES[block->c2 >> 24], 8);
-    r3 ^= *GetCell(settings->m_WorkingKey, r++, 3);
-    block->c0 = S_BOX[r0 & 0xFF] & 0xFF;
-    block->c0 ^= ((S_BOX[(r1 >> 8) & 0xFF] & 0xFF) << 8);
-    block->c0 ^= ((S_BOX[(r2 >> 16) & 0xFF] & 0xFF) << 16);
-    block->c0 ^= ((S_BOX[r3 >> 24] & 0xFF) << 24);
-    block->c0 ^= *GetCell(settings->m_WorkingKey, r, 0);
-    block->c1 = (S_BOX[r1 & 0xFF] & 0xFF);
-    block->c1 ^= ((S_BOX[(r2 >> 8) & 0xFF] & 0xFF) << 8);
-    block->c1 ^= ((S_BOX[(r3 >> 16) & 0xFF] & 0xFF) << 16);
-    block->c1 ^= ((S_BOX[r0 >> 24] & 0xFF) << 24);
-    block->c1 ^= *GetCell(settings->m_WorkingKey, r, 1);
-    block->c2 = (S_BOX[r2 & 0xFF] & 0xFF);
-    block->c2 ^= ((S_BOX[(r3 >> 8) & 0xFF] & 0xFF) << 8);
-    block->c2 ^= ((S_BOX[(r0 >> 16) & 0xFF] & 0xFF) << 16);
-    block->c2 ^= ((S_BOX[r1 >> 24] & 0xFF) << 24);
-    block->c2 ^= *GetCell(settings->m_WorkingKey, r, 2);
-    block->c3 = (S_BOX[r3 & 0xFF] & 0xFF) & 0xFFFFFFFF;
-    block->c3 ^= ((S_BOX[(r0 >> 8) & 0xFF] & 0xFF) << 8);
-    block->c3 ^= ((S_BOX[(r1 >> 16) & 0xFF] & 0xFF) << 16);
-    block->c3 ^= ((S_BOX[r2 >> 24] & 0xFF) << 24);
-    block->c3 ^= *GetCell(settings->m_WorkingKey, r, 3);
-}
-
-int CGXCipher::GetRounds(CGXCipher* settings)
-{
-    int keyLen = settings->m_BlockCipherKey.GetSize() / 4;
-    return keyLen + 6;
-}
-
-int GetUInt32LE(
-    CGXByteBuffer* arr,
-    unsigned long* value)
-{
-    if (arr->GetPosition() + 4 > arr->GetSize())
-    {
-        return DLMS_ERROR_CODE_OUTOFMEMORY;
-    }
-    *value = ((unsigned char*)arr->GetData())[arr->GetPosition() + 3] << 24 |
-        ((unsigned char*)arr->GetData())[arr->GetPosition() + 2] << 16 |
-        ((unsigned char*)arr->GetData())[arr->GetPosition() + 1] << 8 |
-        ((unsigned char*)arr->GetData())[arr->GetPosition()];
-    arr->SetPosition(arr->GetPosition() + 4);
-    return 0;
-}
-
-int CGXCipher::GenerateKey(CGXCipher* settings)
-{
-    if (settings->m_WorkingKey == 0)
-    {
-        // Key length in words.
-        unsigned long i, k;
-        unsigned long keyLen = settings->m_BlockCipherKey.GetSize() / 4;
-        int rounds, ret, j, t = 0;
-        rounds = GetRounds(settings);
-        // 4 words make one block.
-        settings->m_WorkingKey = (unsigned long*)malloc(4 * sizeof(unsigned long) * (rounds + 1));
-        // Copy the key into the round key array.
-        settings->m_BlockCipherKey.SetPosition(0);
-        for (i = 0; i < settings->m_BlockCipherKey.GetSize(); t++)
-        {
-            if ((ret = GetUInt32LE(&settings->m_BlockCipherKey, GetCell(settings->m_WorkingKey, t >> 2, t & 3))) != 0)
-            {
-                return ret;
-            }
-            i += 4;
-        }
-        // while not enough round key material calculated calculate new values.
-        k = (rounds + 1) << 2;
-        for (i = keyLen; (i < k); i++)
-        {
-            t = *GetCell(settings->m_WorkingKey, (i - 1) >> 2, (i - 1) & 3);
-            if ((i % keyLen) == 0)
-            {
-                t = SubWord(Shift(t, 8)) ^ (R_CON[(i / keyLen) - 1] & 0xFF);
-            }
-            else if ((keyLen > 6) && ((i % keyLen) == 4))
-            {
-                t = SubWord(t);
-            }
-            *GetCell(settings->m_WorkingKey, i >> 2, i & 3) = *GetCell(settings->m_WorkingKey, (i - keyLen) >> 2, (i - keyLen) & 3) ^ t;
-            if (!settings->m_Encrypt)
-            {
-                for (j = 1; j < rounds; j++)
-                {
-                    for (i = 0; i < 4; i++)
-                    {
-                        *GetCell(settings->m_WorkingKey, j, i) = ImixCol(*GetCell(settings->m_WorkingKey, j, i));
-                    }
-                }
-            }
-        }
-    }
-    return 0;
-}
-
 
 /**
 * Get nonse from frame counter and system title.
@@ -696,218 +132,444 @@ static int GetNonse(
     return 0;
 }
 
-int CGXCipher::Init(
-    CGXCipher* settings,
-    CGXByteBuffer& aad,
-    CGXByteBuffer& iv,
-    unsigned long frameCounter,
-    CGXByteBuffer& systemTitle,
-    CGXByteBuffer& bufBlock,
-    CGXGMacBlock& block)
+//Get UInt32.
+#define GETU32(pt) (((unsigned long)(pt)[0] << 24) | \
+                    ((unsigned long)(pt)[1] << 16) | \
+                    ((unsigned long)(pt)[2] <<  8) | \
+                    ((unsigned long)(pt)[3]))
+
+//Set Int32 as Big Endian value.
+#define PUT32(ct, st) { \
+                    (ct)[0] = (unsigned char)((st) >> 24); \
+                    (ct)[1] = (unsigned char)((st) >> 16); \
+                    (ct)[2] = (unsigned char)((st) >>  8); \
+                    (ct)[3] = (unsigned char)(st); }
+
+//Note! Rcon value is different than in aes!
+static const unsigned char Rcon[11] = {
+    0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36 };
+
+
+//There is only one TE table. Counting is taking little bit longer, but memory is needed less.
+const unsigned long Te0[256] = {
+    0xc66363a5U, 0xf87c7c84U, 0xee777799U, 0xf67b7b8dU,
+    0xfff2f20dU, 0xd66b6bbdU, 0xde6f6fb1U, 0x91c5c554U,
+    0x60303050U, 0x02010103U, 0xce6767a9U, 0x562b2b7dU,
+    0xe7fefe19U, 0xb5d7d762U, 0x4dababe6U, 0xec76769aU,
+    0x8fcaca45U, 0x1f82829dU, 0x89c9c940U, 0xfa7d7d87U,
+    0xeffafa15U, 0xb25959ebU, 0x8e4747c9U, 0xfbf0f00bU,
+    0x41adadecU, 0xb3d4d467U, 0x5fa2a2fdU, 0x45afafeaU,
+    0x239c9cbfU, 0x53a4a4f7U, 0xe4727296U, 0x9bc0c05bU,
+    0x75b7b7c2U, 0xe1fdfd1cU, 0x3d9393aeU, 0x4c26266aU,
+    0x6c36365aU, 0x7e3f3f41U, 0xf5f7f702U, 0x83cccc4fU,
+    0x6834345cU, 0x51a5a5f4U, 0xd1e5e534U, 0xf9f1f108U,
+    0xe2717193U, 0xabd8d873U, 0x62313153U, 0x2a15153fU,
+    0x0804040cU, 0x95c7c752U, 0x46232365U, 0x9dc3c35eU,
+    0x30181828U, 0x379696a1U, 0x0a05050fU, 0x2f9a9ab5U,
+    0x0e070709U, 0x24121236U, 0x1b80809bU, 0xdfe2e23dU,
+    0xcdebeb26U, 0x4e272769U, 0x7fb2b2cdU, 0xea75759fU,
+    0x1209091bU, 0x1d83839eU, 0x582c2c74U, 0x341a1a2eU,
+    0x361b1b2dU, 0xdc6e6eb2U, 0xb45a5aeeU, 0x5ba0a0fbU,
+    0xa45252f6U, 0x763b3b4dU, 0xb7d6d661U, 0x7db3b3ceU,
+    0x5229297bU, 0xdde3e33eU, 0x5e2f2f71U, 0x13848497U,
+    0xa65353f5U, 0xb9d1d168U, 0x00000000U, 0xc1eded2cU,
+    0x40202060U, 0xe3fcfc1fU, 0x79b1b1c8U, 0xb65b5bedU,
+    0xd46a6abeU, 0x8dcbcb46U, 0x67bebed9U, 0x7239394bU,
+    0x944a4adeU, 0x984c4cd4U, 0xb05858e8U, 0x85cfcf4aU,
+    0xbbd0d06bU, 0xc5efef2aU, 0x4faaaae5U, 0xedfbfb16U,
+    0x864343c5U, 0x9a4d4dd7U, 0x66333355U, 0x11858594U,
+    0x8a4545cfU, 0xe9f9f910U, 0x04020206U, 0xfe7f7f81U,
+    0xa05050f0U, 0x783c3c44U, 0x259f9fbaU, 0x4ba8a8e3U,
+    0xa25151f3U, 0x5da3a3feU, 0x804040c0U, 0x058f8f8aU,
+    0x3f9292adU, 0x219d9dbcU, 0x70383848U, 0xf1f5f504U,
+    0x63bcbcdfU, 0x77b6b6c1U, 0xafdada75U, 0x42212163U,
+    0x20101030U, 0xe5ffff1aU, 0xfdf3f30eU, 0xbfd2d26dU,
+    0x81cdcd4cU, 0x180c0c14U, 0x26131335U, 0xc3ecec2fU,
+    0xbe5f5fe1U, 0x359797a2U, 0x884444ccU, 0x2e171739U,
+    0x93c4c457U, 0x55a7a7f2U, 0xfc7e7e82U, 0x7a3d3d47U,
+    0xc86464acU, 0xba5d5de7U, 0x3219192bU, 0xe6737395U,
+    0xc06060a0U, 0x19818198U, 0x9e4f4fd1U, 0xa3dcdc7fU,
+    0x44222266U, 0x542a2a7eU, 0x3b9090abU, 0x0b888883U,
+    0x8c4646caU, 0xc7eeee29U, 0x6bb8b8d3U, 0x2814143cU,
+    0xa7dede79U, 0xbc5e5ee2U, 0x160b0b1dU, 0xaddbdb76U,
+    0xdbe0e03bU, 0x64323256U, 0x743a3a4eU, 0x140a0a1eU,
+    0x924949dbU, 0x0c06060aU, 0x4824246cU, 0xb85c5ce4U,
+    0x9fc2c25dU, 0xbdd3d36eU, 0x43acacefU, 0xc46262a6U,
+    0x399191a8U, 0x319595a4U, 0xd3e4e437U, 0xf279798bU,
+    0xd5e7e732U, 0x8bc8c843U, 0x6e373759U, 0xda6d6db7U,
+    0x018d8d8cU, 0xb1d5d564U, 0x9c4e4ed2U, 0x49a9a9e0U,
+    0xd86c6cb4U, 0xac5656faU, 0xf3f4f407U, 0xcfeaea25U,
+    0xca6565afU, 0xf47a7a8eU, 0x47aeaee9U, 0x10080818U,
+    0x6fbabad5U, 0xf0787888U, 0x4a25256fU, 0x5c2e2e72U,
+    0x381c1c24U, 0x57a6a6f1U, 0x73b4b4c7U, 0x97c6c651U,
+    0xcbe8e823U, 0xa1dddd7cU, 0xe874749cU, 0x3e1f1f21U,
+    0x964b4bddU, 0x61bdbddcU, 0x0d8b8b86U, 0x0f8a8a85U,
+    0xe0707090U, 0x7c3e3e42U, 0x71b5b5c4U, 0xcc6666aaU,
+    0x904848d8U, 0x06030305U, 0xf7f6f601U, 0x1c0e0e12U,
+    0xc26161a3U, 0x6a35355fU, 0xae5757f9U, 0x69b9b9d0U,
+    0x17868691U, 0x99c1c158U, 0x3a1d1d27U, 0x279e9eb9U,
+    0xd9e1e138U, 0xebf8f813U, 0x2b9898b3U, 0x22111133U,
+    0xd26969bbU, 0xa9d9d970U, 0x078e8e89U, 0x339494a7U,
+    0x2d9b9bb6U, 0x3c1e1e22U, 0x15878792U, 0xc9e9e920U,
+    0x87cece49U, 0xaa5555ffU, 0x50282878U, 0xa5dfdf7aU,
+    0x038c8c8fU, 0x59a1a1f8U, 0x09898980U, 0x1a0d0d17U,
+    0x65bfbfdaU, 0xd7e6e631U, 0x844242c6U, 0xd06868b8U,
+    0x824141c3U, 0x299999b0U, 0x5a2d2d77U, 0x1e0f0f11U,
+    0x7bb0b0cbU, 0xa85454fcU, 0x6dbbbbd6U, 0x2c16163aU,
+};
+
+#define RCON(i) ((unsigned long) Rcon[(i)] << 24)
+
+#define ROTATE(val, bits) ((val >> bits) | (val << (32 - bits)))
+
+#define TE0(i) Te0[((i) >> 24) & 0xff]
+
+#define TE1(i) ROTATE(Te0[((i) >> 16) & 0xff], 8)
+
+#define TE2(i) ROTATE(Te0[((i) >> 8) & 0xff], 16)
+
+#define TE3(i) ROTATE(Te0[(i) & 0xff], 24)
+
+#define TE41(i) ((Te0[((i) >> 24) & 0xff] << 8) & 0xff000000)
+
+#define TE42(i) (Te0[((i) >> 16) & 0xff] & 0x00ff0000)
+
+#define TE43(i) (Te0[((i) >> 8) & 0xff] & 0x0000ff00)
+
+#define TE44(i) ((Te0[(i) & 0xff] >> 8) & 0x000000ff)
+
+#define TE421(i) ((Te0[((i) >> 16) & 0xff] << 8) & 0xff000000)
+
+#define TE432(i) (Te0[((i) >> 8) & 0xff] & 0x00ff0000)
+
+#define TE443(i) (Te0[(i) & 0xff] & 0x0000ff00)
+
+#define TE414(i) ((Te0[((i) >> 24) & 0xff] >> 8) & 0x000000ff)
+
+#define TE411(i) ((Te0[((i) >> 24) & 0xff] << 8) & 0xff000000)
+
+#define TE422(i) (Te0[((i) >> 16) & 0xff] & 0x00ff0000)
+
+#define TE433(i) (Te0[((i) >> 8) & 0xff] & 0x0000ff00)
+
+#define TE444(i) ((Te0[(i) & 0xff] >> 8) & 0x000000ff)
+
+int CGXCipher::Int(unsigned long* rk,
+    const unsigned char* cipherKey,
+    unsigned short keyBits)
 {
-    int ret, bufLength;
-    if (block.tag.GetSize() == 0)
-    {
-        // Tag size is 12 bytes.
-        block.tag.Capacity(12);
-    }
-    else if (block.tag.GetSize() != 12)
-    {
-        //Invalid tag.
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
-    if ((ret = GenerateKey(settings)) != 0)
-    {
-        return ret;
-    }
-    if (settings->m_Encrypt)
-    {
-        bufLength = BLOCK_SIZE;
-    }
-    else
-    {
-        bufLength = (BLOCK_SIZE + TAG_SIZE);
-    }
-    if ((ret = GetNonse(frameCounter, systemTitle, iv)) != 0)
-    {
-        return ret;
-    }
+    unsigned long i;
+    unsigned long temp;
 
-    bufBlock.Capacity(bufLength);
-    settings->m_H.Zero(0, BLOCK_SIZE);
-    if ((ret = ProcessBlock(settings, &settings->m_H, 0, &settings->m_H, 0, &block)) != 0)
-    {
-        return ret;
-    }
-    if ((ret = Init2(settings)) != 0)
-    {
-        return ret;
-    }
+    rk[0] = GETU32(cipherKey);
+    rk[1] = GETU32(cipherKey + 4);
+    rk[2] = GETU32(cipherKey + 8);
+    rk[3] = GETU32(cipherKey + 12);
 
-    settings->m_J0.Zero(0, 16);
-    settings->m_J0.SetSize(0);
-    settings->m_J0.Set(&iv, 0, -1);
-    settings->m_J0.SetSize(16);
-    settings->m_J0.GetData()[15] = 0x01;
-    GetGHash(settings, &aad);
-    settings->m_Counter.Clear();
-    settings->m_Counter.Set(&settings->m_J0, 0, -1);
-    block.bytesRemaining = 0;
-    block.totalLength = 0;
-    return 0;
-}
-
-void CGXCipher::gCTRBlock(
-    CGXCipher *settings,
-    CGXByteBuffer *buf,
-    int bufCount,
-    CGXGMacBlock *block,
-    CGXByteBuffer *output)
-{
-    int pos, ret;
-    CGXByteBuffer *hashBytes;
-    CGXByteBuffer tmp;
-    tmp.Zero(0, BLOCK_SIZE);
-    for (pos = 15; pos >= 12; --pos)
+    if (keyBits == 128)
     {
-        if (++settings->m_Counter.GetData()[pos] != 0)
+        for (i = 0; i < 10; i++)
         {
-            break;
+            temp = rk[3];
+            rk[4] = rk[0] ^ TE421(temp) ^ TE432(temp) ^
+                TE443(temp) ^ TE414(temp);
+            rk[4] = rk[0] ^ TE421(temp) ^ TE432(temp) ^
+                TE443(temp) ^ TE414(temp) ^ RCON(i);
+            rk[5] = rk[1] ^ rk[4];
+            rk[6] = rk[2] ^ rk[5];
+            rk[7] = rk[3] ^ rk[6];
+            rk += 4;
+        }
+        return 0;
+    }
+
+    rk[4] = GETU32(cipherKey + 16);
+    rk[5] = GETU32(cipherKey + 20);
+
+    if (keyBits == 192)
+    {
+        for (i = 0; i < 8; i++)
+        {
+            temp = rk[5];
+            rk[6] = rk[0] ^ TE421(temp) ^ TE432(temp) ^
+                TE443(temp) ^ TE414(temp) ^ RCON(i);
+            rk[7] = rk[1] ^ rk[6];
+            rk[8] = rk[2] ^ rk[7];
+            rk[9] = rk[3] ^ rk[8];
+            if (i == 7)
+                return 12;
+            rk[10] = rk[4] ^ rk[9];
+            rk[11] = rk[5] ^ rk[10];
+            rk += 6;
         }
     }
 
-    if ((ret = ProcessBlock(settings, &settings->m_Counter, 0, &tmp, 0, block)) != 0)
+    rk[6] = GETU32(cipherKey + 24);
+    rk[7] = GETU32(cipherKey + 28);
+
+    if (keyBits == 256)
+    {
+        for (i = 0; i < 7; i++)
+        {
+            temp = rk[7];
+            rk[8] = rk[0] ^ TE421(temp) ^ TE432(temp) ^
+                TE443(temp) ^ TE414(temp) ^ RCON(i);
+            rk[9] = rk[1] ^ rk[8];
+            rk[10] = rk[2] ^ rk[9];
+            rk[11] = rk[3] ^ rk[10];
+            if (i == 6)
+                return 14;
+            temp = rk[11];
+            rk[12] = rk[4] ^ TE411(temp) ^ TE422(temp) ^
+                TE433(temp) ^ TE444(temp);
+            rk[13] = rk[5] ^ rk[12];
+            rk[14] = rk[6] ^ rk[13];
+            rk[15] = rk[7] ^ rk[14];
+            rk += 8;
+        }
+    }
+    return DLMS_ERROR_CODE_INVALID_PARAMETER;
+}
+
+void CGXCipher::AesEncrypt(
+    const unsigned long* rk,
+    int Nr,
+    const unsigned char* pt,
+    unsigned char* ct)
+{
+    unsigned long s0, s1, s2, s3, t0, t1, t2, t3;
+    int r;
+    s0 = GETU32(pt) ^ rk[0];
+    s1 = GETU32(pt + 4) ^ rk[1];
+    s2 = GETU32(pt + 8) ^ rk[2];
+    s3 = GETU32(pt + 12) ^ rk[3];
+
+#define ROUND(i,d,s) \
+d##0 = TE0(s##0) ^ TE1(s##1) ^ TE2(s##2) ^ TE3(s##3) ^ rk[4 * i]; \
+d##1 = TE0(s##1) ^ TE1(s##2) ^ TE2(s##3) ^ TE3(s##0) ^ rk[4 * i + 1]; \
+d##2 = TE0(s##2) ^ TE1(s##3) ^ TE2(s##0) ^ TE3(s##1) ^ rk[4 * i + 2]; \
+d##3 = TE0(s##3) ^ TE1(s##0) ^ TE2(s##1) ^ TE3(s##2) ^ rk[4 * i + 3]
+
+    /* Nr - 1 full rounds: */
+    r = Nr >> 1;
+    for (;;)
+    {
+        ROUND(1, t, s);
+        rk += 8;
+        if (--r == 0)
+            break;
+        ROUND(0, s, t);
+    }
+
+#undef ROUND
+
+    s0 = TE41(t0) ^ TE42(t1) ^ TE43(t2) ^ TE44(t3) ^ rk[0];
+    PUT32(ct, s0);
+    s1 = TE41(t1) ^ TE42(t2) ^ TE43(t3) ^ TE44(t0) ^ rk[1];
+    PUT32(ct + 4, s1);
+    s2 = TE41(t2) ^ TE42(t3) ^ TE43(t0) ^ TE44(t1) ^ rk[2];
+    PUT32(ct + 8, s2);
+    s3 = TE41(t3) ^ TE42(t0) ^ TE43(t1) ^ TE44(t2) ^ rk[3];
+    PUT32(ct + 12, s3);
+}
+
+void CGXCipher::Xor(
+    unsigned char *dst,
+    const unsigned char *src)
+{
+    unsigned long *d = (unsigned long *)dst;
+    unsigned long *s = (unsigned long *)src;
+    *d++ ^= *s++;
+    *d++ ^= *s++;
+    *d++ ^= *s++;
+    *d++ ^= *s++;
+}
+
+void CGXCipher::shift_right_block(unsigned char *v)
+{
+    unsigned long val = GETU32(v + 12);
+    val >>= 1;
+    if (v[11] & 0x01)
+    {
+        val |= 0x80000000;
+    }
+    PUT32(v + 12, val);
+
+    val = GETU32(v + 8);
+    val >>= 1;
+    if (v[7] & 0x01)
+        val |= 0x80000000;
+    PUT32(v + 8, val);
+
+    val = GETU32(v + 4);
+    val >>= 1;
+    if (v[3] & 0x01)
+        val |= 0x80000000;
+    PUT32(v + 4, val);
+
+    val = GETU32(v);
+    val >>= 1;
+    PUT32(v, val);
+}
+
+void CGXCipher::MultiplyH(const unsigned char *x, const unsigned char* y, unsigned char * z)
+{
+    unsigned char tmp[16];
+    int i, j;
+
+    memset(z, 0, 16);
+    memcpy(tmp, y, 16);
+
+    for (i = 0; i < 16; i++)
+    {
+        for (j = 0; j < 8; j++)
+        {
+            if (x[i] & 1 << (7 - j))
+            {
+                Xor(z, tmp);
+            }
+            //If last bit.
+            if (tmp[15] & 0x01)
+            {
+                shift_right_block(tmp);
+                tmp[0] ^= 0xe1;
+            }
+            else
+            {
+                shift_right_block(tmp);
+            }
+        }
+    }
+}
+
+void CGXCipher::GetGHash(
+    const unsigned char *h,
+    const unsigned char *x,
+    int xlen,
+    unsigned char *y)
+{
+    int m, i;
+    const unsigned char* xpos = x;
+    unsigned char tmp[16];
+    m = xlen / 16;
+    for (i = 0; i < m; i++)
+    {
+        Xor(y, xpos);
+        xpos += 16;
+        MultiplyH(y, h, tmp);
+        memcpy(y, tmp, 16);
+    }
+    if (x + xlen > xpos)
+    {
+        size_t last = x + xlen - xpos;
+        memcpy(tmp, xpos, last);
+        memset(tmp + last, 0, sizeof(tmp) - last);
+
+        Xor(y, tmp);
+
+        MultiplyH(y, h, tmp);
+        memcpy(y, tmp, 16);
+    }
+}
+
+void CGXCipher::Init_j0(
+    const unsigned char* iv,
+    unsigned char len,
+    const unsigned char* H,
+    unsigned char* J0)
+{
+    unsigned char tmp[16];
+    //IV length.
+    if (len == 12)
+    {
+        memcpy(J0, iv, len);
+        memset(J0 + len, 0, 16 - len);
+        J0[15] = 0x01;
+    }
+    else
+    {
+        memset(J0, 0, 16);
+        GetGHash(H, iv, len, J0);
+        PUT32(tmp, (unsigned long)0);
+        PUT32(tmp + 4, (unsigned long)0);
+        //Here is expected that data is newer longger than 32 bit.
+        //This is done because microcontrollers show warning here.
+        PUT32(tmp + 8, (unsigned long)0);
+        PUT32(tmp + 12, (unsigned long)(len * 8));
+        GetGHash(H, tmp, sizeof(tmp), J0);
+    }
+}
+
+void CGXCipher::Inc32(unsigned char *block)
+{
+    unsigned long val;
+    val = GETU32(block + 16 - 4);
+    val++;
+    PUT32(block + 16 - 4, val);
+}
+
+void CGXCipher::Gctr(unsigned long *aes, const unsigned char *icb, const unsigned char *x, int xlen, unsigned char *y)
+{
+    size_t i, n, last;
+    unsigned char cb[16], tmp[16];
+    const unsigned char *xpos = x;
+    unsigned char *ypos = y;
+
+    if (xlen == 0)
     {
         return;
     }
-    if (settings->m_Encrypt)
+    n = xlen / 16;
+    memcpy(cb, icb, 16);
+    //Full blocks.
+    for (i = 0; i < n; i++)
     {
-        tmp.Zero(bufCount, BLOCK_SIZE - bufCount);
-        hashBytes = &tmp;
+        AesEncrypt(aes, aes[60], cb, ypos);
+        Xor(ypos, xpos);
+        xpos += 16;
+        ypos += 16;
+        Inc32(cb);
     }
-    else
-    {
-        hashBytes = buf;
-    }
-    for (pos = 0; pos != bufCount; ++pos)
-    {
-        tmp.GetData()[pos] ^= buf->GetData()[pos];
-    }
-    output->Set(&tmp, 0, bufCount);
-    Xor(settings->m_S.GetData(), hashBytes->GetData());
-    MultiplyH(settings, settings->m_S.GetData());
-    block->totalLength += (long)bufCount;
-}
 
-/**
-* Write bytes to decrypt/encrypt.
-*
-* @param input
-*/
-void CGXCipher::Write(
-    CGXCipher *settings,
-    CGXByteBuffer *data,
-    CGXByteBuffer *bufBlock,
-    CGXGMacBlock *block,
-    CGXByteBuffer* output)
-{
-    unsigned long pos, cnt;
-    for (pos = 0; pos < data->GetSize(); pos += 16)
+    last = x + xlen - xpos;
+    //Last, partial block.
+    if (last)
     {
-        cnt = 16;
-        if (data->GetSize() - pos < 16)
+        AesEncrypt(aes, aes[60], cb, tmp);
+        for (i = 0; i < last; i++)
         {
-            cnt = data->GetSize() - pos;
-            block->bytesRemaining = cnt;
-        }
-        bufBlock->Set(data, pos, cnt);
-        if (cnt == 16)
-        {
-            gCTRBlock(settings, bufBlock, BLOCK_SIZE, block, output);
-            if (!settings->m_Encrypt)
-            {
-                bufBlock->Move(BLOCK_SIZE, 0, block->tag.GetSize());
-            }
-            block->bytesRemaining = 0;
-            bufBlock->SetSize(0);
+            *ypos = *xpos++ ^ tmp[i];
+            ++ypos;
         }
     }
 }
 
-/**
-* Reset
-*/
-void CGXCipher::Reset(
-    CGXCipher *settings,
-    CGXByteBuffer *aad)
+void CGXCipher::AesGcmGctr(unsigned long *aes, const unsigned char *J0, const unsigned char *in, int len, unsigned char *out)
 {
-    GetGHash(settings, aad);
-    settings->m_Counter.Capacity(0);
-    settings->m_Counter.Set(&settings->m_J0, 0, -1);
+    unsigned char J0inc[16];
+    if (len == 0)
+    {
+        return;
+    }
+
+    memcpy(J0inc, J0, 16);
+    Inc32(J0inc);
+    Gctr(aes, J0inc, in, len, out);
 }
 
-/**
-* Set packet length to byte array.
-*
-* @param length
-* @param buff
-* @param offset
-*/
-static void SetPackLength(
-    unsigned long length,
-    CGXByteBuffer* buff,
-    unsigned int offset)
+void CGXCipher::AesGcmGhash(const unsigned char *H, const unsigned char *aad, int aad_len,
+    const unsigned char *crypt, int crypt_len, unsigned char *S)
 {
-    buff->SetUInt64(length);
-}
-
-int CGXCipher::FlushFinalBlock(
-    DLMS_SECURITY security,
-    CGXCipher *settings,
-    CGXByteBuffer *aad,
-    CGXByteBuffer *bufBlock,
-    CGXGMacBlock *block,
-    CGXByteBuffer *output)
-{
-    CGXByteBuffer tmp;
-    // Crypt/Uncrypt remaining bytes.
-    if (block->bytesRemaining > 0)
-    {
-        tmp.Set(bufBlock, 0, block->bytesRemaining);
-        tmp.Zero(block->bytesRemaining, BLOCK_SIZE - block->bytesRemaining);
-        gCTRBlock(settings, &tmp, block->bytesRemaining, block, output);
-    }
-    // If tag is not needed.
-    if (security == DLMS_SECURITY_ENCRYPTION)
-    {
-        Reset(settings, aad);
-        return 0;
-    }
-    // Count HASH.
-    tmp.Clear();
-    tmp.Capacity(16);
-    SetPackLength(aad->GetSize() * 8, &tmp, 0);
-    SetPackLength(block->totalLength * 8, &tmp, 8);
-    Xor(settings->m_S.GetData(), tmp.GetData());
-    CGXCipher::MultiplyH(settings, settings->m_S.GetData());
-    tmp.Zero(0, BLOCK_SIZE);
-    ProcessBlock(settings, &settings->m_J0, 0, &tmp, 0, block);
-    Xor(tmp.GetData(), settings->m_S.GetData());
-    if (!settings->m_Encrypt)
-    {
-        if (memcmp(block->tag.GetData(), tmp.GetData(), 12) != 0)
-        {
-            return DLMS_ERROR_CODE_INVALID_TAG;
-        }
-    }
-    else
-    {
-        // Tag size is 12 bytes.
-        block->tag.SetSize(0);
-        block->tag.Set(&tmp, 0, 12);
-    }
-    Reset(settings, aad);
-    return 0;
+    unsigned char len_buf[16];
+    GetGHash(H, aad, aad_len, S);
+    GetGHash(H, crypt, crypt_len, S);
+    //Here is expected that data is newer longger than 32 bit.
+    //This is done because microcontrollers show warning here.
+    PUT32(len_buf, (unsigned long)0);
+    PUT32(len_buf + 4, (unsigned long)(aad_len * 8));
+    PUT32(len_buf + 8, (unsigned long)0);
+    PUT32(len_buf + 12, (unsigned long)(crypt_len * 8));
+    GetGHash(H, len_buf, sizeof(len_buf), S);
 }
 
 int CGXCipher::Encrypt(
@@ -916,88 +578,116 @@ int CGXCipher::Encrypt(
     unsigned long frameCounter,
     unsigned char tag,
     CGXByteBuffer& systemTitle,
+    CGXByteBuffer& key,
     CGXByteBuffer& plainText,
     CGXByteBuffer& encrypted)
 {
+    unsigned short headerSize = 0;
     int ret;
-    CGXGMacBlock block;
-    CGXByteBuffer data, aad, iv, bufBlock;
-    m_Encrypt = 1;
-    systemTitle.SetPosition(0);
-    if ((ret = GetAuthenticatedData(security, m_AuthenticationKey, plainText, aad)) != 0)
-    {
-        return ret;
-    }
-    if ((ret = Init(this, aad, iv, frameCounter, systemTitle, bufBlock, block)) != 0)
-    {
-        return ret;
-    }
-    if (type == DLMS_COUNT_TYPE_PACKET)
-    {
-        data.SetUInt8(m_Security);
-    }
-    // Encrypt the secret message
-    if (security != DLMS_SECURITY_AUTHENTICATION)
-    {
-        Write(this, &plainText, &bufBlock, &block, &encrypted);
-    }
-    FlushFinalBlock(security, this, &aad, &bufBlock, &block, &encrypted);
-    if (security == DLMS_SECURITY_AUTHENTICATION)
-    {
-        if (type == DLMS_COUNT_TYPE_PACKET)
-        {
-            data.SetUInt32(frameCounter);
-        }
-        if ((type & DLMS_COUNT_TYPE_DATA) != 0)
-        {
-            data.Set(plainText.GetData() + plainText.GetPosition(),
-                plainText.GetSize() - plainText.GetPosition());
-        }
-        if ((type & DLMS_COUNT_TYPE_TAG) != 0)
-        {
-            data.Set(&block.tag, 0, -1);
-        }
-    }
-    else if (security == DLMS_SECURITY_ENCRYPTION)
-    {
-        if (type == DLMS_COUNT_TYPE_PACKET)
-        {
-            data.SetUInt32(frameCounter);
-        }
-        data.Set(&encrypted, 0, -1);
-    }
-    else if (security == DLMS_SECURITY_AUTHENTICATION_ENCRYPTION)
-    {
-        if (type == DLMS_COUNT_TYPE_PACKET)
-        {
-            data.SetUInt32(frameCounter);
-        }
-        if ((type & DLMS_COUNT_TYPE_DATA) != 0)
-        {
-            data.Set(&encrypted, 0, -1);
-        }
-        if ((type & DLMS_COUNT_TYPE_DATA) != 0 ||
-            (type & DLMS_COUNT_TYPE_TAG) != 0)
-        {
-            data.Set(&block.tag, 0, -1);
-        }
-    }
-    else
+    unsigned long tmp[61] = { 0 };
+    unsigned char H[16] = { 0 };
+    unsigned char J0[16] = { 0 };
+    unsigned char S[16] = { 0 };
+    CGXByteBuffer nonse;
+    CGXByteBuffer aad;
+    if (systemTitle.GetSize() != 8)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    encrypted.SetSize(0);
+    if ((ret = GetNonse(frameCounter, systemTitle, nonse)) != 0)
+    {
+        return ret;
+    }
+    if ((ret = GetAuthenticatedData(
+        security,
+        m_AuthenticationKey,
+        plainText,
+        aad)) != 0)
+    {
+        return ret;
+    }
+
+    if ((ret = Int(tmp, key.m_Data, 16 * 8)) != 0)
+    {
+        return ret;
+    }
+    tmp[60] = 10;
+
+    //Hash subkey.
+    AesEncrypt(tmp, tmp[60], H, H);
+    Init_j0(nonse.m_Data, (unsigned char)nonse.GetSize(), H, J0);
+    encrypted.Capacity(40 + 16 + (2 * plainText.m_Size));
+    //Data is encrypted.
     if (type == DLMS_COUNT_TYPE_PACKET)
     {
-        encrypted.Capacity(10 + data.GetSize());
         encrypted.SetUInt8(tag);
-        GXHelpers::SetObjectCount(data.GetSize(), encrypted);
+        int len = 5 + plainText.m_Size;
+        if (security != DLMS_SECURITY_ENCRYPTION)
+        {
+            len += 12;
+        }
+        if (tag == DLMS_COMMAND_GENERAL_GLO_CIPHERING ||
+            tag == DLMS_COMMAND_GENERAL_DED_CIPHERING)
+        {
+            GXHelpers::SetObjectCount(systemTitle.m_Size, encrypted);
+            encrypted.Set(systemTitle.m_Data, systemTitle.m_Size);
+        }
+        GXHelpers::SetObjectCount(len, encrypted);
+        encrypted.SetUInt8(security);
+        encrypted.SetUInt32(frameCounter);
+        headerSize = (unsigned short)encrypted.m_Size;
+        if (security == DLMS_SECURITY_AUTHENTICATION)
+        {
+            encrypted.Set(&plainText, 0, plainText.m_Size);
+        }
     }
     else
     {
-        encrypted.Capacity(data.GetSize());
+        //Data is decrypted.
+        if (security == DLMS_SECURITY_AUTHENTICATION ||
+            security == DLMS_SECURITY_AUTHENTICATION_ENCRYPTION)
+        {
+            encrypted.Capacity(plainText.m_Size + (16 % aad.m_Size) + aad.m_Size);
+        }
+        else
+        {
+            encrypted.Capacity(plainText.m_Size);
+        }
     }
-    encrypted.Set(&data, 0, -1);
+    encrypted.SetSize(plainText.GetSize() + headerSize);
+    if (security == DLMS_SECURITY_AUTHENTICATION)
+    {
+        if (type != DLMS_COUNT_TYPE_PACKET)
+        {
+            encrypted.SetSize(0);
+        }
+        else
+        {
+            memcpy(encrypted.m_Data + headerSize, plainText.m_Data, plainText.m_Size);
+        }
+        AesGcmGhash(H, aad.m_Data, aad.m_Size, encrypted.m_Data + headerSize, 0, S);
+        Gctr(tmp, J0, S, aad.m_Size, encrypted.m_Data + encrypted.m_Size);
+        encrypted.m_Size += 12;
+    }
+    else if (security == DLMS_SECURITY_ENCRYPTION)
+    {
+        //Encrypt the data.
+        AesGcmGctr(tmp, J0, plainText.m_Data, plainText.m_Size, encrypted.m_Data + headerSize);
+    }
+    else if (security == DLMS_SECURITY_AUTHENTICATION_ENCRYPTION)
+    {
+        //Encrypt the data.
+        AesGcmGctr(tmp, J0, plainText.m_Data, plainText.m_Size, encrypted.m_Data + headerSize);
+        if ((encrypted.m_Size - headerSize) % 16 != 0)
+        {
+            unsigned short add = 16 - ((encrypted.m_Size - headerSize) % 16);
+            encrypted.Zero(encrypted.m_Size, add);
+            encrypted.m_Size -= add;
+        }
+        AesGcmGhash(H, aad.m_Data, aad.m_Size, encrypted.m_Data + headerSize, plainText.m_Size, S);
+        Gctr(tmp, J0, S, aad.m_Size, encrypted.m_Data + encrypted.m_Size);
+        encrypted.m_Size += 12;
+    }
     return 0;
 }
 
@@ -1025,15 +715,17 @@ static bool TagsEquals(CGXByteBuffer& tag1, CGXByteBuffer& tag2)
 
 int CGXCipher::Decrypt(
     CGXByteBuffer& title,
+    CGXByteBuffer& key,
     CGXByteBuffer& data,
     DLMS_SECURITY& security)
 {
-    CGXByteBuffer tag, ciphertext, systemTitle, countTag;
-    DLMS_COMMAND cmd = DLMS_COMMAND_NONE;
-    int length;
+    unsigned long length;
     int ret;
     unsigned char ch;
-    unsigned long len, frameCounter;
+    unsigned long frameCounter;
+    DLMS_COMMAND cmd;
+    CGXByteBuffer* pTitle = &title;
+    CGXByteBuffer tag, ciphertext, systemTitle, countTag;
     if (data.GetSize() - data.GetPosition() < 2)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
@@ -1045,12 +737,17 @@ int CGXCipher::Decrypt(
     cmd = (DLMS_COMMAND)ch;
     switch (cmd)
     {
-    case DLMS_COMMAND_GLO_GENERAL_CIPHERING:
-        if ((ret = GXHelpers::GetObjectCount(data, len)) != 0)
+    case DLMS_COMMAND_GENERAL_GLO_CIPHERING:
+    case DLMS_COMMAND_GENERAL_DED_CIPHERING:
+        if ((ret = GXHelpers::GetObjectCount(data, length)) != 0)
         {
             return ret;
         }
-        systemTitle.Set(&data, data.GetPosition(), len);
+        if (length != 0)
+        {
+            systemTitle.Set(&data, data.m_Position, length);
+            pTitle = &systemTitle;
+        }
         break;
     case DLMS_COMMAND_GLO_INITIATE_REQUEST:
     case DLMS_COMMAND_GLO_INITIATE_RESPONSE:
@@ -1065,11 +762,18 @@ int CGXCipher::Decrypt(
     case DLMS_COMMAND_GLO_METHOD_REQUEST:
     case DLMS_COMMAND_GLO_METHOD_RESPONSE:
     case DLMS_COMMAND_GLO_EVENT_NOTIFICATION_REQUEST:
+    case DLMS_COMMAND_DED_GET_REQUEST:
+    case DLMS_COMMAND_DED_GET_RESPONSE:
+    case DLMS_COMMAND_DED_SET_REQUEST:
+    case DLMS_COMMAND_DED_SET_RESPONSE:
+    case DLMS_COMMAND_DED_METHOD_REQUEST:
+    case DLMS_COMMAND_DED_METHOD_RESPONSE:
+    case DLMS_COMMAND_DED_EVENT_NOTIFICATION:
         break;
     default:
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    if ((ret = GXHelpers::GetObjectCount(data, len)) != 0)
+    if ((ret = GXHelpers::GetObjectCount(data, length)) != 0)
     {
         return ret;
     }
@@ -1082,12 +786,12 @@ int CGXCipher::Decrypt(
     {
         return ret;
     }
-
+    m_FrameCounter = frameCounter + 1;
     if (security == DLMS_SECURITY_AUTHENTICATION)
     {
-        length = data.GetSize() - data.GetPosition() - 12;
+        length = (unsigned short)(data.m_Size - data.m_Position - 12);
         //Get tag
-        tag.Set(data.GetData() + data.GetPosition() + length, 12);
+        tag.Set(data.m_Data + data.GetPosition() + length, 12);
         //Skip tag from data.
         data.SetSize(data.GetPosition() + length);
         // Check tag.
@@ -1096,33 +800,29 @@ int CGXCipher::Decrypt(
             DLMS_COUNT_TYPE_TAG,
             frameCounter,
             0,
-            cmd == DLMS_COMMAND_GLO_GENERAL_CIPHERING ? systemTitle : title,
+            title,
+            key,
             data,
-            countTag)) != 0)
+            countTag)) == 0)
         {
-            return ret;
+            // Check tag.
+            if (memcmp(tag.m_Data, countTag.m_Data, 12) != 0)
+            {
+                ret = DLMS_ERROR_CODE_INVALID_TAG;
+            }
         }
-        if (!TagsEquals(tag, countTag))
-        {
-            //Decrypt failed. Invalid tag.
-            return DLMS_ERROR_CODE_INVALID_TAG;
-        }
-        return 0;
+        return ret;
     }
-    else if (security == DLMS_SECURITY_ENCRYPTION)
+    if (security == DLMS_SECURITY_ENCRYPTION)
     {
-        length = data.GetSize() - data.GetPosition();
+        length = (unsigned short)(data.m_Size - data.m_Position);
         ciphertext.Set(&data, data.GetPosition(), length);
     }
     else if (security == DLMS_SECURITY_AUTHENTICATION_ENCRYPTION)
     {
-        length = data.GetSize() - data.GetPosition() - 12;
-        ciphertext.Set(&data, data.GetPosition(), length);
-        tag.Set(&data, data.GetPosition(), 12);
-    }
-    else
-    {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        length = (unsigned short)(data.m_Size - data.m_Position - 12);
+        ciphertext.Set(&data, data.m_Position, length);
+        tag.Set(&data, data.m_Position, 12);
     }
     data.Clear();
     if ((ret = Encrypt(
@@ -1130,7 +830,8 @@ int CGXCipher::Decrypt(
         DLMS_COUNT_TYPE_DATA,
         frameCounter,
         0,
-        cmd == DLMS_COMMAND_GLO_GENERAL_CIPHERING ? systemTitle : title,
+        title,
+        key,
         ciphertext,
         data)) != 0)
     {
@@ -1181,8 +882,8 @@ int CGXCipher::Aes1Encrypt(
     CGXByteBuffer& secret)
 {
     unsigned char buf1, buf2, buf3, buf4, round, i;
-    unsigned char *key = secret.GetData();
-    unsigned char *data = buff.GetData();
+    unsigned char *key = secret.m_Data;
+    unsigned char *data = buff.m_Data;
     for (round = 0; round < 10; ++round)
     {
         for (i = 0; i < 16; ++i)
@@ -1278,7 +979,7 @@ CGXByteBuffer& CGXCipher::GetSystemTitle()
 void CGXCipher::SetSystemTitle(CGXByteBuffer& value)
 {
     m_SystemTitle.Clear();
-    m_SystemTitle.Set(value.GetData(), value.GetSize() - value.GetPosition());
+    m_SystemTitle.Set(value.m_Data, value.m_Size - value.m_Position);
 }
 
 CGXByteBuffer& CGXCipher::GetBlockCipherKey()
@@ -1289,7 +990,7 @@ CGXByteBuffer& CGXCipher::GetBlockCipherKey()
 void CGXCipher::SetBlockCipherKey(CGXByteBuffer& value)
 {
     m_BlockCipherKey.Clear();
-    m_BlockCipherKey.Set(value.GetData(), value.GetSize() - value.GetPosition());
+    m_BlockCipherKey.Set(value.m_Data, value.m_Size - value.m_Position);
 }
 
 CGXByteBuffer& CGXCipher::GetAuthenticationKey()
@@ -1300,7 +1001,7 @@ CGXByteBuffer& CGXCipher::GetAuthenticationKey()
 void CGXCipher::SetAuthenticationKey(CGXByteBuffer& value)
 {
     m_AuthenticationKey.Clear();
-    m_AuthenticationKey.Set(value.GetData(), value.GetSize() - value.GetPosition());
+    m_AuthenticationKey.Set(value.m_Data, value.m_Size - value.m_Position);
 }
 
 unsigned long CGXCipher::GetFrameCounter()

@@ -50,7 +50,7 @@ class CGXDLMSLNCommandHandler
  *            Received data.
  */
     static int GetRequestNormal(
-        CGXDLMSSettings settings,
+        CGXDLMSSettings& settings,
         unsigned char invokeID,
         CGXDLMSServer* server,
         CGXByteBuffer& data,
@@ -64,7 +64,7 @@ class CGXDLMSLNCommandHandler
     *            Received data.
     */
     static int GetRequestNextDataBlock(
-        CGXDLMSSettings settings,
+        CGXDLMSSettings& settings,
         unsigned char invokeID,
         CGXDLMSServer* server,
         CGXByteBuffer& data,
@@ -78,7 +78,7 @@ class CGXDLMSLNCommandHandler
      *            Received data.
      */
     static int GetRequestWithList(
-        CGXDLMSSettings settings,
+        CGXDLMSSettings& settings,
         unsigned char invokeID,
         CGXDLMSServer* server,
         CGXByteBuffer& data,
