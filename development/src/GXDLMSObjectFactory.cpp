@@ -76,6 +76,7 @@
 #include "../include/GXDLMSCharge.h"
 #include "../include/GXDLMSParameterMonitor.h"
 #include "../include/GXDLMSTokenGateway.h"
+#include "../include/GXDLMSCompactData.h"
 
 // Reserved for internal use.
 CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
@@ -180,6 +181,8 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
         return new CGXDLMSParameterMonitor();
     case DLMS_OBJECT_TYPE_TOKEN_GATEWAY:
         return new CGXDLMSTokenGateway();
+    case DLMS_OBJECT_TYPE_COMPACT_DATA:
+        return new CGXDLMSCompactData();
     default:
 #ifdef _DEBUG
         printf("Unknown object: %d\r\n", type);

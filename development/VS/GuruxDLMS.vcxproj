@@ -136,6 +136,7 @@
     <ClCompile Include="..\src\GXDLMSAccount.cpp" />
     <ClCompile Include="..\src\GXDLMSCertificateInfo.cpp" />
     <ClCompile Include="..\src\GXDLMSCharge.cpp" />
+    <ClCompile Include="..\src\GXDLMSCompactData.cpp" />
     <ClCompile Include="..\src\GXDLMSCredit.cpp" />
     <ClCompile Include="..\src\GXDLMSGSMCellInfo.cpp" />
     <ClCompile Include="..\src\GXAPDU.cpp" />
@@ -272,6 +273,7 @@
     <ClInclude Include="..\include\GXDLMSCharge.h" />
     <ClInclude Include="..\include\GXDLMSClient.h" />
     <ClInclude Include="..\include\GXDLMSClock.h" />
+    <ClInclude Include="..\include\GXDLMSCompactData.h" />
     <ClInclude Include="..\include\GXDLMSConnectionEventArgs.h" />
     <ClInclude Include="..\include\GXDLMSContextType.h" />
     <ClInclude Include="..\include\GXDLMSConverter.h" />

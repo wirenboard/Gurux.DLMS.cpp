@@ -1000,6 +1000,8 @@ const char* CGXDLMSConverter::ToString(DLMS_OBJECT_TYPE type)
         return "GXDLMSTokenGateway";
     case DLMS_OBJECT_TYPE_GSM_DIAGNOSTIC:
         return "GXDLMSGSMDiagnostic";
+    case DLMS_OBJECT_TYPE_COMPACT_DATA:
+        return "GXDLMSCompactData";
     default:
         return "Manufacture spesific.";
     }
