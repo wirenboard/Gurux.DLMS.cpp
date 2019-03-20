@@ -1155,7 +1155,11 @@ typedef enum
     /*
     * Response message from gateway to client.
     */
-    DLMS_COMMAND_GATEWAY_RESPONSE = 0xE7
+    DLMS_COMMAND_GATEWAY_RESPONSE = 0xE7,
+    /*Ded initiate request.*/
+    DLMS_COMMAND_DED_INITIATE_REQUEST = 65,
+    /*Ded initiate response.*/
+    DLMS_COMMAND_DED_INITIATE_RESPONSE = 72
 } DLMS_COMMAND;
 
 typedef enum

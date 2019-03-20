@@ -182,6 +182,8 @@ public:
     /// <param name="list"></param>
     static void GetDedTags(DLMS_TRANSLATOR_OUTPUT_TYPE type, std::map<unsigned long, std::string> & list)
     {
+        list[DLMS_COMMAND_DED_INITIATE_REQUEST] = "ded_InitiateRequest";
+        list[DLMS_COMMAND_DED_INITIATE_RESPONSE] = "ded_InitiateResponse";
         list[DLMS_COMMAND_DED_GET_REQUEST] = "ded_GetRequest";
         list[DLMS_COMMAND_DED_GET_RESPONSE] = "ded_GetResponse";
         list[DLMS_COMMAND_DED_SET_REQUEST] = "ded_SetRequest";
@@ -608,7 +610,7 @@ public:
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="error">Service error enumeration value.</param>
     /// <returns>Service error simple XML tag.</returns>
@@ -620,7 +622,7 @@ public:
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="value">Service error simple XML tag.</param>
     /// <returns>Service error enumeration value.</returns>

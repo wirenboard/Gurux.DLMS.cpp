@@ -237,8 +237,8 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     // value: Byte array received from the meter.
     // type: Wanted type.
-    // useUtc: Standard says that Time zone is from normal time to UTC in minutes. 
-    //         If meter is configured to use UTC time (UTC to normal time) 
+    // useUtc: Standard says that Time zone is from normal time to UTC in minutes.
+    //         If meter is configured to use UTC time (UTC to normal time)
     //         set this to true.
     // returns Value changed by type.
     static int ChangeType(
@@ -686,7 +686,7 @@ public:
     {
         return CGXDLMSConverter::ToString(type);
     }
-    
+
     //Parse push objects.
     int ParsePushObjects(
         std::vector<CGXDLMSVariant>& data,

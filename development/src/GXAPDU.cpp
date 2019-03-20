@@ -177,7 +177,8 @@ int GetInitiateRequest(
     // Tag for xDLMS-Initiate request
     data.SetUInt8(DLMS_COMMAND_INITIATE_REQUEST);
     // Usage field for dedicated-key component.
-    if (settings.GetCipher() == NULL || settings.GetCipher()->GetDedicatedKey().GetSize() == 0)
+    if (settings.GetCipher() == NULL || settings.GetCipher()->GetDedicatedKey().GetSize() == 0 ||
+        settings.GetCipher()->GetSecurity() == DLMS_SECURITY_NONE)
     {
         data.SetUInt8(0x00);
     }
@@ -719,7 +720,7 @@ int CGXAPDU::ParseInitiate(
 {
     int ret;
     int originalPos;
-    unsigned char tag;
+    unsigned char tag, tag1;
     unsigned long cnt;
     CGXByteBuffer encrypted;
     // Tag for xDLMS-Initate.response
@@ -727,12 +728,29 @@ int CGXAPDU::ParseInitiate(
     {
         return ret;
     }
-    if (tag == DLMS_COMMAND_GLO_INITIATE_RESPONSE)
+    if (tag == DLMS_COMMAND_GLO_INITIATE_RESPONSE ||
+        tag == DLMS_COMMAND_GLO_INITIATE_REQUEST ||
+        tag == DLMS_COMMAND_GENERAL_GLO_CIPHERING ||
+        tag == DLMS_COMMAND_GENERAL_DED_CIPHERING)
     {
         if (xml != NULL)
         {
             std::string str;
             originalPos = data.GetPosition();
+            CGXByteBuffer st;
+            if (tag == DLMS_COMMAND_GENERAL_GLO_CIPHERING ||
+                tag == DLMS_COMMAND_GENERAL_DED_CIPHERING)
+            {
+                if ((ret = GXHelpers::GetObjectCount(data, cnt)) != 0)
+                {
+                    return ret;
+                }
+                st.Set(&data, data.GetPosition(), cnt);
+            }
+            else
+            {
+                st = settings.GetSourceSystemTitle();
+            }
             if ((ret = GXHelpers::GetObjectCount(data, cnt)) != 0)
             {
                 return ret;
@@ -743,13 +761,14 @@ int CGXAPDU::ParseInitiate(
                 int pos = xml->GetXmlLength();
                 data.SetPosition(originalPos - 1);
                 DLMS_SECURITY security = DLMS_SECURITY_NONE;
-                if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(),
-                    settings.GetCipher()->GetBlockCipherKey(), data, security)) != 0)
+                if ((ret = cipher->Decrypt(st,
+                    settings.GetCipher()->GetBlockCipherKey(),
+                    data, security)) != 0)
                 {
                     return ret;
                 }
                 cipher->SetSecurity(security);
-                if ((ret = data.GetUInt8(&tag)) != 0)
+                if ((ret = data.GetUInt8(&tag1)) != 0)
                 {
                     return ret;
                 }
@@ -757,7 +776,7 @@ int CGXAPDU::ParseInitiate(
                 str = "Security: ";
                 str.append(CGXDLMSConverter::ToString(security));
                 xml->AppendLine(str);
-                if (Parse(initiateRequest, settings, cipher, data, xml, tag) == 0)
+                if (Parse(initiateRequest, settings, cipher, data, xml, tag1) == 0)
                 {
                     xml->EndComment();
                 }
@@ -768,68 +787,10 @@ int CGXAPDU::ParseInitiate(
                 }
             }
             str = encrypted.ToHexString(false);
-            xml->AppendLine(DLMS_COMMAND_GLO_INITIATE_RESPONSE, "", str);
+            xml->AppendLine(tag, "", str);
             return 0;
         }
         data.SetPosition(data.GetPosition() - 1);
-        DLMS_SECURITY security = DLMS_SECURITY_NONE;
-        if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(),
-            settings.GetCipher()->GetBlockCipherKey(), data, security)) != 0)
-        {
-            return ret;
-        }
-        cipher->SetSecurity(security);
-        if ((ret = data.GetUInt8(&tag)) != 0)
-        {
-            return ret;
-        }
-    }
-    else if (tag == DLMS_COMMAND_GLO_INITIATE_REQUEST)
-    {
-        if (xml != NULL)
-        {
-            std::string str;
-            originalPos = data.GetPosition();
-            if ((ret = GXHelpers::GetObjectCount(data, cnt)) != 0)
-            {
-                return ret;
-            }
-            encrypted.Set(&data, data.GetPosition(), data.Available());
-            if (cipher != NULL && xml->GetComments())
-            {
-                int pos = xml->GetXmlLength();
-                data.SetPosition(originalPos - 1);
-                DLMS_SECURITY security = DLMS_SECURITY_NONE;
-                if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(),
-                    settings.GetCipher()->GetBlockCipherKey(), data, security)) != 0)
-                {
-                    return ret;
-                }
-                cipher->SetSecurity(security);
-                if ((ret = data.GetUInt8(&tag)) != 0)
-                {
-                    return ret;
-                }
-                xml->StartComment("Decrypted data:");
-                str = "Security: ";
-                str.append(CGXDLMSConverter::ToString(security));
-                xml->AppendLine(str);
-                if (Parse(initiateRequest, settings, cipher, data, xml, tag) == 0)
-                {
-                    xml->EndComment();
-                }
-                else
-                {
-                    // It's OK if this fails.
-                    xml->SetXmlLength(pos);
-                }
-            }
-            str = encrypted.ToHexString(false);
-            xml->AppendLine(DLMS_COMMAND_GLO_INITIATE_REQUEST, "", str);
-            return 0;
-        }
-        data.SetPosition(data.GetPosition() - 1);
-        // InitiateRequest
         DLMS_SECURITY security = DLMS_SECURITY_NONE;
         if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(),
             settings.GetCipher()->GetBlockCipherKey(), data, security)) != 0)

@@ -662,9 +662,6 @@
     <ClInclude Include="..\include\GXDLMSTranslator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\TranslatorSimpleTags.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\TranslatorStandardTags.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -723,6 +720,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\GXDLMSCompactData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\TranslatorSimpleTags.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

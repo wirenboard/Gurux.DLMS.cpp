@@ -46,7 +46,7 @@ private:
     /**
     * Schedule entry index.
     */
-    unsigned char m_Index;
+    unsigned short m_Index;
 
     /**
      * Is Schedule entry enabled.
@@ -61,7 +61,7 @@ private:
     /**
      * Script identifier of the script to be executed.
      */
-    unsigned char m_ScriptSelector;
+    unsigned short m_ScriptSelector;
 
     /**
     *
@@ -72,7 +72,7 @@ private:
      * Defines a period in minutes, in which an entry shall be processed after
      * power fail.
      */
-    unsigned char m_ValidityWindow;
+    unsigned short m_ValidityWindow;
 
     /**
      * Days of the week on which the entry is valid.
@@ -100,7 +100,7 @@ public:
      *
      * @return Entry index.
      */
-    unsigned char GetIndex();
+    unsigned short GetIndex();
 
     /**
      * Set schedule entry index.
@@ -108,7 +108,7 @@ public:
      * @param value
      *            Entry index.
      */
-    void SetIndex(unsigned char value);
+    void SetIndex(unsigned short value);
 
     /**
      * Is Schedule entry enabled.
@@ -139,7 +139,7 @@ public:
      *
      * @return Script identifier.
      */
-    unsigned char GetScriptSelector();
+    unsigned short GetScriptSelector();
 
     /**
      * Set script identifier of the script to be executed.
@@ -147,7 +147,7 @@ public:
      * @param value
      *            Script identifier.
      */
-    void SetScriptSelector(unsigned char value);
+    void SetScriptSelector(unsigned short value);
 
     /**
      * @return
@@ -165,7 +165,7 @@ public:
      *
      * @return Validity period in minutes.
      */
-    unsigned char GetValidityWindow();
+    unsigned short GetValidityWindow();
 
     /**
      * Defines a period in minutes, in which an entry shall be processed after
@@ -174,7 +174,7 @@ public:
      * @param value
      *            Validity period in minutes.
      */
-    void SetValidityWindow(unsigned char value);
+    void SetValidityWindow(unsigned short value);
 
     /**
      * Get days of the week on which the entry is valid.

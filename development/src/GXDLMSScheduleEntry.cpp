@@ -34,12 +34,12 @@
 
 #include "../include/GXDLMSScheduleEntry.h"
 
-unsigned char CGXDLMSScheduleEntry::GetIndex()
+unsigned short CGXDLMSScheduleEntry::GetIndex()
 {
     return m_Index;
 }
 
-void CGXDLMSScheduleEntry::SetIndex(unsigned char value)
+void CGXDLMSScheduleEntry::SetIndex(unsigned short value)
 {
     m_Index = value;
 }
@@ -64,13 +64,13 @@ void CGXDLMSScheduleEntry::SetLogicalName(std::string value)
     m_LogicalName = value;
 }
 
-unsigned char CGXDLMSScheduleEntry::GetScriptSelector()
+unsigned short CGXDLMSScheduleEntry::GetScriptSelector()
 {
     return m_ScriptSelector;
 }
 
 
-void CGXDLMSScheduleEntry::SetScriptSelector(unsigned char value)
+void CGXDLMSScheduleEntry::SetScriptSelector(unsigned short value)
 {
     m_ScriptSelector = value;
 }
@@ -86,12 +86,12 @@ void CGXDLMSScheduleEntry::SetSwitchTime(CGXDateTime value)
     m_SwitchTime = value;
 }
 
-unsigned char CGXDLMSScheduleEntry::GetValidityWindow()
+unsigned short CGXDLMSScheduleEntry::GetValidityWindow()
 {
     return m_ValidityWindow;
 }
 
-void CGXDLMSScheduleEntry::SetValidityWindow(unsigned char value)
+void CGXDLMSScheduleEntry::SetValidityWindow(unsigned short value)
 {
     m_ValidityWindow = value;
 }
