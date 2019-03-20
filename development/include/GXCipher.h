@@ -100,13 +100,13 @@ private:
     /*
     * Count GHash.
     */
-    static void CGXCipher::GetGHash(
+    static void GetGHash(
         const unsigned char *h,
         const unsigned char *x,
         int xlen,
         unsigned char *y);
 
-    static void CGXCipher::Init_j0(
+    static void Init_j0(
         const unsigned char* iv,
         unsigned char len,
         const unsigned char* H,
