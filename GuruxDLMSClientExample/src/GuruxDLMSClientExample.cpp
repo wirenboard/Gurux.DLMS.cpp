@@ -260,9 +260,6 @@ int main(int argc, char* argv[])
             }
         }
         CGXDLMSSecureClient cl(useLogicalNameReferencing, clientAddress, serverAddress, authentication, password, interfaceType);
-        CGXByteBuffer challenge;
-        challenge.SetHexString("0000000000000000");
-        cl.SetCtoSChallenge(challenge);
         CGXCommunication comm(&cl, 5000, trace);
 
         if (port != 0 || address != NULL)
