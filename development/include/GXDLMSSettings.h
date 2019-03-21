@@ -65,7 +65,7 @@ class CGXDLMSSettings
 
     // Is custom challenges used. If custom challenge is used new challenge is
     // not generated if it is Set. This is for debugging purposes.
-    bool m_CustomChallenges;
+    bool m_UseCustomChallenge;
 
     // Client to server challenge.
     CGXByteBuffer m_CtoSChallenge;
@@ -331,7 +331,7 @@ public:
     CGXDLMSObjectCollection& GetObjects();
 
     // Get Is custom challenges used.
-    bool IsCustomChallenges();
+    bool GetUseCustomChallenge();
 
     // Set is custom challenges used.
     void SetUseCustomChallenge(bool value);

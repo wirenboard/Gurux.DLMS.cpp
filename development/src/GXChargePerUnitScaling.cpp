@@ -33,6 +33,8 @@
 //---------------------------------------------------------------------------
 
 #include "../include/GXChargePerUnitScaling.h"
+#include "../include/GXHelpers.h"
+
  // Constructor.
 CGXChargePerUnitScaling::CGXChargePerUnitScaling()
 {
@@ -86,8 +88,8 @@ void CGXChargePerUnitScaling::SetPriceScale(signed char value)
 
 std::string CGXChargePerUnitScaling::ToString()
 {
-    std::string str = std::to_string(m_CommodityScale);
+    std::string str = GXHelpers::IntToString(m_CommodityScale);
     str.append(", ");
-    str = std::to_string(m_PriceScale);
+    str = GXHelpers::IntToString(m_PriceScale);
     return str;
 }

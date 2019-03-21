@@ -974,7 +974,7 @@ int ParseApplicationContextName(
         }
         else
         {
-            str = std::to_string(name);
+            str = GXHelpers::IntToString(name);
         }
         xml->AppendLine(TRANSLATOR_GENERAL_TAGS_APPLICATION_CONTEXT_NAME, "", str);
         return 0;
@@ -1819,7 +1819,7 @@ int CGXAPDU::ParsePDU2(
                 }
                 else
                 {
-                    str = std::to_string(settings.GetAuthentication());
+                    str = GXHelpers::IntToString(settings.GetAuthentication());
                     xml->AppendLine((unsigned long)tag, "", str);
                 }
             }

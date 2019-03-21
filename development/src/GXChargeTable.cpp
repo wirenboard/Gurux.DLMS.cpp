@@ -33,6 +33,7 @@
 //---------------------------------------------------------------------------
 
 #include "../include/GXChargeTable.h"
+#include "../include/GXHelpers.h"
 
 CGXChargeTable::CGXChargeTable()
 {
@@ -61,6 +62,6 @@ void CGXChargeTable::SetChargePerUnit(short value)
 
 std::string CGXChargeTable::ToString()
 {
-    std::string str = m_Index + " " + std::to_string(m_ChargePerUnit);
+    std::string str = m_Index + " " + GXHelpers::IntToString(m_ChargePerUnit);
     return str;
 }

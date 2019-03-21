@@ -75,6 +75,6 @@ std::string CGXCreditChargeConfiguration::ToString()
     str.append(", ");
     str.append(m_ChargeReference);
     str.append(", ");
-    str.append(std::to_string(m_CollectionConfiguration));
+    str.append(GXHelpers::IntToString(m_CollectionConfiguration));
     return str;
 }

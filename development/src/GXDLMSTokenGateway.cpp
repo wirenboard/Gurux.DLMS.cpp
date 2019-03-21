@@ -80,8 +80,8 @@ void CGXDLMSTokenGateway::GetValues(std::vector<std::string>& values)
         tmp += *it;
     }
     values.push_back(tmp);
-    values.push_back(std::to_string(m_DeliveryMethod));
-    values.push_back(std::to_string(m_Status) + ", " + m_DataValue);
+    values.push_back(GXHelpers::IntToString(m_DeliveryMethod));
+    values.push_back(GXHelpers::IntToString(m_Status) + ", " + m_DataValue);
 }
 
 void CGXDLMSTokenGateway::GetAttributeIndexToRead(std::vector<int>& attributes)

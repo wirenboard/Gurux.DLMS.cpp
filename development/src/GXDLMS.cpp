@@ -2149,18 +2149,18 @@ int CGXDLMS::HandleGbt(CGXDLMSSettings& settings, CGXReplyData& data)
         {
             std::string str;
             str.append("Data length is ");
-            str.append(std::to_string(len));
+            str.append(GXHelpers::IntToString(len));
             str.append("and there are ");
-            str.append(std::to_string(data.GetData().GetSize() - data.GetData().GetPosition()));
+            str.append(GXHelpers::IntToString(data.GetData().GetSize() - data.GetData().GetPosition()));
             str.append(" bytes.");
             data.GetXml()->AppendComment(str);
         }
         data.GetXml()->AppendStartTag(DLMS_COMMAND_GENERAL_BLOCK_TRANSFER);
         if (data.GetXml()->GetComments())
         {
-            data.GetXml()->AppendComment("Last block: " + std::to_string(((bc & 0x80) != 0)));
-            data.GetXml()->AppendComment("Streaming: " + std::to_string(data.GetStreaming()));
-            data.GetXml()->AppendComment("Window size: " + std::to_string(windowSize));
+            data.GetXml()->AppendComment("Last block: " + GXHelpers::IntToString(((bc & 0x80) != 0)));
+            data.GetXml()->AppendComment("Streaming: " + GXHelpers::IntToString(data.GetStreaming()));
+            data.GetXml()->AppendComment("Window size: " + GXHelpers::IntToString(windowSize));
         }
         std::string str;
         data.GetXml()->IntegerToHex((long)bc, 2, str);

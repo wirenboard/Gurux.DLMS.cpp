@@ -632,13 +632,8 @@ std::string CGXByteBuffer::ToHexString(unsigned long position, unsigned long cou
 
 void CGXByteBuffer::AddIntAsString(int value)
 {
-    char buff[20];
-#if _MSC_VER > 1000
-    sprintf_s(buff, 20, "%d", value);
-#else
-    sprintf(buff, "%d", value);
-#endif
-    CGXByteBuffer::AddString(buff);
+    std::string str = GXHelpers::IntToString(value);
+    CGXByteBuffer::AddString(str.c_str());
 }
 
 void CGXByteBuffer::AddDoubleAsString(double value)
@@ -746,4 +741,26 @@ CGXByteBuffer& CGXByteBuffer::operator=(CGXByteBuffer& value)
         Set(&value, 0, (unsigned long)-1);
     }
     return *this;
+}
+
+void CGXByteBuffer::SetHexString(std::string& value)
+{
+    CGXByteBuffer tmp;
+    GXHelpers::HexToBytes(value, tmp);
+    Set(&tmp);
+}
+
+void CGXByteBuffer::SetHexString(std::string value)
+{
+    CGXByteBuffer tmp;
+    GXHelpers::HexToBytes(value, tmp);
+    Set(&tmp);
+}
+
+void CGXByteBuffer::SetHexString(char* value)
+{
+    CGXByteBuffer tmp;
+    std::string str = value;
+    GXHelpers::HexToBytes(str, tmp);
+    Set(&tmp);
 }

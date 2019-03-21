@@ -163,25 +163,20 @@ CGXDLMSSettings& CGXDLMSServer::GetSettings()
     return m_Settings;
 }
 
-CGXByteBuffer& CGXDLMSServer::GetCtoSChallenge()
-{
-    return m_Settings.GetCtoSChallenge();
-}
-
 CGXByteBuffer& CGXDLMSServer::GetStoCChallenge()
 {
     return m_Settings.GetStoCChallenge();
-}
-
-DLMS_INTERFACE_TYPE CGXDLMSServer::GetInterfaceType()
-{
-    return m_Settings.GetInterfaceType();
 }
 
 void CGXDLMSServer::SetStoCChallenge(CGXByteBuffer& value)
 {
     m_Settings.SetUseCustomChallenge(value.GetSize() != 0);
     m_Settings.SetStoCChallenge(value);
+}
+
+DLMS_INTERFACE_TYPE CGXDLMSServer::GetInterfaceType()
+{
+    return m_Settings.GetInterfaceType();
 }
 
 void CGXDLMSServer::SetStartingPacketIndex(int value)
@@ -401,7 +396,10 @@ int CGXDLMSServer::HandleAarqRequest(
     DLMS_ASSOCIATION_RESULT result;
     DLMS_SOURCE_DIAGNOSTIC diagnostic;
     m_Settings.GetCtoSChallenge().Clear();
-    m_Settings.GetStoCChallenge().Clear();
+    if (!m_Settings.GetUseCustomChallenge())
+    {
+        m_Settings.GetStoCChallenge().Clear();
+    }
     if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER)
     {
         Reset(true);
@@ -472,13 +470,15 @@ int CGXDLMSServer::HandleAarqRequest(
     if (m_Settings.GetAuthentication() > DLMS_AUTHENTICATION_LOW)
     {
         // If High authentication is used.
-        CGXByteBuffer challenge;
-        if ((ret = CGXSecure::GenerateChallenge(m_Settings.GetAuthentication(), challenge)) != 0)
+        if (!m_Settings.GetUseCustomChallenge())
         {
-            return ret;
+            CGXByteBuffer challenge;
+            if ((ret = CGXSecure::GenerateChallenge(m_Settings.GetAuthentication(), challenge)) != 0)
+            {
+                return ret;
+            }
+            m_Settings.SetStoCChallenge(challenge);
         }
-        m_Settings.SetStoCChallenge(challenge);
-
         if (m_Settings.GetUseLogicalNameReferencing())
         {
             unsigned char l[] = { 0,0,40,0,0,255 };

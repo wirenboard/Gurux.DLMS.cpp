@@ -207,6 +207,15 @@ public:
     void SetUInt32ByIndexLE(unsigned long index, unsigned long item);
 
     CGXByteBuffer& operator=(CGXByteBuffer& value);
+
+    //Push the given hex string as byte array into this buffer at the current position, and then increments the position.
+    void SetHexString(std::string& value);
+
+    //Push the given hex string as byte array into this buffer at the current position, and then increments the position.
+    void SetHexString(std::string value);
+
+        //Push the given hex string as byte array into this buffer at the current position, and then increments the position.
+    void SetHexString(char* value);
 };
 
 #endif //GXBYTEBUFFER_H

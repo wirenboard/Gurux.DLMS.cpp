@@ -100,14 +100,14 @@ std::string CGXDLMSTarget::ToString()
         return "";
     }
     std::string ln;
-    std::string str = std::to_string(m_Target->GetObjectType());
+    std::string str = GXHelpers::IntToString(m_Target->GetObjectType());
     str.append(" ");
     m_Target->GetLogicalName(ln);
     str.append(ln);
     str.append(" ");
-    str.append(std::to_string(m_AttributeIndex));
+    str.append(GXHelpers::IntToString(m_AttributeIndex));
     str.append(" ");
-    str.append(std::to_string(m_DataIndex));
+    str.append(GXHelpers::IntToString(m_DataIndex));
     str.append(" ");
     str.append(m_Value.ToString());
     return str;

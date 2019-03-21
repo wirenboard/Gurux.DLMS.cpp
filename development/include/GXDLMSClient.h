@@ -692,5 +692,14 @@ public:
         std::vector<CGXDLMSVariant>& data,
         std::vector<std::pair<CGXDLMSObject*, unsigned char> >& items);
 
+    /*
+    Set custom challenge.
+    */
+    void SetCtoSChallenge(CGXByteBuffer& value);
+
+    /*
+    Get custom challenge.
+    */
+    CGXByteBuffer& GetCtoSChallenge();
 };
 #endif //GXDLMSCLIENT_H

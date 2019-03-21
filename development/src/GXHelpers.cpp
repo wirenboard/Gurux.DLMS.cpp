@@ -2365,7 +2365,7 @@ unsigned char GXHelpers::GetValue(char c)
     return value;
 }
 
-void GXHelpers::HexToBytes(std::string value, CGXByteBuffer& buffer)
+void GXHelpers::HexToBytes(std::string& value, CGXByteBuffer& buffer)
 {
     buffer.Clear();
     buffer.Capacity((unsigned long)(value.length() / 2));
@@ -2498,4 +2498,15 @@ std::string GXHelpers::GeneralizedTime(struct tm* date)
     sprintf(tmp, "%.4d%.2d%.2d%.2d%.2d%.2dZ", date->tm_year, date->tm_mon, date->tm_mday, date->tm_hour, date->tm_min, date->tm_sec);
 #endif
     return tmp;
+}
+
+std::string GXHelpers::IntToString(int value)
+{
+    char buff[20];
+#if _MSC_VER > 1000
+    sprintf_s(buff, 20, "%d", value);
+#else
+    sprintf(buff, "%d", value);
+#endif
+    return buff;
 }

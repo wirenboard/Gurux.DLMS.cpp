@@ -115,14 +115,14 @@ void CGXDLMSAccount::GetValues(std::vector<std::string>& values)
     std::string ln;
     GetLogicalName(ln);
     values.push_back(ln);
-    ln = std::to_string(m_PaymentMode) + ", " + std::to_string(m_AccountStatus);
+    ln = GXHelpers::IntToString(m_PaymentMode) + ", " + GXHelpers::IntToString(m_AccountStatus);
     values.push_back(ln);
-    values.push_back(std::to_string(m_CurrentCreditInUse));
-    values.push_back(std::to_string(m_CurrentCreditStatus));
-    values.push_back(std::to_string(m_AvailableCredit));
-    values.push_back(std::to_string(m_AmountToClear));
-    values.push_back(std::to_string(m_ClearanceThreshold));
-    values.push_back(std::to_string(m_AggregatedDebt));
+    values.push_back(GXHelpers::IntToString(m_CurrentCreditInUse));
+    values.push_back(GXHelpers::IntToString(m_CurrentCreditStatus));
+    values.push_back(GXHelpers::IntToString(m_AvailableCredit));
+    values.push_back(GXHelpers::IntToString(m_AmountToClear));
+    values.push_back(GXHelpers::IntToString(m_ClearanceThreshold));
+    values.push_back(GXHelpers::IntToString(m_AggregatedDebt));
     AppendList(m_CreditReferences, ln);
     values.push_back(ln);
     AppendList(m_ChargeReferences, ln);
@@ -134,10 +134,10 @@ void CGXDLMSAccount::GetValues(std::vector<std::string>& values)
     values.push_back(m_AccountActivationTime.ToString());
     values.push_back(m_AccountClosureTime.ToString());
     values.push_back(m_Currency.ToString());
-    values.push_back(std::to_string(m_LowCreditThreshold));
-    values.push_back(std::to_string(m_NextCreditAvailableThreshold));
-    values.push_back(std::to_string(m_MaxProvision));
-    values.push_back(std::to_string(m_MaxProvisionPeriod));
+    values.push_back(GXHelpers::IntToString(m_LowCreditThreshold));
+    values.push_back(GXHelpers::IntToString(m_NextCreditAvailableThreshold));
+    values.push_back(GXHelpers::IntToString(m_MaxProvision));
+    values.push_back(GXHelpers::IntToString(m_MaxProvisionPeriod));
 }
 
 void CGXDLMSAccount::GetAttributeIndexToRead(std::vector<int>& attributes)

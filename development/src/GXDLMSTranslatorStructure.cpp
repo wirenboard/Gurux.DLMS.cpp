@@ -440,7 +440,7 @@ int CGXDLMSTranslatorStructure::IntegerToHex(long value, int desimals, bool forc
 {
     if (m_ShowNumericsAsHex && m_OutputType == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
     {
-        std::string f = "%." + std::to_string(desimals);
+        std::string f = "%." + GXHelpers::IntToString(desimals);
         f.append("X");
 #if _MSC_VER > 1000
         sprintf_s(tmp, 20, f.c_str(), value);
@@ -464,7 +464,7 @@ int CGXDLMSTranslatorStructure::IntegerToHex(unsigned long value, int desimals, 
 {
     if (m_ShowNumericsAsHex && m_OutputType == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
     {
-        std::string f = "%." + std::to_string(desimals);
+        std::string f = "%." + GXHelpers::IntToString(desimals);
         f.append("X");
 #if _MSC_VER > 1000
         sprintf_s(tmp, 20, f.c_str(), value);

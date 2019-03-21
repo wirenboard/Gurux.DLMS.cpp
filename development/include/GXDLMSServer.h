@@ -91,7 +91,7 @@ private:
     * @return Returns returned UA packet.
     */
     int HandleSnrmRequest(CGXDLMSSettings& settings, CGXByteBuffer& data, CGXByteBuffer& reply);
- 
+
     /**
     * Reset settings when connection is made or close.
     *
@@ -133,7 +133,7 @@ private:
     int HandleAarqRequest(
         CGXByteBuffer& data,
         CGXDLMSConnectionEventArgs& connectionInfo);
- 
+
     /**
     * Count how many rows can fit to one PDU.
     *
@@ -371,19 +371,9 @@ public:
     void SetWrapper(CGXDLMSTcpUdpSetup* value);
 
     /**
-     * @return Client to Server challenge.
-     */
-    CGXByteBuffer& GetCtoSChallenge();
-
-    /**
-     * @return Server to Client challenge.
+     * @return Server to client challenge.
      */
     CGXByteBuffer& GetStoCChallenge();
-
-    /**
-     * @return Interface type.
-     */
-    DLMS_INTERFACE_TYPE GetInterfaceType();
 
     /**
      * Server to Client custom challenge. This is for debugging purposes. Reset
@@ -394,6 +384,11 @@ public:
      */
     void SetStoCChallenge(
         CGXByteBuffer& value);
+
+    /**
+     * @return Interface type.
+     */
+    DLMS_INTERFACE_TYPE GetInterfaceType();
 
     /**
      * Set starting packet index. Default is One based, but some meters use Zero

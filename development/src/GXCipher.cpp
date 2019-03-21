@@ -691,28 +691,6 @@ int CGXCipher::Encrypt(
     return 0;
 }
 
-/// <summary>
-/// Are tags equals.
-/// </summary>
-/// <param name="tag1"></param>
-/// <param name="tag2"></param>
-/// <returns></returns>
-static bool TagsEquals(CGXByteBuffer& tag1, CGXByteBuffer& tag2)
-{
-    if (tag1.GetSize() < 12 || tag2.GetSize() < 12)
-    {
-        return false;
-    }
-    for (int pos = 0; pos != 12; ++pos)
-    {
-        if (tag1.GetData()[pos] != tag2.GetData()[pos])
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
 int CGXCipher::Decrypt(
     CGXByteBuffer& title,
     CGXByteBuffer& key,
@@ -830,7 +808,7 @@ int CGXCipher::Decrypt(
         DLMS_COUNT_TYPE_DATA,
         frameCounter,
         0,
-        title,
+        *pTitle,
         key,
         ciphertext,
         data)) != 0)

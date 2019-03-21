@@ -33,6 +33,7 @@
 //---------------------------------------------------------------------------
 
 #include "../include/GXTokenGatewayConfiguration.h"
+#include "../include/GXHelpers.h"
 
 CGXTokenGatewayConfiguration::CGXTokenGatewayConfiguration()
 {
@@ -58,6 +59,6 @@ std::string CGXTokenGatewayConfiguration::ToString()
 {
     std::string str = m_CreditReference;
     str.append(", ");
-    str.append(std::to_string(m_TokenProportion));
+    str.append(GXHelpers::IntToString(m_TokenProportion));
     return str;
 }

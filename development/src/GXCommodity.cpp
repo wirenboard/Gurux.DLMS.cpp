@@ -75,11 +75,11 @@ void CGXCommodity::SetIndex(unsigned char value)
 std::string CGXCommodity::ToString()
 {
     std::string ln;
-    std::string str = std::to_string(m_Type);
+    std::string str = GXHelpers::IntToString(m_Type);
     str.append(" ");
     GXHelpers::GetLogicalName(m_LogicalName, ln);
     str.append(ln);
     str.append(" ");
-    str = std::to_string(m_Index);
+    str = GXHelpers::IntToString(m_Index);
     return str;
 }

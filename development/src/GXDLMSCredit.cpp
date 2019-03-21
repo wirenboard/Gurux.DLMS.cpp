@@ -72,15 +72,15 @@ void CGXDLMSCredit::GetValues(std::vector<std::string>& values)
     std::string ln;
     GetLogicalName(ln);
     values.push_back(ln);
-    values.push_back(std::to_string(m_CurrentCreditAmount));
-    values.push_back(std::to_string(m_Type));
-    values.push_back(std::to_string(m_Priority));
-    values.push_back(std::to_string(m_WarningThreshold));
-    values.push_back(std::to_string(m_Limit));
-    values.push_back(std::to_string(m_CreditConfiguration));
-    values.push_back(std::to_string(m_Status));
-    values.push_back(std::to_string(m_PresetCreditAmount));
-    values.push_back(std::to_string(m_CreditAvailableThreshold));
+    values.push_back(GXHelpers::IntToString(m_CurrentCreditAmount));
+    values.push_back(GXHelpers::IntToString(m_Type));
+    values.push_back(GXHelpers::IntToString(m_Priority));
+    values.push_back(GXHelpers::IntToString(m_WarningThreshold));
+    values.push_back(GXHelpers::IntToString(m_Limit));
+    values.push_back(GXHelpers::IntToString(m_CreditConfiguration));
+    values.push_back(GXHelpers::IntToString(m_Status));
+    values.push_back(GXHelpers::IntToString(m_PresetCreditAmount));
+    values.push_back(GXHelpers::IntToString(m_CreditAvailableThreshold));
     values.push_back(m_Period.ToString());
 }
 

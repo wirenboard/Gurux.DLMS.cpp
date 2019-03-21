@@ -130,7 +130,7 @@ public:
     /*
      * value: Template description.
      */
-    void SetTemplateDescription(CGXByteBuffer&& value);
+    void SetTemplateDescription(CGXByteBuffer& value);
 
     /*
      * Returns Capture method.

@@ -537,9 +537,9 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
         if (cnt != value.GetSize() - value.GetPosition())
         {
             std::string tmp = "Invalid length: ";
-            tmp.append(std::to_string(cnt));
+            tmp.append(GXHelpers::IntToString(cnt));
             tmp.append(". It should be: ");
-            tmp.append(std::to_string(value.Available()));
+            tmp.append(GXHelpers::IntToString(value.Available()));
             xml->AppendComment(tmp);
         }
         str = value.ToHexString(value.GetPosition(), value.Available(), false);
@@ -636,7 +636,7 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
         tmp.Clear();
         tmp.Set(&value, value.GetPosition(), len);
         xml->AppendStartTag((DLMS_COMMAND)cmd);
-        str = std::to_string(id);
+        str = GXHelpers::IntToString(id);
         xml->AppendLine(DLMS_TRANSLATOR_TAGS_NETWORK_ID, NULL, str);
         str = tmp.ToHexString(0, len, false);
         xml->AppendLine(DLMS_TRANSLATOR_TAGS_PHYSICAL_DEVICE_ADDRESS, NULL, str);

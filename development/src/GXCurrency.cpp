@@ -33,6 +33,7 @@
 //---------------------------------------------------------------------------
 
 #include "../include/GXCurrency.h"
+#include "../include/GXHelpers.h"
 
 // Constructor.
 CGXCurrency::CGXCurrency()
@@ -96,8 +97,8 @@ std::string CGXCurrency::ToString()
 {
     std::string str = m_Name;
     str.append(", ");
-    str.append(std::to_string(m_Scale));
+    str.append(GXHelpers::IntToString(m_Scale));
     str.append(", ");
-    str.append(std::to_string(m_Unit));
+    str.append(GXHelpers::IntToString(m_Unit));
     return str;
 }

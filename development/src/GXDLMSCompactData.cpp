@@ -90,7 +90,7 @@ CGXByteBuffer& CGXDLMSCompactData::GetTemplateDescription() {
     return m_TemplateDescription;
 }
 
-void CGXDLMSCompactData::SetTemplateDescription(CGXByteBuffer&& value) {
+void CGXDLMSCompactData::SetTemplateDescription(CGXByteBuffer& value) {
     m_TemplateDescription = value;
 }
 
@@ -139,9 +139,9 @@ void CGXDLMSCompactData::GetValues(std::vector<std::string>& values)
     sb << ']';
     values.push_back(sb.str());
     values.push_back(ln);
-    values.push_back(std::to_string(m_TemplateId));
+    values.push_back(GXHelpers::IntToString(m_TemplateId));
     values.push_back(m_TemplateDescription.ToString());
-    values.push_back(std::to_string(m_CaptureMethod));
+    values.push_back(GXHelpers::IntToString(m_CaptureMethod));
 }
 
 void CGXDLMSCompactData::GetAttributeIndexToRead(std::vector<int>& attributes)

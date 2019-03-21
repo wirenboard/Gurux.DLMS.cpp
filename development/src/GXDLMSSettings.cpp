@@ -36,7 +36,7 @@
 
 CGXDLMSSettings::CGXDLMSSettings(bool isServer)
 {
-    m_CustomChallenges = false;
+    m_UseCustomChallenge = false;
     m_BlockIndex = 1;
     m_Connected = DLMS_CONNECTION_STATE_NONE;
     m_DlmsVersionNumber = DLMS_VERSION;
@@ -76,10 +76,7 @@ CGXByteBuffer& CGXDLMSSettings::GetCtoSChallenge()
 
 void CGXDLMSSettings::SetCtoSChallenge(CGXByteBuffer& value)
 {
-    if (!m_CustomChallenges || m_CtoSChallenge.GetSize() == 0)
-    {
-        m_CtoSChallenge = value;
-    }
+    m_CtoSChallenge = value;
 }
 
 CGXByteBuffer& CGXDLMSSettings::GetStoCChallenge()
@@ -89,10 +86,7 @@ CGXByteBuffer& CGXDLMSSettings::GetStoCChallenge()
 
 void CGXDLMSSettings::SetStoCChallenge(CGXByteBuffer& value)
 {
-    if (!m_CustomChallenges || m_StoCChallenge.GetSize() == 0)
-    {
-        m_StoCChallenge = value;
-    }
+    m_StoCChallenge = value;
 }
 
 DLMS_AUTHENTICATION CGXDLMSSettings::GetAuthentication()
@@ -387,7 +381,7 @@ void CGXDLMSSettings::UpdateInvokeId(unsigned char value) {
     if ((value & 0x40) != 0) {
         m_ServiceClass = DLMS_SERVICE_CLASS_CONFIRMED;
     }
-    else 
+    else
     {
         m_ServiceClass = DLMS_SERVICE_CLASS_UN_CONFIRMED;
     }
@@ -414,14 +408,14 @@ CGXDLMSObjectCollection& CGXDLMSSettings::GetObjects()
     return m_Objects;
 }
 
-bool CGXDLMSSettings::IsCustomChallenges()
+bool CGXDLMSSettings::GetUseCustomChallenge()
 {
-    return m_CustomChallenges;
+    return m_UseCustomChallenge;
 }
 
 void CGXDLMSSettings::SetUseCustomChallenge(bool value)
 {
-    m_CustomChallenges = value;
+    m_UseCustomChallenge = value;
 }
 
 DLMS_CONNECTION_STATE CGXDLMSSettings::GetConnected()

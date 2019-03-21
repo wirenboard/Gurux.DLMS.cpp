@@ -612,12 +612,15 @@ int CGXDLMSClient::AARQRequest(std::vector<CGXByteBuffer>& packets)
     // If authentication or ciphering is used.
     if (m_Settings.GetAuthentication() > DLMS_AUTHENTICATION_LOW)
     {
-        CGXByteBuffer challenge;
-        if ((ret = CGXSecure::GenerateChallenge(m_Settings.GetAuthentication(), challenge)) != 0)
+        if (!m_Settings.GetUseCustomChallenge())
         {
-            return ret;
+            CGXByteBuffer challenge;
+            if ((ret = CGXSecure::GenerateChallenge(m_Settings.GetAuthentication(), challenge)) != 0)
+            {
+                return ret;
+            }
+            m_Settings.SetCtoSChallenge(challenge);
         }
-        m_Settings.SetCtoSChallenge(challenge);
     }
     else
     {
@@ -1213,7 +1216,7 @@ int CGXDLMSClient::Write(
             if ((ret = pObject->GetDataType(index, type)) != 0)
             {
                 return ret;
-            }           
+            }
             if ((ret = GXHelpers::SetData(data, type, value)) != 0)
             {
                 return ret;
@@ -1675,4 +1678,15 @@ int CGXDLMSClient::ParsePushObjects(std::vector<CGXDLMSVariant>& data, std::vect
         }
     }
     return 0;
+}
+
+void CGXDLMSClient::SetCtoSChallenge(CGXByteBuffer& value)
+{
+    m_Settings.SetUseCustomChallenge(value.GetSize() != 0);
+    m_Settings.SetCtoSChallenge(value);
+}
+
+CGXByteBuffer& CGXDLMSClient::GetCtoSChallenge()
+{
+    return m_Settings.GetCtoSChallenge();
 }

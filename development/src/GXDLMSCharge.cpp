@@ -72,18 +72,18 @@ void CGXDLMSCharge::GetValues(std::vector<std::string>& values)
     std::string ln;
     GetLogicalName(ln);
     values.push_back(ln);
-    values.push_back(std::to_string(m_TotalAmountPaid));
-    values.push_back(std::to_string(m_ChargeType));
-    values.push_back(std::to_string(m_Priority));
+    values.push_back(GXHelpers::IntToString(m_TotalAmountPaid));
+    values.push_back(GXHelpers::IntToString(m_ChargeType));
+    values.push_back(GXHelpers::IntToString(m_Priority));
     values.push_back(m_UnitChargeActive.ToString());
     values.push_back(m_UnitChargePassive.ToString());
     values.push_back(m_UnitChargeActivationTime.ToString());
-    values.push_back(std::to_string(m_Period));
+    values.push_back(GXHelpers::IntToString(m_Period));
     values.push_back(m_ChargeConfiguration);
     values.push_back(m_LastCollectionTime.ToString());
-    values.push_back(std::to_string(m_LastCollectionAmount));
-    values.push_back(std::to_string(m_TotalAmountRemaining));
-    values.push_back(std::to_string(m_Proportion));
+    values.push_back(GXHelpers::IntToString(m_LastCollectionAmount));
+    values.push_back(GXHelpers::IntToString(m_TotalAmountRemaining));
+    values.push_back(GXHelpers::IntToString(m_Proportion));
 }
 
 void CGXDLMSCharge::GetAttributeIndexToRead(std::vector<int>& attributes)

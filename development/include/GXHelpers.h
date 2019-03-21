@@ -176,7 +176,7 @@ public:
      *            byte array.
      * @return Occurred error.
      */
-    static void HexToBytes(std::string value, CGXByteBuffer& buffer);
+    static void HexToBytes(std::string& value, CGXByteBuffer& buffer);
 
     static void Write(char* fileName, char* pData, int len);
 
@@ -209,5 +209,8 @@ public:
     static void ToBitString(CGXByteBuffer& sb, unsigned char value, int count);
 
     static std::string GeneralizedTime(struct tm* date);
+
+    //Convert int value to string.
+    static std::string IntToString(int value);
 };
 #endif //GXHELPERS_H
