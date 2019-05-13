@@ -124,7 +124,8 @@ private:
         CGXReplyData& reply,
         int index);
 
-    static int HandledGloRequest(CGXDLMSSettings& settings,
+    static int HandledGloRequest(
+        CGXDLMSSettings& settings,
         CGXReplyData& data);
 
     static int HandledGloResponse(
@@ -134,6 +135,11 @@ private:
     static int HandleGeneralCiphering(
         CGXDLMSSettings& settings,
         CGXReplyData& data);
+
+
+    static int HandleGetResponseWithList(
+        CGXDLMSSettings& settings,
+        CGXReplyData& reply);
 
 public:
 

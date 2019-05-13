@@ -23,30 +23,30 @@
     <ProjectGuid>{9E063408-C11A-4C0C-BEAA-9D07E2E0A00A}</ProjectGuid>
     <RootNamespace>GuruxDLMS</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -225,6 +225,7 @@
     <ClCompile Include="..\src\GXDLMSTokenGateway.cpp" />
     <ClCompile Include="..\src\GXDLMSTranslator.cpp" />
     <ClCompile Include="..\src\GXDLMSTranslatorStructure.cpp" />
+    <ClCompile Include="..\src\GXDLMSUtilityTables.cpp" />
     <ClCompile Include="..\src\GXDLMSValueEventArg.cpp" />
     <ClCompile Include="..\src\GXDLMSVariant.cpp" />
     <ClCompile Include="..\src\GXDLMSWeekProfile.cpp" />
@@ -346,6 +347,7 @@
     <ClInclude Include="..\include\GXDLMSTokenGateway.h" />
     <ClInclude Include="..\include\GXDLMSTranslator.h" />
     <ClInclude Include="..\include\GXDLMSTranslatorStructure.h" />
+    <ClInclude Include="..\include\GXDLMSUtilityTables.h" />
     <ClInclude Include="..\include\GXDLMSValueEventArg.h" />
     <ClInclude Include="..\include\GXDLMSValueEventCollection.h" />
     <ClInclude Include="..\include\GXDLMSVariant.h" />

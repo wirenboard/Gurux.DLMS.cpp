@@ -396,7 +396,7 @@ int CGXDLMSLimiter::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         CGXDLMSVariant index = m_MonitoredAttributeIndex;
         CGXDLMSVariant tmp;
         GXHelpers::SetLogicalName(ln.c_str(), tmp);
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_INT16, type)) != 0 ||
+        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, type)) != 0 ||
             (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0 ||
             (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_INT8, index)) != 0)
         {

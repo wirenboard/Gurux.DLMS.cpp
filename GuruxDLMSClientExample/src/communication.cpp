@@ -1064,18 +1064,12 @@ int CGXCommunication::ReadList(
         {
             return ret;
         }
-        if (list.size() != 1 && reply.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
+        if (reply.GetValue().vt == DLMS_DATA_TYPE_ARRAY)
         {
             values.insert(values.end(), reply.GetValue().Arr.begin(), reply.GetValue().Arr.end());
         }
-        else if (reply.GetValue().vt != DLMS_DATA_TYPE_NONE)
-        {
-            // Value is null if data is send multiple frames.
-            values.push_back(reply.GetValue());
-        }
         reply.Clear();
     }
-
     if (values.size() != list.size())
     {
         //Invalid reply. Read items count do not match.

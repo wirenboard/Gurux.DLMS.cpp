@@ -339,6 +339,9 @@
     <ClCompile Include="..\src\GXDLMSCompactData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\GXDLMSUtilityTables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Enums.h">
@@ -723,6 +726,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\TranslatorSimpleTags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GXDLMSUtilityTables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

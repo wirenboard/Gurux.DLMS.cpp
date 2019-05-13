@@ -54,6 +54,13 @@ CGXDLMSLNParameters::CGXDLMSLNParameters(
     m_MultipleBlocks = settings->GetCount() != settings->GetIndex();
     m_LastBlock = settings->GetCount() == settings->GetIndex();
     m_InvokeId = invokeId;
+    if (settings != NULL) {
+        settings->SetCommand(command);
+        if (command == DLMS_COMMAND_GET_REQUEST && commandType != DLMS_GET_COMMAND_TYPE_NEXT_DATA_BLOCK)
+        {
+            settings->SetCommandType(commandType);
+        }
+    }
 }
 
 CGXDLMSSettings* CGXDLMSLNParameters::GetSettings()

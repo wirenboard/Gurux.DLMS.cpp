@@ -36,7 +36,7 @@
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
 #include <tchar.h>
 #include <conio.h>
-#include <Winsock.h> //Add support for sockets	
+#include <Winsock.h> //Add support for sockets
 #include <time.h>
 #include <process.h>//Add support for threads
 #else //Linux includes.
@@ -1043,7 +1043,7 @@ time_t imageActionStartTime;
 void HandleImageTransfer(CGXDLMSValueEventArg* e)
 {
     CGXDLMSImageTransfer* i = (CGXDLMSImageTransfer*)e->GetTarget();
-    //Image name and size to transfer 
+    //Image name and size to transfer
     FILE *f;
     if (e->GetIndex() == 1)
     {
@@ -1057,7 +1057,7 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
         char *p = strrchr(IMAGEFILE, '\\');
         ++p;
         *p = '\0';
-#if defined(_WIN32) || defined(_WIN64)//If Windows 
+#if defined(_WIN32) || defined(_WIN64)//If Windows
         strncat_s(IMAGEFILE, (char*)e->GetParameters().Arr[0].byteArr, (int)e->GetParameters().Arr[0].GetSize());
         strcat_s(IMAGEFILE, ".bin");
 #else
@@ -1067,7 +1067,7 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
         printf("Updating image %s Size: %d\n", IMAGEFILE, imageSize);
 #endif
-#if defined(_WIN32) || defined(_WIN64)//If Windows 
+#if defined(_WIN32) || defined(_WIN64)//If Windows
         fopen_s(&f, IMAGEFILE, "wb");
 #else
         f = fopen(IMAGEFILE, "wb");
@@ -1091,7 +1091,7 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
             return;
         }
         i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_INITIATED);
-#if defined(_WIN32) || defined(_WIN64)//If Windows 
+#if defined(_WIN32) || defined(_WIN64)//If Windows
         fopen_s(&f, IMAGEFILE, "ab");
 #else
         f = fopen(IMAGEFILE, "ab");
@@ -1118,7 +1118,7 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
     else if (e->GetIndex() == 3)
     {
         i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_VERIFICATION_INITIATED);
-#if defined(_WIN32) || defined(_WIN64)//If Windows 
+#if defined(_WIN32) || defined(_WIN64)//If Windows
         fopen_s(&f, IMAGEFILE, "rb");
 #else
         f = fopen(IMAGEFILE, "rb");
@@ -1234,7 +1234,7 @@ void Capture(CGXDLMSProfileGeneric* pg)
             {
                 char tmp[20];
                 // Generate random value here.
-#if defined(_WIN32) || defined(_WIN64)//If Windows 
+#if defined(_WIN32) || defined(_WIN64)//If Windows
                 sprintf_s(tmp, "%d", ++cnt);
 #else
                 sprintf(tmp, "%d", ++cnt);

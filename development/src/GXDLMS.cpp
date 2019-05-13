@@ -2654,6 +2654,50 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
     return ret;
 }
 
+int CGXDLMS::HandleGetResponseWithList(
+    CGXDLMSSettings& settings,
+    CGXReplyData& reply)
+{
+    int ret;
+    unsigned char ch;
+    unsigned long count;
+    CGXDLMSVariant values;
+    values.vt = DLMS_DATA_TYPE_ARRAY;
+    CGXByteBuffer& data = reply.GetData();
+    // Get response with list.
+    //Get count.
+    if ((ret = GXHelpers::GetObjectCount(data, count)) != 0)
+    {
+        return ret;
+    }
+    for (unsigned short pos = 0; pos != (unsigned short)count; ++pos)
+    {
+        // Result
+        if ((ret = data.GetUInt8(&ch)) != 0)
+        {
+            return ret;
+        }
+        if (ch != 0)
+        {
+            if ((ret = data.GetUInt8(&ch)) != 0)
+            {
+                return ret;
+            }
+            return ch;
+        }
+        else
+        {
+            reply.SetReadPosition(reply.GetData().GetPosition());
+            GetValueFromData(settings, reply);
+            reply.GetData().SetPosition(reply.GetReadPosition());
+            values.Arr.push_back(reply.GetValue());
+            reply.GetValue().Clear();
+        }
+    }
+    reply.SetValue(values);
+    return 0;
+}
+
 int CGXDLMS::HandleGetResponse(
     CGXDLMSSettings& settings,
     CGXReplyData& reply,
@@ -2688,7 +2732,7 @@ int CGXDLMS::HandleGetResponse(
         reply.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_INVOKE_ID, "", str);
     }
     // Response normal
-    if (type == 1)
+    if (type == DLMS_GET_COMMAND_TYPE_NORMAL)
     {
         if (data.Available() == 0)
         {
@@ -2742,7 +2786,7 @@ int CGXDLMS::HandleGetResponse(
             }
         }
     }
-    else if (type == 2)
+    else if (type == DLMS_GET_COMMAND_TYPE_NEXT_DATA_BLOCK)
     {
         // GetResponsewithDataBlock
         // Is Last block.
@@ -2789,79 +2833,56 @@ int CGXDLMS::HandleGetResponse(
             }
             return ch;
         }
+        // Get data size.
+        GXHelpers::GetObjectCount(data, count);
+        // if whole block is read.
+        if ((reply.GetMoreData() & DLMS_DATA_REQUEST_TYPES_FRAME) == 0)
+        {
+            // Check Block length.
+            if (count > (unsigned long)(data.Available()))
+            {
+                return DLMS_ERROR_CODE_OUTOFMEMORY;
+            }
+            reply.SetCommand(DLMS_COMMAND_NONE);
+        }
+        if (count == 0)
+        {
+            // If meter sends empty data block.
+            data.SetSize(index);
+        }
         else
         {
-            // Get data size.
-            GXHelpers::GetObjectCount(data, count);
-            // if whole block is read.
-            if ((reply.GetMoreData() & DLMS_DATA_REQUEST_TYPES_FRAME) == 0)
-            {
-                // Check Block length.
-                if (count > (unsigned long)(data.Available()))
-                {
-                    return DLMS_ERROR_CODE_OUTOFMEMORY;
-                }
-                reply.SetCommand(DLMS_COMMAND_NONE);
-            }
-            if (count == 0)
-            {
-                // If meter sends empty data block.
-                data.SetSize(index);
-            }
-            else
-            {
-                if ((ret = GetDataFromBlock(data, index)) != 0)
-                {
-                    return ret;
-                }
-            }
-            // If last packet and data is not try to peek.
-            if (reply.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE)
-            {
-                if (!reply.GetPeek())
-                {
-                    data.SetPosition(0);
-                    settings.ResetBlockIndex();
-                }
-            }
-        }
-    }
-    else if (type == 3)
-    {
-        CGXDLMSVariant values;
-        values.vt = DLMS_DATA_TYPE_ARRAY;
-        // Get response with list.
-        //Get count.
-        if ((ret = GXHelpers::GetObjectCount(data, count)) != 0)
-        {
-            return ret;
-        }
-        for (unsigned short pos = 0; pos != (unsigned short)count; ++pos)
-        {
-            // Result
-            if ((ret = data.GetUInt8(&ch)) != 0)
+            if ((ret = GetDataFromBlock(data, index)) != 0)
             {
                 return ret;
             }
-            if (ch != 0)
+        }
+        // If last packet and data is not try to peek.
+        if (reply.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE)
+        {
+            if (!reply.GetPeek())
             {
-                if ((ret = data.GetUInt8(&ch)) != 0)
-                {
-                    return ret;
-                }
-                return ch;
-            }
-            else
-            {
-                reply.SetReadPosition(reply.GetData().GetPosition());
-                GetValueFromData(settings, reply);
-                reply.GetData().SetPosition(reply.GetReadPosition());
-                values.Arr.push_back(reply.GetValue());
-                reply.GetValue().Clear();
+                data.SetPosition(0);
+                settings.ResetBlockIndex();
             }
         }
-        reply.SetValue(values);
-        return DLMS_ERROR_CODE_FALSE;
+        if (reply.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE &&
+            settings.GetCommand() == DLMS_COMMAND_GET_REQUEST
+            && settings.GetCommandType() == DLMS_GET_COMMAND_TYPE_WITH_LIST) {
+            if ((ret = HandleGetResponseWithList(settings, reply)) != 0)
+            {
+                return ret;
+            }
+            ret = DLMS_ERROR_CODE_FALSE;
+        }
+    }
+    else if (type == DLMS_GET_COMMAND_TYPE_WITH_LIST)
+    {
+        if ((ret = HandleGetResponseWithList(settings, reply)) != 0)
+        {
+            return ret;
+        }
+        ret = DLMS_ERROR_CODE_FALSE;
     }
     else
     {
