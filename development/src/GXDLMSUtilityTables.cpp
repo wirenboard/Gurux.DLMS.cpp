@@ -183,10 +183,12 @@ int CGXDLMSUtilityTables::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
         break;
     case 3:
         // Skip len.
+        ret = DLMS_ERROR_CODE_OK;
         break;
     case 4:
         m_Buffer.Clear();
         m_Buffer.Set(e.GetValue().byteArr, e.GetValue().GetSize());
+        ret = DLMS_ERROR_CODE_OK;
         break;
     default:
         ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
