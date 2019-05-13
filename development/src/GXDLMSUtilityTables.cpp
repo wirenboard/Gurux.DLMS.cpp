@@ -173,22 +173,21 @@ int CGXDLMSUtilityTables::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
 // Set value of given attribute.
 int CGXDLMSUtilityTables::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
-    int ret;
+    int ret = DLMS_ERROR_CODE_OK;
     switch (e.GetIndex()) {
     case 1:
         ret = SetLogicalName(this, e.GetValue());
         break;
     case 2:
         m_TableId = e.GetValue().ToInteger();
+        // Skip len.
         break;
     case 3:
         // Skip len.
-        ret = DLMS_ERROR_CODE_OK;
         break;
     case 4:
         m_Buffer.Clear();
         m_Buffer.Set(e.GetValue().byteArr, e.GetValue().GetSize());
-        ret = DLMS_ERROR_CODE_OK;
         break;
     default:
         ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
