@@ -2620,7 +2620,7 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
         {
             return ret;
         }
-        if (ret == DLMS_ERROR_CODE_FALSE)
+        if (ret == DLMS_ERROR_CODE_FALSE && target->IsComplete())
         {
             target = notify;
             isNotify = true;

@@ -1290,6 +1290,10 @@ int ParseProtocolVersion(CGXDLMSSettings& settings,
     {
         return ret;
     }
+    if (unusedBits > 8)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
     if ((ret = buff.GetUInt8(&value)) != 0)
     {
         return ret;
@@ -1847,7 +1851,12 @@ int CGXAPDU::ParsePDU2(
             }
             break;
         case BER_TYPE_CONTEXT: //0x80
-            ParseProtocolVersion(settings, buff);
+            if (ParseProtocolVersion(settings, buff) != 0)
+            {
+                result = DLMS_ASSOCIATION_RESULT_PERMANENT_REJECTED;
+                diagnostic = DLMS_SOURCE_DIAGNOSTIC_NO_REASON_GIVEN;
+                return 0;
+            }
             break;
         default:
             // Unknown tags.
