@@ -55,21 +55,8 @@ class CGXDLMSLNCommandHandler
         CGXDLMSServer* server,
         CGXByteBuffer& data,
         CGXByteBuffer* replyData,
-        CGXDLMSTranslatorStructure* xml);
-
-    /**
-    * Handle get request next data block command.
-    *
-    * @param data
-    *            Received data.
-    */
-    static int GetRequestNextDataBlock(
-        CGXDLMSSettings& settings,
-        unsigned char invokeID,
-        CGXDLMSServer* server,
-        CGXByteBuffer& data,
-        CGXByteBuffer* replyData,
-        CGXDLMSTranslatorStructure* xml);
+        CGXDLMSTranslatorStructure* xml,
+        unsigned char cipheredCommand);
 
     /**
      * Handle get request with list command.
@@ -83,7 +70,8 @@ class CGXDLMSLNCommandHandler
         CGXDLMSServer* server,
         CGXByteBuffer& data,
         CGXByteBuffer* replyData,
-        CGXDLMSTranslatorStructure* xml);
+        CGXDLMSTranslatorStructure* xml,
+        unsigned char cipheredCommand);
 
     static int HanleSetRequestWithDataBlock(
         CGXDLMSSettings& settings,
@@ -106,20 +94,38 @@ class CGXDLMSLNCommandHandler
         CGXDLMSServer* server,
         CGXByteBuffer& data,
         CGXDLMSLNParameters& p,
-        CGXDLMSTranslatorStructure* xml);
+        CGXDLMSTranslatorStructure* xml,
+        unsigned char cipheredCommand);
 
 public:
     /**
-* Handle Get request.
-*
-* @return Reply to the client.
-*/
+    * Handle get request next data block command.
+    *
+    * @param data
+    *            Received data.
+    */
+    static int GetRequestNextDataBlock(
+        CGXDLMSSettings& settings,
+        unsigned char invokeID,
+        CGXDLMSServer* server,
+        CGXByteBuffer& data,
+        CGXByteBuffer* replyData,
+        CGXDLMSTranslatorStructure* xml,
+        bool streaming,
+        unsigned char cipheredCommand);
+
+    /**
+    * Handle Get request.
+    *
+    * @return Reply to the client.
+    */
     static int HandleGetRequest(
         CGXDLMSSettings& settings,
         CGXDLMSServer* server,
         CGXByteBuffer& data,
         CGXByteBuffer* replyData,
-        CGXDLMSTranslatorStructure* xml);
+        CGXDLMSTranslatorStructure* xml,
+        unsigned char cipheredCommand);
 
     /**
     * Handle Set request.
@@ -131,7 +137,8 @@ public:
         CGXDLMSServer* server,
         CGXByteBuffer& data,
         CGXByteBuffer* replyData,
-        CGXDLMSTranslatorStructure* xml);
+        CGXDLMSTranslatorStructure* xml,
+        unsigned char cipheredCommand);
 
     /**
   * Handle action request.
@@ -146,7 +153,8 @@ public:
         CGXByteBuffer& data,
         CGXByteBuffer* replyData,
         CGXDLMSConnectionEventArgs* connectionInfo,
-        CGXDLMSTranslatorStructure* xml);
+        CGXDLMSTranslatorStructure* xml,
+        unsigned char cipheredCommand);
 
     //Handle Access request.
     static int HandleAccessRequest(
@@ -154,7 +162,8 @@ public:
         CGXDLMSServer* server,
         CGXByteBuffer& data,
         CGXByteBuffer* replyData,
-        CGXDLMSTranslatorStructure* xml);
+        CGXDLMSTranslatorStructure* xml,
+        unsigned char cipheredCommand);
 
     // Handle Event Notification.
     static int HandleEventNotification(

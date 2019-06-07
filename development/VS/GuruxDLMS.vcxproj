@@ -356,6 +356,7 @@
     <ClInclude Include="..\include\GXReplyData.h" />
     <ClInclude Include="..\include\GXSecure.h" />
     <ClInclude Include="..\include\GXSerialNumberCounter.h" />
+    <ClInclude Include="..\include\GXServerReply.h" />
     <ClInclude Include="..\include\GXSNInfo.h" />
     <ClInclude Include="..\include\GXStandardObisCode.h" />
     <ClInclude Include="..\include\GXStandardObisCodeCollection.h" />

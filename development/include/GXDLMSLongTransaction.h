@@ -78,6 +78,19 @@ public:
     }
 
     /**
+ * Constructor.
+ *
+ * @param targets
+ * @param command
+ * @param data
+ */
+    CGXDLMSLongTransaction(DLMS_COMMAND command, CGXByteBuffer& data)
+    {
+        m_Command = command;
+        m_Data.Set(&data, data.GetPosition());
+    }
+
+    /**
      * @return Executed command.
      */
     DLMS_COMMAND GetCommand()

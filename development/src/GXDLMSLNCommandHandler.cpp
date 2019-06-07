@@ -83,7 +83,8 @@ int CGXDLMSLNCommandHandler::GetRequestNormal(
     CGXDLMSServer* server,
     CGXByteBuffer& data,
     CGXByteBuffer* replyData,
-    CGXDLMSTranslatorStructure* xml)
+    CGXDLMSTranslatorStructure* xml,
+    unsigned char cipheredCommand)
 {
     int ret;
     CGXByteBuffer bb;
@@ -93,7 +94,7 @@ int CGXDLMSLNCommandHandler::GetRequestNormal(
     settings.ResetBlockIndex();
     CGXDLMSValueEventCollection arr;
     unsigned char attributeIndex;
-    unsigned char *ln;
+    unsigned char* ln;
     // CI
     unsigned short tmp;
     if ((ret = data.GetUInt16(&tmp)) != 0)
@@ -147,10 +148,6 @@ int CGXDLMSLNCommandHandler::GetRequestNormal(
     CGXDLMSVariant parameters;
     if (selection != 0)
     {
-        if ((ret = data.GetUInt8(&selector)) != 0)
-        {
-            return ret;
-        }
         CGXDataInfo i;
         if ((ret = GXHelpers::GetData(data, i, parameters)) != 0)
         {
@@ -211,7 +208,7 @@ int CGXDLMSLNCommandHandler::GetRequestNormal(
             }
         }
     }
-    CGXDLMSLNParameters p(&settings, invokeID, DLMS_COMMAND_GET_RESPONSE, 1, NULL, &bb, status);
+    CGXDLMSLNParameters p(&settings, invokeID, DLMS_COMMAND_GET_RESPONSE, 1, NULL, &bb, status, cipheredCommand);
     ret = CGXDLMS::GetLNPdu(p, *replyData);
     if (settings.GetCount() != settings.GetIndex()
         || bb.GetSize() != bb.GetPosition())
@@ -232,92 +229,94 @@ int CGXDLMSLNCommandHandler::GetRequestNextDataBlock(
     CGXDLMSServer* server,
     CGXByteBuffer& data,
     CGXByteBuffer* replyData,
-    CGXDLMSTranslatorStructure* xml)
+    CGXDLMSTranslatorStructure* xml,
+    bool streaming,
+    unsigned char cipheredCommand)
 {
     CGXByteBuffer bb;
     int ret;
-    unsigned long index;
-    // Get block index.
-    if ((ret = data.GetUInt32(&index)) != 0)
+    if (!streaming)
     {
-        return ret;
-    }
-    if (xml != NULL)
-    {
-        std::string tmp;
-        xml->IntegerToHex(index, 8, tmp);
-        xml->AppendLine(DLMS_TRANSLATOR_TAGS_BLOCK_NUMBER, "", tmp);
-        return 0;
-    }
+        unsigned long index;
+        // Get block index.
+        if ((ret = data.GetUInt32(&index)) != 0)
+        {
+            return ret;
+        }
+        if (xml != NULL)
+        {
+            std::string tmp;
+            xml->IntegerToHex(index, 8, tmp);
+            xml->AppendLine(DLMS_TRANSLATOR_TAGS_BLOCK_NUMBER, "", tmp);
+            return 0;
+        }
 
-    if (index != settings.GetBlockIndex())
+        if (index != settings.GetBlockIndex())
+        {
+            CGXDLMSLNParameters p(&settings, invokeID, DLMS_COMMAND_GET_RESPONSE, 2,
+                NULL, &bb,
+                DLMS_ERROR_CODE_DATA_BLOCK_NUMBER_INVALID, cipheredCommand);
+            return CGXDLMS::GetLNPdu(p, *replyData);
+        }
+    }
+    settings.IncreaseBlockIndex();
+    CGXDLMSLNParameters p(&settings, invokeID, DLMS_COMMAND_GET_RESPONSE, 2, NULL, &bb, DLMS_ERROR_CODE_OK, cipheredCommand);
+    // If m_Transaction is not in progress.
+    if (server->m_Transaction == NULL)
     {
-        CGXDLMSLNParameters p(&settings, invokeID, DLMS_COMMAND_GET_RESPONSE, 2,
-            NULL, &bb,
-            DLMS_ERROR_CODE_DATA_BLOCK_NUMBER_INVALID);
-        return CGXDLMS::GetLNPdu(p, *replyData);
+        p.SetStatus(DLMS_ERROR_CODE_NO_LONG_GET_OR_READ_IN_PROGRESS);
     }
     else
     {
-        settings.IncreaseBlockIndex();
-        CGXDLMSLNParameters p(&settings, invokeID, DLMS_COMMAND_GET_RESPONSE, 2, NULL, &bb, DLMS_ERROR_CODE_OK);
-        // If m_Transaction is not in progress.
-        if (server->m_Transaction == NULL)
+        bb.Set(&server->m_Transaction->GetData());
+        unsigned char moreData = settings.GetIndex() != settings.GetCount();
+        if (moreData)
         {
-            p.SetStatus(DLMS_ERROR_CODE_NO_LONG_GET_OR_READ_IN_PROGRESS);
-        }
-        else
-        {
-            bb.Set(&server->m_Transaction->GetData());
-            unsigned char moreData = settings.GetIndex() != settings.GetCount();
-            if (moreData)
+            // If there is multiple blocks on the buffer.
+            // This might happen when Max PDU size is very small.
+            if (bb.GetSize() < settings.GetMaxPduSize())
             {
-                // If there is multiple blocks on the buffer.
-                // This might happen when Max PDU size is very small.
-                if (bb.GetSize() < settings.GetMaxPduSize())
+                CGXDLMSVariant value;
+                for (std::vector<CGXDLMSValueEventArg*>::iterator arg = server->m_Transaction->GetTargets().begin();
+                    arg != server->m_Transaction->GetTargets().end(); ++arg)
                 {
-                    CGXDLMSVariant value;
-                    for (std::vector<CGXDLMSValueEventArg*>::iterator arg = server->m_Transaction->GetTargets().begin();
-                        arg != server->m_Transaction->GetTargets().end(); ++arg)
+                    server->PreRead(server->m_Transaction->GetTargets());
+                    if (!(*arg)->GetHandled())
                     {
-                        server->PreRead(server->m_Transaction->GetTargets());
-                        if (!(*arg)->GetHandled())
+                        if ((ret = (*arg)->GetTarget()->GetValue(settings, *(*arg))) != 0)
                         {
-                            if ((ret = (*arg)->GetTarget()->GetValue(settings, *(*arg))) != 0)
-                            {
-                                return ret;
-                            }
-                            std::vector<CGXDLMSValueEventArg*> arr;
-                            arr.push_back(*arg);
-                            server->PostRead(arr);
+                            return ret;
                         }
-                        value = (*arg)->GetValue();
-                        // Add data.
-                        if ((*arg)->IsByteArray() && value.vt == DLMS_DATA_TYPE_OCTET_STRING)
-                        {
-                            // If byte array is added do not add type.
-                            bb.Set(value.byteArr, value.GetSize());
-                        }
-                        else if ((ret = CGXDLMS::AppendData((*arg)->GetTarget(), (*arg)->GetIndex(), bb, value)) != 0)
-                        {
-                            return DLMS_ERROR_CODE_HARDWARE_FAULT;
-                        }
+                        std::vector<CGXDLMSValueEventArg*> arr;
+                        arr.push_back(*arg);
+                        server->PostRead(arr);
+                    }
+                    value = (*arg)->GetValue();
+                    // Add data.
+                    if ((*arg)->IsByteArray() && value.vt == DLMS_DATA_TYPE_OCTET_STRING)
+                    {
+                        // If byte array is added do not add type.
+                        bb.Set(value.byteArr, value.GetSize());
+                    }
+                    else if ((ret = CGXDLMS::AppendData((*arg)->GetTarget(), (*arg)->GetIndex(), bb, value)) != 0)
+                    {
+                        return DLMS_ERROR_CODE_HARDWARE_FAULT;
                     }
                 }
             }
-            p.SetMultipleBlocks(true);
-            ret = CGXDLMS::GetLNPdu(p, *replyData);
-            moreData = settings.GetIndex() != settings.GetCount();
-            if (moreData || bb.GetSize() - bb.GetPosition() != 0)
-            {
-                server->m_Transaction->SetData(bb);
-            }
-            else
-            {
-                delete server->m_Transaction;
-                server->m_Transaction = NULL;
-                settings.ResetBlockIndex();
-            }
+        }
+        p.SetMultipleBlocks(true);
+        ret = CGXDLMS::GetLNPdu(p, *replyData);
+        moreData = settings.GetIndex() != settings.GetCount();
+        if (moreData || bb.GetSize() - bb.GetPosition() != 0)
+        {
+            server->m_Transaction->SetData(bb);
+        }
+        else
+        {
+            delete server->m_Transaction;
+            server->m_Transaction = NULL;
+            settings.ResetBlockIndex();
         }
     }
     return ret;
@@ -329,7 +328,8 @@ int CGXDLMSLNCommandHandler::GetRequestWithList(
     CGXDLMSServer* server,
     CGXByteBuffer& data,
     CGXByteBuffer* replyData,
-    CGXDLMSTranslatorStructure* xml)
+    CGXDLMSTranslatorStructure* xml,
+    unsigned char cipheredCommand)
 {
     CGXDLMSValueEventCollection list;
     CGXByteBuffer bb;
@@ -355,7 +355,7 @@ int CGXDLMSLNCommandHandler::GetRequestWithList(
             return ret;
         }
         DLMS_OBJECT_TYPE ci = (DLMS_OBJECT_TYPE)id;
-        unsigned char * ln;
+        unsigned char* ln;
         ln = data.GetData() + data.GetPosition();
         data.SetPosition(data.GetPosition() + 6);
         if ((ret = data.GetUInt8(&attributeIndex)) != 0)
@@ -417,7 +417,7 @@ int CGXDLMSLNCommandHandler::GetRequestWithList(
             }
             else
             {
-                CGXDLMSValueEventArg *arg = new CGXDLMSValueEventArg(server, obj, attributeIndex, selector, parameters);
+                CGXDLMSValueEventArg* arg = new CGXDLMSValueEventArg(server, obj, attributeIndex, selector, parameters);
                 list.push_back(arg);
                 if (server->GetAttributeAccess(arg) == DLMS_ACCESS_MODE_NONE)
                 {
@@ -464,7 +464,7 @@ int CGXDLMSLNCommandHandler::GetRequestWithList(
         ++pos;
     }
     server->PostRead(list);
-    CGXDLMSLNParameters p(&settings, invokeID, DLMS_COMMAND_GET_RESPONSE, 3, NULL, &bb, 0xFF);
+    CGXDLMSLNParameters p(&settings, invokeID, DLMS_COMMAND_GET_RESPONSE, 3, NULL, &bb, 0xFF, cipheredCommand);
     return CGXDLMS::GetLNPdu(p, *replyData);
 }
 
@@ -473,10 +473,12 @@ int CGXDLMSLNCommandHandler::HandleGetRequest(
     CGXDLMSServer* server,
     CGXByteBuffer& data,
     CGXByteBuffer* replyData,
-    CGXDLMSTranslatorStructure* xml)
+    CGXDLMSTranslatorStructure* xml,
+    unsigned char cipheredCommand)
 {
     // Return error if connection is not established.
-    if (xml == NULL && (settings.GetConnected() && DLMS_CONNECTION_STATE_DLMS) == 0)
+    if (xml == NULL && (settings.GetConnected() && DLMS_CONNECTION_STATE_DLMS) == 0 &&
+        cipheredCommand == DLMS_COMMAND_NONE)
     {
         server->GenerateConfirmedServiceError(DLMS_CONFIRMED_SERVICE_ERROR_INITIATE_ERROR,
             DLMS_SERVICE_ERROR_SERVICE, DLMS_SERVICE_UNSUPPORTED,
@@ -513,17 +515,17 @@ int CGXDLMSLNCommandHandler::HandleGetRequest(
     // GetRequest normal
     if (type == DLMS_GET_COMMAND_TYPE_NORMAL)
     {
-        ret = GetRequestNormal(settings, invokeID, server, data, replyData, xml);
+        ret = GetRequestNormal(settings, invokeID, server, data, replyData, xml, cipheredCommand);
     }
     else if (type == DLMS_GET_COMMAND_TYPE_NEXT_DATA_BLOCK)
     {
         // Get request for next data block
-        ret = GetRequestNextDataBlock(settings, invokeID, server, data, replyData, xml);
+        ret = GetRequestNextDataBlock(settings, invokeID, server, data, replyData, xml, false, cipheredCommand);
     }
     else if (type == DLMS_GET_COMMAND_TYPE_WITH_LIST)
     {
         // Get request with a list.
-        ret = GetRequestWithList(settings, invokeID, server, data, replyData, xml);
+        ret = GetRequestWithList(settings, invokeID, server, data, replyData, xml, cipheredCommand);
     }
     else
     {
@@ -532,7 +534,7 @@ int CGXDLMSLNCommandHandler::HandleGetRequest(
         // Access Error : Device reports a hardware fault.
         bb.SetUInt8(DLMS_ERROR_CODE_HARDWARE_FAULT);
         CGXDLMSLNParameters p(&settings, invokeID, DLMS_COMMAND_GET_RESPONSE,
-            type, NULL, &bb, DLMS_ERROR_CODE_OK);
+            type, NULL, &bb, DLMS_ERROR_CODE_OK, cipheredCommand);
         ret = CGXDLMS::GetLNPdu(p, *replyData);
     }
     if (xml != NULL)
@@ -563,7 +565,7 @@ int CGXDLMSLNCommandHandler::HandleSetRequestNormal(
         return ret;
     }
     DLMS_OBJECT_TYPE ci = (DLMS_OBJECT_TYPE)tmp;
-    unsigned char * ln;
+    unsigned char* ln;
     ln = data.GetData() + data.GetPosition();
     data.SetPosition(data.GetPosition() + 6);
     // Attribute index.
@@ -776,7 +778,7 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithDataBlock(
             {
                 return ret;
             }
-            CGXDLMSValueEventArg * target = *server->m_Transaction->GetTargets().begin();
+            CGXDLMSValueEventArg* target = *server->m_Transaction->GetTargets().begin();
             if (value.vt == DLMS_DATA_TYPE_OCTET_STRING)
             {
                 DLMS_DATA_TYPE dt;
@@ -817,7 +819,8 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
     CGXDLMSServer* server,
     CGXByteBuffer& data,
     CGXDLMSLNParameters& p,
-    CGXDLMSTranslatorStructure* xml)
+    CGXDLMSTranslatorStructure* xml,
+    unsigned char cipheredCommand)
 {
     std::string str;
     CGXDLMSValueEventArg* e;
@@ -826,7 +829,7 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
     unsigned char attributeIndex, selection, selector;
     DLMS_OBJECT_TYPE ci;
     unsigned short tmp;
-    unsigned char *ln;
+    unsigned char* ln;
     CGXDLMSVariant parameters;
     if ((ret = GXHelpers::GetObjectCount(data, cnt)) != 0)
     {
@@ -962,7 +965,8 @@ int CGXDLMSLNCommandHandler::HandleSetRequest(
     CGXDLMSServer* server,
     CGXByteBuffer& data,
     CGXByteBuffer* replyData,
-    CGXDLMSTranslatorStructure* xml)
+    CGXDLMSTranslatorStructure* xml,
+    unsigned char cipheredCommand)
 {
     CGXDLMSVariant value;
     unsigned char type, invoke;
@@ -997,7 +1001,7 @@ int CGXDLMSLNCommandHandler::HandleSetRequest(
         xml->AppendLine(DLMS_TRANSLATOR_TAGS_INVOKE_ID, "", str);
     }
 
-    CGXDLMSLNParameters p(&settings, invoke, DLMS_COMMAND_SET_RESPONSE, type, NULL, NULL, 0);
+    CGXDLMSLNParameters p(&settings, invoke, DLMS_COMMAND_SET_RESPONSE, type, NULL, NULL, 0, cipheredCommand);
     if (type == DLMS_SET_COMMAND_TYPE_NORMAL || type == DLMS_SET_COMMAND_TYPE_FIRST_DATABLOCK)
     {
         ret = HandleSetRequestNormal(settings, server, data, type, p, xml);
@@ -1010,7 +1014,7 @@ int CGXDLMSLNCommandHandler::HandleSetRequest(
     else if (type == DLMS_SET_COMMAND_TYPE_WITH_LIST)
     {
         // Set Request With Data Block
-        ret = HanleSetRequestWithList(settings, invoke, server, data, p, xml);
+        ret = HanleSetRequestWithList(settings, invoke, server, data, p, xml, cipheredCommand);
     }
     else
     {
@@ -1040,7 +1044,8 @@ int CGXDLMSLNCommandHandler::HandleMethodRequest(
     CGXByteBuffer& data,
     CGXByteBuffer* replyData,
     CGXDLMSConnectionEventArgs* connectionInfo,
-    CGXDLMSTranslatorStructure* xml)
+    CGXDLMSTranslatorStructure* xml,
+    unsigned char cipheredCommand)
 {
     CGXByteBuffer bb;
     DLMS_ERROR_CODE error = DLMS_ERROR_CODE_OK;
@@ -1065,7 +1070,7 @@ int CGXDLMSLNCommandHandler::HandleMethodRequest(
         return ret;
     }
     DLMS_OBJECT_TYPE ci = (DLMS_OBJECT_TYPE)tmp;
-    unsigned char * ln;
+    unsigned char* ln;
     ln = data.GetData() + data.GetPosition();
     data.SetPosition(data.GetPosition() + 6);
     // Attribute ID
@@ -1163,7 +1168,7 @@ int CGXDLMSLNCommandHandler::HandleMethodRequest(
             }
         }
     }
-    CGXDLMSLNParameters p(&settings, invokeId, DLMS_COMMAND_METHOD_RESPONSE, 1, NULL, &bb, error);
+    CGXDLMSLNParameters p(&settings, invokeId, DLMS_COMMAND_METHOD_RESPONSE, 1, NULL, &bb, error, cipheredCommand);
     ret = CGXDLMS::GetLNPdu(p, *replyData);
     if (obj->GetObjectType() == DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME && id == 1)
     {
@@ -1187,7 +1192,8 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
     CGXDLMSServer* server,
     CGXByteBuffer& data,
     CGXByteBuffer* replyData,
-    CGXDLMSTranslatorStructure* xml)
+    CGXDLMSTranslatorStructure* xml,
+    unsigned char cipheredCommand)
 {
     //Return error if connection is not established.
     if (xml == NULL && settings.GetConnected() == DLMS_CONNECTION_STATE_NONE)
@@ -1256,7 +1262,7 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
     }
     DLMS_ACCESS_SERVICE_COMMAND_TYPE type;
     unsigned short id;
-    unsigned char *ln;
+    unsigned char* ln;
     for (unsigned long pos = 0; pos != cnt; ++pos)
     {
         if ((ret = data.GetUInt8(&ch)) != 0)

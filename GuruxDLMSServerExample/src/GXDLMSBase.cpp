@@ -591,6 +591,9 @@ int CGXDLMSBase::Init(int port, GX_TRACE_LEVEL trace)
     {
         return ret;
     }
+    SetMaxReceivePDUSize(1024);
+//    SetConformance((DLMS_CONFORMANCE) (GetConformance() | DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER));
+
     //Get local IP address.
     std::string address;
     GetIpAddress(address);
@@ -925,12 +928,12 @@ void CGXDLMSBase::PreRead(std::vector<CGXDLMSValueEventArg*>& args)
                         // Read by range.
                         unsigned int begin = (*it)->GetParameters().Arr[0].ulVal;
                         (*it)->SetRowBeginIndex(begin);
-                        (*it)->SetRowEndIndex(begin + (*it)->GetParameters().Arr[1].ulVal);
+                        (*it)->SetRowEndIndex((*it)->GetParameters().Arr[1].ulVal);
                         // If client wants to read more data what we have.
                         int cnt = GetProfileGenericDataCount();
-                        if ((*it)->GetRowEndIndex() - (*it)->GetRowBeginIndex() > cnt - (*it)->GetRowBeginIndex())
+                        if ((*it)->GetRowEndIndex() > cnt)
                         {
-                            (*it)->SetRowEndIndex(cnt - (*it)->GetRowBeginIndex());
+                            (*it)->SetRowEndIndex(cnt);
                             if ((*it)->GetRowEndIndex() < 0)
                             {
                                 (*it)->SetRowEndIndex(0);
@@ -938,7 +941,7 @@ void CGXDLMSBase::PreRead(std::vector<CGXDLMSValueEventArg*>& args)
                         }
                     }
                 }
-                long count = (*it)->GetRowEndIndex() - (*it)->GetRowBeginIndex();
+                long count = (*it)->GetRowEndIndex() - (*it)->GetRowBeginIndex() + 1;
                 // Read only rows that can fit to one PDU.
                 if ((*it)->GetRowEndIndex() - (*it)->GetRowBeginIndex() > (*it)->GetRowToPdu())
                 {

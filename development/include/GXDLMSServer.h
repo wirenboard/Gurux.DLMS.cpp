@@ -50,6 +50,7 @@
 #include "GXDLMSPushSetup.h"
 
 class CGXDLMSProfileGeneric;
+class CGXServerReply;
 
 class CGXDLMSServer
 {
@@ -100,6 +101,11 @@ private:
     */
     void Reset(bool connected);
 
+    int ReportError(
+        DLMS_COMMAND command,
+        DLMS_ERROR_CODE error,
+        CGXByteBuffer& reply);
+
     /**
     * Generate confirmed service error.
     *
@@ -120,10 +126,10 @@ private:
     * Handle received command.
     */
     int HandleCommand(
-        CGXDLMSConnectionEventArgs& connectionInfo,
         DLMS_COMMAND cmd,
         CGXByteBuffer& data,
-        CGXByteBuffer& reply);
+        CGXServerReply& sr,
+        unsigned char cipheredCommand);
 
     /**
     * Parse AARQ request that client send and returns AARE request.
@@ -167,6 +173,19 @@ private:
         CGXDLMSObject* obj,
         unsigned char index,
         CGXByteBuffer& buff);
+
+    /**
+    * Handles GBT.
+    *
+    * @param data
+    *            Received data.
+    * @param connectionInfo
+    *            Connection info.
+    */
+    int HandleGeneralBlockTransfer(
+        CGXServerReply& sr,
+        CGXByteBuffer& data,
+        unsigned char cipheredCommand);
 
 protected:
     /**
@@ -347,6 +366,7 @@ protected:
     */
     int UpdateShortNames();
 
+    int HandleRequest(CGXServerReply& sr);
 public:
     /**
     * @return HDLC settings.

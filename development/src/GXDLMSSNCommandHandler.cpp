@@ -44,7 +44,8 @@ int CGXDLMSSNCommandHandler::HandleReadRequest(
     CGXDLMSServer* server,
     CGXByteBuffer& data,
     CGXByteBuffer* replyData,
-    CGXDLMSTranslatorStructure* xml)
+    CGXDLMSTranslatorStructure* xml,
+    unsigned char cipheredCommand)
 {
     CGXByteBuffer bb;
     int ret;
@@ -101,7 +102,7 @@ int CGXDLMSSNCommandHandler::HandleReadRequest(
             case DLMS_VARIABLE_ACCESS_SPECIFICATION_BLOCK_NUMBER_ACCESS:
                 return HandleReadBlockNumberAccess(settings, server, data, replyData, xml);
             case DLMS_VARIABLE_ACCESS_SPECIFICATION_READ_DATA_BLOCK_ACCESS:
-                return HandleReadDataBlockAccess(settings, server, DLMS_COMMAND_READ_RESPONSE, data, cnt, replyData, xml);
+                return HandleReadDataBlockAccess(settings, server, DLMS_COMMAND_READ_RESPONSE, data, cnt, replyData, xml, cipheredCommand);
             default:
                 return ReturnSNError(settings, server, DLMS_COMMAND_READ_RESPONSE, DLMS_ERROR_CODE_READ_WRITE_DENIED, replyData);
             }
@@ -150,7 +151,8 @@ int CGXDLMSSNCommandHandler::HandleWriteRequest(
     CGXDLMSServer* server,
     CGXByteBuffer& data,
     CGXByteBuffer* replyData,
-    CGXDLMSTranslatorStructure* xml)
+    CGXDLMSTranslatorStructure* xml,
+    unsigned char cipheredCommand)
 {
     // Return error if connection is not established.
     if (xml == NULL && (settings.GetConnected() && DLMS_CONNECTION_STATE_DLMS) == 0)
@@ -226,7 +228,7 @@ int CGXDLMSSNCommandHandler::HandleWriteRequest(
             }
             break;
         case DLMS_VARIABLE_ACCESS_SPECIFICATION_WRITE_DATA_BLOCK_ACCESS:
-            ret = HandleReadDataBlockAccess(settings, server, DLMS_COMMAND_WRITE_RESPONSE, data, cnt, replyData, xml);
+            ret = HandleReadDataBlockAccess(settings, server, DLMS_COMMAND_WRITE_RESPONSE, data, cnt, replyData, xml, cipheredCommand);
             if (xml == NULL)
             {
                 return ret;
@@ -676,7 +678,8 @@ int CGXDLMSSNCommandHandler::HandleReadDataBlockAccess(
     CGXByteBuffer& data,
     int cnt,
     CGXByteBuffer* replyData,
-    CGXDLMSTranslatorStructure* xml)
+    CGXDLMSTranslatorStructure* xml,
+    unsigned char cipheredCommand)
 {
     int ret;
     unsigned long size;
@@ -784,11 +787,11 @@ int CGXDLMSSNCommandHandler::HandleReadDataBlockAccess(
         }
         if (command == DLMS_COMMAND_READ_RESPONSE)
         {
-            ret = CGXDLMSSNCommandHandler::HandleReadRequest(settings, server, data, replyData, NULL);
+            ret = CGXDLMSSNCommandHandler::HandleReadRequest(settings, server, data, replyData, NULL, cipheredCommand);
         }
         else
         {
-            ret = CGXDLMSSNCommandHandler::HandleWriteRequest(settings, server, data, replyData, NULL);
+            ret = CGXDLMSSNCommandHandler::HandleWriteRequest(settings, server, data, replyData, NULL, cipheredCommand);
         }
         settings.ResetBlockIndex();
     }

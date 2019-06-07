@@ -124,11 +124,11 @@ private:
         CGXReplyData& reply,
         int index);
 
-    static int HandledGloRequest(
+    static int HandleGloDedRequest(
         CGXDLMSSettings& settings,
         CGXReplyData& data);
 
-    static int HandledGloResponse(
+    static int HandleGloDedResponse(
         CGXDLMSSettings& settings,
         CGXReplyData& data, int index);
 

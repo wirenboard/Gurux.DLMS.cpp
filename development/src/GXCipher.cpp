@@ -55,6 +55,7 @@ void CGXCipher::Init(
     m_SystemTitle.Set(systemTitle, count);
     m_BlockCipherKey.Set(BLOCKCIPHERKEY, sizeof(BLOCKCIPHERKEY));
     m_AuthenticationKey.Set(AUTHENTICATIONKEY, sizeof(AUTHENTICATIONKEY));
+    m_SecuritySuite = DLMS_SECURITY_SUITE_AES_GCM_128;
 }
 
 CGXCipher::CGXCipher(CGXByteBuffer& systemTitle)
@@ -374,18 +375,18 @@ d##3 = TE0(s##3) ^ TE1(s##0) ^ TE2(s##1) ^ TE3(s##2) ^ rk[4 * i + 3]
 }
 
 void CGXCipher::Xor(
-    unsigned char *dst,
-    const unsigned char *src)
+    unsigned char* dst,
+    const unsigned char* src)
 {
-    unsigned long *d = (unsigned long *)dst;
-    unsigned long *s = (unsigned long *)src;
+    unsigned long* d = (unsigned long*)dst;
+    unsigned long* s = (unsigned long*)src;
     *d++ ^= *s++;
     *d++ ^= *s++;
     *d++ ^= *s++;
     *d++ ^= *s++;
 }
 
-void CGXCipher::shift_right_block(unsigned char *v)
+void CGXCipher::shift_right_block(unsigned char* v)
 {
     unsigned long val = GETU32(v + 12);
     val >>= 1;
@@ -412,7 +413,7 @@ void CGXCipher::shift_right_block(unsigned char *v)
     PUT32(v, val);
 }
 
-void CGXCipher::MultiplyH(const unsigned char *x, const unsigned char* y, unsigned char * z)
+void CGXCipher::MultiplyH(const unsigned char* x, const unsigned char* y, unsigned char* z)
 {
     unsigned char tmp[16];
     int i, j;
@@ -443,10 +444,10 @@ void CGXCipher::MultiplyH(const unsigned char *x, const unsigned char* y, unsign
 }
 
 void CGXCipher::GetGHash(
-    const unsigned char *h,
-    const unsigned char *x,
+    const unsigned char* h,
+    const unsigned char* x,
     int xlen,
-    unsigned char *y)
+    unsigned char* y)
 {
     int m, i;
     const unsigned char* xpos = x;
@@ -500,7 +501,7 @@ void CGXCipher::Init_j0(
     }
 }
 
-void CGXCipher::Inc32(unsigned char *block)
+void CGXCipher::Inc32(unsigned char* block)
 {
     unsigned long val;
     val = GETU32(block + 16 - 4);
@@ -508,12 +509,12 @@ void CGXCipher::Inc32(unsigned char *block)
     PUT32(block + 16 - 4, val);
 }
 
-void CGXCipher::Gctr(unsigned long *aes, const unsigned char *icb, const unsigned char *x, int xlen, unsigned char *y)
+void CGXCipher::Gctr(unsigned long* aes, const unsigned char* icb, const unsigned char* x, int xlen, unsigned char* y)
 {
     size_t i, n, last;
     unsigned char cb[16], tmp[16];
-    const unsigned char *xpos = x;
-    unsigned char *ypos = y;
+    const unsigned char* xpos = x;
+    unsigned char* ypos = y;
 
     if (xlen == 0)
     {
@@ -544,7 +545,7 @@ void CGXCipher::Gctr(unsigned long *aes, const unsigned char *icb, const unsigne
     }
 }
 
-void CGXCipher::AesGcmGctr(unsigned long *aes, const unsigned char *J0, const unsigned char *in, int len, unsigned char *out)
+void CGXCipher::AesGcmGctr(unsigned long* aes, const unsigned char* J0, const unsigned char* in, int len, unsigned char* out)
 {
     unsigned char J0inc[16];
     if (len == 0)
@@ -557,8 +558,8 @@ void CGXCipher::AesGcmGctr(unsigned long *aes, const unsigned char *J0, const un
     Gctr(aes, J0inc, in, len, out);
 }
 
-void CGXCipher::AesGcmGhash(const unsigned char *H, const unsigned char *aad, int aad_len,
-    const unsigned char *crypt, int crypt_len, unsigned char *S)
+void CGXCipher::AesGcmGhash(const unsigned char* H, const unsigned char* aad, int aad_len,
+    const unsigned char* crypt, int crypt_len, unsigned char* S)
 {
     unsigned char len_buf[16];
     GetGHash(H, aad, aad_len, S);
@@ -582,6 +583,12 @@ int CGXCipher::Encrypt(
     CGXByteBuffer& plainText,
     CGXByteBuffer& encrypted)
 {
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
+    printf("System title: %s\r\n", systemTitle.ToHexString().c_str());
+    printf("key: %s\r\n", key.ToHexString().c_str());
+    printf("Authentication Key: %s\r\n", m_AuthenticationKey.ToHexString().c_str());
+
+#endif //defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
     unsigned short headerSize = 0;
     int ret;
     unsigned long tmp[61] = { 0 };
@@ -695,7 +702,8 @@ int CGXCipher::Decrypt(
     CGXByteBuffer& title,
     CGXByteBuffer& key,
     CGXByteBuffer& data,
-    DLMS_SECURITY& security)
+    DLMS_SECURITY& security,
+    DLMS_SECURITY_SUITE& suite)
 {
     unsigned long length;
     int ret;
@@ -759,7 +767,8 @@ int CGXCipher::Decrypt(
     {
         return ret;
     }
-    security = (DLMS_SECURITY)ch;
+    security = (DLMS_SECURITY)(ch & 0x30);
+    suite = (DLMS_SECURITY_SUITE)(ch & 0x3);
     if ((ret = data.GetUInt32(&frameCounter)) != 0)
     {
         return ret;
@@ -860,8 +869,8 @@ int CGXCipher::Aes1Encrypt(
     CGXByteBuffer& secret)
 {
     unsigned char buf1, buf2, buf3, buf4, round, i;
-    unsigned char *key = secret.m_Data;
-    unsigned char *data = buff.m_Data;
+    unsigned char* key = secret.m_Data;
+    unsigned char* data = buff.m_Data;
     for (round = 0; round < 10; ++round)
     {
         for (i = 0; i < 16; ++i)
@@ -947,6 +956,23 @@ DLMS_SECURITY CGXCipher::GetSecurity()
 void CGXCipher::SetSecurity(DLMS_SECURITY value)
 {
     m_Security = value;
+}
+
+/**
+    * @return Used security suite.
+    */
+DLMS_SECURITY_SUITE CGXCipher::GetSecuritySuite()
+{
+    return m_SecuritySuite;
+}
+
+/**
+ * @param value
+ *            Used security suite.
+ */
+void CGXCipher::SetSecuritySuite(DLMS_SECURITY_SUITE value)
+{
+    m_SecuritySuite = value;
 }
 
 CGXByteBuffer& CGXCipher::GetSystemTitle()

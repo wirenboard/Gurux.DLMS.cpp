@@ -632,7 +632,7 @@ int CGXDLMSClient::AARQRequest(std::vector<CGXByteBuffer>& packets)
     }
     if (GetUseLogicalNameReferencing())
     {
-        CGXDLMSLNParameters p(&m_Settings, 0, DLMS_COMMAND_AARQ, 0, &buff, NULL, 0xff);
+        CGXDLMSLNParameters p(&m_Settings, 0, DLMS_COMMAND_AARQ, 0, &buff, NULL, 0xff, DLMS_COMMAND_NONE);
         ret = CGXDLMS::GetLnMessages(p, packets);
     }
     else
@@ -934,7 +934,7 @@ int CGXDLMSClient::ReleaseRequest(std::vector<CGXByteBuffer>& packets)
     buff.SetUInt8(0, (unsigned char)(buff.GetSize() - 1));
     if (GetUseLogicalNameReferencing())
     {
-        CGXDLMSLNParameters p(&m_Settings, 0, DLMS_COMMAND_RELEASE_REQUEST, 0, NULL, &buff, 0xff);
+        CGXDLMSLNParameters p(&m_Settings, 0, DLMS_COMMAND_RELEASE_REQUEST, 0, NULL, &buff, 0xff, DLMS_COMMAND_NONE);
         ret = CGXDLMS::GetLnMessages(p, packets);
     }
     else
@@ -1050,7 +1050,7 @@ int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int a
         }
         CGXDLMSLNParameters p(&m_Settings, 0,
             DLMS_COMMAND_GET_REQUEST, DLMS_GET_COMMAND_TYPE_NORMAL,
-            &attributeDescriptor, data, 0xFF);
+            &attributeDescriptor, data, 0xFF, DLMS_COMMAND_NONE);
         ret = CGXDLMS::GetLnMessages(p, reply);
     }
     else
@@ -1098,7 +1098,7 @@ int CGXDLMSClient::ReadList(
     {
         CGXDLMSLNParameters p(&m_Settings, 0,
             DLMS_COMMAND_GET_REQUEST, DLMS_GET_COMMAND_TYPE_WITH_LIST,
-            &bb, NULL, 0xff);
+            &bb, NULL, 0xff, DLMS_COMMAND_NONE);
         //Request service primitive shall always fit in a single APDU.
         unsigned short pos = 0, count = (m_Settings.GetMaxPduSize() - 12) / 10;
         if (list.size() < count)
@@ -1241,7 +1241,7 @@ int CGXDLMSClient::Write(
             bb.SetUInt8(0);
             CGXDLMSLNParameters p(&m_Settings, 0,
                 DLMS_COMMAND_SET_REQUEST, DLMS_SET_COMMAND_TYPE_NORMAL,
-                &bb, &data, 0xff);
+                &bb, &data, 0xff, DLMS_COMMAND_NONE);
             ret = CGXDLMS::GetLnMessages(p, reply);
         }
         else
@@ -1303,7 +1303,7 @@ int CGXDLMSClient::Write(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType,
         bb.SetUInt8(0);
         CGXDLMSLNParameters p(&m_Settings, 0,
             DLMS_COMMAND_SET_REQUEST, DLMS_SET_COMMAND_TYPE_NORMAL,
-            &bb, &data, 0xff);
+            &bb, &data, 0xff, DLMS_COMMAND_NONE);
         ret = CGXDLMS::GetLnMessages(p, reply);
     }
     else
@@ -1399,7 +1399,7 @@ int CGXDLMSClient::Method(CGXDLMSVariant name, DLMS_OBJECT_TYPE objectType,
         }
         CGXDLMSLNParameters p(&m_Settings, 0,
             DLMS_COMMAND_METHOD_REQUEST, DLMS_ACTION_COMMAND_TYPE_NORMAL,
-            &bb, &data, 0xff);
+            &bb, &data, 0xff, DLMS_COMMAND_NONE);
         ret = CGXDLMS::GetLnMessages(p, reply);
     }
     else

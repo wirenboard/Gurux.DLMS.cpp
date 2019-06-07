@@ -38,10 +38,8 @@
 class CGXDLMSConnectionEventArgs
 {
 private:
+    // Server ID that client try to use to make connection.
     int m_ServerAddress;
-    /// <summary>
-    /// Server ID that client try to use to make connection.
-    /// </summary>
 public:
     /**
     * Constructor.

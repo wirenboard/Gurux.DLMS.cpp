@@ -41,11 +41,14 @@ CGXDLMSLNParameters::CGXDLMSLNParameters(
     int commandType,
     CGXByteBuffer* attributeDescriptor,
     CGXByteBuffer* data,
-    int status)
+    int status,
+    unsigned char cipheredCommand)
 {
     m_Settings = settings;
     m_BlockIndex = settings->GetBlockIndex();
+    m_BlockNumberAck = settings->GetBlockNumberAck();
     m_Command = command;
+    m_CipheredCommand = cipheredCommand;
     m_RequestType = commandType;
     m_AttributeDescriptor = attributeDescriptor;
     m_Data = data;
@@ -61,6 +64,10 @@ CGXDLMSLNParameters::CGXDLMSLNParameters(
             settings->SetCommandType(commandType);
         }
     }
+    m_BlockNumber = 0;
+    m_BlockNumberAck = 0;
+    m_Streaming = false;;
+    m_WindowSize = 1;
 }
 
 CGXDLMSSettings* CGXDLMSLNParameters::GetSettings()
@@ -71,6 +78,11 @@ CGXDLMSSettings* CGXDLMSLNParameters::GetSettings()
 DLMS_COMMAND CGXDLMSLNParameters::GetCommand()
 {
     return m_Command;
+}
+
+void CGXDLMSLNParameters::SetCommand(DLMS_COMMAND value)
+{
+    m_Command = value;
 }
 
 int CGXDLMSLNParameters::GetRequestType()

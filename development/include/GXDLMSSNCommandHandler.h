@@ -88,7 +88,8 @@ class CGXDLMSSNCommandHandler
         CGXByteBuffer& data,
         int cnt,
         CGXByteBuffer* replyData,
-        CGXDLMSTranslatorStructure* xml);
+        CGXDLMSTranslatorStructure* xml,
+        unsigned char cipheredCommand);
 
     static int ReturnSNError(
         CGXDLMSSettings& settings,
@@ -116,7 +117,8 @@ public:
         CGXDLMSServer* server,
         CGXByteBuffer& data,
         CGXByteBuffer* replyData,
-        CGXDLMSTranslatorStructure* xml);
+        CGXDLMSTranslatorStructure* xml,
+        unsigned char cipheredCommand);
 
     /**
     * Handle write request.
@@ -130,12 +132,13 @@ public:
         CGXDLMSServer* server,
         CGXByteBuffer& data,
         CGXByteBuffer* replyData,
-        CGXDLMSTranslatorStructure* xml);
+        CGXDLMSTranslatorStructure* xml,
+        unsigned char cipheredCommand);
 
 
     // Handle Information Report.
     static int HandleInformationReport(
         CGXDLMSSettings& settings,
-        CGXReplyData& reply);    
+        CGXReplyData& reply);
 };
 #endif //CGXDLMSSN_COMMAND_HANDLER_H

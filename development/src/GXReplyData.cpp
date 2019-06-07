@@ -44,7 +44,7 @@ CGXReplyData::CGXReplyData(
     m_DataType = DLMS_DATA_TYPE_NONE;
     m_MoreData = more;
     m_Command = cmd;
-    m_CommandType = 0;   
+    m_CommandType = 0;
     m_Complete = complete;
     m_Time = NULL;
     m_pData = buff;
@@ -139,6 +139,7 @@ void CGXReplyData::Clear()
     m_ClientAddress = 0;
     m_ServerAddress = 0;
     m_CommandType = 0;
+    m_CipheredCommand = 0;
 }
 
 bool CGXReplyData::IsMoreData()
@@ -236,7 +237,7 @@ void CGXReplyData::SetTime(struct tm* value)
         {
             m_Time = (struct tm*) malloc(sizeof(struct tm));
         }
-        memcpy(m_Time, value, sizeof(struct tm));
+        memcpy(&m_Time, value, sizeof(struct tm));
     }
 }
 
@@ -245,8 +246,91 @@ CGXDLMSTranslatorStructure* CGXReplyData::GetXml()
     return m_pXml;
 }
 
-
 void CGXReplyData::SetXml(CGXDLMSTranslatorStructure* value)
 {
     m_pXml = value;
+}
+
+long CGXReplyData::GetInvokeId()
+{
+    return m_InvokeId;
+}
+
+void CGXReplyData::SetInvokeId(long value)
+{
+    m_InvokeId = value;
+}
+
+int CGXReplyData::GetBlockNumber()
+{
+    return m_BlockNumber;
+}
+
+void CGXReplyData::SetBlockNumber(int value)
+{
+    m_BlockNumber = value;
+}
+
+int CGXReplyData::GetBlockNumberAck()
+{
+    return m_BlockNumberAck;
+}
+
+void CGXReplyData::SetBlockNumberAck(int value)
+{
+    m_BlockNumberAck = value;
+}
+
+bool CGXReplyData::GetStreaming()
+{
+    return m_Streaming;
+}
+
+void CGXReplyData::SetStreaming(bool value)
+{
+    m_Streaming = value;
+}
+
+unsigned char CGXReplyData::GetWindowSize() {
+    return m_WindowSize;
+}
+
+void CGXReplyData::SetWindowSize(unsigned char value)
+{
+    m_WindowSize = value;
+}
+
+bool CGXReplyData::IsStreaming()
+{
+    return m_Streaming && (m_BlockNumberAck * m_WindowSize) + 1 > m_BlockNumber;
+}
+
+unsigned short CGXReplyData::GetClientAddress()
+{
+    return m_ClientAddress;
+}
+
+void CGXReplyData::SetClientAddress(unsigned short value)
+{
+    m_ClientAddress = value;
+}
+
+int CGXReplyData::GetServerAddress()
+{
+    return m_ServerAddress;
+}
+
+void CGXReplyData::SetServerAddress(int value)
+{
+    m_ServerAddress = value;
+}
+
+unsigned char CGXReplyData::GetCipheredCommand()
+{
+    return m_CipheredCommand;
+}
+
+void CGXReplyData::SetCipheredCommand(unsigned char value)
+{
+    m_CipheredCommand = value;
 }

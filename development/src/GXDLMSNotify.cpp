@@ -156,7 +156,7 @@ int CGXDLMSNotify::GenerateDataNotificationMessages(
     int ret;
     if (GetUseLogicalNameReferencing())
     {
-        CGXDLMSLNParameters p(&m_Settings, 0, DLMS_COMMAND_DATA_NOTIFICATION, 0, NULL, &data, 0xff);
+        CGXDLMSLNParameters p(&m_Settings, 0, DLMS_COMMAND_DATA_NOTIFICATION, 0, NULL, &data, 0xff, DLMS_COMMAND_NONE);
         p.SetTime(time);
         ret = CGXDLMS::GetLnMessages(p, reply);
     }

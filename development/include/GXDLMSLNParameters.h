@@ -47,11 +47,16 @@ private:
     /**
      * DLMS settings.
      */
-    CGXDLMSSettings *m_Settings;
+    CGXDLMSSettings* m_Settings;
     /**
      * DLMS command.
      */
     DLMS_COMMAND m_Command;
+    /*
+    * DLMS ciphered Command.
+    */
+    unsigned char m_CipheredCommand;
+
     /**
      * Request type.
      */
@@ -88,6 +93,24 @@ private:
     * Invoke ID.
     */
     unsigned long m_InvokeId;
+
+    /*
+     * GBT block number.
+    */
+    int m_BlockNumber;
+    /*
+     * GBT block number ACK.
+     */
+    int m_BlockNumberAck;
+    /*
+     * Is GBT streaming in use.
+     */
+    bool m_Streaming;
+    /*
+     * GBT Window size. This is for internal use.
+     */
+    unsigned char m_WindowSize;
+
 public:
     /**
      * Constructor.
@@ -109,20 +132,26 @@ public:
         int commandType,
         CGXByteBuffer* attributeDescriptor,
         CGXByteBuffer* data,
-        int status);
+        int status,
+        unsigned char cipheredCommand);
 
     /**
-     * @return DLMS settings.
+     * Returns DLMS settings.
      */
     CGXDLMSSettings* GetSettings();
 
     /**
-     * @return DLMS command.
+     * Returns DLMS command.
      */
     DLMS_COMMAND GetCommand();
 
     /**
-     * @return Request type.
+     * value DLMS command.
+     */
+    void SetCommand(DLMS_COMMAND value);
+
+    /**
+     * Returns Request type.
      */
     int GetRequestType();
 
@@ -133,17 +162,17 @@ public:
     void SetRequestType(int value);
 
     /**
-     * @return the attributeDescriptor
+     * Returns the attributeDescriptor
      */
     CGXByteBuffer* GetAttributeDescriptor();
 
     /**
-     * @return the data
+     * Returns the data
      */
     CGXByteBuffer* GetData();
 
     /**
-     * @return the time
+     * Returns the time
      */
     struct tm* GetTime();
 
@@ -154,7 +183,7 @@ public:
     void SetTime(struct tm* value);
 
     /**
-     * @return Status.
+     * Returns Status.
      */
     int GetStatus();
 
@@ -165,7 +194,7 @@ public:
     void SetStatus(int value);
 
     /**
-     * @return the multipleBlocks
+     * Returns the multipleBlocks
      */
     bool IsMultipleBlocks();
 
@@ -176,7 +205,7 @@ public:
     void SetMultipleBlocks(bool value);
 
     /**
-     * @return the lastBlock
+     * Returns the lastBlock
      */
     bool IsLastBlock();
 
@@ -187,7 +216,7 @@ public:
     void SetLastBlock(bool value);
 
     /**
-     * @return Block index.
+     * Returns Block index.
      */
     unsigned long GetBlockIndex();
 
@@ -198,7 +227,7 @@ public:
     void SetBlockIndex(unsigned long value);
 
     /**
-    * @return Get Invoke ID and priority. This can be used for Priority
+    * Returns Get Invoke ID and priority. This can be used for Priority
     *         Management.
     */
     unsigned long GetInvokeId();
@@ -209,6 +238,79 @@ public:
     *            Management.
     */
     void SetInvokeId(unsigned long value);
+
+    /*
+    * GBT block number.
+    */
+    int GetBlockNumber()
+    {
+        return m_BlockNumber;
+    }
+
+    /*
+     * GBT block number.
+     */
+    void SetBlockNumber(int value)
+    {
+        m_BlockNumber = value;
+    }
+
+    /**
+     * GBT block number ACK.
+     */
+    int GetBlockNumberAck()
+    {
+        return m_BlockNumberAck;
+    }
+
+    /**
+     * @param value
+     *            GBT block number ACK.
+     */
+    void SetBlockNumberAck(int value)
+    {
+        m_BlockNumberAck = value;
+    }
+
+    /**
+     * Returns Is GBT streaming in use.
+     */
+    bool GetStreaming()
+    {
+        return m_Streaming;
+    }
+
+    /**
+     * Is GBT streaming in use.
+     */
+    void SetStreaming(bool value)
+    {
+        m_Streaming = value;
+    }
+
+    /**
+     * GBT Window size. This is for internal use.
+     */
+    unsigned char GetWindowSize() {
+        return m_WindowSize;
+    }
+
+    /**
+     * GBT Window size. This is for internal use.
+     */
+    void SetWindowSize(unsigned char value)
+    {
+        m_WindowSize = value;
+    }
+
+
+    /**
+     * Returns ciphered DLMS Command.
+     */
+    unsigned char GetCipheredCommand()
+    {
+        return m_CipheredCommand;
+    }
 };
 
 #endif //GXDLMSLNPARAMETERS_H

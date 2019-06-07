@@ -183,6 +183,7 @@ int CGXDLMSAssociationLogicalName::GetObjects(
         //Add count
         GXHelpers::SetObjectCount((unsigned long)m_ObjectList.size(), data);
     }
+    unsigned char gbt = (settings.GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER) != 0;
     for (CGXDLMSObjectCollection::iterator it = m_ObjectList.begin(); it != m_ObjectList.end(); ++it)
     {
         ++pos;
@@ -205,7 +206,7 @@ int CGXDLMSAssociationLogicalName::GetObjects(
             {
                 settings.SetIndex(settings.GetIndex() + 1);
                 //If PDU is full.
-                if (!e.GetSkipMaxPduSize() && data.GetSize() >= settings.GetMaxPduSize())
+                if (!gbt && !e.GetSkipMaxPduSize() && data.GetSize() >= settings.GetMaxPduSize())
                 {
                     break;
                 }

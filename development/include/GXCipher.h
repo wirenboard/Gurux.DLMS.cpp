@@ -68,6 +68,8 @@ private:
      */
     unsigned long m_FrameCounter;
 
+    DLMS_SECURITY_SUITE m_SecuritySuite;
+
 
     static int GetAuthenticatedData(
         DLMS_SECURITY security,
@@ -195,12 +197,15 @@ public:
       *            Decrypted data.
       * @param security
       *            Used security level.
+      * @param suite
+      *            Used security suite.
       */
     int Decrypt(
         CGXByteBuffer& title,
         CGXByteBuffer& key,
         CGXByteBuffer& data,
-        DLMS_SECURITY& security);
+        DLMS_SECURITY& security,
+        DLMS_SECURITY_SUITE& suite);
 
     /**
      * Encrypt data using AES.
@@ -218,43 +223,52 @@ public:
         CGXByteBuffer& secret);
 
     /**
-     * @return Is ciphering used.
+     * Returns is ciphering used.
      */
     bool IsCiphered();
 
     /**
-     * @return Used security.
+     * Returns used security.
      */
     DLMS_SECURITY GetSecurity();
 
     /**
-    * @param value
-    *            Used security.
+    * value: Used security.
     */
     void SetSecurity(DLMS_SECURITY value);
 
+    /*
+    * Returns Used security suite.
+    */
+    DLMS_SECURITY_SUITE GetSecuritySuite();
+
+    /*
+     * value: Used security suite.
+     */
+    void SetSecuritySuite(DLMS_SECURITY_SUITE value);
+
     /**
-     * @return System title.
+     * Returns System title.
      */
     CGXByteBuffer& GetSystemTitle();
 
     /**
-    *  @param value System title.
+    *  value: System title.
     */
     void SetSystemTitle(CGXByteBuffer& value);
 
     /**
-     * @return Block cipher key.
+     * Returns Block cipher key.
      */
     CGXByteBuffer& GetBlockCipherKey();
 
     /**
-    *  @param value Block cipher key.
+    *  value: Block cipher key.
     */
     void SetBlockCipherKey(CGXByteBuffer& value);
 
     /**
-     * @return Authentication key.
+     * Returns Authentication key.
      */
     CGXByteBuffer& GetAuthenticationKey();
 
@@ -265,7 +279,7 @@ public:
     void SetAuthenticationKey(CGXByteBuffer& value);
 
     /**
-     * @return Frame counter. Invocation counter.
+     * Returns Frame counter. Invocation counter.
      */
     unsigned long GetFrameCounter();
 
@@ -274,7 +288,7 @@ public:
     void Reset();
 
     /**
-    * @return Dedicated key.
+    * Returns Dedicated key.
     */
     CGXByteBuffer& GetDedicatedKey();
 

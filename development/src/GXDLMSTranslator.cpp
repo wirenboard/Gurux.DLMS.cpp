@@ -347,22 +347,22 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
     }
     break;
     case DLMS_COMMAND_GET_REQUEST:
-        CGXDLMSLNCommandHandler::HandleGetRequest(settings, NULL, value, NULL, xml);
+        CGXDLMSLNCommandHandler::HandleGetRequest(settings, NULL, value, NULL, xml, DLMS_COMMAND_NONE);
         break;
     case DLMS_COMMAND_SET_REQUEST:
-        CGXDLMSLNCommandHandler::HandleSetRequest(settings, NULL, value, NULL, xml);
+        CGXDLMSLNCommandHandler::HandleSetRequest(settings, NULL, value, NULL, xml, DLMS_COMMAND_NONE);
         break;
     case DLMS_COMMAND_READ_REQUEST:
-        CGXDLMSSNCommandHandler::HandleReadRequest(settings, NULL, value, NULL, xml);
+        CGXDLMSSNCommandHandler::HandleReadRequest(settings, NULL, value, NULL, xml, DLMS_COMMAND_NONE);
         break;
     case DLMS_COMMAND_METHOD_REQUEST:
-        CGXDLMSLNCommandHandler::HandleMethodRequest(settings, NULL, value, NULL, NULL, xml);
+        CGXDLMSLNCommandHandler::HandleMethodRequest(settings, NULL, value, NULL, NULL, xml, DLMS_COMMAND_NONE);
         break;
     case DLMS_COMMAND_WRITE_REQUEST:
-        CGXDLMSSNCommandHandler::HandleWriteRequest(settings, NULL, value, NULL, xml);
+        CGXDLMSSNCommandHandler::HandleWriteRequest(settings, NULL, value, NULL, xml, DLMS_COMMAND_NONE);
         break;
     case DLMS_COMMAND_ACCESS_REQUEST:
-        CGXDLMSLNCommandHandler::HandleAccessRequest(settings, NULL, value, NULL, xml);
+        CGXDLMSLNCommandHandler::HandleAccessRequest(settings, NULL, value, NULL, xml, DLMS_COMMAND_NONE);
         break;
     case DLMS_COMMAND_DATA_NOTIFICATION:
         data.SetXml(xml);
@@ -512,9 +512,10 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
             if (st->GetSize() != 0)
             {
                 DLMS_SECURITY security = DLMS_SECURITY_NONE;
+                DLMS_SECURITY_SUITE suite;
                 if ((ret = settings.GetCipher()->Decrypt(*st, value,
                     settings.GetCipher()->GetBlockCipherKey(),
-                    security)) != 0)
+                    security, suite)) != 0)
                 {
                     // It's OK if this fails. Ciphering settings are not correct.
                     xml->SetXmlLength(len2);
@@ -549,6 +550,7 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
         if (settings.GetCipher() != NULL && m_Comments)
         {
             DLMS_SECURITY security;
+            DLMS_SECURITY_SUITE suite;
             int len2 = xml->GetXmlLength();
             int originalPosition = value.GetPosition();
             value.SetPosition(value.GetPosition() - 1);
@@ -559,7 +561,7 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
                 data.GetData().SetPosition(data.GetData().GetPosition() - 1);
                 if (settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(), data.GetData(),
                     settings.GetCipher()->GetBlockCipherKey(),
-                    security) == 0)
+                    security, suite) == 0)
                 {
                     xml->StartComment("Decrypt data: " + data.GetData().ToHexString());
                     CGXByteBuffer& bb = data.GetData();
@@ -578,7 +580,7 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
                 {
                     if (settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(), data.GetData(),
                         settings.GetCipher()->GetBlockCipherKey(),
-                        security) == 0)
+                        security, suite) == 0)
                     {
                         xml->StartComment("Decrypt data: " + data.GetData().ToHexString());
                         ret = PduToXml(xml, data.GetData(), omitDeclaration, omitNameSpace, false, output);

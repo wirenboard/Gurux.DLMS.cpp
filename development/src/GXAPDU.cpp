@@ -63,7 +63,7 @@ int GetAuthenticationString(
         unsigned char p[] = { 0x60, 0x85, 0x74, 0x05, 0x08, 0x02, (unsigned char)settings.GetAuthentication() };
         data.Set(p, 7);
         // Add Calling authentication information.
-        CGXByteBuffer *callingAuthenticationValue;
+        CGXByteBuffer* callingAuthenticationValue;
         if (settings.GetAuthentication() == DLMS_AUTHENTICATION_LOW)
         {
             callingAuthenticationValue = &settings.GetPassword();
@@ -634,7 +634,7 @@ int CGXAPDU::Parse(bool initiateRequest,
         //If client asks too high PDU.
         if (pduSize > settings.GetMaxServerPDUSize())
         {
-            pduSize = settings.GetMaxServerPDUSize();
+            settings.SetMaxReceivePDUSize(settings.GetMaxServerPDUSize());
         }
     }
     else
@@ -761,9 +761,10 @@ int CGXAPDU::ParseInitiate(
                 int pos = xml->GetXmlLength();
                 data.SetPosition(originalPos - 1);
                 DLMS_SECURITY security = DLMS_SECURITY_NONE;
+                DLMS_SECURITY_SUITE suite;
                 if ((ret = cipher->Decrypt(st,
                     settings.GetCipher()->GetBlockCipherKey(),
-                    data, security)) != 0)
+                    data, security, suite)) != 0)
                 {
                     return ret;
                 }
@@ -792,12 +793,14 @@ int CGXAPDU::ParseInitiate(
         }
         data.SetPosition(data.GetPosition() - 1);
         DLMS_SECURITY security = DLMS_SECURITY_NONE;
+        DLMS_SECURITY_SUITE suite;
         if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(),
-            settings.GetCipher()->GetBlockCipherKey(), data, security)) != 0)
+            settings.GetCipher()->GetBlockCipherKey(), data, security, suite)) != 0)
         {
             return ret;
         }
         cipher->SetSecurity(security);
+        cipher->SetSecuritySuite(suite);
         if ((ret = data.GetUInt8(&tag)) != 0)
         {
             return ret;
@@ -1212,7 +1215,7 @@ int CGXAPDU::GetUserInformation(
             settings.GetCipher()->GetFrameCounter(),
             DLMS_COMMAND_GLO_INITIATE_RESPONSE,
             cipher->GetSystemTitle(),
-            cipher->GetAuthenticationKey(),
+            cipher->GetBlockCipherKey(),
             tmp,
             data);
     }
@@ -1954,8 +1957,8 @@ int CGXAPDU::GenerateAARE(
     DLMS_ASSOCIATION_RESULT result,
     DLMS_SOURCE_DIAGNOSTIC diagnostic,
     CGXCipher* cipher,
-    CGXByteBuffer *errorData,
-    CGXByteBuffer *encryptedData)
+    CGXByteBuffer* errorData,
+    CGXByteBuffer* encryptedData)
 {
     int ret;
     unsigned long offset = data.GetSize();

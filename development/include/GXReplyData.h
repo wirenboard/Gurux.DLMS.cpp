@@ -141,6 +141,8 @@ private:
      */
     int m_ServerAddress;
 
+    unsigned char m_CipheredCommand;
+
 public:
     /*
      * Constructor.
@@ -311,126 +313,92 @@ public:
     /**
     * Invoke ID.
     */
-    long GetInvokeId()
-    {
-        return m_InvokeId;
-    }
+    long GetInvokeId();
 
     /**
      * Invoke ID.
      */
-    void setInvokeId(long value)
-    {
-        m_InvokeId = value;
-    }
+    void SetInvokeId(long value);
 
     /*
      * GBT block number.
      */
-    int GetBlockNumber()
-    {
-        return m_BlockNumber;
-    }
+    int GetBlockNumber();
 
     /*
      * GBT block number.
      */
-    void SetBlockNumber(int value)
-    {
-        m_BlockNumber = value;
-    }
+    void SetBlockNumber(int value);
 
     /**
      * GBT block number ACK.
      */
-    int GetBlockNumberAck()
-    {
-        return m_BlockNumberAck;
-    }
+    int GetBlockNumberAck();
 
     /**
      * @param value
      *            GBT block number ACK.
      */
-    void SetBlockNumberAck(int value)
-    {
-        m_BlockNumberAck = value;
-    }
+    void SetBlockNumberAck(int value);
 
     /**
      * @return Is GBT streaming in use.
      */
-    bool GetStreaming()
-    {
-        return m_Streaming;
-    }
+    bool GetStreaming();
 
     /**
      * Is GBT streaming in use.
      */
-    void SetStreaming(bool value)
-    {
-        m_Streaming = value;
-    }
+    void SetStreaming(bool value);
 
     /**
      * GBT Window size. This is for internal use.
      */
-    unsigned char GetWindowSize() {
-        return m_WindowSize;
-    }
+    unsigned char GetWindowSize();
 
     /**
      * GBT Window size. This is for internal use.
      */
-    void SetWindowSize(unsigned char value)
-    {
-        m_WindowSize = value;
-    }
+    void SetWindowSize(unsigned char value);
 
     /**
      * Is GBT streaming.
      */
-    bool IsStreaming()
-    {
-        return m_Streaming && (m_BlockNumberAck * m_WindowSize) + 1 > m_BlockNumber;
-    }
+    bool IsStreaming();
 
     /**
      * Client address of the notification message. Notification message
      * sets this.
      */
-    unsigned short GetClientAddress()
-    {
-        return m_ClientAddress;
-    }
+    unsigned short GetClientAddress();
 
     /**
      *            Client address of the notification message. Notification
      *            message sets this.
      */
-    void SetClientAddress(unsigned short value)
-    {
-        m_ClientAddress = value;
-    }
+    void SetClientAddress(unsigned short value);
 
     /*
      * Server address of the notification message. Notification message
      *         sets this.
      */
-    int GetServerAddress()
-    {
-        return m_ServerAddress;
-    }
+    int GetServerAddress();
 
     /*
      *            Server address of the notification message. Notification
      *            message sets this.
      */
-    void SetServerAddress(int value)
-    {
-        m_ServerAddress = value;
-    }
+    void SetServerAddress(int value);
+
+    /*
+     * returns Received ciphered command.
+     */
+    unsigned char GetCipheredCommand();
+
+    /*
+     * value: Received ciphered command.
+     */
+    void SetCipheredCommand(unsigned char value);
 };
 
 #endif //GXREPLYDATA_H
