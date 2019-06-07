@@ -35,7 +35,7 @@
 #ifndef GXSERVERREPLY_H
 #define GXSERVERREPLY_H
 
-#include "GXByteBuffer.h"
+#include "GXBytebuffer.h"
 #include "GXDLMSConnectionEventArgs.h"
 
 class CGXServerReply
