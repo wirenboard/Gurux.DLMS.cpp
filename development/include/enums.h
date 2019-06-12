@@ -785,9 +785,14 @@ typedef enum
 
 typedef enum
 {
+    //All data is received.
     DLMS_DATA_REQUEST_TYPES_NONE = 0x0,
+    //Frame is available.
     DLMS_DATA_REQUEST_TYPES_FRAME = 0x1,
-    DLMS_DATA_REQUEST_TYPES_BLOCK = 0x2
+    //Block is available.
+    DLMS_DATA_REQUEST_TYPES_BLOCK = 0x2,
+    //General Block transfer data is available.
+    DLMS_DATA_REQUEST_TYPES_GBT = 0x4
 } DLMS_DATA_REQUEST_TYPES;
 
 typedef enum

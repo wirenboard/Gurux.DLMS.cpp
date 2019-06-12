@@ -51,6 +51,12 @@ private:
     static void UpdateOBISCodes(CGXDLMSObjectCollection& objects);
     // SN referencing
     int ParseSNObjects(CGXByteBuffer& buff, bool onlyKnownObjects);
+
+    //Parse SN object item.
+    int ParseSNObjectItem(CGXDLMSVariant& value);
+    //Parse LN object item.
+    int ParseLNObjectItem(CGXDLMSVariant& value);
+
     /**
     * Parse LN objects.
     *
@@ -149,6 +155,12 @@ public:
      */
     void SetAutoIncreaseInvokeID(bool value);
 
+    // Maximum client PDU size.
+    unsigned short GetMaxPduSize();
+
+    // Maximum client PDU size.
+    int SetMaxReceivePDUSize(unsigned short value);
+
     CGXDLMSLimits& GetLimits();
 
     // Collection of the objects.
@@ -224,6 +236,17 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     // Returns ReceiverReady query as byte array.
     /////////////////////////////////////////////////////////////////////////////
+    // reply: Reply data.
+    // Data: Data to send.
+    // Returns: 0 if succeed. Otherwise error number.
+    /////////////////////////////////////////////////////////////////////////////
+    int ReceiverReady(
+        CGXReplyData& reply,
+        CGXByteBuffer& Data);
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Returns ReceiverReady query as byte array.
+    /////////////////////////////////////////////////////////////////////////////
     // Type: type of the next requested packet.
     // Data: Data to send.
     // Returns: 0 if succeed. Otherwise error number.
@@ -268,6 +291,17 @@ public:
         CGXDLMSVariant& value,
         DLMS_DATA_TYPE type,
         CGXDLMSVariant& newValue);
+
+    /**
+    * Parses the COSEM objects of the received data.
+    *
+    * objects : Read objects.
+    * objects : Collection of COSEM objects.
+    * onlyKnownObjects : Only known objects are parsed.
+    */
+    int ParseObjects(
+        std::vector<CGXDLMSVariant>& objects,
+        bool onlyKnownObjects);
 
     /**
     * Parses the COSEM objects of the received data.

@@ -65,8 +65,7 @@ CGXDLMSLNParameters::CGXDLMSLNParameters(
         }
     }
     m_BlockNumber = 0;
-    m_BlockNumberAck = 0;
-    m_Streaming = false;;
+    m_Streaming = false;
     m_WindowSize = 1;
 }
 

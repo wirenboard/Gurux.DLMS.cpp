@@ -591,9 +591,6 @@ int CGXDLMSBase::Init(int port, GX_TRACE_LEVEL trace)
     {
         return ret;
     }
-    SetMaxReceivePDUSize(1024);
-//    SetConformance((DLMS_CONFORMANCE) (GetConformance() | DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER));
-
     //Get local IP address.
     std::string address;
     GetIpAddress(address);

@@ -260,7 +260,11 @@ int CGXDLMSLNCommandHandler::GetRequestNextDataBlock(
         }
     }
     settings.IncreaseBlockIndex();
-    CGXDLMSLNParameters p(&settings, invokeID, DLMS_COMMAND_GET_RESPONSE, 2, NULL, &bb, DLMS_ERROR_CODE_OK, cipheredCommand);
+    CGXDLMSLNParameters p(&settings, invokeID,
+        streaming ? DLMS_COMMAND_GENERAL_BLOCK_TRANSFER : DLMS_COMMAND_GET_RESPONSE,
+        2, NULL, &bb, DLMS_ERROR_CODE_OK, cipheredCommand);
+    p.SetStreaming(streaming);
+    p.SetWindowSize(settings.GetWindowSize());
     // If m_Transaction is not in progress.
     if (server->m_Transaction == NULL)
     {

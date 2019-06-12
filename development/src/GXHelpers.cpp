@@ -62,6 +62,7 @@ static int GetArray(CGXByteBuffer& buff, CGXDataInfo& info, int index, CGXDLMSVa
             return ret;
         }
         info.SetCount(cnt);
+        value.Arr.reserve(cnt);
     }
     if (info.GetXml() != NULL)
     {

@@ -60,6 +60,8 @@ CGXDLMSSettings::CGXDLMSSettings(bool isServer)
     m_QualityOfService = 0;
     m_UserId = 0;
     m_UseUtc2NormalTime = false;
+    m_BlockNumberAck = 0;
+    m_WindowSize = 1;
 }
 
 //Destructor.
@@ -238,6 +240,7 @@ void CGXDLMSSettings::SetBlockIndex(unsigned long value)
 void CGXDLMSSettings::ResetBlockIndex()
 {
     m_BlockIndex = 1;
+    m_BlockNumberAck = 0;
 }
 
 void CGXDLMSSettings::IncreaseBlockIndex()

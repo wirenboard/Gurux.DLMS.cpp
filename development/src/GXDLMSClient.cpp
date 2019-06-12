@@ -82,6 +82,16 @@ CGXDLMSClient::~CGXDLMSClient()
 {
 }
 
+unsigned short CGXDLMSClient::GetMaxPduSize()
+{
+    return m_Settings.GetMaxPduSize();
+}
+
+int CGXDLMSClient::SetMaxReceivePDUSize(unsigned short value)
+{
+    return m_Settings.SetMaxReceivePDUSize(value);
+}
+
 DLMS_CONFORMANCE CGXDLMSClient::GetNegotiatedConformance()
 {
     return (DLMS_CONFORMANCE)m_Settings.GetNegotiatedConformance();
@@ -91,7 +101,6 @@ void CGXDLMSClient::SetNegotiatedConformance(DLMS_CONFORMANCE value)
 {
     m_Settings.SetNegotiatedConformance(value);
 }
-
 
 DLMS_CONFORMANCE CGXDLMSClient::GetProposedConformance()
 {
@@ -233,6 +242,37 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
     return ret;
 }
 
+int CGXDLMSClient::ParseSNObjectItem(CGXDLMSVariant& value)
+{
+    int ret;
+    if (value.vt != DLMS_DATA_TYPE_STRUCTURE || value.Arr.size() != 4)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    if (value.Arr[0].vt != DLMS_DATA_TYPE_INT16 ||
+        value.Arr[1].vt != DLMS_DATA_TYPE_UINT16 ||
+        value.Arr[2].vt != DLMS_DATA_TYPE_UINT8 ||
+        value.Arr[3].vt != DLMS_DATA_TYPE_OCTET_STRING)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    short sn = value.Arr[0].ToInteger();
+    unsigned short class_id = (unsigned short)value.Arr[1].ToInteger();
+    unsigned char version = (unsigned char)value.Arr[2].ToInteger();
+    CGXDLMSVariant ln = value.Arr[3];
+    CGXDLMSObject* pObj = CGXDLMSObjectFactory::CreateObject((DLMS_OBJECT_TYPE)class_id);
+    if (pObj != NULL)
+    {
+        pObj->SetShortName(sn);
+        pObj->SetVersion(version);
+        int cnt = ln.GetSize();
+        assert(cnt == 6);
+        CGXDLMSObject::SetLogicalName(pObj, ln);
+        m_Settings.GetObjects().push_back(pObj);
+    }
+    return ret;
+}
+
 // SN referencing
 int CGXDLMSClient::ParseSNObjects(CGXByteBuffer& buff, bool onlyKnownObjects)
 {
@@ -260,33 +300,128 @@ int CGXDLMSClient::ParseSNObjects(CGXByteBuffer& buff, bool onlyKnownObjects)
     for (unsigned long objPos = 0; objPos != cnt; ++objPos)
     {
         info.Clear();
-        if ((ret = GXHelpers::GetData(buff, info, value)) != 0)
+        if ((ret = GXHelpers::GetData(buff, info, value)) != 0 ||
+            (ret = ParseSNObjectItem(value)) != 0)
         {
             return ret;
         }
-        if (value.vt != DLMS_DATA_TYPE_STRUCTURE || value.Arr.size() != 4)
-        {
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-        if (value.Arr[0].vt != DLMS_DATA_TYPE_INT16 ||
-            value.Arr[1].vt != DLMS_DATA_TYPE_UINT16 ||
-            value.Arr[2].vt != DLMS_DATA_TYPE_UINT8 ||
-            value.Arr[3].vt != DLMS_DATA_TYPE_OCTET_STRING)
-        {
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-        short sn = value.Arr[0].ToInteger();
-        unsigned short class_id = (unsigned short)value.Arr[1].ToInteger();
-        unsigned char version = (unsigned char)value.Arr[2].ToInteger();
-        CGXDLMSVariant ln = value.Arr[3];
-        CGXDLMSObject* pObj = CGXDLMSObjectFactory::CreateObject((DLMS_OBJECT_TYPE)class_id);
+    }
+    return 0;
+}
+
+int CGXDLMSClient::ParseLNObjectItem(CGXDLMSVariant& value)
+{
+    int ret;
+    if (value.Arr.size() != 4)
+    {
+        //Invalid structure format.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    int classID = value.Arr[0].ToInteger() & 0xFFFF;
+    if (classID > 0)
+    {
+        CGXDLMSObject* pObj = CGXDLMSObjectFactory::CreateObject((DLMS_OBJECT_TYPE)classID);
         if (pObj != NULL)
         {
-            pObj->SetShortName(sn);
+            if (value.vt != DLMS_DATA_TYPE_STRUCTURE || value.Arr.size() != 4)
+            {
+                return DLMS_ERROR_CODE_INVALID_PARAMETER;
+            }
+            if (value.Arr[0].vt != DLMS_DATA_TYPE_UINT16)
+            {
+                return DLMS_ERROR_CODE_INVALID_PARAMETER;
+            }
+            if (value.Arr[1].vt != DLMS_DATA_TYPE_UINT8)
+            {
+                return DLMS_ERROR_CODE_INVALID_PARAMETER;
+            }
+            unsigned char version = value.Arr[1].ToInteger();
+            if (value.Arr[2].vt != DLMS_DATA_TYPE_OCTET_STRING)
+            {
+                return DLMS_ERROR_CODE_INVALID_PARAMETER;
+            }
+            CGXDLMSVariant ln = value.Arr[2];
+            //Get Access rights...
+            if (value.Arr[3].vt != DLMS_DATA_TYPE_STRUCTURE || value.Arr[3].Arr.size() != 2)
+            {
+                return DLMS_ERROR_CODE_INVALID_PARAMETER;
+            }
             pObj->SetVersion(version);
-            int cnt = ln.GetSize();
+            int cnt;
+            // attribute_access_descriptor Start
+            if (value.Arr[3].Arr[0].vt != DLMS_DATA_TYPE_ARRAY)
+            {
+                delete pObj;
+                return DLMS_ERROR_CODE_INVALID_PARAMETER;
+            }
+            if (value.Arr[3].Arr.size() == 2)
+            {
+                for (unsigned int pos = 0; pos != value.Arr[3].Arr[0].Arr.size(); ++pos)
+                {
+                    if (value.Arr[3].Arr[0].Arr[pos].vt != DLMS_DATA_TYPE_STRUCTURE ||
+                        value.Arr[3].Arr[0].Arr[pos].Arr.size() != 3)
+                    {
+                        delete pObj;
+                        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                    }
+                    int id = value.Arr[3].Arr[0].Arr[pos].Arr[0].ToInteger();
+                    //Get access_mode
+                    DLMS_DATA_TYPE tp = value.Arr[3].Arr[0].Arr[pos].Arr[1].vt;
+                    if (tp != DLMS_DATA_TYPE_ENUM)
+                    {
+                        delete pObj;
+                        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                    }
+                    pObj->SetAccess(id, (DLMS_ACCESS_MODE)value.Arr[3].Arr[0].Arr[pos].Arr[1].ToInteger());
+                    //Get access_selectors
+                    if (value.Arr[3].Arr[0].Arr[pos].Arr[2].vt == DLMS_DATA_TYPE_ARRAY)
+                    {
+                        int cnt2 = (unsigned long)value.Arr[3].Arr[0].Arr[pos].Arr[2].Arr.size();
+                        for (int pos2 = 0; pos2 != cnt2; ++pos2)
+                        {
+                            //Get access_mode
+                        }
+                    }
+                    else if (value.Arr[3].Arr[0].Arr[pos].Arr[2].vt != DLMS_DATA_TYPE_NONE)
+                    {
+                        delete pObj;
+                        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                    }
+                }
+                // attribute_access_descriptor End
+                // method_access_item Start
+                if (value.Arr[3].Arr[1].vt != DLMS_DATA_TYPE_ARRAY)
+                {
+                    delete pObj;
+                    return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                }
+                for (unsigned int pos = 0; pos != value.Arr[3].Arr[1].Arr.size(); ++pos)
+                {
+                    CGXDLMSVariant tmp = value.Arr[3].Arr[1].Arr[pos];
+                    if (tmp.vt != DLMS_DATA_TYPE_STRUCTURE ||
+                        tmp.Arr.size() != 2)
+                    {
+                        delete pObj;
+                        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                    }
+                    int id = tmp.Arr[0].ToInteger();
+                    //Get access_mode
+                    //In version 0 data type is boolean.
+                    if (tmp.Arr[1].vt != DLMS_DATA_TYPE_ENUM && tmp.Arr[1].vt != DLMS_DATA_TYPE_BOOLEAN)
+                    {
+                        delete pObj;
+                        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                    }
+                    pObj->SetMethodAccess(id, (DLMS_METHOD_ACCESS_MODE)tmp.Arr[1].ToInteger());
+                }
+            }
+            // method_access_item End
+            cnt = ln.GetSize();
             assert(cnt == 6);
-            CGXDLMSObject::SetLogicalName(pObj, ln);
+            if ((ret = CGXDLMSObject::SetLogicalName(pObj, ln)) != 0)
+            {
+                return ret;
+            }
             m_Settings.GetObjects().push_back(pObj);
         }
     }
@@ -326,123 +461,10 @@ int CGXDLMSClient::ParseLNObjects(CGXByteBuffer& buff, bool onlyKnownObjects)
         info.SetType(DLMS_DATA_TYPE_NONE);
         info.SetIndex(0);
         info.SetCount(0);
-
-        if ((ret = GXHelpers::GetData(buff, info, value)) != 0)
+        if ((ret = GXHelpers::GetData(buff, info, value)) != 0 ||
+            (ret = ParseLNObjectItem(value)) != 0)
         {
             return ret;
-        }
-        if (value.Arr.size() != 4)
-        {
-            //Invalid structure format.
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-        int classID = value.Arr[0].ToInteger() & 0xFFFF;
-        if (classID > 0)
-        {
-            CGXDLMSObject* pObj = CGXDLMSObjectFactory::CreateObject((DLMS_OBJECT_TYPE)classID);
-            if (pObj != NULL)
-            {
-                if (value.vt != DLMS_DATA_TYPE_STRUCTURE || value.Arr.size() != 4)
-                {
-                    return DLMS_ERROR_CODE_INVALID_PARAMETER;
-                }
-                if (value.Arr[0].vt != DLMS_DATA_TYPE_UINT16)
-                {
-                    return DLMS_ERROR_CODE_INVALID_PARAMETER;
-                }
-                if (value.Arr[1].vt != DLMS_DATA_TYPE_UINT8)
-                {
-                    return DLMS_ERROR_CODE_INVALID_PARAMETER;
-                }
-                unsigned char version = value.Arr[1].ToInteger();
-                if (value.Arr[2].vt != DLMS_DATA_TYPE_OCTET_STRING)
-                {
-                    return DLMS_ERROR_CODE_INVALID_PARAMETER;
-                }
-                CGXDLMSVariant ln = value.Arr[2];
-                //Get Access rights...
-                if (value.Arr[3].vt != DLMS_DATA_TYPE_STRUCTURE || value.Arr[3].Arr.size() != 2)
-                {
-                    return DLMS_ERROR_CODE_INVALID_PARAMETER;
-                }
-                pObj->SetVersion(version);
-                int cnt;
-                // attribute_access_descriptor Start
-                if (value.Arr[3].Arr[0].vt != DLMS_DATA_TYPE_ARRAY)
-                {
-                    delete pObj;
-                    return DLMS_ERROR_CODE_INVALID_PARAMETER;
-                }
-                if (value.Arr[3].Arr.size() == 2)
-                {
-                    for (unsigned int pos = 0; pos != value.Arr[3].Arr[0].Arr.size(); ++pos)
-                    {
-                        if (value.Arr[3].Arr[0].Arr[pos].vt != DLMS_DATA_TYPE_STRUCTURE ||
-                            value.Arr[3].Arr[0].Arr[pos].Arr.size() != 3)
-                        {
-                            delete pObj;
-                            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-                        }
-                        int id = value.Arr[3].Arr[0].Arr[pos].Arr[0].ToInteger();
-                        //Get access_mode
-                        DLMS_DATA_TYPE tp = value.Arr[3].Arr[0].Arr[pos].Arr[1].vt;
-                        if (tp != DLMS_DATA_TYPE_ENUM)
-                        {
-                            delete pObj;
-                            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-                        }
-                        pObj->SetAccess(id, (DLMS_ACCESS_MODE)value.Arr[3].Arr[0].Arr[pos].Arr[1].ToInteger());
-                        //Get access_selectors
-                        if (value.Arr[3].Arr[0].Arr[pos].Arr[2].vt == DLMS_DATA_TYPE_ARRAY)
-                        {
-                            int cnt2 = (unsigned long)value.Arr[3].Arr[0].Arr[pos].Arr[2].Arr.size();
-                            for (int pos2 = 0; pos2 != cnt2; ++pos2)
-                            {
-                                //Get access_mode
-                            }
-                        }
-                        else if (value.Arr[3].Arr[0].Arr[pos].Arr[2].vt != DLMS_DATA_TYPE_NONE)
-                        {
-                            delete pObj;
-                            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-                        }
-                    }
-                    // attribute_access_descriptor End
-                    // method_access_item Start
-                    if (value.Arr[3].Arr[1].vt != DLMS_DATA_TYPE_ARRAY)
-                    {
-                        delete pObj;
-                        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-                    }
-                    for (unsigned int pos = 0; pos != value.Arr[3].Arr[1].Arr.size(); ++pos)
-                    {
-                        CGXDLMSVariant tmp = value.Arr[3].Arr[1].Arr[pos];
-                        if (tmp.vt != DLMS_DATA_TYPE_STRUCTURE ||
-                            tmp.Arr.size() != 2)
-                        {
-                            delete pObj;
-                            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-                        }
-                        int id = tmp.Arr[0].ToInteger();
-                        //Get access_mode
-                        //In version 0 data type is boolean.
-                        if (tmp.Arr[1].vt != DLMS_DATA_TYPE_ENUM && tmp.Arr[1].vt != DLMS_DATA_TYPE_BOOLEAN)
-                        {
-                            delete pObj;
-                            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-                        }
-                        pObj->SetMethodAccess(id, (DLMS_METHOD_ACCESS_MODE)tmp.Arr[1].ToInteger());
-                    }
-                }
-                // method_access_item End
-                cnt = ln.GetSize();
-                assert(cnt == 6);
-                if ((ret = CGXDLMSObject::SetLogicalName(pObj, ln)) != 0)
-                {
-                    return ret;
-                }
-                m_Settings.GetObjects().push_back(pObj);
-            }
         }
     }
     return 0;
@@ -464,6 +486,33 @@ int CGXDLMSClient::ParseObjects(CGXByteBuffer& data, bool onlyKnownObjects)
         if ((ret = ParseSNObjects(data, onlyKnownObjects)) != 0)
         {
             return ret;
+        }
+    }
+    return 0;
+}
+
+int CGXDLMSClient::ParseObjects(std::vector<CGXDLMSVariant>& objects, bool onlyKnownObjects)
+{
+    int ret;
+    m_Settings.GetObjects().Free();
+    if (GetUseLogicalNameReferencing())
+    {
+        for (std::vector< CGXDLMSVariant >::iterator it = objects.begin(); it != objects.end(); ++it)
+        {
+            if ((ret = ParseLNObjectItem(*it)) != 0)
+            {
+                return ret;
+            }
+        }
+    }
+    else
+    {
+        for (std::vector< CGXDLMSVariant >::iterator it = objects.begin(); it != objects.end(); ++it)
+        {
+            if ((ret = ParseSNObjectItem(*it)) != 0)
+            {
+                return ret;
+            }
         }
     }
     return 0;
@@ -770,6 +819,13 @@ int CGXDLMSClient::ParseApplicationAssociationResponse(
         return DLMS_ERROR_CODE_AUTHENTICATION_FAILURE;
     }
     return 0;
+}
+
+int CGXDLMSClient::ReceiverReady(
+    CGXReplyData& reply,
+    CGXByteBuffer& packets)
+{
+    return CGXDLMS::ReceiverReady(m_Settings, reply, NULL, packets);
 }
 
 int CGXDLMSClient::ReceiverReady(DLMS_DATA_REQUEST_TYPES type, CGXByteBuffer& packets)
@@ -1659,7 +1715,7 @@ void CGXDLMSClient::SetProtocolVersion(char* value)
 
 int CGXDLMSClient::ParsePushObjects(std::vector<CGXDLMSVariant>& data, std::vector<std::pair<CGXDLMSObject*, unsigned char> >& items)
 {
-    CGXDLMSObject *obj;
+    CGXDLMSObject* obj;
     int ret;
     CGXDLMSVariant tmp, value;
     CGXDLMSVariant ln;

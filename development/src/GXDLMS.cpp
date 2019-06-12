@@ -155,14 +155,28 @@ int CGXDLMS::ReceiverReady(
     CGXCipher* cipher,
     CGXByteBuffer& reply)
 {
+    CGXReplyData data;
+    data.SetMoreData(type);
+    data.SetWindowSize(settings.GetWindowSize());
+    data.SetBlockNumberAck(settings.GetBlockNumberAck());
+    data.SetBlockNumber(settings.GetBlockIndex());
+    return ReceiverReady(settings, data, cipher, reply);
+}
+
+int CGXDLMS::ReceiverReady(
+    CGXDLMSSettings& settings,
+    CGXReplyData& data,
+    CGXCipher* cipher,
+    CGXByteBuffer& reply)
+{
     int ret;
     reply.Clear();
-    if (type == DLMS_DATA_REQUEST_TYPES_NONE)
+    if (data.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     // Get next frame.
-    if ((type & DLMS_DATA_REQUEST_TYPES_FRAME) != 0)
+    if ((data.GetMoreData() & DLMS_DATA_REQUEST_TYPES_FRAME) != 0)
     {
         if ((ret = CGXDLMS::GetHdlcFrame(settings, settings.GetReceiverReady(), NULL, reply)) != 0)
         {
@@ -170,53 +184,66 @@ int CGXDLMS::ReceiverReady(
         }
         return ret;
     }
-    // Get next block.
-    DLMS_COMMAND cmd;
-    CGXByteBuffer bb(6);
     std::vector<CGXByteBuffer> tmp;
-    if (settings.GetUseLogicalNameReferencing())
+    if (data.GetMoreData() == DLMS_DATA_REQUEST_TYPES_GBT && (settings.GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER) != 0)
     {
-        if (settings.IsServer())
-        {
-            cmd = DLMS_COMMAND_GET_RESPONSE;
-        }
-        else
-        {
-            cmd = DLMS_COMMAND_GET_REQUEST;
-        }
-    }
-    else
-    {
-        if (settings.IsServer())
-        {
-            cmd = DLMS_COMMAND_READ_RESPONSE;
-        }
-        else
-        {
-            cmd = DLMS_COMMAND_READ_REQUEST;
-        }
-    }
-    if (settings.GetUseLogicalNameReferencing())
-    {
-        bb.SetUInt32(settings.GetBlockIndex());
-    }
-    else
-    {
-        bb.SetUInt16((unsigned short)settings.GetBlockIndex());
-    }
-    settings.IncreaseBlockIndex();
-    if (settings.GetUseLogicalNameReferencing())
-    {
-        CGXDLMSLNParameters p(&settings, 0, cmd,
-            DLMS_GET_COMMAND_TYPE_NEXT_DATA_BLOCK, &bb, NULL, 0xff, DLMS_COMMAND_NONE);
+        CGXDLMSLNParameters p(&settings, 0, DLMS_COMMAND_GENERAL_BLOCK_TRANSFER,
+            0, NULL, NULL, 0xff, DLMS_COMMAND_NONE);
+        p.SetWindowSize(data.GetWindowSize());
+        p.SetBlockNumberAck(data.GetBlockNumberAck());
+        p.SetBlockIndex(data.GetBlockNumber());
+        p.SetStreaming(false);
         ret = GetLnMessages(p, tmp);
     }
     else
     {
-        CGXDLMSSNParameters p(&settings, cmd, 1,
-            DLMS_VARIABLE_ACCESS_SPECIFICATION_BLOCK_NUMBER_ACCESS,
-            &bb, NULL);
-        ret = GetSnMessages(p, tmp);
+        // Get next block.
+        DLMS_COMMAND cmd;
+        CGXByteBuffer bb(6);
+        if (settings.GetUseLogicalNameReferencing())
+        {
+            if (settings.IsServer())
+            {
+                cmd = DLMS_COMMAND_GET_RESPONSE;
+            }
+            else
+            {
+                cmd = DLMS_COMMAND_GET_REQUEST;
+            }
+        }
+        else
+        {
+            if (settings.IsServer())
+            {
+                cmd = DLMS_COMMAND_READ_RESPONSE;
+            }
+            else
+            {
+                cmd = DLMS_COMMAND_READ_REQUEST;
+            }
+        }
+        if (settings.GetUseLogicalNameReferencing())
+        {
+            bb.SetUInt32(settings.GetBlockIndex());
+        }
+        else
+        {
+            bb.SetUInt16((unsigned short)settings.GetBlockIndex());
+        }
+        settings.IncreaseBlockIndex();
+        if (settings.GetUseLogicalNameReferencing())
+        {
+            CGXDLMSLNParameters p(&settings, 0, cmd,
+                DLMS_GET_COMMAND_TYPE_NEXT_DATA_BLOCK, &bb, NULL, 0xff, DLMS_COMMAND_NONE);
+            ret = GetLnMessages(p, tmp);
+        }
+        else
+        {
+            CGXDLMSSNParameters p(&settings, cmd, 1,
+                DLMS_VARIABLE_ACCESS_SPECIFICATION_BLOCK_NUMBER_ACCESS,
+                &bb, NULL);
+            ret = GetSnMessages(p, tmp);
+        }
     }
     reply.Set(&tmp.at(0), 0, -1);
     return ret;
@@ -952,11 +979,10 @@ int CGXDLMS::GetLNPdu(
             //Add data length.
             GXHelpers::SetObjectCount(bb.GetSize(), reply);
             reply.Set(&bb);
-            p.SetBlockNumberAck(p.GetBlockNumberAck() + 1);
             if (p.GetCommand() != DLMS_COMMAND_GENERAL_BLOCK_TRANSFER)
             {
                 p.SetCommand(DLMS_COMMAND_GENERAL_BLOCK_TRANSFER);
-                p.SetBlockNumberAck(p.GetSettings()->GetBlockNumberAck() + 1);
+                p.SetBlockNumberAck(p.GetBlockNumberAck() + 1);
             }
         }
     }
@@ -2277,11 +2303,11 @@ int CGXDLMS::HandleGbt(CGXDLMSSettings& settings, CGXReplyData& data)
     // Is Last block,
     if ((bc & 0x80) == 0)
     {
-        data.SetMoreData((DLMS_DATA_REQUEST_TYPES)(data.GetMoreData() | DLMS_DATA_REQUEST_TYPES_BLOCK));
+        data.SetMoreData((DLMS_DATA_REQUEST_TYPES)(data.GetMoreData() | DLMS_DATA_REQUEST_TYPES_GBT));
     }
     else
     {
-        data.SetMoreData((DLMS_DATA_REQUEST_TYPES)(data.GetMoreData() & ~DLMS_DATA_REQUEST_TYPES_BLOCK));
+        data.SetMoreData((DLMS_DATA_REQUEST_TYPES)(data.GetMoreData() & ~DLMS_DATA_REQUEST_TYPES_GBT));
         if (data.GetData().GetSize() != 0)
         {
             data.GetData().SetPosition(0);

@@ -122,7 +122,7 @@ class CGXDLMSSettings
     // DLMS version number.
     unsigned char m_DlmsVersionNumber;
 
-    // Maximum receivers PDU size.
+    // Maximum client PDU size.
     unsigned short m_MaxReceivePDUSize;
 
     // Maximum server PDU size.
