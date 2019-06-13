@@ -270,7 +270,7 @@ int CGXDLMSClient::ParseSNObjectItem(CGXDLMSVariant& value)
         CGXDLMSObject::SetLogicalName(pObj, ln);
         m_Settings.GetObjects().push_back(pObj);
     }
-    return ret;
+    return 0;
 }
 
 // SN referencing

@@ -78,7 +78,7 @@ public:
     void SetPosition(unsigned long value);
 
     //Allocate new size for the array in bytes.
-    void Capacity(unsigned long capacity);
+    int Capacity(unsigned long capacity);
 
     //Get buffer capacity.
     unsigned long Capacity();
@@ -87,39 +87,39 @@ public:
     void Zero(unsigned long index, unsigned long count);
 
     //Push new data to the byteArray.
-    void SetUInt8(unsigned char item);
+    int SetUInt8(unsigned char item);
 
-    void SetUInt8(unsigned long index, unsigned char item);
-    void SetUInt16(unsigned short item);
+    int SetUInt8(unsigned long index, unsigned char item);
+    int SetUInt16(unsigned short item);
 
-    void SetUInt32(unsigned long item);
+    int SetUInt32(unsigned long item);
 
-    void SetUInt32ByIndex(unsigned long index, unsigned long item);
+    int SetUInt32ByIndex(unsigned long index, unsigned long item);
 
-    void SetUInt64(unsigned long long item);
+    int SetUInt64(unsigned long long item);
 
-    void SetInt8(char item);
+    int SetInt8(char item);
 
-    void SetInt16(short item);
+    int SetInt16(short item);
 
-    void SetInt32(long item);
+    int SetInt32(long item);
 
-    void SetInt64(long long item);
+    int SetInt64(long long item);
 
-    void SetFloat(float value);
+    int SetFloat(float value);
 
-    void SetDouble(double value);
+    int SetDouble(double value);
 
-    void Set(const void* pSource, unsigned long count);
+    int Set(const void* pSource, unsigned long count);
 
-    void Set(CGXByteBuffer* data, unsigned long index = 0, unsigned long count = -1);
+    int Set(CGXByteBuffer* data, unsigned long index = 0, unsigned long count = -1);
 
     //Add string to byte buffer.
-    void AddString(const std::string& value);
+    int AddString(const std::string& value);
 
-    void AddString(const char* value);
+    int AddString(const char* value);
 
-    void AttachString(char* value);
+    int AttachString(char* value);
 
     void Clear();
 
@@ -200,11 +200,6 @@ public:
 
     //Move data insize byte array.
     int Move(unsigned long srcPos, unsigned long destPos, unsigned long count);
-
-    //Little Endian methods.
-    int GetUInt32LE(unsigned long* value);
-    int GetUInt32LE(unsigned long index, unsigned long* value);
-    void SetUInt32ByIndexLE(unsigned long index, unsigned long item);
 
     CGXByteBuffer& operator=(CGXByteBuffer& value);
 

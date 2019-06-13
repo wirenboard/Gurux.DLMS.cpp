@@ -111,7 +111,7 @@ void CGXByteBuffer::SetPosition(unsigned long value)
 }
 
 // Allocate new size for the array in bytes.
-void CGXByteBuffer::Capacity(unsigned long capacity)
+int CGXByteBuffer::Capacity(unsigned long capacity)
 {
     m_Capacity = capacity;
     if (capacity == 0)
@@ -126,12 +126,19 @@ void CGXByteBuffer::Capacity(unsigned long capacity)
     }
     else
     {
-        m_Data = (unsigned char*)realloc(m_Data, m_Capacity);
+        unsigned char* tmp = (unsigned char*)realloc(m_Data, m_Capacity);
+        //If not enought memory available.
+        if (tmp == NULL)
+        {
+            return DLMS_ERROR_CODE_OUTOFMEMORY;
+        }
+        m_Data = tmp;
         if (m_Size > capacity)
         {
             m_Size = capacity;
         }
     }
+    return 0;
 }
 
 unsigned long CGXByteBuffer::Capacity()
@@ -154,61 +161,95 @@ void CGXByteBuffer::Zero(unsigned long index, unsigned long count)
 }
 
 // Push new data to the byteArray.
-void CGXByteBuffer::SetUInt8(unsigned char item)
+int CGXByteBuffer::SetUInt8(unsigned char item)
 {
-    SetUInt8(m_Size, item);
-    ++m_Size;
+    int ret = SetUInt8(m_Size, item);
+    if (ret == 0)
+    {
+        ++m_Size;
+    }
+    return ret;
 }
 
-void CGXByteBuffer::SetUInt8(unsigned long index, unsigned char item)
+int CGXByteBuffer::SetUInt8(unsigned long index, unsigned char item)
 {
     if (m_Capacity == 0 || index + 1 > m_Capacity)
     {
         m_Capacity += VECTOR_CAPACITY;
-        m_Data = (unsigned char*)realloc(m_Data, m_Capacity);
+        unsigned char* tmp = (unsigned char*)realloc(m_Data, m_Capacity);
+        //If not enought memory available.
+        if (tmp == NULL)
+        {
+            return DLMS_ERROR_CODE_OUTOFMEMORY;
+        }
+        m_Data = tmp;
     }
     m_Data[index] = item;
+    return 0;
 }
 
-void CGXByteBuffer::SetUInt16(unsigned short item)
+int CGXByteBuffer::SetUInt16(unsigned short item)
 {
 
     if (m_Capacity == 0 || m_Size + 2 > m_Capacity)
     {
         m_Capacity += VECTOR_CAPACITY;
-        m_Data = (unsigned char*)realloc(m_Data, m_Capacity);
+        unsigned char* tmp = (unsigned char*)realloc(m_Data, m_Capacity);
+        //If not enought memory available.
+        if (tmp == NULL)
+        {
+            return DLMS_ERROR_CODE_OUTOFMEMORY;
+        }
+        m_Data = tmp;
     }
     m_Data[m_Size] = (item >> 8) & 0xFF;
     m_Data[m_Size + 1] = item & 0xFF;
     m_Size += 2;
+    return 0;
 }
 
-void CGXByteBuffer::SetUInt32(unsigned long item)
+int CGXByteBuffer::SetUInt32(unsigned long item)
 {
-
-    CGXByteBuffer::SetUInt32ByIndex(m_Size, item);
-    m_Size += 4;
+    int ret = CGXByteBuffer::SetUInt32ByIndex(m_Size, item);
+    if (ret == 0)
+    {
+        m_Size += 4;
+    }
+    return ret;
 }
 
-void CGXByteBuffer::SetUInt32ByIndex(unsigned long index, unsigned long item)
+int CGXByteBuffer::SetUInt32ByIndex(unsigned long index, unsigned long item)
 {
     if (m_Capacity == 0 || index + 4 > m_Capacity)
     {
         m_Capacity += VECTOR_CAPACITY;
-        m_Data = (unsigned char*)realloc(m_Data, m_Capacity);
+        unsigned char* tmp = (unsigned char*)realloc(m_Data, m_Capacity);
+        //If not enought memory available.
+        if (tmp == NULL)
+        {
+            return DLMS_ERROR_CODE_OUTOFMEMORY;
+        }
+        m_Data = tmp;
     }
     m_Data[index] = (item >> 24) & 0xFF;
     m_Data[index + 1] = (item >> 16) & 0xFF;
     m_Data[index + 2] = (item >> 8) & 0xFF;
     m_Data[index + 3] = item & 0xFF;
+    return 0;
 }
 
-void CGXByteBuffer::SetUInt64(unsigned long long item)
+int CGXByteBuffer::SetUInt64(unsigned long long item)
 {
     if (m_Capacity == 0 || m_Size + 8 > m_Capacity)
     {
         m_Capacity += VECTOR_CAPACITY;
-        m_Data = (unsigned char*)realloc(m_Data, m_Capacity);
+        unsigned char* tmp = (unsigned char*)realloc(m_Data, m_Capacity);
+        //If not enought memory available.
+        if (tmp == NULL)
+        {
+            return DLMS_ERROR_CODE_OUTOFMEMORY;
+        }
+        m_Data = tmp;
     }
     m_Data[m_Size] = (unsigned char)((item >> 56) & 0xFF);
     m_Data[m_Size + 1] = (item >> 48) & 0xFF;
@@ -219,9 +260,10 @@ void CGXByteBuffer::SetUInt64(unsigned long long item)
     m_Data[m_Size + 6] = (item >> 8) & 0xFF;
     m_Data[m_Size + 7] = item & 0xFF;
     m_Size += 8;
+    return 0;
 }
 
-void CGXByteBuffer::SetFloat(float value)
+int CGXByteBuffer::SetFloat(float value)
 {
     typedef union
     {
@@ -234,16 +276,23 @@ void CGXByteBuffer::SetFloat(float value)
     if (m_Capacity == 0 || m_Size + 4 > m_Capacity)
     {
         m_Capacity += VECTOR_CAPACITY;
-        m_Data = (unsigned char*)realloc(m_Data, m_Capacity);
+        unsigned char* tmp = (unsigned char*)realloc(m_Data, m_Capacity);
+        //If not enought memory available.
+        if (tmp == NULL)
+        {
+            return DLMS_ERROR_CODE_OUTOFMEMORY;
+        }
+        m_Data = tmp;
     }
     m_Data[m_Size] = tmp.b[3];
     m_Data[m_Size + 1] = tmp.b[2];
     m_Data[m_Size + 2] = tmp.b[1];
     m_Data[m_Size + 3] = tmp.b[0];
     m_Size += 4;
+    return 0;
 }
 
-void CGXByteBuffer::SetDouble(double value)
+int CGXByteBuffer::SetDouble(double value)
 {
     typedef union
     {
@@ -256,7 +305,13 @@ void CGXByteBuffer::SetDouble(double value)
     if (m_Capacity == 0 || m_Size + 8 > m_Capacity)
     {
         m_Capacity += VECTOR_CAPACITY;
-        m_Data = (unsigned char*)realloc(m_Data, m_Capacity);
+        unsigned char* tmp = (unsigned char*)realloc(m_Data, m_Capacity);
+        //If not enought memory available.
+        if (tmp == NULL)
+        {
+            return DLMS_ERROR_CODE_OUTOFMEMORY;
+        }
+        m_Data = tmp;
     }
     m_Data[m_Size] = tmp.b[7];
     m_Data[m_Size + 1] = tmp.b[6];
@@ -267,31 +322,30 @@ void CGXByteBuffer::SetDouble(double value)
     m_Data[m_Size + 6] = tmp.b[1];
     m_Data[m_Size + 7] = tmp.b[0];
     m_Size += 8;
+    return 0;
 }
 
-
-
-void CGXByteBuffer::SetInt8(char item)
+int CGXByteBuffer::SetInt8(char item)
 {
-    CGXByteBuffer::SetUInt8((unsigned char)item);
+    return CGXByteBuffer::SetUInt8((unsigned char)item);
 }
 
-void CGXByteBuffer::SetInt16(short item)
+int CGXByteBuffer::SetInt16(short item)
 {
-    CGXByteBuffer::SetUInt16((unsigned short)item);
+    return CGXByteBuffer::SetUInt16((unsigned short)item);
 }
 
-void CGXByteBuffer::SetInt32(long item)
+int CGXByteBuffer::SetInt32(long item)
 {
-    CGXByteBuffer::SetUInt32((unsigned long)item);
+    return CGXByteBuffer::SetUInt32((unsigned long)item);
 }
 
-void CGXByteBuffer::SetInt64(long long item)
+int CGXByteBuffer::SetInt64(long long item)
 {
-    CGXByteBuffer::SetUInt64((unsigned long long) item);
+    return CGXByteBuffer::SetUInt64((unsigned long long) item);
 }
 
-void CGXByteBuffer::Set(const void* pSource, unsigned long count)
+int CGXByteBuffer::Set(const void* pSource, unsigned long count)
 {
     if (pSource != NULL && count != 0)
     {
@@ -306,14 +360,21 @@ void CGXByteBuffer::Set(const void* pSource, unsigned long count)
             {
                 m_Capacity += count + VECTOR_CAPACITY;
             }
-            m_Data = (unsigned char*)realloc(m_Data, m_Capacity);
+            unsigned char* tmp = (unsigned char*)realloc(m_Data, m_Capacity);
+            //If not enought memory available.
+            if (tmp == NULL)
+            {
+                return DLMS_ERROR_CODE_OUTOFMEMORY;
+            }
+            m_Data = tmp;
         }
         memcpy(m_Data + m_Size, pSource, count);
         m_Size += count;
     }
+    return 0;
 }
 
-void CGXByteBuffer::Set(CGXByteBuffer* data, unsigned long index, unsigned long count)
+int CGXByteBuffer::Set(CGXByteBuffer* data, unsigned long index, unsigned long count)
 {
     if (data != NULL)
     {
@@ -321,30 +382,39 @@ void CGXByteBuffer::Set(CGXByteBuffer* data, unsigned long index, unsigned long 
         {
             count = data->m_Size - index;
         }
-        CGXByteBuffer::Set(data->m_Data + index, count);
-        data->m_Position += count;
+        int ret = CGXByteBuffer::Set(data->m_Data + index, count);
+        if (ret == 0)
+        {
+            data->m_Position += count;
+        }
     }
+    return 0;
 }
 
-void CGXByteBuffer::AddString(const char* value)
+int CGXByteBuffer::AddString(const char* value)
 {
     if (value != NULL)
     {
         unsigned long len = (unsigned long)strlen(value);
-        CGXByteBuffer::Set(value, len);
+        return CGXByteBuffer::Set(value, len);
     }
+    return 0;
 }
 
-void CGXByteBuffer::AddString(const std::string& value)
+int CGXByteBuffer::AddString(const std::string& value)
 {
-    CGXByteBuffer::Set(value.c_str(), (unsigned long)value.length());
+    return CGXByteBuffer::Set(value.c_str(), (unsigned long)value.length());
 }
 
-void CGXByteBuffer::AttachString(char* value)
+int CGXByteBuffer::AttachString(char* value)
 {
     unsigned long len = (unsigned long)strlen(value);
-    CGXByteBuffer::Set(value, len);
-    free(value);
+    int ret = CGXByteBuffer::Set(value, len);
+    if (ret == 0)
+    {
+        free(value);
+    }
+    return ret;
 }
 
 void CGXByteBuffer::Clear()
@@ -398,48 +468,6 @@ int CGXByteBuffer::GetUInt32(unsigned long* value)
     m_Position += 4;
     return 0;
 }
-
-int CGXByteBuffer::GetUInt32LE(unsigned long* value)
-{
-    if (m_Position + 4 > m_Size)
-    {
-        return DLMS_ERROR_CODE_OUTOFMEMORY;
-    }
-    *value = m_Data[m_Position + 3] << 24 |
-        m_Data[m_Position + 2] << 16 |
-        m_Data[m_Position + 1] << 8 |
-        m_Data[m_Position];
-    m_Position += 4;
-    return 0;
-}
-
-int CGXByteBuffer::GetUInt32LE(unsigned long index, unsigned long* value)
-{
-    if (index + 4 > m_Size)
-    {
-        return DLMS_ERROR_CODE_OUTOFMEMORY;
-    }
-    *value = m_Data[index + 3] << 24 |
-        m_Data[index + 2] << 16 |
-        m_Data[index + 1] << 8 |
-        m_Data[index];
-    return 0;
-}
-
-void CGXByteBuffer::SetUInt32ByIndexLE(unsigned long index, unsigned long item)
-{
-
-    if (m_Capacity == 0 || index + 4 > m_Capacity)
-    {
-        m_Capacity += VECTOR_CAPACITY;
-        m_Data = (unsigned char*)realloc(m_Data, m_Capacity);
-    }
-    m_Data[index + 3] = (item >> 24) & 0xFF;
-    m_Data[index + 2] = (item >> 16) & 0xFF;
-    m_Data[index + 1] = (item >> 8) & 0xFF;
-    m_Data[index] = item & 0xFF;
-}
-
 
 int CGXByteBuffer::GetInt16(short* value)
 {
