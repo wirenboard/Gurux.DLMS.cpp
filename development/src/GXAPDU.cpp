@@ -44,24 +44,22 @@ int GetAuthenticationString(
     CGXDLMSSettings& settings,
     CGXByteBuffer& data)
 {
+    // Add sender ACSE-requirements field component.
+    data.SetUInt8(BER_TYPE_CONTEXT
+        | PDU_TYPE_SENDER_ACSE_REQUIREMENTS);
+    data.SetUInt8(2);
+    data.SetUInt8(BER_TYPE_BIT_STRING
+        | BER_TYPE_OCTET_STRING);
+    data.SetUInt8(0x80);
+    data.SetUInt8(BER_TYPE_CONTEXT | PDU_TYPE_MECHANISM_NAME);
+    // Len
+    data.SetUInt8(7);
+    // OBJECT IDENTIFIER
+    unsigned char p[] = { 0x60, 0x85, 0x74, 0x05, 0x08, 0x02, (unsigned char)settings.GetAuthentication() };
+    data.Set(p, 7);
     // If authentication is used.
     if (settings.GetAuthentication() != DLMS_AUTHENTICATION_NONE)
     {
-        // Add sender ACSE-requirements field component.
-        data.SetUInt8(BER_TYPE_CONTEXT
-            | PDU_TYPE_SENDER_ACSE_REQUIREMENTS);
-        data.SetUInt8(2);
-        data.SetUInt8(BER_TYPE_BIT_STRING
-            | BER_TYPE_OCTET_STRING);
-        data.SetUInt8(0x80);
-
-        data.SetUInt8(BER_TYPE_CONTEXT
-            | PDU_TYPE_MECHANISM_NAME);
-        // Len
-        data.SetUInt8(7);
-        // OBJECT IDENTIFIER
-        unsigned char p[] = { 0x60, 0x85, 0x74, 0x05, 0x08, 0x02, (unsigned char)settings.GetAuthentication() };
-        data.Set(p, 7);
         // Add Calling authentication information.
         CGXByteBuffer* callingAuthenticationValue;
         if (settings.GetAuthentication() == DLMS_AUTHENTICATION_LOW)
