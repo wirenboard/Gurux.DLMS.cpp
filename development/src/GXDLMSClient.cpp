@@ -244,7 +244,6 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
 
 int CGXDLMSClient::ParseSNObjectItem(CGXDLMSVariant& value)
 {
-    int ret;
     if (value.vt != DLMS_DATA_TYPE_STRUCTURE || value.Arr.size() != 4)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;

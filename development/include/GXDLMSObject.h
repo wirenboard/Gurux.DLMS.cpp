@@ -56,8 +56,6 @@ class CGXDLMSObject : public IGXDLMSBase
     void Initialize(short sn, unsigned short class_id, unsigned char version, CGXByteBuffer* pLogicalName);
     std::string m_Description;
     DLMS_OBJECT_TYPE m_ObjectType;
-    char m_AttributeIndex;
-    unsigned short m_DataIndex;
 protected:
     unsigned short m_Version;
     std::map<int, time_t> m_ReadTimes;
