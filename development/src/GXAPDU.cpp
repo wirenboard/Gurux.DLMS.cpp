@@ -42,10 +42,11 @@
  */
 int GetAuthenticationString(
     CGXDLMSSettings& settings,
-    CGXByteBuffer& data)
+    CGXByteBuffer& data,
+    bool ignoreAcse)
 {
     if (settings.GetAuthentication() != DLMS_AUTHENTICATION_NONE ||
-        (settings.GetCipher() != NULL && settings.GetCipher()->GetSecurity() != DLMS_SECURITY_NONE))
+        (!ignoreAcse && settings.GetCipher() != NULL && settings.GetCipher()->GetSecurity() != DLMS_SECURITY_NONE))
     {
         // Add sender ACSE-requirements field component.
         data.SetUInt8(BER_TYPE_CONTEXT
@@ -1242,7 +1243,7 @@ int CGXAPDU::GenerateAarq(
     {
         return ret;
     }
-    if ((ret = GetAuthenticationString(settings, data)) != 0)
+    if ((ret = GetAuthenticationString(settings, data, encryptedData != NULL && encryptedData->GetSize() != 0)) != 0)
     {
         return ret;
     }
