@@ -585,6 +585,9 @@ long GetLongInvokeIDPriority(CGXDLMSSettings& settings)
      */
 void AddLLCBytes(CGXDLMSSettings* settings, CGXByteBuffer& data)
 {
+    CGXByteBuffer tmp;
+    tmp.Set(&data);
+    data.Clear();
     if (settings->IsServer())
     {
         data.Set(LLC_REPLY_BYTES, 3);
@@ -593,6 +596,7 @@ void AddLLCBytes(CGXDLMSSettings* settings, CGXByteBuffer& data)
     {
         data.Set(LLC_SEND_BYTES, 3);
     }
+    data.Set(&tmp);
 }
 
 /**
@@ -734,10 +738,6 @@ int CGXDLMS::GetLNPdu(
         && p.GetSettings()->GetCipher() != NULL
         && p.GetSettings()->GetCipher()->GetSecurity() != DLMS_SECURITY_NONE;
     int len = 0;
-    if (!ciphering && p.GetSettings()->GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC)
-    {
-        AddLLCBytes(p.GetSettings(), reply);
-    }
     if (p.GetCommand() == DLMS_COMMAND_AARQ)
     {
         reply.Set(p.GetAttributeDescriptor());
