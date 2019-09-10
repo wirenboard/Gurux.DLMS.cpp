@@ -42,11 +42,6 @@
 #include "GXDLMSSettings.h"
 #include "GXDLMSTranslatorStructure.h"
 
-const unsigned char LOGICAL_NAME_OBJECT_ID[7] = { 0x60, 0x85, 0x74, 0x05, 0x08, 0x01, 0x01 };
-const unsigned char SHORT_NAME_OBJECT_ID[7] = { 0x60, 0x85, 0x74, 0x05, 0x08, 0x01, 0x02 };
-const unsigned char LOGICAL_NAME_OBJECT_ID_WITH_CIPHERING[7] = { 0x60, 0x85, 0x74, 0x05, 0x08, 0x01, 0x03 };
-const unsigned char SHORT_NAME_OBJECT_ID_WITH_CIPHERING[7] = { 0x60, 0x85, 0x74, 0x05, 0x08, 0x01, 0x04 };
-
 /////////////////////////////////////////////////////////////////////////////
 // The services to access the attributes and methods of COSEM objects are
 // determined on DLMS/COSEM Application layer. The services are carried by

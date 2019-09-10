@@ -123,27 +123,20 @@ int GenerateApplicationContextName(
     // Len
     data.SetUInt8(0x07);
     bool ciphered = cipher != NULL && cipher->IsCiphered();
+
+    data.SetUInt8(0x60);
+    data.SetUInt8(0x85);
+    data.SetUInt8(0x74);
+    data.SetUInt8(0x5);
+    data.SetUInt8(0x8);
+    data.SetUInt8(0x1);
     if (settings.GetUseLogicalNameReferencing())
     {
-        if (ciphered)
-        {
-            data.Set(LOGICAL_NAME_OBJECT_ID_WITH_CIPHERING, sizeof(LOGICAL_NAME_OBJECT_ID_WITH_CIPHERING));
-        }
-        else
-        {
-            data.Set(LOGICAL_NAME_OBJECT_ID, sizeof(LOGICAL_NAME_OBJECT_ID));
-        }
+        data.SetUInt8(ciphered ? 3 : 1);
     }
     else
     {
-        if (ciphered)
-        {
-            data.Set(SHORT_NAME_OBJECT_ID_WITH_CIPHERING, sizeof(SHORT_NAME_OBJECT_ID_WITH_CIPHERING));
-        }
-        else
-        {
-            data.Set(SHORT_NAME_OBJECT_ID, sizeof(SHORT_NAME_OBJECT_ID));
-        }
+        data.SetUInt8(ciphered ? 4 : 2);
     }
     // Add system title.
     if (!settings.IsServer() &&
@@ -161,6 +154,17 @@ int GenerateApplicationContextName(
         // LEN
         GXHelpers::SetObjectCount(cipher->GetSystemTitle().GetSize(), data);
         data.Set(cipher->GetSystemTitle().GetData(), cipher->GetSystemTitle().GetSize());
+    }
+    //Add CallingAEInvocationId.
+    if (!settings.IsServer() && settings.GetUserID() != -1 && settings.GetCipher()->GetSecurity() != DLMS_SECURITY_NONE)
+    {
+        data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AE_INVOCATION_ID);
+        //LEN
+        data.SetUInt8(3);
+        data.SetUInt8(BER_TYPE_INTEGER);
+        //LEN
+        data.SetUInt8(1);
+        data.SetUInt8(settings.GetUserID());
     }
     return 0;
 }
