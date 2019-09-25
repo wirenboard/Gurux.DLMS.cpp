@@ -158,8 +158,14 @@ public:
     // Maximum client PDU size.
     unsigned short GetMaxPduSize();
 
+    //  Source system title.
+    // Meter returns system title when ciphered connection is made or GMAC authentication is used.
+    CGXByteBuffer& GetSourceSystemTitle();
+
+
     // Maximum client PDU size.
     int SetMaxReceivePDUSize(unsigned short value);
+    unsigned short GetMaxReceivePDUSize();
 
     CGXDLMSLimits& GetLimits();
 

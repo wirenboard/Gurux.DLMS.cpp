@@ -87,9 +87,19 @@ unsigned short CGXDLMSClient::GetMaxPduSize()
     return m_Settings.GetMaxPduSize();
 }
 
+CGXByteBuffer& CGXDLMSClient::GetSourceSystemTitle()
+{
+    return m_Settings.GetSourceSystemTitle();
+}
+
 int CGXDLMSClient::SetMaxReceivePDUSize(unsigned short value)
 {
     return m_Settings.SetMaxReceivePDUSize(value);
+}
+
+unsigned short CGXDLMSClient::GetMaxReceivePDUSize()
+{
+    return m_Settings.GetMaxPduSize();
 }
 
 DLMS_CONFORMANCE CGXDLMSClient::GetNegotiatedConformance()

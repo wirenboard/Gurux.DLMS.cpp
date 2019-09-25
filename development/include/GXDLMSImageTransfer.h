@@ -50,6 +50,7 @@ class CGXDLMSImageTransfer : public CGXDLMSObject
     bool m_ImageTransferEnabled;
     DLMS_IMAGE_TRANSFER_STATUS m_ImageTransferStatus;
     std::vector<CGXDLMSImageActivateInfo*> m_ImageActivateInfo;
+    int GetImageBlocks(CGXByteBuffer& image, std::vector<CGXByteBuffer>& packets);
 public:
     //Constructor.
     CGXDLMSImageTransfer();
@@ -98,6 +99,20 @@ public:
     void SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS value);
 
     std::vector<CGXDLMSImageActivateInfo*>& GetImageActivateInfo();
+
+    int ImageTransferInitiate(CGXDLMSClient* client, unsigned char* imageIdentifier, unsigned char imageIdentifierSize, long imageSize, std::vector<CGXByteBuffer>& reply);
+
+    int ImageTransferInitiate(CGXDLMSClient* client, std::string imageIdentifier, long imageSize, std::vector<CGXByteBuffer>& reply);
+
+    // Move image to the meter.
+    int ImageBlockTransfer(CGXDLMSClient* client, CGXByteBuffer& image, unsigned long& imageBlockCount, std::vector<CGXByteBuffer>& reply);
+
+    // Verify image.
+    int ImageVerify(CGXDLMSClient* client, std::vector<CGXByteBuffer>& reply);
+
+    // Activate image.
+    int ImageActivate(CGXDLMSClient* client, std::vector<CGXByteBuffer>& reply);
+
 
     // Returns amount of attributes.
     int GetAttributeCount();

@@ -136,6 +136,113 @@ std::vector<CGXDLMSImageActivateInfo*>& CGXDLMSImageTransfer::GetImageActivateIn
     return m_ImageActivateInfo;
 }
 
+int CGXDLMSImageTransfer::ImageTransferInitiate(CGXDLMSClient* client, unsigned char* imageIdentifier, unsigned char imageIdentifierSize, long imageSize, std::vector<CGXByteBuffer>& reply)
+{
+    if (m_ImageBlockSize == 0)
+    {
+        //Invalid image block size"
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    if (m_ImageBlockSize > client->GetMaxReceivePDUSize())
+    {
+        //Image block size is bigger than max PDU size.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    int ret;
+    CGXByteBuffer data;
+    CGXDLMSVariant identifier, size;
+    identifier.Add(imageIdentifier, imageIdentifierSize);
+    size = imageSize;
+    data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+    data.SetUInt8(2);
+    if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, identifier)) == 0 &&
+        (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT32, size)) == 0)
+    {
+        CGXDLMSVariant tmp = data;
+        ret = client->Method(this, 1, tmp, reply);
+    }
+    return ret;
+}
+
+int CGXDLMSImageTransfer::ImageTransferInitiate(CGXDLMSClient* client, std::string imageIdentifier, long imageSize, std::vector<CGXByteBuffer>& reply)
+{
+    return ImageTransferInitiate(client, (unsigned char*) imageIdentifier.c_str(), (unsigned char)imageIdentifier.length(), imageSize, reply);
+}
+
+// Returns image blocks to send to the meter.
+int CGXDLMSImageTransfer::GetImageBlocks(CGXByteBuffer& image, std::vector<CGXByteBuffer>& packets)
+{
+    int ret = 0;
+    unsigned long cnt = (unsigned long)(image.GetSize() / m_ImageBlockSize);
+    if (image.GetSize() % m_ImageBlockSize != 0)
+    {
+        ++cnt;
+    }
+    packets.clear();
+    CGXDLMSVariant tmp;
+    for (unsigned long pos = 0; pos != cnt; ++pos)
+    {
+        CGXByteBuffer data;
+        data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+        data.SetUInt8(2);
+        tmp = pos;
+        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT32, tmp)) != 0)
+        {
+            break;
+        }
+        int bytes = (int)(image.GetSize() - ((pos + 1) * m_ImageBlockSize));
+        //If last packet
+        if (bytes < 0)
+        {
+            bytes = (int)(image.GetSize() - (pos * m_ImageBlockSize));
+            data.Set(&image, data.GetSize(), bytes);
+        }
+        else
+        {
+            data.Set(&image, data.GetSize(), m_ImageBlockSize);
+        }
+        tmp = data;
+        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+        {
+            break;
+        }
+        packets.push_back(data);
+    }
+    return ret;
+}
+
+int CGXDLMSImageTransfer::ImageBlockTransfer(CGXDLMSClient* client, CGXByteBuffer& image, unsigned long& imageBlockCount, std::vector<CGXByteBuffer>& reply)
+{
+    int ret;
+    std::vector<CGXByteBuffer> blocks;
+    if ((ret = GetImageBlocks(image, blocks)) == 0)
+    {
+        imageBlockCount = blocks.size();
+        CGXDLMSVariant tmp;
+        for (std::vector<CGXByteBuffer>::iterator it = blocks.begin(); it != blocks.end(); ++it)
+        {
+            tmp = *it;
+            if ((ret = client->Method(this, 2, tmp, reply)) != 0)
+            {
+                break;
+            }
+        }
+    }
+    return ret;
+}
+
+int CGXDLMSImageTransfer::ImageVerify(CGXDLMSClient* client, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 3, data, reply);
+}
+
+int CGXDLMSImageTransfer::ImageActivate(CGXDLMSClient* client, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 4, data, reply);
+}
+
 // Returns amount of attributes.
 int CGXDLMSImageTransfer::GetAttributeCount()
 {
