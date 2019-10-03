@@ -53,7 +53,7 @@ void GetUtcOffset(struct tm* timeptr, int& hours, int& minutes, int& deviation)
     // local time for Jan 2, 1900 00:00 UTC
 #if defined(_WIN32) || defined(_WIN64)//Windows
     TIME_ZONE_INFORMATION tz;
-#if _MSC_VER > 1000    
+#if _MSC_VER > 1000
     localtime_s(&tm, &zero);
 #else
     tm = *localtime(&zero);
@@ -690,7 +690,7 @@ long CGXDateTime::GetDifference(struct tm& start, CGXDateTime& to)
 {
     long diff = 0;
     // Compare seconds.
-    if ((to.GetSkip() & DATETIME_SKIPS_SECOND) != 0)
+    if ((to.GetSkip() & DATETIME_SKIPS_SECOND) == 0)
     {
         if (start.tm_sec < to.m_Value.tm_sec)
         {
@@ -701,12 +701,8 @@ long CGXDateTime::GetDifference(struct tm& start, CGXDateTime& to)
             diff -= (start.tm_sec - to.m_Value.tm_sec) * 1000L;
         }
     }
-    else if (diff < 0)
-    {
-        diff = 60000 + diff;
-    }
     // Compare minutes.
-    if ((to.GetSkip() & DATETIME_SKIPS_MINUTE) != 0)
+    if ((to.GetSkip() & DATETIME_SKIPS_MINUTE) == 0)
     {
         if (start.tm_min < to.m_Value.tm_min)
         {
@@ -722,7 +718,7 @@ long CGXDateTime::GetDifference(struct tm& start, CGXDateTime& to)
         diff = 60 * 60000 + diff;
     }
     // Compare hours.
-    if ((to.GetSkip() & DATETIME_SKIPS_HOUR) != 0)
+    if ((to.GetSkip() & DATETIME_SKIPS_HOUR) == 0)
     {
         if (start.tm_hour < to.m_Value.tm_hour)
         {
@@ -738,7 +734,7 @@ long CGXDateTime::GetDifference(struct tm& start, CGXDateTime& to)
         diff = 60 * 60000 + diff;
     }
     // Compare days.
-    if ((to.GetSkip() & DATETIME_SKIPS_DAY) != 0)
+    if ((to.GetSkip() & DATETIME_SKIPS_DAY) == 0)
     {
         if (start.tm_mday < to.m_Value.tm_mday)
         {
@@ -765,7 +761,7 @@ long CGXDateTime::GetDifference(struct tm& start, CGXDateTime& to)
         diff = 24 * 60 * 60000 + diff;
     }
     // Compare months.
-    if ((to.GetSkip() & DATETIME_SKIPS_MONTH) != 0)
+    if ((to.GetSkip() & DATETIME_SKIPS_MONTH) == 0)
     {
         if (start.tm_mon < to.m_Value.tm_mon)
         {
