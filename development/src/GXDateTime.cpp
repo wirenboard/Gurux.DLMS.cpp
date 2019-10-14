@@ -606,6 +606,24 @@ void CGXDateTime::SetStatus(DLMS_CLOCK_STATUS value)
     m_Status = value;
 }
 
+void CGXDateTime::Reset()
+{
+    ResetDate();
+    ResetTime();
+    m_Status = DLMS_CLOCK_STATUS_OK;
+    m_Deviation = 0;
+    m_Skip = DATETIME_SKIPS_NONE;
+    m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
+    m_Status = DLMS_CLOCK_STATUS_OK;
+}
+
+void CGXDateTime::ResetDate()
+{
+    m_Value.tm_mday = 1;
+    m_Value.tm_mon = m_Value.tm_wday = m_Value.tm_yday = m_Value.tm_isdst = 0;
+    m_Value.tm_year = 0;
+}
+
 void CGXDateTime::ResetTime()
 {
     m_Value.tm_hour = m_Value.tm_min = m_Value.tm_sec = 0;

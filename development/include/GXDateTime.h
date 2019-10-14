@@ -121,6 +121,16 @@ public:
     void SetStatus(DLMS_CLOCK_STATUS value);
 
     /**
+    * Reset date and time fields.
+    */
+    void Reset();
+
+    /**
+    * Reset date fields.
+    */
+    void ResetDate();
+
+    /**
     * Set time to midnight.
     */
     void ResetTime();
@@ -172,7 +182,7 @@ public:
     static short GetCurrentTimeZone();
 
     //Get currect deviation.
-    static char GetCurrentDeviation();  
+    static char GetCurrentDeviation();
 
     unsigned long ToUnixTime();
 };

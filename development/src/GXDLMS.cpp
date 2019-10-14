@@ -2662,7 +2662,7 @@ int CGXDLMS::GetPdu(
         {
             data.GetData().SetPosition(data.GetCipherIndex() + 1);
             ret = HandleGbt(settings, data);
-            data.SetCipherIndex(data.GetData().GetSize());
+            data.SetCipherIndex((unsigned short) data.GetData().GetSize());
             data.SetCommand(DLMS_COMMAND_NONE);
         }
         // Get command if operating as a server.
