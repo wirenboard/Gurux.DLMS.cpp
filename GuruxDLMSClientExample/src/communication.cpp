@@ -78,6 +78,7 @@ int CGXCommunication::Close()
             (ret = ReadDataBlock(data, reply)) != 0)
         {
             //Show error but continue close.
+            printf("ReleaseRequest failed (%d) %s.\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
         }
     }
     if (m_hComPort != INVALID_HANDLE_VALUE || m_socket != -1)
@@ -86,6 +87,7 @@ int CGXCommunication::Close()
             (ret = ReadDataBlock(data, reply)) != 0)
         {
             //Show error but continue close.
+            printf("DisconnectRequest failed (%d) %s.\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
         }
     }
     if (m_hComPort != INVALID_HANDLE_VALUE)
@@ -753,7 +755,7 @@ int CGXCommunication::InitializeConnection()
             printf("Use Logical Name referencing is wrong. Change it!\r\n");
             return ret;
         }
-        printf("AARQRequest failed %d.\r\n", ret);
+        printf("AARQRequest failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
         return ret;
     }
     reply.Clear();
@@ -764,6 +766,7 @@ int CGXCommunication::InitializeConnection()
             (ret = ReadDataBlock(data, reply)) != 0 ||
             (ret = m_Parser->ParseApplicationAssociationResponse(reply.GetData())) != 0)
         {
+            printf("Authentication failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
             return ret;
         }
     }
@@ -1465,17 +1468,32 @@ int CGXCommunication::GetProfileGenerics()
 int CGXCommunication::ReadAll()
 {
     int ret;
-    if ((ret = InitializeConnection()) != 0 ||
-        (ret = GetAssociationView()) != 0 ||
-        // Read Scalers and units from the register objects.
-        (ret = ReadScalerAndUnits()) != 0 ||
-        // Read Profile Generic columns.
-        (ret = GetProfileGenericColumns()) != 0 ||
-        // Read all attributes from all objects.
-        (ret = GetReadOut()) != 0 ||
-        // Read historical data.
-        (ret = GetProfileGenerics()) != 0)
+    if ((ret = InitializeConnection()) == 0)
     {
+        // Get list of objects that meter supports.
+        if ((ret = GetAssociationView()) != 0)
+        {
+            printf("GetAssociationView failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+        }
+        // Read Scalers and units from the register objects.
+        if (ret == 0 && (ret = ReadScalerAndUnits()) != 0)
+        {
+            printf("ReadScalerAndUnits failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+        }
+        // Read Profile Generic columns.
+        if (ret == 0 && (ret = GetProfileGenericColumns()) != 0)
+        {
+            printf("GetProfileGenericColumns failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+        }
+        if (ret == 0 && (ret = GetReadOut()) != 0)
+        {
+            printf("GetReadOut failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+        }
+        // Read historical data.
+        if (ret == 0 && (ret = GetProfileGenerics()) != 0)
+        {
+            printf("GetProfileGenerics failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+        }
     }
     Close();
     return ret;
