@@ -488,13 +488,6 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
             printf("Failed to Open port. This is not a serial port.\r");
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
-
-        if ((ioctl(m_hComPort, TIOCEXCL) == -1))
-        {
-            printf("Failed to Open port. Exclusive access denied.\r");
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-
         memset(&options, 0, sizeof(options));
         options.c_iflag = 0;
         options.c_oflag = 0;

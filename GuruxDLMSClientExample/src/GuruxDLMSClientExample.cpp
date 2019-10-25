@@ -284,7 +284,7 @@ int main(int argc, char* argv[])
         {
             if ((ret = comm.Open(serialPort, iec)) != 0)
             {
-                printf("Connect failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
+                printf("Serial port open failed %d.\r\n", ret);
                 return 1;
             }
         }
