@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
         char* address = NULL;
         char* serialPort = NULL;
         bool iec = false;
-        while ((opt = getopt(argc, argv, "h:p:c:s:r:it:a:wP:g:S:")) != -1)
+        while ((opt = getopt(argc, argv, "h:p:c:s:r:it:a:wP:g:S:n:")) != -1)
         {
             switch (opt)
             {
@@ -220,6 +220,9 @@ int main(int argc, char* argv[])
                 break;
             case 's':
                 serverAddress = atoi(optarg);
+                break;
+            case 'n':
+                serverAddress = CGXDLMSClient::GetServerAddress(atoi(optarg));
                 break;
             case '?':
             {
