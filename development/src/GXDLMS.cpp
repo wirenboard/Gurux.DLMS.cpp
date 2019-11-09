@@ -771,14 +771,17 @@ int CGXDLMS::GetLNPdu(
             }
             else
             {
-                // Data is send in octet string. Remove data type.
+                // Data is send in octet string. Remove data type except from event Notification.
                 int pos = reply.GetSize();
                 CGXDLMSVariant tmp = *p.GetTime();
                 if ((ret = GXHelpers::SetData(reply, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
                 {
                     return ret;
                 }
-                reply.Move(pos + 1, pos, reply.GetSize() - pos - 1);
+                if (p.GetCommand() != DLMS_COMMAND_EVENT_NOTIFICATION)
+                {
+                    reply.Move(pos + 1, pos, reply.GetSize() - pos - 1);
+                }
             }
         }
         else if (p.GetCommand() != DLMS_COMMAND_RELEASE_REQUEST)

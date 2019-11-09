@@ -1367,6 +1367,10 @@ int CGXDLMSLNCommandHandler::HandleEventNotification(
     // If date time is given.
     if (ch != 0)
     {
+        if ((ret = reply.GetData().GetUInt8(&ch)) != 0)
+        {
+            return ret;
+        }
         tmp.Set(&reply.GetData(), reply.GetData().GetPosition(), ch);
         CGXDLMSVariant value;
         if ((ret = CGXDLMSClient::ChangeType(tmp, DLMS_DATA_TYPE_DATETIME, value)) != 0)
