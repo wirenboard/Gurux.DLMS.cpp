@@ -1078,6 +1078,10 @@ int UpdatePassword(
             std::string str;
             if (settings.GetAuthentication() == DLMS_AUTHENTICATION_LOW)
             {
+                if (settings.GetPassword().IsAsciiString())
+                {
+                    xml->AppendComment(settings.GetPassword().ToString());
+                }
                 str = settings.GetPassword().ToHexString(false);
                 xml->AppendLine(TRANSLATOR_GENERAL_TAGS_CALLING_AUTHENTICATION,
                     "", str);

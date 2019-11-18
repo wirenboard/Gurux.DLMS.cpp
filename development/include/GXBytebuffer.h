@@ -211,6 +211,13 @@ public:
 
         //Push the given hex string as byte array into this buffer at the current position, and then increments the position.
     void SetHexString(char* value);
+
+    //Check is byte buffer ASCII string.
+    static bool IsAsciiString(unsigned char* value, unsigned long length);
+
+    //Check is byte buffer ASCII string.
+    bool IsAsciiString();
+
 };
 
 #endif //GXBYTEBUFFER_H

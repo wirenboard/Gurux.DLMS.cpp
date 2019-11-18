@@ -1041,14 +1041,7 @@ int GetOctetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDL
                 }
                 if (isString)
                 {
-                    for (int pos = 0; pos != value.GetSize(); ++pos)
-                    {
-                        if (value.byteArr[pos] < 32 || value.byteArr[pos] > 126)
-                        {
-                            isString = false;
-                            break;
-                        }
-                    }
+                    isString = CGXByteBuffer::IsAsciiString(value.byteArr, value.GetSize());
                 }
                 if (isString)
                 {
@@ -1097,6 +1090,10 @@ int GetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMSVar
     if (len > 0)
     {
         tmp = new char[len + 1];
+        if (tmp == NULL)
+        {
+            return DLMS_ERROR_CODE_OUTOFMEMORY;
+        }
         tmp[len] = '\0';
         if ((ret = buff.Get((unsigned char*)tmp, len)) != 0)
         {

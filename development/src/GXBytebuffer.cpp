@@ -792,3 +792,24 @@ void CGXByteBuffer::SetHexString(char* value)
     GXHelpers::HexToBytes(str, tmp);
     Set(&tmp);
 }
+
+bool CGXByteBuffer::IsAsciiString(unsigned char* value, unsigned long length)
+{
+    if (value != NULL)
+    {
+        for (unsigned long pos = 0; pos != length; ++pos)
+        {
+            unsigned char it = value[pos];
+            if ((it < 32 || it > 127) && it != '\r' && it != '\n' && it != 0)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool CGXByteBuffer::IsAsciiString()
+{
+    return IsAsciiString(m_Data, m_Size);
+}
