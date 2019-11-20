@@ -100,14 +100,6 @@ private:
         std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns,
         CGXByteBuffer& data);
 
-    /*
-    * Add new capture object (column) to the profile generic.
-    */
-    int AddCaptureObject(
-        CGXDLMSObject* pObj,
-        int attributeIndex,
-        int dataIndex);
-
     int GetProfileGenericData(
         CGXDLMSSettings& settings,
         CGXDLMSValueEventArg& e,
@@ -125,6 +117,13 @@ private:
         std::vector<CGXDLMSVariant>& cols,
         std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns);
 public:
+    /*
+     * Add new capture object (column) to the profile generic.
+     */
+    int AddCaptureObject(
+        CGXDLMSObject* pObj,
+        int attributeIndex,
+        int dataIndex);
 
     /**
     * Get selected columns from parameters.

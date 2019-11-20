@@ -42,7 +42,7 @@ CGXDLMSUtilityTables::CGXDLMSUtilityTables() :
 
 //SN Constructor.
 CGXDLMSUtilityTables::CGXDLMSUtilityTables(std::string ln, unsigned short sn) :
-    CGXDLMSObject(DLMS_OBJECT_TYPE_DATA, ln, sn)
+    CGXDLMSObject(DLMS_OBJECT_TYPE_UTILITY_TABLES, ln, sn)
 {
 
 }

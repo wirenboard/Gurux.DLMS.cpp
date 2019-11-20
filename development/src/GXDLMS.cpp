@@ -1036,6 +1036,7 @@ int CGXDLMS::GetLnMessages(
             }
             messages.push_back(tmp);
             tmp.Clear();
+            frame = 0;
         }
         reply.Clear();
     } while (ret == 0 && p.GetData() != NULL && p.GetData()->GetPosition() != p.GetData()->GetSize());
@@ -1262,14 +1263,7 @@ int CGXDLMS::GetSnMessages(
                 ret = GetHdlcFrame(*p.GetSettings(), frame, &data, reply);
                 if (data.GetPosition() != data.GetSize())
                 {
-                    if (p.GetSettings()->IsServer())
-                    {
-                        frame = 0;
-                    }
-                    else
-                    {
-                        frame = p.GetSettings()->GetNextSend(0);
-                    }
+                    frame = p.GetSettings()->GetNextSend(0);
                 }
             }
             if (ret != 0)
@@ -1278,6 +1272,7 @@ int CGXDLMS::GetSnMessages(
             }
             messages.push_back(reply);
             reply.Clear();
+            frame = 0;
         }
         reply.Clear();
     } while (ret == 0 && p.GetData() != NULL && p.GetData()->GetPosition() != p.GetData()->GetSize());
