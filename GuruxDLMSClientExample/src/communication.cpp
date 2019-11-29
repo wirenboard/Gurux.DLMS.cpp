@@ -443,6 +443,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
     if (m_hComPort == INVALID_HANDLE_VALUE)
     {
+        printf("Failed to open serial port: \"%s\"\r\n", port.c_str());
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     dcb.DCBlength = sizeof(DCB);
@@ -478,14 +479,14 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
     m_hComPort = open(port.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (m_hComPort == -1) // if open is unsuccessful.
     {
-        printf("Failed to Open port.\r");
+        printf("Failed to open serial port: \"%s\"\r\n", port.c_str());
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     else
     {
         if (!isatty(m_hComPort))
         {
-            printf("Failed to Open port. This is not a serial port.\r");
+            printf("Failed to Open port. This is not a serial port.\r\n");
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         memset(&options, 0, sizeof(options));
@@ -525,7 +526,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         //options.c_cflag |= CRTSCTS;
         if (tcsetattr(m_hComPort, TCSAFLUSH, &options) != 0)
         {
-            printf("Failed to Open port. tcsetattr failed.\r");
+            printf("Failed to Open port. tcsetattr failed.\r\n");
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
     }

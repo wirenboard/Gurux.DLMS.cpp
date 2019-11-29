@@ -132,7 +132,7 @@ CGXDateTime::CGXDateTime()
     m_Deviation = -(hours * 60 + minutes);
     m_Skip = DATETIME_SKIPS_NONE;
     memset(&m_Value, 0xFF, sizeof(m_Value));
-    m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
+    m_Extra = DATE_TIME_EXTRA_INFO_NONE;
     m_Status = DLMS_CLOCK_STATUS_OK;
 }
 
@@ -144,7 +144,7 @@ CGXDateTime::CGXDateTime(struct tm& value)
     m_Deviation = -(hours * 60 + minutes);
     m_Value = value;
     m_Skip = DATETIME_SKIPS_NONE;
-    m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
+    m_Extra = DATE_TIME_EXTRA_INFO_NONE;
     if (value.tm_isdst)
     {
         m_Status = DLMS_CLOCK_STATUS_DAYLIGHT_SAVE_ACTIVE;
@@ -163,7 +163,7 @@ CGXDateTime::CGXDateTime(struct tm* value)
     m_Deviation = -(hours * 60 + minutes);
     m_Value = *value;
     m_Skip = DATETIME_SKIPS_NONE;
-    m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
+    m_Extra = DATE_TIME_EXTRA_INFO_NONE;
     if (value->tm_isdst)
     {
         m_Status = DLMS_CLOCK_STATUS_DAYLIGHT_SAVE_ACTIVE;
@@ -204,7 +204,7 @@ CGXDateTime::CGXDateTime(int year, int month, int day, int hour, int minute, int
 void CGXDateTime::Init(int year, int month, int day, int hour, int minute, int second, int millisecond, int devitation)
 {
     memset(&m_Value, 0, sizeof(m_Value));
-    m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
+    m_Extra = DATE_TIME_EXTRA_INFO_NONE;
     m_Status = DLMS_CLOCK_STATUS_OK;
     int skip = DATETIME_SKIPS_NONE;
     if (year < 1 || year == 0xFFFF)
@@ -315,28 +315,14 @@ void CGXDateTime::SetSkip(DATETIME_SKIPS value)
     m_Skip = value;
 }
 
-/**
- Daylight savings begin.
-*/
-bool CGXDateTime::GetDaylightSavingsBegin()
+DATE_TIME_EXTRA_INFO CGXDateTime::GetExtra()
 {
-    return m_DaylightSavingsBegin;
-}
-void CGXDateTime::SetDaylightSavingsBegin(bool value)
-{
-    m_DaylightSavingsBegin = value;
+    return m_Extra;
 }
 
-/**
- Daylight savings end.
-*/
-bool CGXDateTime::GetDaylightSavingsEnd()
+void CGXDateTime::SetExtra(DATE_TIME_EXTRA_INFO value)
 {
-    return m_DaylightSavingsEnd;
-}
-void CGXDateTime::SetDaylightSavingsEnd(bool value)
-{
-    m_DaylightSavingsEnd = value;
+    m_Extra = value;
 }
 
 int CGXDateTime::GetDeviation()
@@ -348,7 +334,6 @@ void CGXDateTime::SetDeviation(int value)
 {
     m_Deviation = value;
 }
-
 
 //Constants for different orders of date components.
 typedef enum
@@ -613,7 +598,7 @@ void CGXDateTime::Reset()
     m_Status = DLMS_CLOCK_STATUS_OK;
     m_Deviation = 0;
     m_Skip = DATETIME_SKIPS_NONE;
-    m_DaylightSavingsBegin = m_DaylightSavingsEnd = false;
+    m_Extra = DATE_TIME_EXTRA_INFO_NONE;
     m_Status = DLMS_CLOCK_STATUS_OK;
 }
 

@@ -70,12 +70,14 @@ public:
     CGXTime(CGXDateTime& value) : CGXDateTime(value.GetValue())
     {
         SetSkip((DATETIME_SKIPS)(value.m_Skip | DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY | DATETIME_SKIPS_DAYOFWEEK));
+        SetExtra(value.m_Extra);
     }
 
     CGXTime& operator=(const CGXDateTime& value)
     {
         SetValue(value.m_Value);
         SetSkip((DATETIME_SKIPS)(value.m_Skip | DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY | DATETIME_SKIPS_DAYOFWEEK));
+        SetExtra(value.m_Extra);
         return *this;
     }
 };

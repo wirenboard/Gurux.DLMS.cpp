@@ -2660,7 +2660,7 @@ int CGXDLMS::GetPdu(
         {
             data.GetData().SetPosition(data.GetCipherIndex() + 1);
             ret = HandleGbt(settings, data);
-            data.SetCipherIndex((unsigned short) data.GetData().GetSize());
+            data.SetCipherIndex((unsigned short)data.GetData().GetSize());
             data.SetCommand(DLMS_COMMAND_NONE);
         }
         // Get command if operating as a server.
@@ -2777,6 +2777,30 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
         return DLMS_ERROR_CODE_OK;
     }
     ret = GetPdu(settings, *target);
+
+    if (ret == 0 && !isNotify)
+    {
+        CGXByteBuffer& d = data.GetData();
+        //Check command to make sure it's not notify message.
+        switch (target->GetCommand())
+        {
+        case DLMS_COMMAND_DATA_NOTIFICATION:
+        case DLMS_COMMAND_GLO_EVENT_NOTIFICATION_REQUEST:
+        case DLMS_COMMAND_INFORMATION_REPORT:
+        case DLMS_COMMAND_EVENT_NOTIFICATION:
+        case DLMS_COMMAND_DED_EVENT_NOTIFICATION:
+            isNotify = true;
+            notify->SetCommand(data.GetCommand());
+            data.SetCommand(DLMS_COMMAND_NONE);
+            notify->SetTime(data.GetTime());
+            data.SetTime(0);
+            notify->GetData().Set(&d, d.GetPosition(), d.GetSize() - d.GetPosition());
+            data.GetData().Trim();
+            break;
+        default:
+            break;
+        }
+    }
     if (ret == 0 && isNotify)
     {
         return DLMS_ERROR_CODE_FALSE;
