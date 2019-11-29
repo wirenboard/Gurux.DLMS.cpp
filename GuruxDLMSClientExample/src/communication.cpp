@@ -686,6 +686,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         ret = write(m_hComPort, buff, len);
         if (ret != len)
         {
+            printf("write failed %dr\n", errno);
             return DLMS_ERROR_CODE_SEND_FAILED;
         }
 #endif
@@ -699,6 +700,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         dcb.Parity = NOPARITY;
         if ((ret = GXSetCommState(m_hComPort, &dcb)) != 0)
         {
+            printf("GXSetCommState failed %d\n", ret);
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         //Some meters need this sleep. Do not remove.
@@ -711,7 +713,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         cfsetispeed(&options, baudRate);
         if (tcsetattr(m_hComPort, TCSAFLUSH, &options) != 0)
         {
-            printf("Failed to Open port. tcsetattr failed.\r");
+            printf("Failed to Open port. tcsetattr failed %d.\r\n", errno);
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         //Some meters need this sleep. Do not remove.
