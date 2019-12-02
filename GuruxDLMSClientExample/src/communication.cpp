@@ -296,6 +296,7 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             {
                 if (readTime > m_WaitTime)
                 {
+                    printf("Read failed. Timeout occurred.\r\n");
                     return DLMS_ERROR_CODE_RECEIVE_FAILED;
                 }
                 readTime += 100;
@@ -304,10 +305,12 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             //If connection is closed.
             else if (errno == EBADF)
             {
+                printf("Read failed. Connection closed.\r\n");
                 return DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
             else
             {
+                printf("Read failed. %d.\r\n", errno);
                 return DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
         }
@@ -565,6 +568,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         ret = write(m_hComPort, buff, len);
         if (ret != len)
         {
+            printf("write failed %d\r\n", errno);
             return DLMS_ERROR_CODE_SEND_FAILED;
         }
 #endif
@@ -821,7 +825,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         ret = write(m_hComPort, data.GetData(), len);
         if (ret != len)
         {
-            printf("send failed %d\n", errno);
+            printf("write failed %d\n", errno);
             return DLMS_ERROR_CODE_SEND_FAILED;
         }
 #endif
@@ -866,6 +870,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             unsigned short pos = bb.GetSize();
             if (Read(0x7E, bb) != 0)
             {
+                printf("Read failed.\r\n");
                 return DLMS_ERROR_CODE_SEND_FAILED;
             }
             if (tmp.size() == 0)
