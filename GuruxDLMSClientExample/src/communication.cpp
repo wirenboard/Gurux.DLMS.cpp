@@ -544,7 +544,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         len = (int)strlen(buff);
         if (m_Trace > GX_TRACE_LEVEL_WARNING)
         {
-            printf("\r\nTX: ");
+            printf("\r\nTX:\t");
             for (pos = 0; pos != len; ++pos)
             {
                 printf("%.2X ", buff[pos]);
@@ -588,7 +588,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
 
         if (m_Trace > GX_TRACE_LEVEL_WARNING)
         {
-            printf("-> %s\r\n", reply.ToHexString().c_str());
+            printf("RX:\t%s\r\n", reply.ToHexString().c_str());
         }
         if (reply.GetUInt8(&ch) != 0 || ch != '/')
         {
@@ -694,9 +694,9 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
             return DLMS_ERROR_CODE_SEND_FAILED;
         }
 #endif
-        //It's ok if this fails.
-        Read('\n', reply);
 #if defined(_WIN32) || defined(_WIN64)//Windows
+        //Some meters need this sleep. Do not remove.
+        Sleep(200);
         dcb.BaudRate = baudRate;
         printf("New baudrate %d\r\n", (int)dcb.BaudRate);
         dcb.ByteSize = 8;
@@ -708,8 +708,10 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         //Some meters need this sleep. Do not remove.
-        Sleep(1000);
+        Sleep(800);
 #else
+        //Some meters need this sleep. Do not remove.
+        usleep(200000);
         // 8n1, see termios.h for more information
         options.c_cflag = CS8 | CREAD | CLOCAL;
         //Set Baud Rates
@@ -721,8 +723,10 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         //Some meters need this sleep. Do not remove.
-        usleep(1000000);
+        usleep(800000);
 #endif
+        //It's ok if this fails.
+        Read('\n', reply);
     }
     return DLMS_ERROR_CODE_OK;
 }
@@ -785,7 +789,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         return DLMS_ERROR_CODE_OK;
     }
     Now(tmp);
-    tmp = "TX: " + tmp;
+    tmp = "TX:\t" + tmp;
     tmp += "\t" + data.ToHexString();
     if (m_Trace > GX_TRACE_LEVEL_INFO)
     {
@@ -876,7 +880,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             if (tmp.size() == 0)
             {
                 Now(tmp);
-                tmp = "RX: " + tmp + "\t";
+                tmp = "RX:\t" + tmp + "\t";
             }
             else
             {
@@ -900,7 +904,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             if (tmp.size() == 0)
             {
                 Now(tmp);
-                tmp = "RX: " + tmp + "\t";
+                tmp = "RX:\t" + tmp + "\t";
             }
             else
             {
