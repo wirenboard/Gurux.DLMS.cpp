@@ -3845,10 +3845,10 @@ int CGXDLMS::ParseSnrmUaResponse(
         switch (id)
         {
         case HDLC_INFO_MAX_INFO_TX:
-            limits->SetMaxInfoRX((unsigned char)value.ToInteger());
+            limits->SetMaxInfoRX((unsigned short)value.ToInteger());
             break;
         case HDLC_INFO_MAX_INFO_RX:
-            limits->SetMaxInfoTX((unsigned char)value.ToInteger());
+            limits->SetMaxInfoTX((unsigned short)value.ToInteger());
             break;
         case HDLC_INFO_WINDOW_SIZE_TX:
             limits->SetWindowSizeRX((unsigned char)value.ToInteger());
