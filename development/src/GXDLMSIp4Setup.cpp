@@ -56,7 +56,7 @@ CGXDLMSIp4Setup::CGXDLMSIp4Setup() :
 CGXDLMSIp4Setup::CGXDLMSIp4Setup(std::string ln, unsigned short sn) :
     CGXDLMSObject(DLMS_OBJECT_TYPE_IP4_SETUP, ln, sn)
 {
-    m_IPAddress.empty();
+    m_IPAddress.clear();
     m_SubnetMask = 0;
     m_GatewayIPAddress = 0;
     m_UseDHCP = false;

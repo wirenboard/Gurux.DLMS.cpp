@@ -158,17 +158,36 @@ public:
     // Maximum client PDU size.
     unsigned short GetMaxPduSize();
 
+    /////////////////////////////////////////////////////////////////////////////
+    // Standard says that Time zone is from normal time to UTC in minutes.
+    // If meter is configured to use UTC time (UTC to normal time) set this to true.
+    bool GetUseUtc2NormalTime();
+    void SetUseUtc2NormalTime(bool value);
+
+    /////////////////////////////////////////////////////////////////////////////
+    //User id is the identifier of the user.
+    unsigned char CGXDLMSClient::GetUserID();
+    void SetUserID(unsigned char value);
+
+    /////////////////////////////////////////////////////////////////////////////
+    //Quality of service.
+    unsigned char GetQualityOfService();
+    void SetQualityOfService(unsigned char value);
+
+    /////////////////////////////////////////////////////////////////////////////
     //  Source system title.
     // Meter returns system title when ciphered connection is made or GMAC authentication is used.
     CGXByteBuffer& GetSourceSystemTitle();
 
 
+    /////////////////////////////////////////////////////////////////////////////
     // Maximum client PDU size.
     int SetMaxReceivePDUSize(unsigned short value);
     unsigned short GetMaxReceivePDUSize();
 
     CGXDLMSLimits& GetLimits();
 
+    /////////////////////////////////////////////////////////////////////////////
     // Collection of the objects.
     CGXDLMSObjectCollection& GetObjects();
 

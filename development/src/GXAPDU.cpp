@@ -201,7 +201,15 @@ int GetInitiateRequest(
     data.SetUInt8(0);
 
     // Usage field of the proposed-quality-of-service component. Not used
-    data.SetUInt8(0x00);
+    if (settings.GetQualityOfService() == 0)
+    {
+        data.SetUInt8(0x00);
+    }
+    else
+    {
+        data.SetUInt8(0x01);
+        data.SetUInt8(settings.GetQualityOfService());
+    }
     data.SetUInt8(settings.GetDLMSVersion());
     // Tag for conformance block
     data.SetUInt8(0x5F);

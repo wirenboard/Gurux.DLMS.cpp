@@ -87,6 +87,37 @@ unsigned short CGXDLMSClient::GetMaxPduSize()
     return m_Settings.GetMaxPduSize();
 }
 
+
+bool CGXDLMSClient::GetUseUtc2NormalTime()
+{
+    return m_Settings.GetUseUtc2NormalTime();
+}
+
+void CGXDLMSClient::SetUseUtc2NormalTime(bool value)
+{
+    m_Settings.SetUseUtc2NormalTime(value);
+}
+
+unsigned char CGXDLMSClient::GetUserID()
+{
+    return m_Settings.GetUserID();
+}
+
+void CGXDLMSClient::SetUserID(unsigned char value)
+{
+    m_Settings.SetUserID(value);
+}
+
+unsigned char CGXDLMSClient::GetQualityOfService()
+{
+    return m_Settings.GetQualityOfService();
+}
+
+void CGXDLMSClient::SetQualityOfService(unsigned char value)
+{
+    m_Settings.SetQualityOfService(value);
+}
+
 CGXByteBuffer& CGXDLMSClient::GetSourceSystemTitle()
 {
     return m_Settings.GetSourceSystemTitle();
