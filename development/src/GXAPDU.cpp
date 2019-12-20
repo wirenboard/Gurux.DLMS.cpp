@@ -156,7 +156,7 @@ int GenerateApplicationContextName(
         data.Set(cipher->GetSystemTitle().GetData(), cipher->GetSystemTitle().GetSize());
     }
     //Add CallingAEInvocationId.
-    if (!settings.IsServer() && settings.GetUserID() != -1 && settings.GetCipher()->GetSecurity() != DLMS_SECURITY_NONE)
+    if (!settings.IsServer() && settings.GetUserID() != 0 && settings.GetCipher()->GetSecurity() != DLMS_SECURITY_NONE)
     {
         data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AE_INVOCATION_ID);
         //LEN
