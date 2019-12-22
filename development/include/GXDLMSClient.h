@@ -155,6 +155,24 @@ public:
      */
     void SetAutoIncreaseInvokeID(bool value);
 
+    // Gets used authentication.
+    DLMS_AUTHENTICATION GetAuthentication();
+
+    //Sets Used authentication.
+    void SetAuthentication(DLMS_AUTHENTICATION value);
+
+    // Gets client address.
+    unsigned long GetClientAddress();
+
+    // Sets client address.
+    void SetClientAddress(unsigned long value);
+
+    // Server address.
+    unsigned long GetServerAddress();
+
+    // Server address.
+    void SetServerAddress(unsigned long value);
+
     // Maximum client PDU size.
     unsigned short GetMaxPduSize();
 
@@ -166,7 +184,7 @@ public:
 
     /////////////////////////////////////////////////////////////////////////////
     //User id is the identifier of the user.
-    unsigned char CGXDLMSClient::GetUserID();
+    unsigned char GetUserID();
     void SetUserID(unsigned char value);
 
     /////////////////////////////////////////////////////////////////////////////

@@ -279,11 +279,18 @@ public:
     void SetAuthenticationKey(CGXByteBuffer& value);
 
     /**
-     * Returns Frame counter. Invocation counter.
+     * Returns Frame counter. AKA. Invocation counter.
      */
     unsigned long GetFrameCounter();
 
     void SetFrameCounter(unsigned long value);
+
+    /**
+     * Returns Invocation counter. AKA Frame counter.
+     */
+    unsigned long GetInvocationCounter();
+
+    void SetInvocationCounter(unsigned long value);
 
     void Reset();
 

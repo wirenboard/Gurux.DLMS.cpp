@@ -55,6 +55,8 @@ static void ShowHelp()
     printf(" -w WRAPPER profile is used. HDLC is default.\r\n");
     printf(" -t Trace messages.\r\n");
     printf(" -g \"0.0.1.0.0.255:1; 0.0.1.0.0.255:2\" Get selected object(s) with given attribute index.\r\n");
+    printf(" -C \t Security Level. (None, Authentication, Encrypted, AuthenticationEncryption)");
+    printf(" -v \t Invocation counter data object Logical Name. Ex. 0.0.43.1.1.255");
     printf("Example:\r\n");
     printf("Read LG device using TCP/IP connection.\r\n");
     printf("GuruxDlmsSample -r SN -c 16 -s 1 -h [Meter IP Address] -p [Meter Port No]\r\n");
@@ -91,6 +93,7 @@ int main(int argc, char* argv[])
         int clientAddress = 16, serverAddress = 1;
         DLMS_AUTHENTICATION authentication = DLMS_AUTHENTICATION_NONE;
         DLMS_INTERFACE_TYPE interfaceType = DLMS_INTERFACE_TYPE_HDLC;
+        DLMS_SECURITY security = DLMS_SECURITY_NONE;
         char *password = NULL;
         char *p, *p2, *readObjects = NULL;
         int index, a, b, c, d, e, f;
@@ -99,7 +102,8 @@ int main(int argc, char* argv[])
         char* address = NULL;
         char* serialPort = NULL;
         bool iec = false;
-        while ((opt = getopt(argc, argv, "h:p:c:s:r:it:a:wP:g:S:n:")) != -1)
+        char* invocationCounter = NULL;
+        while ((opt = getopt(argc, argv, "h:p:c:s:r:it:a:wP:g:S:n:C:v:")) != -1)
         {
             switch (opt)
             {
@@ -153,6 +157,41 @@ int main(int argc, char* argv[])
             case 'i':
                 //IEC.
                 iec = 1;
+                break;
+            case 'C':
+                if (strcmp("None", optarg) == 0)
+                {
+                    security = DLMS_SECURITY_NONE;
+                }
+                else if(strcmp("Authentication", optarg) == 0)
+                {
+                    security = DLMS_SECURITY_AUTHENTICATION;
+                }
+                else if(strcmp("Encryption", optarg) == 0)
+                {
+                    security = DLMS_SECURITY_ENCRYPTION;
+                }
+                else if (strcmp("AuthenticationEncryption", optarg) == 0)
+                {
+                    security = DLMS_SECURITY_AUTHENTICATION_ENCRYPTION;
+                }
+                else
+                {
+                    printf("Invalid Ciphering option '%s'. (None, Authentication, Encryption, AuthenticationEncryption)", optarg);
+                    return 1;
+                }
+                break;
+            case 'v':
+                invocationCounter = optarg;
+#if defined(_WIN32) || defined(_WIN64)//Windows
+                if ((ret = sscanf_s(optarg, "%d.%d.%d.%d.%d.%d:%d", &a, &b, &c, &d, &e, &f)) != 6)
+#else
+                if ((ret = sscanf(optarg, "%d.%d.%d.%d.%d.%d:%d", &a, &b, &c, &d, &e, &f)) != 6)
+#endif
+                {
+                    ShowHelp();
+                    return 1;
+                }
                 break;
             case 'g':
                 //Get (read) selected objects.
@@ -250,6 +289,12 @@ int main(int argc, char* argv[])
                 else if (optarg[0] == 'g') {
                     printf("Missing mandatory OBIS code option.\n");
                 }
+                else if (optarg[0] == 'C') {
+                    printf("Missing mandatory Ciphering option.\n");
+                }
+                else if (optarg[0] == 'v') {
+                    printf("Missing mandatory invocation counter logical name option.\n");
+                }
                 else
                 {
                     ShowHelp();
@@ -263,7 +308,8 @@ int main(int argc, char* argv[])
             }
         }
         CGXDLMSSecureClient cl(useLogicalNameReferencing, clientAddress, serverAddress, authentication, password, interfaceType);
-        CGXCommunication comm(&cl, 5000, trace);
+        cl.GetCiphering()->SetSecurity(security);
+        CGXCommunication comm(&cl, 5000, trace, invocationCounter);
 
         if (port != 0 || address != NULL)
         {

@@ -37,6 +37,7 @@
 #include "../../development/include/GXDLMSProfileGeneric.h"
 #include "../../development/include/GXDLMSDemandRegister.h"
 #include "../../development/include/GXDLMSTranslator.h"
+#include "../../development/include/GXDLMSData.h"
 
 void CGXCommunication::WriteValue(GX_TRACE_LEVEL trace, std::string line)
 {
@@ -48,9 +49,9 @@ void CGXCommunication::WriteValue(GX_TRACE_LEVEL trace, std::string line)
 }
 
 
-CGXCommunication::CGXCommunication(CGXDLMSClient* pParser, int wt, GX_TRACE_LEVEL trace) :
+CGXCommunication::CGXCommunication(CGXDLMSSecureClient* pParser, int wt, GX_TRACE_LEVEL trace, char* invocationCounter) :
     m_WaitTime(wt), m_Parser(pParser),
-    m_socket(-1), m_Trace(trace)
+    m_socket(-1), m_Trace(trace), m_InvocationCounter(invocationCounter)
 {
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
     ZeroMemory(&m_osReader, sizeof(OVERLAPPED));
@@ -64,6 +65,24 @@ CGXCommunication::CGXCommunication(CGXDLMSClient* pParser, int wt, GX_TRACE_LEVE
 CGXCommunication::~CGXCommunication(void)
 {
     Close();
+}
+
+//Close connection to the meter.
+int CGXCommunication::Disconnect()
+{
+    int ret;
+    std::vector<CGXByteBuffer> data;
+    CGXReplyData reply;
+    if (m_hComPort != INVALID_HANDLE_VALUE || m_socket != -1)
+    {
+        if ((ret = m_Parser->DisconnectRequest(data)) != 0 ||
+            (ret = ReadDataBlock(data, reply)) != 0)
+        {
+            //Show error but continue close.
+            printf("DisconnectRequest failed (%d) %s.\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+        }
+    }
+    return 0;
 }
 
 //Close connection to the meter.
@@ -131,7 +150,7 @@ int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
     //If address is give as name
     if (add.sin_addr.s_addr == INADDR_NONE)
     {
-        hostent *Hostent = gethostbyname(pAddress);
+        hostent* Hostent = gethostbyname(pAddress);
         if (Hostent == NULL)
         {
 #if defined(_WIN32) || defined(_WIN64)//If Windows
@@ -731,16 +750,82 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
     return DLMS_ERROR_CODE_OK;
 }
 
+/// Read Invocation counter (frame counter) from the meter and update it.
+int CGXCommunication::UpdateFrameCounter()
+{
+    int ret = 0;
+    //Read frame counter if GeneralProtection is used.
+    if (m_InvocationCounter != NULL && m_Parser->GetCiphering() != NULL && m_Parser->GetCiphering()->GetSecurity() != DLMS_SECURITY_NONE)
+    {
+        if (m_Trace > GX_TRACE_LEVEL_WARNING)
+        {
+            printf("UpdateFrameCounter\r\n");
+        }
+        m_Parser->SetProposedConformance((DLMS_CONFORMANCE)(m_Parser->GetProposedConformance() | DLMS_CONFORMANCE_GENERAL_PROTECTION));
+        unsigned long add = m_Parser->GetClientAddress();
+        DLMS_AUTHENTICATION auth = m_Parser->GetAuthentication();
+        DLMS_SECURITY security = m_Parser->GetCiphering()->GetSecurity();
+        CGXByteBuffer& challenge = m_Parser->GetCtoSChallenge();
+        std::vector<CGXByteBuffer> data;
+        CGXReplyData reply;
+        m_Parser->SetClientAddress(16);
+        m_Parser->SetAuthentication(DLMS_AUTHENTICATION_NONE);
+        m_Parser->GetCiphering()->SetSecurity(DLMS_SECURITY_NONE);
+        //Get meter's send and receive buffers size.
+        if ((ret = m_Parser->SNRMRequest(data)) != 0 ||
+            (ret = ReadDataBlock(data, reply)) != 0 ||
+            (ret = m_Parser->ParseUAResponse(reply.GetData())) != 0)
+        {
+            printf("SNRMRequest failed %d.\r\n", ret);
+            return ret;
+        }
+        reply.Clear();
+        if ((ret = m_Parser->AARQRequest(data)) != 0 ||
+            (ret = ReadDataBlock(data, reply)) != 0 ||
+            (ret = m_Parser->ParseAAREResponse(reply.GetData())) != 0)
+        {
+            if (ret == DLMS_ERROR_CODE_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED)
+            {
+                printf("Use Logical Name referencing is wrong. Change it!\r\n");
+                return ret;
+            }
+            printf("AARQRequest failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+            return ret;
+        }
+        reply.Clear();
+        std::string ln;
+        ln.append(m_InvocationCounter);
+        CGXDLMSData d(ln);
+        std::string str;
+        if ((ret = Read(&d, 2, str)) == 0)
+        {
+            m_Parser->GetCiphering()->SetInvocationCounter(1 + d.GetValue().ToInteger());
+        }
+        reply.Clear();
+        Disconnect();
+        m_Parser->SetClientAddress(add);
+        m_Parser->SetAuthentication(auth);
+        m_Parser->GetCiphering()->SetSecurity(security);
+        m_Parser->SetCtoSChallenge(challenge);
+    }
+    return ret;
+}
+
+
 //Initialize connection to the meter.
 int CGXCommunication::InitializeConnection()
 {
+    int ret = 0;
+    if ((ret = UpdateFrameCounter()) != 0)
+    {
+        return ret;
+    }
     if (m_Trace > GX_TRACE_LEVEL_WARNING)
     {
         printf("InitializeConnection\r\n");
     }
     std::vector<CGXByteBuffer> data;
     CGXReplyData reply;
-    int ret = 0;
     //Get meter's send and receive buffers size.
     if ((ret = m_Parser->SNRMRequest(data)) != 0 ||
         (ret = ReadDataBlock(data, reply)) != 0 ||
@@ -833,7 +918,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             return DLMS_ERROR_CODE_SEND_FAILED;
         }
 #endif
-    }
+        }
     else if ((ret = send(m_socket, (const char*)data.GetData(), len, 0)) == -1)
     {
         //If error has occured
@@ -871,7 +956,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
 
         if (m_hComPort != INVALID_HANDLE_VALUE)
         {
-            unsigned short pos = bb.GetSize();
+            unsigned short pos = (unsigned short)bb.GetSize();
             if (Read(0x7E, bb) != 0)
             {
                 printf("Read failed.\r\n");
@@ -1366,10 +1451,10 @@ int CGXCommunication::GetReadOut()
                 WriteValue(m_Trace, value.c_str());
                 WriteValue(m_Trace, "\r\n");
             }
+            }
         }
-    }
     return ret;
-}
+    }
 
 int CGXCommunication::GetProfileGenerics()
 {

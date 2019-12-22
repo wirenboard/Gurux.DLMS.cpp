@@ -178,6 +178,38 @@ DLMS_SERVICE_CLASS CGXDLMSClient::GetServiceClass()
     return m_Settings.GetServiceClass();
 }
 
+DLMS_AUTHENTICATION CGXDLMSClient::GetAuthentication()
+{
+    return m_Settings.GetAuthentication();
+}
+
+void CGXDLMSClient::SetAuthentication(DLMS_AUTHENTICATION value)
+{
+    m_Settings.SetAuthentication(value);
+}
+
+
+unsigned long CGXDLMSClient::GetClientAddress()
+{
+    return m_Settings.GetClientAddress();
+}
+
+void CGXDLMSClient::SetClientAddress(unsigned long value)
+{
+    m_Settings.SetClientAddress(value);
+}
+
+unsigned long CGXDLMSClient::GetServerAddress()
+{
+    return m_Settings.GetServerAddress();
+}
+
+// Server address.
+void CGXDLMSClient::SetServerAddress(unsigned long value)
+{
+    m_Settings.SetServerAddress(value);
+}
+
 void CGXDLMSClient::SetServiceClass(DLMS_SERVICE_CLASS value)
 {
     m_Settings.SetServiceClass(value);

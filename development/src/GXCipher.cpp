@@ -1017,6 +1017,16 @@ void CGXCipher::SetFrameCounter(unsigned long value)
     m_FrameCounter = value;
 }
 
+unsigned long CGXCipher::GetInvocationCounter()
+{
+    return m_FrameCounter;
+}
+
+void CGXCipher::SetInvocationCounter(unsigned long value)
+{
+    m_FrameCounter = value;
+}
+
 void CGXCipher::Reset()
 {
 

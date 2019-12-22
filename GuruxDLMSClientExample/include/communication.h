@@ -69,10 +69,11 @@
 class CGXCommunication
 {
     GX_TRACE_LEVEL m_Trace;
-    CGXDLMSClient* m_Parser;
+    CGXDLMSSecureClient* m_Parser;
     int m_socket;
     static const unsigned int RECEIVE_BUFFER_SIZE = 200;
     unsigned char   m_Receivebuff[RECEIVE_BUFFER_SIZE];
+    char* m_InvocationCounter;
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
     HANDLE			m_hComPort;
     OVERLAPPED		m_osWrite;
@@ -82,12 +83,17 @@ class CGXCommunication
 #endif
     int m_WaitTime;
     int Read(unsigned char eop, CGXByteBuffer& reply);
+    /// Read Invocation counter (frame counter) from the meter and update it.
+    int UpdateFrameCounter();
 public:
     void WriteValue(GX_TRACE_LEVEL trace, std::string line);
 public:
 
-    CGXCommunication(CGXDLMSClient* pCosem, int wt, GX_TRACE_LEVEL trace);
+    CGXCommunication(CGXDLMSSecureClient* pCosem, int wt, GX_TRACE_LEVEL trace, char* invocationCounter);
     ~CGXCommunication(void);
+
+    //Disconnect from the meter.
+    int Disconnect();
 
     int Close();
     int Connect(const char* pAddress, unsigned short port = 4059);
