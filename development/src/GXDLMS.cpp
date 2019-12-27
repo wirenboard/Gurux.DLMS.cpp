@@ -714,7 +714,9 @@ int Cipher0(CGXDLMSLNParameters& p,
         cmd,
         title,
         *key,
-        reply, tmp);
+        reply,
+        tmp,
+        true);
     p.GetSettings()->GetCipher()->SetFrameCounter(p.GetSettings()->GetCipher()->GetFrameCounter() + 1);
     if (ret != 0)
     {
@@ -1218,7 +1220,9 @@ int CGXDLMS::GetSNPdu(
             GetGloMessage(p.GetCommand()),
             p.GetSettings()->GetCipher()->GetSystemTitle(),
             p.GetSettings()->GetCipher()->GetAuthenticationKey(),
-            reply, tmp);
+            reply,
+            tmp,
+            true);
         if (ret != 0)
         {
             return ret;
@@ -2413,8 +2417,12 @@ int CGXDLMS::HandleGloDedResponse(
                 return ret;
             }
             data.GetData().Set(&bb);
+            data.SetCipheredCommand(data.GetCommand());
             data.SetCommand(DLMS_COMMAND_NONE);
-            GetPdu(settings, data);
+            if ((ret = GetPdu(settings, data)) != 0)
+            {
+                return ret;
+            }
             data.SetCipherIndex((unsigned short)data.GetData().GetSize());
         }
     }
@@ -2948,6 +2956,16 @@ int CGXDLMS::HandleGetResponse(
         {
             return ret;
         }
+        if (reply.GetXml() != NULL)
+        {
+            //Result start tag.
+            reply.GetXml()->AppendStartTag(DLMS_TRANSLATOR_TAGS_RESULT);
+            //LastBlock
+            std::string str;
+            reply.GetXml()->IntegerToHex((unsigned long) ch, 2, str);
+            reply.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_LAST_BLOCK, "Value", str);
+        }
+
         if (ch == 0)
         {
             reply.SetMoreData(
@@ -2963,16 +2981,26 @@ int CGXDLMS::HandleGetResponse(
         {
             return ret;
         }
-        // If meter's block index is zero based or Actaris is read.
-        // Actaris SL7000 might return wrong block index sometimes.
-        // It's not reseted to 1.
-        if (number != 1 && settings.GetBlockIndex() == 1)
+        if (reply.GetXml() != NULL)
         {
-            settings.SetBlockIndex(number);
+            //BlockNumber
+            std::string str;
+            reply.GetXml()->IntegerToHex(number, 8, str);
+            reply.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_BLOCK_NUMBER, "Value", str);
         }
-        if (number != settings.GetBlockIndex())
+        else
         {
-            return DLMS_ERROR_CODE_DATA_BLOCK_NUMBER_INVALID;
+            // If meter's block index is zero based or Actaris is read.
+            // Actaris SL7000 might return wrong block index sometimes.
+            // It's not reseted to 1.
+            if (number != 1 && settings.GetBlockIndex() == 1)
+            {
+                settings.SetBlockIndex(number);
+            }
+            if (number != settings.GetBlockIndex())
+            {
+                return DLMS_ERROR_CODE_DATA_BLOCK_NUMBER_INVALID;
+            }
         }
         // Get status.
         if ((ret = data.GetUInt8(&ch)) != 0)
@@ -3017,8 +3045,8 @@ int CGXDLMS::HandleGetResponse(
             if (!reply.GetPeek())
             {
                 data.SetPosition(0);
-                settings.ResetBlockIndex();
             }
+            settings.ResetBlockIndex();
         }
         if (reply.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE &&
             settings.GetCommand() == DLMS_COMMAND_GET_REQUEST

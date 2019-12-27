@@ -127,7 +127,7 @@ int CGXSecure::Secure(
         CGXByteBuffer tmp;
         CGXByteBuffer& key = settings.GetCipher()->GetBlockCipherKey();
         ret = cipher->Encrypt(DLMS_SECURITY_AUTHENTICATION,
-            DLMS_COUNT_TYPE_TAG, ic, 0, secret, key,  data, tmp);
+            DLMS_COUNT_TYPE_TAG, ic, 0, secret, key,  data, tmp, true);
         if (ret == 0)
         {
             reply.SetUInt8(DLMS_SECURITY_AUTHENTICATION);

@@ -173,9 +173,9 @@ public:
       *            Tag.
       * @param systemTitle
       *            System Title.
-      * @param data
+      * @param plainText
       *            Data to encrypt.
-      * @param reply
+      * @param encrypted
       *            Encrypted data.
       */
     int Encrypt(
@@ -186,7 +186,8 @@ public:
         CGXByteBuffer& systemTitle,
         CGXByteBuffer& key,
         CGXByteBuffer& plainText,
-        CGXByteBuffer& encrypted);
+        CGXByteBuffer& encrypted,
+        bool encrypt);
 
     /**
       * Decrypt data.

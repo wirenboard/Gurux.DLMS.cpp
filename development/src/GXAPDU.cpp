@@ -288,7 +288,8 @@ int CGXAPDU::GenerateUserInformation(
                 cipher->GetSystemTitle(),
                 key,
                 tmp,
-                crypted)) != 0)
+                crypted,
+                true)) != 0)
             {
                 return ret;
             }
@@ -1236,7 +1237,8 @@ int CGXAPDU::GetUserInformation(
             cipher->GetSystemTitle(),
             cipher->GetBlockCipherKey(),
             tmp,
-            data);
+            data,
+            true);
     }
     return 0;
 }

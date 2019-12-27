@@ -581,7 +581,8 @@ int CGXCipher::Encrypt(
     CGXByteBuffer& systemTitle,
     CGXByteBuffer& key,
     CGXByteBuffer& plainText,
-    CGXByteBuffer& encrypted)
+    CGXByteBuffer& encrypted,
+    bool encrypt)
 {
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
 //    printf("System title: %s\r\n", systemTitle.ToHexString().c_str());
@@ -622,7 +623,22 @@ int CGXCipher::Encrypt(
     //Hash subkey.
     AesEncrypt(tmp, tmp[60], H, H);
     Init_j0(nonse.m_Data, (unsigned char)nonse.GetSize(), H, J0);
-    encrypted.Capacity(40 + 16 + (2 * plainText.m_Size));
+
+    //Allocate space for authentication tag.
+    if (security != DLMS_SECURITY_ENCRYPTION)
+    {
+        if (!encrypt)
+        {
+            //Save authentication key to nonse.
+            nonse.Clear();
+            nonse.Set(plainText.GetData() + plainText.GetSize() - 12, 12);
+            plainText.SetSize(plainText.GetSize() - 12);
+        }
+    }
+    if (encrypt)
+    {
+        encrypted.Capacity(plainText.GetSize() + 30);
+    }
     //Data is encrypted.
     if (type == DLMS_COUNT_TYPE_PACKET)
     {
@@ -673,7 +689,17 @@ int CGXCipher::Encrypt(
         }
         AesGcmGhash(H, aad.m_Data, aad.m_Size, encrypted.m_Data + headerSize, 0, S);
         Gctr(tmp, J0, S, aad.m_Size, encrypted.m_Data + encrypted.m_Size);
-        encrypted.m_Size += 12;
+        if (encrypt)
+        {
+            encrypted.m_Size += 12;
+        }
+        else
+        {
+            if (memcmp(nonse.m_Data, plainText.m_Data + plainText.m_Size, 12) != 0)
+            {
+                ret = DLMS_ERROR_CODE_INVALID_TAG;
+            }
+        }
     }
     else if (security == DLMS_SECURITY_ENCRYPTION)
     {
@@ -692,7 +718,17 @@ int CGXCipher::Encrypt(
         }
         AesGcmGhash(H, aad.m_Data, aad.m_Size, encrypted.m_Data + headerSize, plainText.m_Size, S);
         Gctr(tmp, J0, S, aad.m_Size, encrypted.m_Data + encrypted.m_Size);
-        encrypted.m_Size += 12;
+        if (encrypt)
+        {
+            encrypted.m_Size += 12;
+        }
+        else
+        {
+            if (memcmp(nonse.m_Data, plainText.m_Data + plainText.m_Size, 12) != 0)
+            {
+                ret = DLMS_ERROR_CODE_INVALID_TAG;
+            }
+        }
     }
     return 0;
 }
@@ -789,7 +825,8 @@ int CGXCipher::Decrypt(
             title,
             key,
             data,
-            countTag)) == 0)
+            countTag,
+            false)) == 0)
         {
             // Check tag.
             if (memcmp(tag.m_Data, countTag.m_Data, 12) != 0)
@@ -806,9 +843,8 @@ int CGXCipher::Decrypt(
     }
     else if (security == DLMS_SECURITY_AUTHENTICATION_ENCRYPTION)
     {
-        length = (unsigned short)(data.m_Size - data.m_Position - 12);
-        ciphertext.Set(&data, data.m_Position, length);
-        tag.Set(&data, data.m_Position, 12);
+        length = (unsigned short)(data.m_Size - data.m_Position);
+        ciphertext.Set(&data, data.GetPosition(), length);
     }
     data.Clear();
     if ((ret = Encrypt(
@@ -819,15 +855,10 @@ int CGXCipher::Decrypt(
         *pTitle,
         key,
         ciphertext,
-        data)) != 0)
+        data,
+        false)) != 0)
     {
         return ret;
-    }
-    //Check tag.
-    if (security == DLMS_SECURITY_AUTHENTICATION_ENCRYPTION)
-    {
-        //Remove tag.
-        data.SetSize(data.GetSize() - 12);
     }
     return 0;
 }
