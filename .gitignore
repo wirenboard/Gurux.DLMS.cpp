@@ -233,3 +233,4 @@ GuruxDLMSServerExample/VS/data.csv
 *.db-wal
 *.testlog
 *.manifest
+*.zip
