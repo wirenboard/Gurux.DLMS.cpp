@@ -184,9 +184,9 @@ int main(int argc, char* argv[])
             case 'v':
                 invocationCounter = optarg;
 #if defined(_WIN32) || defined(_WIN64)//Windows
-                if ((ret = sscanf_s(optarg, "%d.%d.%d.%d.%d.%d:%d", &a, &b, &c, &d, &e, &f)) != 6)
+                if ((ret = sscanf_s(optarg, "%d.%d.%d.%d.%d.%d", &a, &b, &c, &d, &e, &f)) != 6)
 #else
-                if ((ret = sscanf(optarg, "%d.%d.%d.%d.%d.%d:%d", &a, &b, &c, &d, &e, &f)) != 6)
+                if ((ret = sscanf(optarg, "%d.%d.%d.%d.%d.%d", &a, &b, &c, &d, &e, &f)) != 6)
 #endif
                 {
                     ShowHelp();
