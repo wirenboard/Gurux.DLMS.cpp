@@ -217,7 +217,7 @@ int CGXDLMSImageTransfer::ImageBlockTransfer(CGXDLMSClient* client, CGXByteBuffe
     std::vector<CGXByteBuffer> blocks;
     if ((ret = GetImageBlocks(image, blocks)) == 0)
     {
-        imageBlockCount = blocks.size();
+        imageBlockCount = (unsigned long) blocks.size();
         CGXDLMSVariant tmp;
         for (std::vector<CGXByteBuffer>::iterator it = blocks.begin(); it != blocks.end(); ++it)
         {

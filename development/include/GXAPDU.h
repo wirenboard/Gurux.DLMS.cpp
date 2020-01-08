@@ -67,8 +67,8 @@ private:
         CGXByteBuffer& buff,
         DLMS_ASSOCIATION_RESULT& result,
         DLMS_SOURCE_DIAGNOSTIC& diagnostic,
-        CGXDLMSTranslatorStructure* xml);    
-    
+        CGXDLMSTranslatorStructure* xml);
+
     static int Parse(bool initiateRequest,
         CGXDLMSSettings& settings,
         CGXCipher* cipher,

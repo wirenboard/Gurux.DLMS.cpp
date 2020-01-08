@@ -715,15 +715,12 @@ int Cipher0(CGXDLMSLNParameters& p,
         title,
         *key,
         reply,
-        tmp,
         true);
-    p.GetSettings()->GetCipher()->SetFrameCounter(p.GetSettings()->GetCipher()->GetFrameCounter() + 1);
     if (ret != 0)
     {
         return ret;
     }
-    reply.SetSize(0);
-    reply.Set(&tmp, 0, tmp.GetSize());
+    p.GetSettings()->GetCipher()->SetFrameCounter(1 + p.GetSettings()->GetCipher()->GetFrameCounter());
     return 0;
 }
 
@@ -1221,18 +1218,15 @@ int CGXDLMS::GetSNPdu(
             p.GetSettings()->GetCipher()->GetSystemTitle(),
             p.GetSettings()->GetCipher()->GetAuthenticationKey(),
             reply,
-            tmp,
             true);
         if (ret != 0)
         {
             return ret;
         }
-        reply.SetSize(0);
         if (p.GetSettings()->GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC)
         {
             AddLLCBytes(p.GetSettings(), reply);
         }
-        reply.Set(&tmp, 0, tmp.GetSize());
     }
     return 0;
 }
@@ -2416,7 +2410,7 @@ int CGXDLMS::HandleGloDedResponse(
             {
                 return ret;
             }
-            data.GetData().Set(&bb);
+            data.GetData().Set(&bb, bb.GetPosition());
             data.SetCipheredCommand(data.GetCommand());
             data.SetCommand(DLMS_COMMAND_NONE);
             if ((ret = GetPdu(settings, data)) != 0)

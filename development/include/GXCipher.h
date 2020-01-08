@@ -81,7 +81,7 @@ private:
         unsigned char* systemTitle,
         unsigned char count);
 
-    static int Int(unsigned long* rk,
+    static int Int(uint32_t* rk,
         const unsigned char* cipherKey,
         unsigned short keyBits);
 
@@ -89,24 +89,24 @@ private:
     * Make xor for 128 bits.
     */
     static void Xor(
-        unsigned char *dst,
-        const unsigned char *src);
+        unsigned char* dst,
+        const unsigned char* src);
 
-    static void shift_right_block(unsigned char *v);
+    static void shift_right_block(unsigned char* v);
 
     static void MultiplyH(
-        const unsigned char *x,
+        const unsigned char* x,
         const unsigned char* y,
-        unsigned char * z);
+        unsigned char* z);
 
     /*
     * Count GHash.
     */
     static void GetGHash(
-        const unsigned char *h,
-        const unsigned char *x,
+        const unsigned char* h,
+        const unsigned char* x,
         int xlen,
-        unsigned char *y);
+        unsigned char* y);
 
     static void Init_j0(
         const unsigned char* iv,
@@ -114,32 +114,33 @@ private:
         const unsigned char* H,
         unsigned char* J0);
 
-    static void Inc32(unsigned char *block);
+    static void Inc32(unsigned char* block);
+
     static void Gctr(
-        unsigned long *aes,
-        const unsigned char *icb,
-        const unsigned char *x,
-        int xlen,
-        unsigned char *y);
+        unsigned int* aes,
+        const unsigned char* icb,
+        unsigned char* in,
+        int len,
+        unsigned char* out);
 
     static void AesGcmGctr(
-        unsigned long *aes,
-        const unsigned char *J0,
-        const unsigned char *in,
+        unsigned int* aes,
+        const unsigned char* J0,
+        unsigned char* in,
         int len,
-        unsigned char *out);
+        unsigned char* out);
 
     static void AesGcmGhash(
-        const unsigned char *H,
-        const unsigned char *aad,
+        const unsigned char* H,
+        const unsigned char* aad,
         int aad_len,
-        const unsigned char *crypt,
+        const unsigned char* crypt,
         int crypt_len,
-        unsigned char *S);
+        unsigned char* S);
 
     static void AesEncrypt(
-        const unsigned long* rk,
-        int Nr,
+        const unsigned int* rk,
+        unsigned int Nr,
         const unsigned char* pt,
         unsigned char* ct);
 public:
@@ -185,8 +186,7 @@ public:
         unsigned char tag,
         CGXByteBuffer& systemTitle,
         CGXByteBuffer& key,
-        CGXByteBuffer& plainText,
-        CGXByteBuffer& encrypted,
+        CGXByteBuffer& input,
         bool encrypt);
 
     /**

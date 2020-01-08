@@ -264,9 +264,9 @@ int CGXAPDU::GenerateUserInformation(
         else
         {
             unsigned char cmd = DLMS_COMMAND_GLO_INITIATE_REQUEST;
-            CGXByteBuffer tmp, crypted;
+            CGXByteBuffer crypted;
             CGXByteBuffer& key = cipher->GetBlockCipherKey();
-            if ((ret = GetInitiateRequest(settings, cipher, tmp)) != 0)
+            if ((ret = GetInitiateRequest(settings, cipher, crypted)) != 0)
             {
                 return ret;
             }
@@ -287,7 +287,6 @@ int CGXAPDU::GenerateUserInformation(
                 cmd,
                 cipher->GetSystemTitle(),
                 key,
-                tmp,
                 crypted,
                 true)) != 0)
             {
@@ -1228,15 +1227,12 @@ int CGXAPDU::GetUserInformation(
     }
     if (cipher != NULL && cipher->IsCiphered())
     {
-        CGXByteBuffer tmp(data);
-        data.Clear();
         return cipher->Encrypt(cipher->GetSecurity(),
             DLMS_COUNT_TYPE_PACKET,
             settings.GetCipher()->GetFrameCounter(),
             DLMS_COMMAND_GLO_INITIATE_RESPONSE,
             cipher->GetSystemTitle(),
             cipher->GetBlockCipherKey(),
-            tmp,
             data,
             true);
     }

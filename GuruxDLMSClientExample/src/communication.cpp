@@ -85,7 +85,7 @@ int CGXCommunication::Disconnect()
     return 0;
 }
 
-//Close connection to the meter.
+//Close connection to the meter and close the communcation channel.
 int CGXCommunication::Close()
 {
     int ret;
