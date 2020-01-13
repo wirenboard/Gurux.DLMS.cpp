@@ -770,7 +770,6 @@ int CGXCipher::Decrypt(
     {
         return ret;
     }
-    m_FrameCounter = frameCounter + 1;
     if ((ret = Encrypt(
         security,
         DLMS_COUNT_TYPE_DATA,

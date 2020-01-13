@@ -53,13 +53,13 @@ CGXDLMSTranslator::CGXDLMSTranslator(DLMS_TRANSLATOR_OUTPUT_TYPE type)
     m_RSendSequence = 0;
     m_RReceiveSequence = 0;
     m_Comments = false;
-    m_PduOnly = false;;
-    m_CompletePdu = false;;
-    m_Hex = false;;
-    m_ShowStringAsHex = false;;
-    m_OmitXmlDeclaration = false;;
-    m_OmitXmlNameSpace = false;;
-    m_MultipleFrames = false;;
+    m_PduOnly = false;
+    m_CompletePdu = false;
+    m_Hex = false;
+    m_ShowStringAsHex = false;
+    m_OmitXmlDeclaration = false;
+    m_OmitXmlNameSpace = false;
+    m_MultipleFrames = false;
     if (type == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
     {
         m_Hex = true;
@@ -195,7 +195,6 @@ void CGXDLMSTranslator::GetCiphering(CGXDLMSSettings& settings)
     if (m_Security != DLMS_SECURITY_NONE)
     {
         CGXCipher* c = settings.GetCipher();
-        settings.GetCipher()->SetSystemTitle(m_SystemTitle);
         c->SetSecurity(m_Security);
         c->SetSystemTitle(m_SystemTitle);
         c->SetBlockCipherKey(m_BlockCipherKey);
@@ -279,7 +278,6 @@ int GetUa(CGXByteBuffer& data, CGXDLMSTranslatorStructure* xml)
         {
         case HDLC_INFO_MAX_INFO_TX:
             xml->AppendLine("<MaxInfoTX Value=\"" + value.ToString() + "\" />");
-            //limits->SetMaxInfoRX((unsigned char)value.ToInteger());
             break;
         case HDLC_INFO_MAX_INFO_RX:
             xml->AppendLine("<MaxInfoRX Value=\"" + value.ToString() + "\" />");
@@ -653,6 +651,7 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
             return DLMS_ERROR_CODE_INVALID_COMMAND;
         }
         str = "<Data=\"";
+        value.SetPosition(value.GetPosition() - 1);
         str.append(value.ToHexString(value.GetPosition(), value.Available(), false));
         str.append("\" />");
         xml->AppendLine(str);

@@ -2341,15 +2341,30 @@ int CGXDLMS::HandleGloDedRequest(CGXDLMSSettings& settings,
             int ret;
             unsigned char ch;
             data.GetData().SetPosition(data.GetData().GetPosition() - 1);
-            if ((ret = settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(),
-                settings.GetCipher()->GetBlockCipherKey(), data.GetData(), security, suite)) != 0)
+            if (settings.GetCipher()->GetDedicatedKey().GetSize() != 0 && (settings.GetConnected() & DLMS_CONNECTION_STATE_DLMS) != 0)
             {
-                return ret;
+                if ((ret = settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(),
+                    settings.GetCipher()->GetDedicatedKey(), data.GetData(), security, suite)) != 0)
+                {
+                    return ret;
+                }
+            }
+            //If pre-set connection is made.
+            else if (settings.GetSourceSystemTitle().GetSize() == 0)
+            {
+
+            }
+            else
+            {
+                if ((ret = settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(),
+                    settings.GetCipher()->GetBlockCipherKey(), data.GetData(), security, suite)) != 0)
+                {
+                    return ret;
+                }
             }
             settings.GetCipher()->SetSecuritySuite(suite);
             settings.GetCipher()->SetSecurity(security);
-
-            // Get DLMS_COMMAND_
+            // Get command.
             data.SetCipheredCommand(data.GetCommand());
             data.GetData().GetUInt8(&ch);
             data.SetCommand((DLMS_COMMAND)ch);
@@ -2696,6 +2711,13 @@ int CGXDLMS::GetPdu(
             case DLMS_COMMAND_GLO_GET_RESPONSE:
             case DLMS_COMMAND_GLO_SET_RESPONSE:
             case DLMS_COMMAND_GLO_METHOD_RESPONSE:
+            case DLMS_COMMAND_GLO_GENERAL_CIPHERING:
+            case DLMS_COMMAND_DED_READ_RESPONSE:
+            case DLMS_COMMAND_DED_WRITE_RESPONSE:
+            case DLMS_COMMAND_DED_GET_RESPONSE:
+            case DLMS_COMMAND_DED_SET_RESPONSE:
+            case DLMS_COMMAND_DED_METHOD_RESPONSE:
+            case DLMS_COMMAND_GENERAL_DED_CIPHERING:
                 data.GetData().SetPosition(data.GetCipherIndex());
                 ret = GetPdu(settings, data);
                 break;
@@ -2956,7 +2978,7 @@ int CGXDLMS::HandleGetResponse(
             reply.GetXml()->AppendStartTag(DLMS_TRANSLATOR_TAGS_RESULT);
             //LastBlock
             std::string str;
-            reply.GetXml()->IntegerToHex((unsigned long) ch, 2, str);
+            reply.GetXml()->IntegerToHex((unsigned long)ch, 2, str);
             reply.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_LAST_BLOCK, "Value", str);
         }
 

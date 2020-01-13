@@ -46,7 +46,7 @@ static void ShowHelp()
     printf(" -p \t port number or name (Example: 1000).\r\n");
     printf(" -S [COM1:9600:8None1]\t serial port.");
     printf(" -i IEC is a start protocol.\r\n");
-    printf(" -a \t Authentication (None, Low, High).\r\n");
+    printf(" -a \t Authentication (None, Low, High, HighMd5, HighSha1, HighGmac, HighSha256).\r\n");
     printf(" -P \t Password for authentication.\r\n");
     printf(" -c \t Client address. (Default: 16)\r\n");
     printf(" -s \t Server address. (Default: 1)\r\n");
