@@ -1689,8 +1689,8 @@ int CGXDLMS::CheckHdlcAddress(
         // Check that server addresses match.
         if (settings.GetServerAddress() != source &&
             //If All-station (Broadcast).
-            settings.GetServerAddress() == 0x7F &&
-            settings.GetServerAddress() == 0x3FFF)
+            settings.GetServerAddress() != 0x7F &&
+            settings.GetServerAddress() != 0x3FFF)
         {
             //Check logical and physical address separately.
             //This is done because some meters might send four bytes
