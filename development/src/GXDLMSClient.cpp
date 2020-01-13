@@ -1214,6 +1214,11 @@ int CGXDLMSClient::ReadList(
         //Invalid parameter
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
+    if ((GetNegotiatedConformance() & DLMS_CONFORMANCE_MULTIPLE_REFERENCES) == 0) {
+        //Meter doesn't support multiple objects reading with one request.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+
     int ret;
     m_Settings.ResetBlockIndex();
     CGXByteBuffer bb;
