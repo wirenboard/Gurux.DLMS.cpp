@@ -801,6 +801,7 @@ int CGXCommunication::UpdateFrameCounter()
         {
             m_Parser->GetCiphering()->SetInvocationCounter(1 + d.GetValue().ToInteger());
         }
+        printf("Invocation counter: %d\r\n", m_Parser->GetCiphering()->GetInvocationCounter());
         reply.Clear();
         Disconnect();
         m_Parser->SetClientAddress(add);

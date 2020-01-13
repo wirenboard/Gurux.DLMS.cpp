@@ -763,6 +763,10 @@ int CGXCipher::Decrypt(
     {
         return ret;
     }
+    if (data.Available() < length)
+    {
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
+    }
     if ((ret = data.GetUInt8(&ch)) != 0)
     {
         return ret;
