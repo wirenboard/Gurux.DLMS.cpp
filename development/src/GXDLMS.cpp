@@ -720,7 +720,6 @@ int Cipher0(CGXDLMSLNParameters& p,
     {
         return ret;
     }
-    p.GetSettings()->GetCipher()->SetFrameCounter(1 + p.GetSettings()->GetCipher()->GetFrameCounter());
     return 0;
 }
 

@@ -671,7 +671,10 @@ int CGXCipher::Encrypt(
             }
         }
     }
-
+    if (encrypt)
+    {
+        ++m_FrameCounter;
+    }
     if (encrypt && type == DLMS_COUNT_TYPE_PACKET)
     {
         nonse.Clear();
