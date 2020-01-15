@@ -110,9 +110,16 @@ int CGXSecure::Secure(
         challenge.Set(&secret);
         challenge.Set(&settings.GetCipher()->GetSystemTitle());
         challenge.Set(&settings.GetSourceSystemTitle());
-        challenge.Set(&settings.GetStoCChallenge());
-        challenge.Set(&settings.GetCtoSChallenge());
-        challenge.Set(&data);
+        if (settings.IsServer())
+        {
+            challenge.Set(&settings.GetCtoSChallenge());
+            challenge.Set(&settings.GetStoCChallenge());
+        }
+        else
+        {
+            challenge.Set(&settings.GetStoCChallenge());
+            challenge.Set(&settings.GetCtoSChallenge());
+        }
     }
     else if (settings.GetAuthentication() != DLMS_AUTHENTICATION_HIGH_GMAC)
     {
