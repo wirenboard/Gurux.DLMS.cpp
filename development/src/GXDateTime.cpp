@@ -39,10 +39,17 @@
 #include <locale>
 #include <vector>
 #include <assert.h>
+#include <time.h>
 
 #if defined(_WIN32) || defined(_WIN64)//Windows
 #include <windows.h>
 #endif
+
+//Destructor.
+CGXDateTime::~CGXDateTime()
+{
+
+}
 
 //Get UTC offset in minutes.
 void GetUtcOffset(struct tm* timeptr, int& hours, int& minutes, int& deviation)
@@ -93,7 +100,7 @@ void GetUtcOffset(struct tm* timeptr, int& hours, int& minutes, int& deviation)
     }
 }
 
-static time_t GetUtcTime(struct tm * timeptr)
+static time_t GetUtcTime(struct tm* timeptr)
 {
     /* gets the epoch time relative to the local time zone,
     and then adds the appropriate number of seconds to make it UTC */
@@ -198,6 +205,545 @@ CGXDateTime::CGXDateTime(int year, int month, int day, int hour, int minute, int
 CGXDateTime::CGXDateTime(int year, int month, int day, int hour, int minute, int second, int millisecond, int devitation)
 {
     Init(year, month, day, hour, minute, second, millisecond, devitation);
+}
+
+void CGXDateTime::GetSystemDateTimeFormat(std::string& value)
+{
+    char buff[50];
+    struct tm order = { 0 };
+    order.tm_year = 0;
+    order.tm_mday = 1;
+    order.tm_mon = 0;//Month is zero based.
+    order.tm_hour = 13;
+    strftime(buff, sizeof(buff), "%x %X", &order);
+    value = buff;
+}
+
+int CGXDateTime::GetDateFormat2(GXDLMS_DATE_FORMAT& format, char& separator)
+{
+    int ret = 0, value, lastPos = 0, pos;
+    char buff[11];
+    struct tm order = { 0 };
+    order.tm_year = 0;
+    order.tm_mday = 1;
+    order.tm_mon = 1;//Month is zero based.
+    ret = (int)strftime(buff, sizeof(buff), "%x", &order);
+    if (ret > 0)
+    {
+        for (pos = 0; pos != ret; ++pos)
+        {
+            //If numeric value
+            if (buff[pos] >= '0' && buff[pos] <= '9')
+            {
+
+            }
+            else //If date time separator.
+            {
+                separator = buff[pos];
+#if _MSC_VER > 1000
+                if (sscanf_s(buff + lastPos, "%d", &value) == 1)
+#else
+                if (sscanf(buff + lastPos, "%d", &value) == 1)
+#endif
+                {
+                    if (value == 1)
+                    {
+                        format = lastPos == 0 ? GXDLMS_DATE_FORMAT_DMY : GXDLMS_DATE_FORMAT_YDM;
+                        break;
+                    }
+                    else if (value == 2)
+                    {
+                        format = lastPos == 0 ? GXDLMS_DATE_FORMAT_MDY : GXDLMS_DATE_FORMAT_YMD;
+                        break;
+                    }
+                }
+                lastPos = pos + 1;
+            }
+        }
+        ret = 0;
+    }
+    else
+    {
+        ret = DLMS_ERROR_CODE_INVALID_DATE_TIME;
+    }
+    return ret;
+}
+
+
+int CGXDateTime::GetTimeFormat2(char& separator, char& use24HourClock)
+{
+    int ret = 0, pos;
+    char buff[15];
+    char pm[15];
+    struct tm order = { 0 };
+    order.tm_hour = 13;
+    order.tm_min = 0;
+    order.tm_sec = 0;
+    separator = 0;
+    ret = (int)strftime(buff, 15, "%X", &order);
+    if (ret > 0)
+    {
+        for (pos = 0; pos != ret; ++pos)
+        {
+            //If numeric value
+            if (buff[pos] >= '0' && buff[pos] <= '9')
+            {
+
+            }
+            else//If date time separator.
+            {
+                separator = buff[pos];
+                strftime(pm, 15, "%p", &order);
+                use24HourClock = strchr(buff, pm[0]) == 0;
+                break;
+            }
+        }
+        ret = 0;
+    }
+    else
+    {
+        ret = DLMS_ERROR_CODE_INVALID_DATE_TIME;
+    }
+    return ret;
+}
+
+int CGXDateTime::GetDateTimeFormat(
+    std::string& value,
+    GXDLMS_DATE_FORMAT& format,
+    char& dateSeparator,
+    char& timeSeparator,
+    char& use24HourClock)
+{
+    int ret;
+    if ((ret = GetDateFormat2(format, dateSeparator)) == 0 &&
+        (ret = GetTimeFormat2(timeSeparator, use24HourClock)) == 0)
+    {
+        switch (format)
+        {
+        case GXDLMS_DATE_FORMAT_DMY:
+            value.append("%d");
+            value += dateSeparator;
+            value.append("%m");
+            value += dateSeparator;
+            value.append("%Y");
+            break;
+        case GXDLMS_DATE_FORMAT_MDY:
+            value.append("%m");
+            value += dateSeparator;
+            value.append("%d");
+            value += dateSeparator;
+            value.append("%Y");
+            break;
+        case GXDLMS_DATE_FORMAT_YMD:
+            value.append("%Y");
+            value += dateSeparator;
+            value.append("%m");
+            value += dateSeparator;
+            value.append("%d");
+            break;
+        case GXDLMS_DATE_FORMAT_YDM:
+            value.append("%Y");
+            value += dateSeparator;
+            value.append("%d");
+            value += dateSeparator;
+            value.append("%m");
+            break;
+        default:
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+        value += ' ';
+        if (use24HourClock)
+        {
+            value.append("%H");
+        }
+        else
+        {
+            value.append("%I");
+        }
+        value += timeSeparator;
+        value.append("%M");
+        value += timeSeparator;
+        value.append("%S");
+        if (!use24HourClock)
+        {
+            value += ' ';
+            value.append("%p");
+        }
+    }
+    return ret;
+}
+
+void Remove(std::string& value, const char* tag, const char sep)
+{
+    size_t pos;
+    if (sep != 0)
+    {
+        char tmp[6];
+        strcpy(tmp, tag);
+        size_t len = strlen(tag);
+        tmp[len] = sep;
+        tmp[len + 1] = '\0';
+        if ((pos = value.find(tmp)) != std::string::npos)
+        {
+            value.replace(pos, strlen(tmp), "");
+        }
+        else
+        {
+            strcpy(&tmp[1], tag);
+            tmp[0] = sep;
+            if ((pos = value.find(tmp)) != std::string::npos)
+            {
+                value.replace(pos, strlen(tmp), "");
+            }
+        }
+    }
+    if ((pos = value.find(tag)) != std::string::npos)
+    {
+        value.replace(pos, strlen(tag), "");
+    }
+}
+
+void Replace(std::string& value, const char* tag, const char* v)
+{
+    size_t pos;
+    if ((pos = value.find(tag)) != std::string::npos)
+    {
+        value.replace(pos, strlen(tag), v);
+        // Trim spaces.
+        value = GXHelpers::trim(value);
+    }
+}
+
+int Remove(CGXDateTime* value, std::string& format, char dateSeparator, char timeSeparator)
+{
+    if (dynamic_cast<CGXDate*>(value) != NULL)
+    {
+        Remove(format, "%H", timeSeparator);
+        Remove(format, "%I", timeSeparator);
+        Remove(format, "%M", timeSeparator);
+        Remove(format, "%S", timeSeparator);
+        Remove(format, "%p", timeSeparator);
+        value->SetSkip((DATETIME_SKIPS)(value->GetSkip() | DATETIME_SKIPS_HOUR | DATETIME_SKIPS_MINUTE | DATETIME_SKIPS_SECOND | DATETIME_SKIPS_MS));
+    }
+    else if (dynamic_cast<CGXTime*>(value) != NULL)
+    {
+        Remove(format, "%Y", dateSeparator);
+        Remove(format, "%y", dateSeparator);
+        Remove(format, "%m", dateSeparator);
+        Remove(format, "%d", dateSeparator);
+        value->SetSkip((DATETIME_SKIPS)(value->GetSkip() | DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY | DATETIME_SKIPS_DAYOFWEEK));
+    }
+    // Trim spaces.
+    format = GXHelpers::trim(format);
+    return 0;
+}
+
+static bool IsNumeric(char value)
+{
+    return value >= '0' && value <= '9';
+}
+
+int CGXDateTime::FromString(const char* datetime)
+{
+    int ret;
+    std::string value = datetime;
+    std::string format;
+    GXDLMS_DATE_FORMAT df;
+    char dateSeparator, timeSeparator, use24HourClock;
+
+    memset(&m_Value, 0, sizeof(m_Value));
+    m_Extra = DATE_TIME_EXTRA_INFO_NONE;
+    m_Status = DLMS_CLOCK_STATUS_OK;
+    m_Deviation = 0;
+    m_Skip = DATETIME_SKIPS_NONE;
+    if ((ret = GetDateTimeFormat(format, df, dateSeparator, timeSeparator, use24HourClock)) == 0)
+    {
+        size_t pos;
+        Remove(this, format, dateSeparator, timeSeparator);
+        if ((pos = value.find("BEGIN")) != std::string::npos)
+        {
+            value.replace(pos, pos + strlen("BEGIN"), "01");
+            m_Extra = (DATE_TIME_EXTRA_INFO)(m_Extra | DATE_TIME_EXTRA_INFO_DST_BEGIN);
+        }
+        if ((pos = value.find("END")) != std::string::npos)
+        {
+            value.replace(pos, pos + strlen("END"), "01");
+            m_Extra = (DATE_TIME_EXTRA_INFO)(m_Extra | DATE_TIME_EXTRA_INFO_DST_END);
+        }
+        if ((pos = value.find("LASTDAY2")) != std::string::npos)
+        {
+            value.replace(pos, pos + strlen("LASTDAY2"), "01");
+            m_Extra = (DATE_TIME_EXTRA_INFO)(m_Extra | DATE_TIME_EXTRA_INFO_LAST_DAY2);
+        }
+        if ((pos = value.find("LASTDAY")) != std::string::npos)
+        {
+            value.replace(pos, pos + strlen("LASTDAY"), "01");
+            m_Extra = (DATE_TIME_EXTRA_INFO)(m_Extra | DATE_TIME_EXTRA_INFO_LAST_DAY);
+        }
+        int skip = 0;
+        std::string v = value;
+        if ((pos = value.find('*')) != std::string::npos)
+        {
+            //Day of week is not supported when date time is give as a string.
+            skip |= DATETIME_SKIPS_DAYOFWEEK;
+            int lastFormatIndex = -1;
+            int offset = 0;
+            for (pos = 0; pos < value.size(); ++pos)
+            {
+                char c = value.at(pos);
+                if (!IsNumeric(c))
+                {
+                    if (c == '*')
+                    {
+                        int cnt = 1;
+                        ++lastFormatIndex;
+                        c = format[lastFormatIndex + 1];
+                        std::string val = "1";
+                        while (lastFormatIndex + cnt + 1 < (int) format.size() && format[lastFormatIndex + cnt + 1] == c)
+                        {
+                            val += "0";
+                            ++cnt;
+                        }
+                        v = v.substr(0, pos + offset) + val + value.substr(pos + 1);
+                        offset += cnt - 1;
+                        std::string tmp = format.substr(lastFormatIndex + 1, cnt);
+                        tmp = GXHelpers::trim(tmp);
+                        if (tmp == "Y")
+                        {
+                            skip |= DATETIME_SKIPS_YEAR;
+                        }
+                        else if (tmp == "m")
+                        {
+                            skip |= DATETIME_SKIPS_MONTH;
+                        }
+                        else if (tmp == "d")
+                        {
+                            skip |= DATETIME_SKIPS_DAY;
+                        }
+                        else if (tmp == "H" || tmp == "I")
+                        {
+                            skip |= DATETIME_SKIPS_HOUR;
+                            if (format.find("%p") != std::string::npos)
+                            {
+                                Replace(format, "%p", "");
+                            }
+                        }
+                        else if (tmp == "M")
+                        {
+                            skip |= DATETIME_SKIPS_MINUTE;
+                        }
+                        else if (tmp == "p")
+                        {
+                            skip |= DATETIME_SKIPS_HOUR;
+                            Replace(format, "%p", "");
+                        }
+                        else if (tmp == "S")
+                        {
+                            skip |= DATETIME_SKIPS_SECOND;
+                        }
+                        else if (tmp.size() != 0)
+                        {
+                            return DLMS_ERROR_CODE_INVALID_DATE_TIME;
+                        }
+                    }
+                    else
+                    {
+                        lastFormatIndex = format.find(c, lastFormatIndex + 1);
+                        //Dot is used time separator in some countries.
+                        if (lastFormatIndex == -1 && c == ':')
+                        {
+                            lastFormatIndex = format.find('.', lastFormatIndex + 1);
+                        }
+                    }
+                }
+            }
+        }
+        Replace(format, "%Y", "%d");
+        Replace(format, "%d", "%d");
+        Replace(format, "%m", "%d");
+        Replace(format, "%H", "%d");
+        Replace(format, "%I", "%d");
+        Replace(format, "%M", "%d");
+        Replace(format, "%S", "%d");
+        Replace(format, "%p", "%s");
+        int a = 0, b = 0, c = 0, d = 0, e = 0, f = 0;
+        char g[15];
+        g[0] = 0;
+        if (dynamic_cast<CGXDate*>(this) != NULL)
+        {
+            ret = sscanf(v.c_str(), format.c_str(), &a, &b, &c);
+            if (ret != 3)
+            {
+                ret = DLMS_ERROR_CODE_INVALID_DATE_TIME;
+            }
+            else
+            {
+                ret = 0;
+            }
+        }
+        else if (dynamic_cast<CGXTime*>(this) != NULL)
+        {
+            ret = sscanf(v.c_str(), format.c_str(), &d, &e, &f, &g);
+            if (ret != 4)
+            {
+                if (ret == 3)
+                {
+                    if (!use24HourClock)
+                    {
+                        //Is AM is missing.
+                        g[0] = '\0';
+                    }
+                    ret = 0;
+                }
+                else
+                {
+                    ret = DLMS_ERROR_CODE_INVALID_DATE_TIME;
+                }
+            }
+            else
+            {
+                ret = 0;
+            }
+        }
+        else
+        {
+            ret = sscanf(v.c_str(), format.c_str(), &a, &b, &c, &d, &e, &f, &g);
+            if (ret != 7)
+            {
+                if (ret == 6)
+                {
+                    if (!use24HourClock)
+                    {
+                        //Is AM is missing.
+                        g[0] = '\0';
+                    }
+                    ret = 0;
+                }
+                else
+                {
+                    ret = DLMS_ERROR_CODE_INVALID_DATE_TIME;
+                }
+            }
+            else
+            {
+                ret = 0;
+            }
+        }
+        if (ret == 0)
+        {
+            if (!use24HourClock && memcmp(g, "PM", 2) == 0)
+            {
+                d += 12;
+            }
+            switch (df)
+            {
+            case GXDLMS_DATE_FORMAT_DMY:
+                Init(c, b, a, d, e, f, 0, 0);
+                break;
+            case GXDLMS_DATE_FORMAT_MDY:
+                Init(c, a, b, d, e, f, 0, 0);
+                break;
+            case GXDLMS_DATE_FORMAT_YMD:
+                Init(a, b, c, d, e, f, 0, 0);
+                break;
+            case GXDLMS_DATE_FORMAT_YDM:
+                Init(a, c, b, d, e, f, 0, 0);
+                break;
+            default:
+                ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
+            }
+            if (ret == 0)
+            {
+                m_Skip = (DATETIME_SKIPS)(m_Skip | skip | DATETIME_SKIPS_MS);
+            }
+        }
+    }
+    return ret;
+}
+
+int CGXDateTime::ToFormatString(std::string& value)
+{
+    int ret;
+    char buff[30];
+    value.clear();
+    if (m_Skip != 0 || m_Extra != 0)
+    {
+        std::string format;
+        GXDLMS_DATE_FORMAT df;
+        char dateSeparator, timeSeparator, use24HourClock;
+        if ((ret = GetDateTimeFormat(format, df, dateSeparator, timeSeparator, use24HourClock)) == 0)
+        {
+            Remove(this, format, dateSeparator, timeSeparator);
+
+            if ((m_Extra & DATE_TIME_EXTRA_INFO_DST_BEGIN) != 0)
+            {
+                Replace(format, "%m", "BEGIN");
+            }
+            else if ((m_Extra & DATE_TIME_EXTRA_INFO_DST_END) != 0)
+            {
+                Replace(format, "%m", "END");
+            }
+            else if ((m_Extra & DATE_TIME_EXTRA_INFO_LAST_DAY) != 0)
+            {
+                Replace(format, "%d", "LASTDAY");
+            }
+            else if ((m_Extra & DATE_TIME_EXTRA_INFO_LAST_DAY2) != 0)
+            {
+                Replace(format, "%d", "LASTDAY2");
+            }
+            if ((m_Skip & DATETIME_SKIPS_YEAR) != 0)
+            {
+                Replace(format, "%Y", "*");
+                Replace(format, "%g", "*");
+            }
+            if ((m_Skip & DATETIME_SKIPS_MONTH) != 0)
+            {
+                Replace(format, "%m", "*");
+            }
+            if ((m_Skip & DATETIME_SKIPS_DAY) != 0)
+            {
+                Replace(format, "%d", "*");
+            }
+            if ((m_Skip & DATETIME_SKIPS_HOUR) != 0)
+            {
+                Replace(format, "%I", "*");
+                Replace(format, "%H", "*");
+                Remove(format, "%p", 0);
+            }
+            if ((m_Skip & DATETIME_SKIPS_SECOND) != 0)
+            {
+                Replace(format, "%S", "*");
+            }
+            if ((m_Skip & DATETIME_SKIPS_MINUTE) != 0)
+            {
+                Replace(format, "%M", "*");
+            }
+            ret = (int)strftime(buff, sizeof(buff), GXHelpers::trim(format).c_str(), &m_Value);
+            if (ret != 0)
+            {
+                ret = 0;
+                value = buff;
+            }
+            else
+            {
+                ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
+            }
+        }
+    }
+    else
+    {
+        ret = (int)strftime(buff, sizeof(buff), "%x %X", &m_Value);
+        if (ret == 7)
+        {
+            ret = 0;
+            value = buff;
+        }
+        else
+        {
+            ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+    }
+    return ret;
 }
 
 // Constructor.
@@ -335,62 +881,6 @@ void CGXDateTime::SetDeviation(int value)
     m_Deviation = value;
 }
 
-//Constants for different orders of date components.
-typedef enum
-{
-    GXDLMS_DATE_FORMAT_INVALID = -1,
-    GXDLMS_DATE_FORMAT_DMY = 0,
-    GXDLMS_DATE_FORMAT_MDY = 1,
-    GXDLMS_DATE_FORMAT_YMD = 2,
-    GXDLMS_DATE_FORMAT_YDM = 3
-} GXDLMS_DATE_FORMAT;
-
-int GetDateFormat(GXDLMS_DATE_FORMAT& format, char& separator)
-{
-    int ret = 0, value, lastPos = 0, pos;
-    char buff[11];
-    struct tm order = { 0 };
-    order.tm_year = 0;
-    order.tm_mday = 1;
-    order.tm_mon = 1;//Month is zero based.
-    ret = (int)strftime(buff, 11, "%x", &order);
-    if (ret > 0)
-    {
-        for (pos = 0; pos != ret; ++pos)
-        {
-            //If numeric value
-            if (buff[pos] >= '0' && buff[pos] <= '9')
-            {
-
-            }
-            else //If date time separator.
-            {
-                separator = buff[pos];
-#if _MSC_VER > 1000
-                if (sscanf_s(buff + lastPos, "%d", &value) == 1)
-#else
-                if (sscanf(buff + lastPos, "%d", &value) == 1)
-#endif
-                {
-                    if (value == 1)
-                    {
-                        format = lastPos == 0 ? GXDLMS_DATE_FORMAT_DMY : GXDLMS_DATE_FORMAT_YDM;
-                        break;
-                    }
-                    else if (value == 2)
-                    {
-                        format = lastPos == 0 ? GXDLMS_DATE_FORMAT_MDY : GXDLMS_DATE_FORMAT_YMD;
-                        break;
-                    }
-                }
-                lastPos = pos + 1;
-            }
-            }
-        }
-    return ret;
-    }
-
-
 std::string CGXDateTime::ToString()
 {
     char buff[50];
@@ -403,7 +893,7 @@ std::string CGXDateTime::ToString()
         //Add year, month and date if used.
         if ((m_Skip & (DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY)) != (DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY))
         {
-            ret = GetDateFormat(format, separator);
+            ret = GetDateFormat2(format, separator);
             switch (format)
             {
             case GXDLMS_DATE_FORMAT_DMY:
@@ -518,42 +1008,42 @@ std::string CGXDateTime::ToString()
             if (ba.GetSize() != 0)
             {
                 ba.SetUInt8(' ');
-        }
+            }
 #if _MSC_VER > 1000
             sprintf_s(buff, 50, "%.2d", m_Value.tm_hour);
 #else
             sprintf(buff, "%.2d", m_Value.tm_hour);
 #endif
             ba.AddString(buff);
-    }
+        }
         //Add minutes.
         if (m_Value.tm_min != -1 && (m_Skip & DATETIME_SKIPS_MINUTE) == 0)
         {
             if (ba.GetSize() != 0)
             {
                 ba.SetUInt8(':');
-        }
+            }
 #if _MSC_VER > 1000
             sprintf_s(buff, 50, "%.2d", m_Value.tm_min);
 #else
             sprintf(buff, "%.2d", m_Value.tm_min);
 #endif
             ba.AddString(buff);
-}
+        }
         //Add seconds.
         if (m_Value.tm_sec != -1 && (m_Skip & DATETIME_SKIPS_SECOND) == 0)
         {
             if (ba.GetSize() != 0)
             {
                 ba.SetUInt8(':');
-        }
+            }
 #if _MSC_VER > 1000
             sprintf_s(buff, 50, "%.2d", m_Value.tm_sec);
 #else
             sprintf(buff, "%.2d", m_Value.tm_sec);
 #endif
             ba.AddString(buff);
-}
+        }
         return ba.ToString();
     }
     //If value is not set return empty std::string.
@@ -679,13 +1169,13 @@ int CGXDateTime::ToLocalTime(struct tm& localTime)
         if (t == -1)
         {
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
+        }
 #if _MSC_VER > 1000
         localtime_s(&localTime, &t);
 #else
         localTime = *localtime(&t);
 #endif
-}
+    }
     return 0;
 }
 
@@ -789,5 +1279,5 @@ long CGXDateTime::GetDifference(struct tm& start, CGXDateTime& to)
 }
 unsigned long CGXDateTime::ToUnixTime()
 {
-    return (unsigned long) mktime(&m_Value);
+    return (unsigned long)mktime(&m_Value);
 }

@@ -77,6 +77,17 @@ enum DATE_TIME_EXTRA_INFO
     DATE_TIME_EXTRA_INFO_LAST_DAY2 = 0x8,
 };
 
+
+//Constants for different orders of date components.
+typedef enum
+{
+    GXDLMS_DATE_FORMAT_INVALID = -1,
+    GXDLMS_DATE_FORMAT_DMY = 0,
+    GXDLMS_DATE_FORMAT_MDY = 1,
+    GXDLMS_DATE_FORMAT_YMD = 2,
+    GXDLMS_DATE_FORMAT_YDM = 3
+} GXDLMS_DATE_FORMAT;
+
 // This class is used because in COSEM object model some fields from date time can be ignored.
 // Default behavior of DateTime do not allow this.
 class CGXDateTime
@@ -89,6 +100,22 @@ class CGXDateTime
     DATE_TIME_EXTRA_INFO m_Extra;
     DLMS_CLOCK_STATUS m_Status;
     void Init(int year, int month, int day, int hour, int minute, int second, int millisecond, int devitation);
+    //Get date format.
+    int GetDateFormat2(
+        GXDLMS_DATE_FORMAT& format,
+        char& separator);
+
+    //Get time format.
+    int GetTimeFormat2(
+        char& separator,
+        char& use24HourClock);
+
+    int GetDateTimeFormat(
+        std::string& value,
+        GXDLMS_DATE_FORMAT& format,
+        char& dateSeparator,
+        char& timeSeparator,
+        char& use24HourClock);
 public:
     // Constructor.
     CGXDateTime();
@@ -103,6 +130,18 @@ public:
 
     // Constructor.
     CGXDateTime(int year, int month, int day, int hour, int minute, int second, int millisecond, int devitation);
+
+    /////////////////////////////////////////////////////////////////////////
+    //Get system date-time format.
+    static void GetSystemDateTimeFormat(std::string& value);
+
+    //Destructor.
+    virtual ~CGXDateTime();
+
+    // Get date time from string.
+    int FromString(const char* value);
+
+    int ToFormatString(std::string& value);
 
     // Used date time value.
     struct tm& GetValue();

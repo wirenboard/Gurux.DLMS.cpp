@@ -124,7 +124,7 @@ int CGXDLMSSha256::Update(unsigned int *h, unsigned char *block, CGXByteBuffer& 
     unsigned int block_nb;
     unsigned int new_len, rem_len, tmp_len;
     const unsigned char *shifted_message;
-    tmp_len = 64 - (data.GetSize() - data.GetPosition());
+    tmp_len = 64 - (data.Available());
     rem_len = data.GetSize() < tmp_len ? data.GetSize() : tmp_len;
     memcpy(&block[data.GetPosition()], data.GetData(), rem_len);
     if (data.GetSize() - data.GetPosition() < 64)

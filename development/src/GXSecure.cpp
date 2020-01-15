@@ -105,7 +105,16 @@ int CGXSecure::Secure(
     // Get server Challenge.
     CGXByteBuffer challenge;
     // Get shared secret
-    if (settings.GetAuthentication() != DLMS_AUTHENTICATION_HIGH_GMAC)
+    if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256)
+    {
+        challenge.Set(&secret);
+        challenge.Set(&settings.GetCipher()->GetSystemTitle());
+        challenge.Set(&settings.GetSourceSystemTitle());
+        challenge.Set(&settings.GetStoCChallenge());
+        challenge.Set(&settings.GetCtoSChallenge());
+        challenge.Set(&data);
+    }
+    else if (settings.GetAuthentication() != DLMS_AUTHENTICATION_HIGH_GMAC)
     {
         challenge.Set(&data);
         challenge.Set(&secret);

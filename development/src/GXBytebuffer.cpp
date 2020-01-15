@@ -778,7 +778,7 @@ CGXByteBuffer& CGXByteBuffer::operator=(CGXByteBuffer& value)
     m_Size = 0;
     if (value.GetSize() != 0)
     {
-        Set(&value, 0, (unsigned long)-1);
+        Set(value.m_Data, value.m_Size);
     }
     return *this;
 }
