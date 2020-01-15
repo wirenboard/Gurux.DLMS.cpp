@@ -1,5 +1,8 @@
 Credits
 =======
+  - HLS SHA-256 challenge is count wrong.
+    * [jan.kolar](http://gurux.fi/user/175629)
+
   - DateTime in push message causes memory corrupt in memcpy.
     * [seanscoggins](https://www.gurux.fi/user/182306)
 
