@@ -123,8 +123,8 @@ static int GetArray(CGXByteBuffer& buff, CGXDataInfo& info, int index, CGXDLMSVa
     */
 int GetTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 {
-    int ret;
-    unsigned char hour, minute, second, ms;
+    int ms, ret;
+    unsigned char hour, minute, second, ch;
     if (buff.GetSize() - buff.GetPosition() < 4)
     {
         // If there is not enough data available.
@@ -150,9 +150,17 @@ int GetTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     {
         return ret;
     }
-    if ((ret = buff.GetUInt8(&ms)) != 0)
+    if ((ret = buff.GetUInt8(&ch)) != 0)
     {
         return ret;
+    }
+    if (ch != 0xFF)
+    {
+        ms = 10 * ch;
+    }
+    else
+    {
+        ms = -1;
     }
     CGXTime dt(hour, minute, second, ms);
     value = dt;
@@ -259,6 +267,7 @@ int GetDate(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 */
 int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 {
+    DATETIME_SKIPS skip = DATETIME_SKIPS_NONE;
     struct tm tm = { 0 };
     unsigned short year;
     short deviation;
@@ -326,6 +335,7 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     }
     else
     {
+        skip = (DATETIME_SKIPS)(skip | DATETIME_SKIPS_MS);
         ms = 0;
     }
     if ((ret = buff.GetInt16(&deviation)) != 0)
@@ -338,8 +348,12 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     }
     status = ch;
     CGXDateTime dt;
+    if (status == 0xFF)
+    {
+        status = 0;
+        skip = (DATETIME_SKIPS)(skip | DATETIME_SKIPS_STATUS);
+    }
     dt.SetStatus((DLMS_CLOCK_STATUS)status);
-    DATETIME_SKIPS skip = DATETIME_SKIPS_NONE;
     if (year < 1 || year == 0xFFFF)
     {
         skip = (DATETIME_SKIPS)(skip | DATETIME_SKIPS_YEAR);
@@ -410,7 +424,6 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     // If ms is Zero it's skipped.
     if (ms < 1 || ms > 1000)
     {
-        skip = (DATETIME_SKIPS)(skip | DATETIME_SKIPS_MS);
         ms = 0;
     }
     tm.tm_isdst = (status & DLMS_CLOCK_STATUS_DAYLIGHT_SAVE_ACTIVE) != 0;
@@ -1149,6 +1162,10 @@ int GetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMSVar
     else
     {
         value = "";
+    }
+    if (info.GetXml() != NULL)
+    {
+        info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", value.strVal);
     }
     return 0;
 }
@@ -2044,7 +2061,12 @@ static int SetDateTime(CGXByteBuffer& buff, CGXDLMSVariant& value)
         buff.SetUInt16(value.dateTime.GetDeviation());
     }
     // Add clock_status
-    if (dt.tm_isdst)
+    if ((skip & DATETIME_SKIPS_STATUS) != 0)
+    {
+        // Status is not used.
+        buff.SetUInt8(0xFF);
+    }
+    else if (dt.tm_isdst)
     {
         buff.SetUInt8(value.dateTime.GetStatus() | DLMS_CLOCK_STATUS_DAYLIGHT_SAVE_ACTIVE);
     }

@@ -58,8 +58,10 @@ enum DATETIME_SKIPS
     DATETIME_SKIPS_SECOND = 0x40,
     // Hundreds of seconds part of date time is skipped.
     DATETIME_SKIPS_MS = 0x80,
-    //Devitation is skipped on write.
-    DATETIME_SKIPS_DEVITATION = 0x100
+    //Devitation is skipped.
+    DATETIME_SKIPS_DEVITATION = 0x100,
+    //Status is skipped.
+    DATETIME_SKIPS_STATUS = 0x200
 };
 
 // DataType extra info.

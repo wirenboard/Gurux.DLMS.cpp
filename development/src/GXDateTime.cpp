@@ -183,22 +183,29 @@ CGXDateTime::CGXDateTime(struct tm* value)
 
 CGXDateTime::CGXDateTime(int year, int month, int day, int hour, int minute, int second, int millisecond)
 {
-    int hours, minutes, deviation;
-    struct tm dt;
-    dt.tm_year = year;
-    dt.tm_mon = month;
-    dt.tm_mday = day;
-    dt.tm_hour = hour;
-    dt.tm_min = minute;
-    dt.tm_sec = second;
-    time_t tm1 = time(NULL);
+    if (year != -1 && month != -1 && day != -1 && hour != -1 && minute != -1)
+    {
+        int hours, minutes, deviation;
+        struct tm dt;
+        dt.tm_year = year;
+        dt.tm_mon = month;
+        dt.tm_mday = day;
+        dt.tm_hour = hour;
+        dt.tm_min = minute;
+        dt.tm_sec = second;
+        time_t tm1 = time(NULL);
 #if _MSC_VER > 1000
-    localtime_s(&dt, &tm1);
+        localtime_s(&dt, &tm1);
 #else
-    dt = *localtime(&tm1);
+        dt = *localtime(&tm1);
 #endif
-    GetUtcOffset(&dt, hours, minutes, deviation);
-    Init(year, month, day, hour, minute, second, millisecond, -(hours * 60 + minutes));
+        GetUtcOffset(&dt, hours, minutes, deviation);
+        Init(year, month, day, hour, minute, second, millisecond, -(hours * 60 + minutes));
+    }
+    else
+    {
+        Init(year, month, day, hour, minute, second, millisecond, 0xFFFF);
+    }
 }
 
 // Constructor.

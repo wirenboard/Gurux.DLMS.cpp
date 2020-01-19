@@ -554,15 +554,15 @@ int CGXAPDU::Parse(bool initiateRequest,
         {
             return ret;
         }
-        if (ch != 6)
-        {
-            //Invalid DLMS version number.
-            return DLMS_ERROR_CODE_INVALID_VERSION_NUMBER;
-        }
         if (xml != NULL && (initiateRequest || xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML))
         {
             xml->IntegerToHex((long)ch, 2, str);
             xml->AppendLine(TRANSLATOR_GENERAL_TAGS_NEGOTIATED_DLMS_VERSION_NUMBER, "", str);
+        }
+        else if (ch != 6)
+        {
+            //Invalid DLMS version number.
+            return DLMS_ERROR_CODE_INVALID_VERSION_NUMBER;
         }
     }
 
