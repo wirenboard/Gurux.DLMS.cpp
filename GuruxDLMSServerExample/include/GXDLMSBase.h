@@ -35,10 +35,12 @@
 #pragma once
 
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
-#include <Winsock.h> //Add support for sockets	
+#include <Winsock.h> //Add support for sockets
 #endif
 
 #include "../../development/include/GXDLMSSecureServer.h"
+#include "../../development/include/GXDLMSSecuritySetup.h"
+
 #if defined(_WIN32) || defined(_WIN64)//Windows
 extern TCHAR DATAFILE[FILENAME_MAX];
 extern TCHAR IMAGEFILE[FILENAME_MAX];
@@ -50,7 +52,7 @@ extern char IMAGEFILE[FILENAME_MAX];
 class CGXDLMSBase : public CGXDLMSSecureServer
 {
 private:
-#if defined(_WIN32) || defined(_WIN64)//If Windows 
+#if defined(_WIN32) || defined(_WIN64)//If Windows
     SOCKET m_ServerSocket;
     HANDLE m_ReceiverThread;
 #else //If Linux.
@@ -69,7 +71,7 @@ public:
         CGXDLMSIecHdlcSetup* hdlc) :
         CGXDLMSSecureServer(ln, hdlc)
     {
-#if defined(_WIN32) || defined(_WIN64)//If Windows 
+#if defined(_WIN32) || defined(_WIN64)//If Windows
         m_ReceiverThread = INVALID_HANDLE_VALUE;
         m_ServerSocket = INVALID_SOCKET;
 #else //If Linux.
@@ -77,6 +79,9 @@ public:
         m_ReceiverThread = -1;
 #endif
         SetMaxReceivePDUSize(1024);
+        CGXDLMSSecuritySetup* s = new CGXDLMSSecuritySetup();
+        s->SetServerSystemTitle(GetCiphering()->GetSystemTitle());
+        GetItems().push_back(s);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -87,7 +92,7 @@ public:
         CGXDLMSTcpUdpSetup* wrapper) :
         CGXDLMSSecureServer(ln, wrapper)
     {
-#if defined(_WIN32) || defined(_WIN64)//If Windows 
+#if defined(_WIN32) || defined(_WIN64)//If Windows
         m_ReceiverThread = INVALID_HANDLE_VALUE;
         m_ServerSocket = INVALID_SOCKET;
 #else //If Linux.
@@ -105,7 +110,7 @@ public:
         CGXDLMSIecHdlcSetup* hdlc) :
         CGXDLMSSecureServer(sn, hdlc)
     {
-#if defined(_WIN32) || defined(_WIN64)//If Windows 
+#if defined(_WIN32) || defined(_WIN64)//If Windows
         m_ReceiverThread = INVALID_HANDLE_VALUE;
         m_ServerSocket = INVALID_SOCKET;
 #else //If Linux.
@@ -123,7 +128,7 @@ public:
         CGXDLMSTcpUdpSetup* wrapper) :
         CGXDLMSSecureServer(sn, wrapper)
     {
-#if defined(_WIN32) || defined(_WIN64)//If Windows 
+#if defined(_WIN32) || defined(_WIN64)//If Windows
         m_ReceiverThread = INVALID_HANDLE_VALUE;
         m_ServerSocket = INVALID_SOCKET;
 #else //If Linux.

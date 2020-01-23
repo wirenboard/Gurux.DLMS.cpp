@@ -75,10 +75,7 @@ int CGXDLMSSecureClient::Encrypt(CGXByteBuffer& kek, CGXByteBuffer& data, CGXByt
         //Key Encrypting Key.
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    //TODO:
-//    GXDLMSChipperingStream gcm = new GXDLMSChipperingStream(true, kek);
-//    return gcm.encryptAes(data);
-    return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    return CGXSecure::EncryptAesKeyWrapping(data, kek, reply);
 }
 
 int CGXDLMSSecureClient::Decrypt(CGXByteBuffer& kek, CGXByteBuffer& data, CGXByteBuffer& reply)
@@ -102,8 +99,5 @@ int CGXDLMSSecureClient::Decrypt(CGXByteBuffer& kek, CGXByteBuffer& data, CGXByt
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    //TODO:
-//    GXDLMSChipperingStream gcm = new GXDLMSChipperingStream(false, kek);
-//    return gcm.decryptAes(data);
-    return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    return CGXSecure::DecryptAesKeyWrapping(data, kek, reply);
 }

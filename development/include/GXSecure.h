@@ -71,6 +71,9 @@ public:
         CGXByteBuffer& data,
         CGXByteBuffer& secret,
         CGXByteBuffer& reply);
+
+    static int EncryptAesKeyWrapping(CGXByteBuffer& data, CGXByteBuffer& kek, CGXByteBuffer& reply);
+    static int DecryptAesKeyWrapping(CGXByteBuffer& data, CGXByteBuffer& kek, CGXByteBuffer& reply);
 };
 
 #endif //GXSECURE_H

@@ -36,15 +36,16 @@
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSSecuritySetup.h"
 #include "../include/GXDLMSConverter.h"
+#include "../include/GXDLMSSecureClient.h"
 
 //Constructor.
-CGXDLMSSecuritySetup::CGXDLMSSecuritySetup() : CGXDLMSSecuritySetup("", 0)
+CGXDLMSSecuritySetup::CGXDLMSSecuritySetup() : CGXDLMSSecuritySetup("0.0.43.0.0.255", 0)
 {
 }
 
 //SN Constructor.
 CGXDLMSSecuritySetup::CGXDLMSSecuritySetup(std::string ln, unsigned short sn) :
-    CGXDLMSObject(DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP, ln, sn)
+    CGXDLMSObject(DLMS_OBJECT_TYPE_SECURITY_SETUP, ln, sn)
 {
 
 }
@@ -115,13 +116,117 @@ int CGXDLMSSecuritySetup::GetMethodCount()
     return 8;
 }
 
+int CGXDLMSSecuritySetup::Activate(
+    CGXDLMSClient* client,
+    DLMS_SECURITY security,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)security);
+    return client->Method(this, 1, data, reply);
+}
+
+int CGXDLMSSecuritySetup::GlobalKeyTransfer(
+    CGXDLMSClient* client,
+    CGXByteBuffer& kek,
+    std::vector<std::pair<DLMS_GLOBAL_KEY_TYPE, CGXByteBuffer&> >& list,
+    std::vector<CGXByteBuffer>& reply)
+{
+    int ret =  0;
+    CGXDLMSVariant data;
+    CGXByteBuffer bb, tmp;
+    if (list.size() == 0)
+    {
+        //Invalid list. It is empty.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
+    bb.SetUInt8((unsigned char) list.size());
+    for (std::vector<std::pair<DLMS_GLOBAL_KEY_TYPE, CGXByteBuffer&> >::iterator it = list.begin(); it != list.end(); ++it)
+    {
+        bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+        bb.SetUInt8(2);
+        data = (char)it->first;
+        if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_ENUM, data)) != 0 ||
+            (ret = CGXDLMSSecureClient::Encrypt(kek, it->second, tmp)) != 0)
+        {
+            break;
+        }
+        data = tmp;
+        if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_OCTET_STRING, data)) != 0)
+        {
+            break;
+        }
+    }
+    if (ret == 0)
+    {
+        data = bb;
+        ret = client->Method(this, 2, data, DLMS_DATA_TYPE_ARRAY, reply);
+    }
+    return ret;
+}
+
+int CGXDLMSSecuritySetup::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
+{
+    if (e.GetIndex() == 1)
+    {
+        m_SecurityPolicy = e.GetParameters().ToInteger();
+    }
+    else if (e.GetIndex() == 2)
+    {
+        for (std::vector<CGXDLMSVariant>::iterator it = e.GetParameters().Arr.begin(); it != e.GetParameters().Arr.end(); ++it)
+        {
+            DLMS_GLOBAL_KEY_TYPE type = (DLMS_GLOBAL_KEY_TYPE)it->Arr[0].ToInteger();
+            CGXByteBuffer data, reply;
+            CGXByteBuffer kek = settings.GetKek();
+            data.Set(it->Arr[1].byteArr, it->Arr[1].GetSize());
+            if (CGXDLMSSecureClient::Decrypt(kek, data, reply) != 0 ||
+                reply.GetSize() != 16)
+            {
+                e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+                break;
+            }
+            switch (type) {
+            case DLMS_GLOBAL_KEY_TYPE_UNICAST_ENCRYPTION:
+                settings.GetCipher()->SetBlockCipherKey(reply);
+                break;
+            case DLMS_GLOBAL_KEY_TYPE_BROADCAST_ENCRYPTION:
+                // Invalid type
+                e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+                break;
+            case DLMS_GLOBAL_KEY_TYPE_AUTHENTICATION:
+                // if settings.Cipher is null non secure server is used.
+                settings.GetCipher()->SetAuthenticationKey(reply);
+                break;
+            case DLMS_GLOBAL_KEY_TYPE_KEK:
+                settings.SetKek(reply);
+                break;
+            default:
+                e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+            }
+        }
+    }
+    else
+    {
+        e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+    }
+    return DLMS_ERROR_CODE_OK;
+}
+
 void CGXDLMSSecuritySetup::GetValues(std::vector<std::string>& values)
 {
     values.clear();
     std::string ln;
     GetLogicalName(ln);
     values.push_back(ln);
-    values.push_back(CGXDLMSConverter::ToString((DLMS_SECURITY_POLICY)m_SecurityPolicy));
+    if (m_Version == 0)
+    {
+        values.push_back(CGXDLMSConverter::ToString((DLMS_SECURITY_POLICY)m_SecurityPolicy));
+    }
+    else
+    {
+        CGXDLMSConverter::ToString((DLMS_SECURITY_POLICY1)m_SecurityPolicy, ln);
+        values.push_back(ln);
+    }
     values.push_back(CGXDLMSConverter::ToString(m_SecuritySuite));
     std::string str = m_ClientSystemTitle.ToHexString();
     values.push_back(str);

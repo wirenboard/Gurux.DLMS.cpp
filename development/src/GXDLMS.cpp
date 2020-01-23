@@ -1877,7 +1877,6 @@ int CGXDLMS::HandleAccessResponse(
     std::string str;
     unsigned char ch;
     unsigned long invokeId, len;
-    //TODO: int start = reply.GetData().GetPosition() - 1;
     //Get invoke id.
     if ((ret = reply.GetData().GetUInt32(&invokeId)) != 0)
     {
@@ -3769,7 +3768,7 @@ int CGXDLMS::GetActionInfo(DLMS_OBJECT_TYPE objectType, unsigned char& value, un
         value = 0x38;
         count = 1;
         break;
-    case DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP:
+    case DLMS_OBJECT_TYPE_SECURITY_SETUP:
         value = 0x30;
         count = 8;
         break;

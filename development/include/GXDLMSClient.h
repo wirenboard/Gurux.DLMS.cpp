@@ -572,6 +572,49 @@ public:
         CGXDLMSVariant& data,
         std::vector<CGXByteBuffer>& reply);
 
+
+    /**
+    * Generate Method (Action) request.
+    *
+    * @param item
+    *            Method object short name or Logical Name.
+    * @param index
+    *            Method index.
+    * @param data
+    *            Method data.
+    * @param type
+    *            Data type.
+    * @return DLMS action message.
+    */
+    int Method(
+        CGXDLMSObject* item,
+        int index,
+        CGXDLMSVariant& data,
+        DLMS_DATA_TYPE dataType,
+        std::vector<CGXByteBuffer>& reply);
+
+    /**
+   * Generate Method (Action) request..
+   *
+   * @param name
+   *            Method object short name or Logical Name.
+   * @param objectType
+   *            Object type.
+   * @param methodIndex
+   *            Method index.
+   * @param value
+   *            Method data.
+   * @param dataType
+   *            Data type.
+   * @return DLMS action message.
+   */
+    int Method(
+        CGXDLMSVariant name,
+        DLMS_OBJECT_TYPE objectType,
+        int methodIndex,
+        CGXDLMSVariant& data,
+        std::vector<CGXByteBuffer>& reply);
+
     /**
     * Generate Method (Action) request..
     *
@@ -592,6 +635,7 @@ public:
         DLMS_OBJECT_TYPE objectType,
         int methodIndex,
         CGXDLMSVariant& data,
+        DLMS_DATA_TYPE dataType,
         std::vector<CGXByteBuffer>& reply);
 
     /**

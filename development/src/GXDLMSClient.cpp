@@ -1467,27 +1467,47 @@ int CGXDLMSClient::Write(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType,
 int CGXDLMSClient::Method(CGXDLMSObject* item, int index,
     CGXDLMSVariant& data, std::vector<CGXByteBuffer>& reply)
 {
-    CGXDLMSVariant name = item->GetName();
-    return Method(name, item->GetObjectType(), index, data, reply);
+    return Method(item, index, data, data.vt, reply);
 }
 
 /**
-    * Generate Method (Action) request..
+    * Generate Method (Action) request.
     *
-    * @param name
+    * @param item
     *            Method object short name or Logical Name.
-    * @param objectType
-    *            Object type.
     * @param index
     *            Method index.
-    * @param value
+    * @param data
     *            Method data.
-    * @param dataType
+    * @param type
     *            Data type.
     * @return DLMS action message.
     */
-int CGXDLMSClient::Method(CGXDLMSVariant name, DLMS_OBJECT_TYPE objectType,
-    int index, CGXDLMSVariant& value, std::vector<CGXByteBuffer>& reply)
+int CGXDLMSClient::Method(CGXDLMSObject* item, int index,
+    CGXDLMSVariant& data, DLMS_DATA_TYPE dataType, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant name = item->GetName();
+    return Method(name, item->GetObjectType(), index, data, dataType, reply);
+}
+
+int CGXDLMSClient::Method(
+    CGXDLMSVariant name,
+    DLMS_OBJECT_TYPE objectType,
+    int index,
+    CGXDLMSVariant& value,
+    std::vector<CGXByteBuffer>& reply)
+{
+    return Method(name, objectType,
+        index, value, value.vt, reply);
+}
+
+int CGXDLMSClient::Method(
+    CGXDLMSVariant name,
+    DLMS_OBJECT_TYPE objectType,
+    int index,
+    CGXDLMSVariant& value,
+    DLMS_DATA_TYPE dataType,
+    std::vector<CGXByteBuffer>& reply)
 {
     int ret;
     if (index < 1)
@@ -1502,7 +1522,7 @@ int CGXDLMSClient::Method(CGXDLMSVariant name, DLMS_OBJECT_TYPE objectType,
     {
         m_Settings.SetInvokeID((unsigned char)((m_Settings.GetInvokeID() + 1) & 0xF));
     }
-    if ((ret = GXHelpers::SetData(data, value.vt, value)) != 0)
+    if ((ret = GXHelpers::SetData(data, dataType, value)) != 0)
     {
         return ret;
     }

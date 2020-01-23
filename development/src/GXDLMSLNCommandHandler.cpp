@@ -1267,6 +1267,7 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
     DLMS_ACCESS_SERVICE_COMMAND_TYPE type;
     unsigned short id;
     unsigned char* ln;
+    unsigned char attributeIndex;
     for (unsigned long pos = 0; pos != cnt; ++pos)
     {
         if ((ret = data.GetUInt8(&ch)) != 0)
@@ -1289,11 +1290,10 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
         ln = data.GetData() + data.GetPosition();
         data.SetPosition(data.GetPosition() + 6);
         // Attribute Id
-        if ((ret = data.GetUInt8(&ch)) != 0)
+        if ((ret = data.GetUInt8(&attributeIndex)) != 0)
         {
             return ret;
         }
-        unsigned char attributeIndex = ch;
         if (xml != NULL)
         {
             xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_ACCESS_REQUEST_SPECIFICATION);

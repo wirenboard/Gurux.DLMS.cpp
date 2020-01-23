@@ -91,3 +91,12 @@ CGXCipher* CGXDLMSSecureServer::GetCiphering()
 {
     return m_Settings.GetCipher();
 }
+
+CGXByteBuffer& CGXDLMSSecureServer::GetKek() {
+    return GetSettings().GetKek();
+}
+
+int CGXDLMSSecureServer::SetKek(CGXByteBuffer& value) {
+    GetSettings().SetKek(value);
+    return 0;
+}

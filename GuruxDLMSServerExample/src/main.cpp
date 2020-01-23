@@ -35,7 +35,7 @@
 #include "../include/getopt.h"
 #include <tchar.h>
 #include <conio.h>
-#include <Winsock.h> //Add support for sockets	
+#include <Winsock.h> //Add support for sockets
 #include <time.h>
 #include <process.h>//Add support for threads
 #else //Linux includes.
@@ -58,7 +58,6 @@
 #include "../../development/include/GXDLMSAssociationLogicalName.h"
 #include "../../development/include/GXDLMSAssociationShortName.h"
 
-
 int Start(int port, GX_TRACE_LEVEL trace)
 {
     int ret;
@@ -71,6 +70,13 @@ int Start(int port, GX_TRACE_LEVEL trace)
     {
         return ret;
     }
+
+    printf("System Title: %s\r\n", SNServer.GetCiphering()->GetSystemTitle().ToHexString().c_str());
+    printf("Authentication key: %s\r\n", SNServer.GetCiphering()->GetAuthenticationKey().ToHexString().c_str());
+    printf("Block cipher key: %s\r\n", SNServer.GetCiphering()->GetBlockCipherKey().ToHexString().c_str());
+  //  printf("Client System title: %s\r\n", SNServer.GetClientSystemTitle().ToHexString().c_str());
+    printf("Master key (KEK) title: %s\r\n", SNServer.GetKek().ToHexString().c_str());
+
     printf("Short Name DLMS Server in port %d.\r\n", port);
     printf("Example connection settings:\n");
     printf("Gurux.DLMS.Client.Example.Net -r sn -h localhost -p %d\n", port);

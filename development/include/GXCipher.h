@@ -170,13 +170,13 @@ public:
     /**
       * Encrypt PDU.
       *
-      * @param tag
+      * tag
       *            Tag.
-      * @param systemTitle
+      * systemTitle
       *            System Title.
-      * @param plainText
+      * plainText
       *            Data to encrypt.
-      * @param encrypted
+      * encrypted
       *            Encrypted data.
       */
     int Encrypt(
@@ -192,14 +192,10 @@ public:
     /**
       * Decrypt data.
       *
-      * @param systemTitle
-      *            System Title.
-      * @param data
-      *            Decrypted data.
-      * @param security
-      *            Used security level.
-      * @param suite
-      *            Used security suite.
+      * systemTitle: System Title.
+      * data: Decrypted data.
+      * security: Used security level.
+      * suite: Used security suite.
       */
     int Decrypt(
         CGXByteBuffer& title,
@@ -208,19 +204,26 @@ public:
         DLMS_SECURITY& security,
         DLMS_SECURITY_SUITE& suite);
 
-    /**
+    /*
      * Encrypt data using AES.
      *
-     * @param data
-     *            Encrypted data.
-     * @param offset
-     *            Data offset.
-     * @param secret
-     *            Secret.
+     * data: Encrypted data.
+     * offset: Data offset.
+     * secret: Secret.
      */
     static int Aes1Encrypt(
         CGXByteBuffer& data,
         unsigned short offset,
+        CGXByteBuffer& secret);
+
+    /*
+     * Decrypt data using AES.
+     *
+     * data: Encrypted data.
+     * secret:  Secret.
+     */
+    static int Aes1Decrypt(
+        CGXByteBuffer& data,
         CGXByteBuffer& secret);
 
     /**
@@ -274,7 +277,7 @@ public:
     CGXByteBuffer& GetAuthenticationKey();
 
     /**
-     * @param value
+     * value
      *            Authentication key.
      */
     void SetAuthenticationKey(CGXByteBuffer& value);
@@ -301,7 +304,7 @@ public:
     CGXByteBuffer& GetDedicatedKey();
 
     /**
-     * @param value
+     * value
      *            Dedicated key.
      */
     void SetDedicatedKey(CGXByteBuffer& value);

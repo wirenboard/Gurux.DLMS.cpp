@@ -55,6 +55,100 @@ int CGXSecure::GenerateChallenge(DLMS_AUTHENTICATION authentication, CGXByteBuff
     return 0;
 }
 
+static const unsigned char WRAP_IV[] = { 0xA6, 0xA6, 0xA6, 0xA6, 0xA6, 0xA6, 0xA6, 0xA6 };
+int CGXSecure::EncryptAesKeyWrapping(CGXByteBuffer& data, CGXByteBuffer& kek, CGXByteBuffer& reply)
+{
+    CGXByteBuffer buf, buf2;
+    //unsigned char buf[16] = { 0 };
+    unsigned char n, j, i;
+
+    if (kek.GetSize() != 16 || data.GetSize() != 16)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    reply.Capacity(24);
+    reply.SetSize(24);
+    reply.SetPosition(0);
+    // Amount of 64-bit blocks.
+    n = (unsigned char)(data.GetSize() >> 3);
+    memcpy(reply.GetData(), WRAP_IV, 8);
+    memcpy(reply.GetData() + 8, data.GetData(), data.GetSize());
+    for (j = 0; j != 6; j++)
+    {
+        for (i = 1; i <= n; i++)
+        {
+            kek.SetPosition(0);
+            buf2.SetSize(0);
+            buf2.Set(&kek);
+            buf.SetSize(0);
+            buf.Set(reply.GetData(), 8);
+            buf.Set(reply.GetData() + (8 * i), 8);
+            CGXCipher::Aes1Encrypt(buf, 0, buf2);
+            unsigned int t = n * j + i;
+            for (int k = 1; t != 0; k++)
+            {
+                unsigned char v = (unsigned char)t;
+                buf.GetData()[sizeof(WRAP_IV) - k] ^= v;
+                t = (int)((unsigned int)t >> 8);
+            }
+            memcpy(reply.GetData(), buf.GetData(), 8);
+            memcpy(reply.GetData() + (8 * i), buf.GetData() + 8, 8);
+        }
+    }
+    return 0;
+}
+
+int CGXSecure::DecryptAesKeyWrapping(CGXByteBuffer& data, CGXByteBuffer& kek, CGXByteBuffer& reply)
+{
+    unsigned char a[8];
+    CGXByteBuffer buf, buf2;
+    signed char j, i;
+    unsigned char k, v, n;
+    unsigned short t;
+    // Amount of 64-bit blocks.
+    n = (unsigned char)(data.GetSize() >> 3);
+    if (kek.GetSize() != 16 || data.GetSize() != n * 8)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    reply.Capacity(16);
+    reply.SetSize(16);
+    reply.SetPosition(0);
+    memcpy(a, data.GetData(), sizeof(WRAP_IV));
+    memcpy(reply.GetData(), data.GetData() + sizeof(WRAP_IV), data.GetSize() - sizeof(WRAP_IV));
+    if (--n == 0)
+    {
+        n = 1;
+    }
+    for (j = 5; j >= 0; j--)
+    {
+        for (i = n; i >= 1; i--)
+        {
+            buf2.SetSize(0);
+            buf2.Set(&kek);
+            buf.SetSize(0);
+            buf.Set(a, sizeof(WRAP_IV));
+            buf.Set(reply.GetData() + 8 * (i - 1), 8);
+            t = n * j + i;
+            for (k = 1; t != 0; k++)
+            {
+                v = (unsigned char)t;
+                buf.GetData()[sizeof(WRAP_IV) - k] ^= v;
+                t = (unsigned short)(t >> 8);
+            }
+            CGXCipher::Aes1Decrypt(buf, buf2);
+            memcpy(a, buf.GetData(), 8);
+            memcpy(reply.GetData() + 8 * (i - 1), buf.GetData() + 8, 8);
+        }
+    }
+    if (memcmp(a, WRAP_IV, sizeof(WRAP_IV)) != 0)
+    {
+        reply.SetSize(16);
+        return DLMS_ERROR_CODE_FALSE;
+    }
+    return 0;
+}
+
 /**
     * Chipher text.
     *
@@ -142,7 +236,7 @@ int CGXSecure::Secure(
     {
         CGXByteBuffer& key = settings.GetCipher()->GetBlockCipherKey();
         ret = cipher->Encrypt(DLMS_SECURITY_AUTHENTICATION,
-            DLMS_COUNT_TYPE_TAG, ic, 0, secret, key,  data, true);
+            DLMS_COUNT_TYPE_TAG, ic, 0, secret, key, data, true);
         if (ret == 0)
         {
             reply.SetUInt8(DLMS_SECURITY_AUTHENTICATION);

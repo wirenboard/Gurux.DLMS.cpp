@@ -108,7 +108,7 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
         return new CGXDLMSExtendedRegister();
     case DLMS_OBJECT_TYPE_GPRS_SETUP:
         return new CGXDLMSGPRSSetup();
-    case DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP:
+    case DLMS_OBJECT_TYPE_SECURITY_SETUP:
         return new CGXDLMSSecuritySetup();
     case DLMS_OBJECT_TYPE_IEC_HDLC_SETUP:
         return new CGXDLMSIecHdlcSetup();

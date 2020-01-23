@@ -812,16 +812,6 @@ static unsigned char GaloisMultiply(unsigned char value)
     }
 }
 
-/**
-     * Encrypt data using AES.
-     *
-     * @param data
-     *            Encrypted data.
-     * @param offset
-     *            Data offset.
-     * @param secret
-     *            Secret.
-     */
 int CGXCipher::Aes1Encrypt(
     CGXByteBuffer& buff,
     unsigned short offset,
@@ -898,6 +888,95 @@ int CGXCipher::Aes1Encrypt(
     for (i = 0; i < 16; i++)
     {
         data[i + offset] = (data[i + offset] ^ key[i]);
+    }
+    return 0;
+}
+
+int CGXCipher::Aes1Decrypt(
+    CGXByteBuffer& buff,
+    CGXByteBuffer& secret)
+{
+    unsigned char buf1, buf2, buf3, round, i;
+    int buf4;
+    CGXByteBuffer key2;
+    key2.Set(&secret, 0, secret.GetSize());
+    unsigned char* data = buff.GetData();
+    unsigned char* key = key2.GetData();
+    for (round = 0; round < 10; round++) {
+        key[0] = (S_BOX[key[13] & 0xFF] ^ key[0] ^ R_CON[round]);
+        key[1] = (S_BOX[key[14] & 0xFF] ^ key[1]);
+        key[2] = (S_BOX[key[15] & 0xFF] ^ key[2]);
+        key[3] = (S_BOX[key[12] & 0xFF] ^ key[3]);
+        for (i = 4; i < 16; i++) {
+            key[i] = (key[i] ^ key[i - 4]);
+        }
+    }
+
+    for (i = 0; i < 16; i++) {
+        data[i] = (data[i] ^ key[i]);
+    }
+
+    for (round = 0; round < 10; ++round) {
+        for (i = 15; i > 3; --i) {
+            key[i] = (key[i] ^ key[i - 4]);
+        }
+        key[0] = (S_BOX[key[13] & 0xFF] ^ key[0] ^ R_CON[9 - round]);
+        key[1] = (S_BOX[key[14] & 0xFF] ^ key[1]);
+        key[2] = (S_BOX[key[15] & 0xFF] ^ key[2]);
+        key[3] = (S_BOX[key[12] & 0xFF] ^ key[3]);
+
+        if (round > 0) {
+            for (i = 0; i < 4; i++) {
+                buf4 = (i << 2) & 0xFF;
+
+                buf1 = GaloisMultiply(
+                    GaloisMultiply(data[buf4] ^ data[buf4 + 2]));
+                buf2 = GaloisMultiply(
+                    GaloisMultiply(data[buf4 + 1] ^ data[buf4 + 3]));
+                data[buf4] ^= buf1;
+                data[buf4 + 1] ^= buf2;
+                data[buf4 + 2] ^= buf1;
+                data[buf4 + 3] ^= buf2;
+
+                buf1 = (data[buf4] ^ data[buf4 + 1] ^ data[buf4 + 2] ^ data[buf4 + 3]);
+                buf2 = data[buf4];
+                buf3 = (data[buf4] ^ data[buf4 + 1]);
+                buf3 = GaloisMultiply(buf3);
+                data[buf4] = (data[buf4] ^ buf3 ^ buf1);
+                buf3 = (data[buf4 + 1] ^ data[buf4 + 2]);
+                buf3 = GaloisMultiply(buf3);
+                data[buf4 + 1] = (data[buf4 + 1] ^ buf3 ^ buf1);
+                buf3 = (data[buf4 + 2] ^ data[buf4 + 3]);
+                buf3 = GaloisMultiply(buf3);
+                data[buf4 + 2] = (data[buf4 + 2] ^ buf3 ^ buf1);
+                buf3 = (data[buf4 + 3] ^ buf2);
+                buf3 = GaloisMultiply(buf3);
+                data[buf4 + 3] = (data[buf4 + 3] ^ buf3 ^ buf1);
+            }
+        }
+        // Row 1
+        buf1 = data[13];
+        data[13] = data[9];
+        data[9] = data[5];
+        data[5] = data[1];
+        data[1] = buf1;
+        // Row 2
+        buf1 = data[10];
+        buf2 = data[14];
+        data[10] = data[2];
+        data[14] = data[6];
+        data[2] = buf1;
+        data[6] = buf2;
+        // Row 3
+        buf1 = data[3];
+        data[3] = data[7];
+        data[7] = data[11];
+        data[11] = data[15];
+        data[15] = buf1;
+
+        for (i = 0; i < 16; i++) {
+            data[i] = (S_BOX_REVERSED[data[i] & 0xFF] ^ key[i]);
+        }
     }
     return 0;
 }

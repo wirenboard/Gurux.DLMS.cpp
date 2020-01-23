@@ -591,6 +591,9 @@ int CGXDLMSBase::Init(int port, GX_TRACE_LEVEL trace)
     {
         return ret;
     }
+    CGXByteBuffer kek;
+    kek.AddString("1111111111111111");
+    SetKek(kek);
     //Get local IP address.
     std::string address;
     GetIpAddress(address);
@@ -1278,6 +1281,16 @@ void CGXDLMSBase::PostAction(std::vector<CGXDLMSValueEventArg*>& args)
         if ((*it)->GetTarget()->GetObjectType() == DLMS_OBJECT_TYPE_PROFILE_GENERIC)
         {
             HandleProfileGenericActions(*it);
+        }
+
+        if ((*it)->GetTarget()->GetObjectType() == DLMS_OBJECT_TYPE_SECURITY_SETUP)
+        {
+            printf("----------------------------------------------------------\r\n");
+            printf("Updated keys :\r\n");
+            printf("System Title: %s\r\n", GetCiphering()->GetSystemTitle().ToHexString().c_str());
+            printf("Authentication key: %s\r\n", GetCiphering()->GetAuthenticationKey().ToHexString().c_str());
+            printf("Block cipher key: %s\r\n", GetCiphering()->GetBlockCipherKey().ToHexString().c_str());
+            printf("Master key (KEK) title: %s\r\n", GetKek().ToHexString().c_str());
         }
     }
 }

@@ -496,6 +496,64 @@ const char* CGXDLMSConverter::ToString(DLMS_SECURITY_POLICY value)
     return "Unknown security policy";
 }
 
+//Get Security Setup security policy v1 as a std::string.
+int CGXDLMSConverter::ToString(DLMS_SECURITY_POLICY1 value, std::string& str)
+{
+    str.clear();
+    if (value == 0)
+    {
+        str = "Nothing";
+    }
+    else
+    {
+        if ((value & DLMS_SECURITY_POLICY1_AUTHENTICATED_REQUEST) != 0)
+        {
+            str.append("RequestAuthenticated");
+        }
+        if ((value & DLMS_SECURITY_POLICY1_ENCRYPTED_REQUEST) != 0)
+        {
+            if (!str.empty())
+            {
+                str.append(", ");
+            }
+            str.append("RequestEncrypted");
+        }
+        if ((value & DLMS_SECURITY_POLICY1_DIGITALLY_SIGNED_REQUEST) != 0)
+        {
+            if (!str.empty())
+            {
+                str.append(", ");
+            }
+            str.append("RequestDigitallySigned");
+        }
+        if ((value & DLMS_SECURITY_POLICY1_AUTHENTICATED_RESPONSE) != 0)
+        {
+            if (!str.empty())
+            {
+                str.append(", ");
+            }
+            str.append("ResponseAuthenticated");
+        }
+        if ((value & DLMS_SECURITY_POLICY1_AUTHENTICATED_RESPONSE) != 0)
+        {
+            if (!str.empty())
+            {
+                str.append(", ");
+            }
+            str.append("ResponseEncrypted");
+        }
+        if ((value & DLMS_SECURITY_POLICY1_ENCRYPTED_RESPONSE) != 0)
+        {
+            if (!str.empty())
+            {
+                str.append(", ");
+            }
+            str.append("ResponseDigitallySigned");
+        }
+    }
+    return 0;
+}
+
 //Get Security Setup security suite as a std::string.
 const char* CGXDLMSConverter::ToString(DLMS_SECURITY_SUITE value)
 {
@@ -924,7 +982,7 @@ const char* CGXDLMSConverter::ToString(DLMS_OBJECT_TYPE type)
         return "GXDLMSExtendedRegister";
     case DLMS_OBJECT_TYPE_GPRS_SETUP:
         return "GXDLMSGprsSetup";
-    case DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP:
+    case DLMS_OBJECT_TYPE_SECURITY_SETUP:
         return "GXDLMSSecuritySetup";
     case DLMS_OBJECT_TYPE_IEC_HDLC_SETUP:
         return "GXDLMSHdlcSetup";
