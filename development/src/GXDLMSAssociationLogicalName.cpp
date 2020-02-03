@@ -432,45 +432,45 @@ void CGXDLMSAssociationLogicalName::GetValues(std::vector<std::string>& values)
     }
 }
 
-void CGXDLMSAssociationLogicalName::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSAssociationLogicalName::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //ObjectList is static and read only once.
-    if (!IsRead(2))
+    if (all || !IsRead(2))
     {
         attributes.push_back(2);
     }
     //associated_partners_id is static and read only once.
-    if (!IsRead(3))
+    if (all || !IsRead(3))
     {
         attributes.push_back(3);
     }
     //Application Context Name is static and read only once.
-    if (!IsRead(4))
+    if (all || !IsRead(4))
     {
         attributes.push_back(4);
     }
     //xDLMS Context Info
-    if (!IsRead(5))
+    if (all || !IsRead(5))
     {
         attributes.push_back(5);
     }
     // Authentication Mechanism Name
-    if (!IsRead(6))
+    if (all || !IsRead(6))
     {
         attributes.push_back(6);
     }
     // Secret
-    if (!IsRead(7))
+    if (all || !IsRead(7))
     {
         attributes.push_back(7);
     }
     // Association Status
-    if (!IsRead(8))
+    if (all || !IsRead(8))
     {
         attributes.push_back(8);
     }
@@ -482,11 +482,11 @@ void CGXDLMSAssociationLogicalName::GetAttributeIndexToRead(std::vector<int>& at
     //User list and current user are in version 2.
     if (m_Version > 1)
     {
-        if (!IsRead(10))
+        if (all || !IsRead(10))
         {
             attributes.push_back(10);
         }
-        if (!IsRead(11))
+        if (all || !IsRead(11))
         {
             attributes.push_back(11);
         }
@@ -563,6 +563,7 @@ int CGXDLMSAssociationLogicalName::Invoke(CGXDLMSSettings& settings, CGXDLMSValu
     {
         int ret;
         unsigned long ic = 0;
+        CGXByteBuffer secret;
         CGXByteBuffer* readSecret;
         if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
         {
@@ -578,6 +579,15 @@ int CGXDLMSAssociationLogicalName::Invoke(CGXDLMSSettings& settings, CGXDLMSValu
             {
                 return ret;
             }
+        }
+        else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256)
+        {
+            secret.Set(&m_Secret);
+            secret.Set(&settings.GetSourceSystemTitle());
+            secret.Set(&settings.GetCipher()->GetSystemTitle());
+            secret.Set(&settings.GetStoCChallenge());
+            secret.Set(&settings.GetCtoSChallenge());
+            readSecret = &secret;
         }
         else
         {
@@ -595,6 +605,16 @@ int CGXDLMSAssociationLogicalName::Invoke(CGXDLMSSettings& settings, CGXDLMSValu
             {
                 readSecret = &settings.GetCipher()->GetSystemTitle();
                 ic = settings.GetCipher()->GetFrameCounter();
+            }
+            else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256)
+            {
+                secret.Clear();
+                secret.Set(&m_Secret);
+                secret.Set(&settings.GetCipher()->GetSystemTitle());
+                secret.Set(&settings.GetSourceSystemTitle());
+                secret.Set(&settings.GetCtoSChallenge());
+                secret.Set(&settings.GetStoCChallenge());
+                readSecret = &secret;
             }
             else
             {

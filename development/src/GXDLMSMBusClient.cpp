@@ -44,7 +44,17 @@ CGXDLMSMBusClient::CGXDLMSMBusClient() :
 CGXDLMSMBusClient::CGXDLMSMBusClient(std::string ln, unsigned short sn) :
     CGXDLMSObject(DLMS_OBJECT_TYPE_MBUS_CLIENT, ln, sn)
 {
-
+    m_CapturePeriod = 0;
+    m_PrimaryAddress = 0;
+    m_IdentificationNumber = 0;
+    m_ManufacturerID = 0;
+    m_DataHeaderVersion = 0;
+    m_DeviceType = 0;
+    m_AccessNumber = 0;
+    m_Status = 0;
+    m_Alarm = 0;
+    m_Configuration = 0;
+    m_EncryptionKeyStatus = DLMS_MBUS_ENCRYPTION_KEY_STATUS_NO_ENCRYPTION_KEY;
 }
 
 CGXDLMSMBusClient::CGXDLMSMBusClient(std::string ln) :
@@ -157,14 +167,33 @@ void CGXDLMSMBusClient::SetAlarm(int value)
     m_Alarm = value;
 }
 
+unsigned short CGXDLMSMBusClient::GetConfiguration()
+{
+    return m_Configuration;
+}
+void CGXDLMSMBusClient::SetConfiguration(unsigned short value)
+{
+    m_Configuration = value;
+}
+
+DLMS_MBUS_ENCRYPTION_KEY_STATUS CGXDLMSMBusClient::GetEncryptionKeyStatus()
+{
+    return m_EncryptionKeyStatus;
+}
+
+void CGXDLMSMBusClient::SetEncryptionKeyStatus(DLMS_MBUS_ENCRYPTION_KEY_STATUS value)
+{
+    m_EncryptionKeyStatus = value;
+}
+
 // Returns amount of attributes.
 int CGXDLMSMBusClient::GetAttributeCount()
 {
-    if (GetVersion() == 0)
+    if (m_Version == 0)
     {
         return 12;
     }
-    return 13;
+    return 14;
 }
 
 // Returns amount of methods.
@@ -206,69 +235,87 @@ void CGXDLMSMBusClient::GetValues(std::vector<std::string>& values)
     values.push_back(CGXDLMSVariant(m_AccessNumber).ToString());
     values.push_back(CGXDLMSVariant(m_Status).ToString());
     values.push_back(CGXDLMSVariant(m_Alarm).ToString());
+    if (m_Version > 0)
+    {
+        values.push_back(CGXDLMSVariant(m_Configuration).ToString());
+        values.push_back(CGXDLMSVariant(m_EncryptionKeyStatus).ToString());
+    }
 }
 
-void CGXDLMSMBusClient::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSMBusClient::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //MBusPortReference
-    if (CanRead(2))
+    if (all || CanRead(2))
     {
         attributes.push_back(2);
     }
     //CaptureDefinition
-    if (CanRead(3))
+    if (all || CanRead(3))
     {
         attributes.push_back(3);
     }
     //CapturePeriod
-    if (CanRead(4))
+    if (all || CanRead(4))
     {
         attributes.push_back(4);
     }
     //PrimaryAddress
-    if (CanRead(5))
+    if (all || CanRead(5))
     {
         attributes.push_back(5);
     }
     //IdentificationNumber
-    if (CanRead(6))
+    if (all || CanRead(6))
     {
         attributes.push_back(6);
     }
     //ManufacturerID
-    if (CanRead(7))
+    if (all || CanRead(7))
     {
         attributes.push_back(7);
     }
     //Version
-    if (CanRead(8))
+    if (all || CanRead(8))
     {
         attributes.push_back(8);
     }
     //DeviceType
-    if (CanRead(9))
+    if (all || CanRead(9))
     {
         attributes.push_back(9);
     }
     //AccessNumber
-    if (CanRead(10))
+    if (all || CanRead(10))
     {
         attributes.push_back(10);
     }
     //Status
-    if (CanRead(11))
+    if (all || CanRead(11))
     {
         attributes.push_back(11);
     }
     //Alarm
-    if (CanRead(12))
+    if (all || CanRead(12))
     {
         attributes.push_back(12);
+    }
+    if (m_Version > 0)
+    {
+        //Configuration
+        if (all || CanRead(13))
+        {
+            attributes.push_back(13);
+        }
+        //EncryptionKeyStatus
+        if (all || CanRead(14))
+        {
+            attributes.push_back(14);
+        }
     }
 }
 
@@ -321,6 +368,14 @@ int CGXDLMSMBusClient::GetDataType(int index, DLMS_DATA_TYPE& type)
     else if (index == 12)
     {
         type = DLMS_DATA_TYPE_UINT8;
+    }
+    else if (index == 13 && m_Version > 0)
+    {
+        type = DLMS_DATA_TYPE_UINT16;
+    }
+    else if (index == 14 && m_Version > 0)
+    {
+        type = DLMS_DATA_TYPE_ENUM;
     }
     else
     {
@@ -390,7 +445,21 @@ int CGXDLMSMBusClient::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg&
     }
     else
     {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        if (m_Version > 0)
+        {
+            if (e.GetIndex() == 13)
+            {
+                e.SetValue(m_Configuration);
+            }
+            if (e.GetIndex() == 14)
+            {
+                e.SetValue(m_EncryptionKeyStatus);
+            }
+        }
+        else
+        {
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
     }
     return DLMS_ERROR_CODE_OK;
 }
@@ -456,7 +525,21 @@ int CGXDLMSMBusClient::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg&
     }
     else
     {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        if (m_Version > 0)
+        {
+            if (e.GetIndex() == 13)
+            {
+                m_Configuration = e.GetValue().ToInteger();
+            }
+            else if (e.GetIndex() == 14)
+            {
+                m_EncryptionKeyStatus = (DLMS_MBUS_ENCRYPTION_KEY_STATUS)e.GetValue().ToInteger();
+            }
+        }
+        else
+        {
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
     }
     return DLMS_ERROR_CODE_OK;
 }

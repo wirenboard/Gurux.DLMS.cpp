@@ -37,111 +37,112 @@
 #include "../include/GXDLMSConverter.h"
 
 //Constructor.
-CGXDLMSIECOpticalPortSetup::CGXDLMSIECOpticalPortSetup() :
-    CGXDLMSIECOpticalPortSetup("0.0.20.0.0.255", 0)
+CGXDLMSIECLocalPortSetup::CGXDLMSIECLocalPortSetup() :
+    CGXDLMSIECLocalPortSetup("0.0.20.0.0.255", 0)
 {
 }
 
 //SN Constructor.
-CGXDLMSIECOpticalPortSetup::CGXDLMSIECOpticalPortSetup(std::string ln, unsigned short sn) :
+CGXDLMSIECLocalPortSetup::CGXDLMSIECLocalPortSetup(std::string ln, unsigned short sn) :
     CGXDLMSObject(DLMS_OBJECT_TYPE_IEC_LOCAL_PORT_SETUP, ln, sn)
 {
     m_DefaultMode = DLMS_OPTICAL_PROTOCOL_MODE_DEFAULT;
     m_DefaultBaudrate = DLMS_BAUD_RATE_300;
     m_ProposedBaudrate = DLMS_BAUD_RATE_9600;
+    m_Version = 1;
 }
 
 //LN Constructor.
-CGXDLMSIECOpticalPortSetup::CGXDLMSIECOpticalPortSetup(std::string ln) :
-    CGXDLMSIECOpticalPortSetup(ln, 0)
+CGXDLMSIECLocalPortSetup::CGXDLMSIECLocalPortSetup(std::string ln) :
+    CGXDLMSIECLocalPortSetup(ln, 0)
 {
 }
 
-DLMS_OPTICAL_PROTOCOL_MODE CGXDLMSIECOpticalPortSetup::GetDefaultMode()
+DLMS_OPTICAL_PROTOCOL_MODE CGXDLMSIECLocalPortSetup::GetDefaultMode()
 {
     return m_DefaultMode;
 }
-void CGXDLMSIECOpticalPortSetup::SetDefaultMode(DLMS_OPTICAL_PROTOCOL_MODE value)
+void CGXDLMSIECLocalPortSetup::SetDefaultMode(DLMS_OPTICAL_PROTOCOL_MODE value)
 {
     m_DefaultMode = value;
 }
 
-DLMS_BAUD_RATE CGXDLMSIECOpticalPortSetup::GetDefaultBaudrate()
+DLMS_BAUD_RATE CGXDLMSIECLocalPortSetup::GetDefaultBaudrate()
 {
     return m_DefaultBaudrate;
 }
-void CGXDLMSIECOpticalPortSetup::SetDefaultBaudrate(DLMS_BAUD_RATE value)
+void CGXDLMSIECLocalPortSetup::SetDefaultBaudrate(DLMS_BAUD_RATE value)
 {
     m_DefaultBaudrate = value;
 }
 
-DLMS_BAUD_RATE CGXDLMSIECOpticalPortSetup::GetProposedBaudrate()
+DLMS_BAUD_RATE CGXDLMSIECLocalPortSetup::GetProposedBaudrate()
 {
     return m_ProposedBaudrate;
 }
-void CGXDLMSIECOpticalPortSetup::SetProposedBaudrate(DLMS_BAUD_RATE value)
+void CGXDLMSIECLocalPortSetup::SetProposedBaudrate(DLMS_BAUD_RATE value)
 {
     m_ProposedBaudrate = value;
 }
 
-DLMS_LOCAL_PORT_RESPONSE_TIME CGXDLMSIECOpticalPortSetup::GetResponseTime()
+DLMS_LOCAL_PORT_RESPONSE_TIME CGXDLMSIECLocalPortSetup::GetResponseTime()
 {
     return m_ResponseTime;
 }
-void CGXDLMSIECOpticalPortSetup::SetResponseTime(DLMS_LOCAL_PORT_RESPONSE_TIME value)
+void CGXDLMSIECLocalPortSetup::SetResponseTime(DLMS_LOCAL_PORT_RESPONSE_TIME value)
 {
     m_ResponseTime = value;
 }
 
-std::string CGXDLMSIECOpticalPortSetup::GetDeviceAddress()
+std::string CGXDLMSIECLocalPortSetup::GetDeviceAddress()
 {
     return m_DeviceAddress;
 }
-void CGXDLMSIECOpticalPortSetup::SetDeviceAddress(std::string value)
+void CGXDLMSIECLocalPortSetup::SetDeviceAddress(std::string value)
 {
     m_DeviceAddress = value;
 }
 
-std::string CGXDLMSIECOpticalPortSetup::GetPassword1()
+std::string CGXDLMSIECLocalPortSetup::GetPassword1()
 {
     return m_Password1;
 }
-void CGXDLMSIECOpticalPortSetup::SetPassword1(std::string value)
+void CGXDLMSIECLocalPortSetup::SetPassword1(std::string value)
 {
     m_Password1 = value;
 }
 
-std::string CGXDLMSIECOpticalPortSetup::GetPassword2()
+std::string CGXDLMSIECLocalPortSetup::GetPassword2()
 {
     return m_Password2;
 }
-void CGXDLMSIECOpticalPortSetup::SetPassword2(std::string value)
+void CGXDLMSIECLocalPortSetup::SetPassword2(std::string value)
 {
     m_Password2 = value;
 }
 
-std::string CGXDLMSIECOpticalPortSetup::GetPassword5()
+std::string CGXDLMSIECLocalPortSetup::GetPassword5()
 {
     return m_Password5;
 }
-void CGXDLMSIECOpticalPortSetup::SetPassword5(std::string value)
+void CGXDLMSIECLocalPortSetup::SetPassword5(std::string value)
 {
     m_Password5 = value;
 }
 
 // Returns amount of attributes.
-int CGXDLMSIECOpticalPortSetup::GetAttributeCount()
+int CGXDLMSIECLocalPortSetup::GetAttributeCount()
 {
     return 9;
 }
 
 // Returns amount of methods.
-int CGXDLMSIECOpticalPortSetup::GetMethodCount()
+int CGXDLMSIECLocalPortSetup::GetMethodCount()
 {
     return 0;
 }
 
-void CGXDLMSIECOpticalPortSetup::GetValues(std::vector<std::string>& values)
+void CGXDLMSIECLocalPortSetup::GetValues(std::vector<std::string>& values)
 {
     values.clear();
     std::string ln;
@@ -157,56 +158,56 @@ void CGXDLMSIECOpticalPortSetup::GetValues(std::vector<std::string>& values)
     values.push_back(m_Password5);
 }
 
-void CGXDLMSIECOpticalPortSetup::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSIECLocalPortSetup::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //DefaultMode
-    if (!IsRead(2))
+    if (all || !IsRead(2))
     {
         attributes.push_back(2);
     }
     //DefaultBaudrate
-    if (!IsRead(3))
+    if (all || !IsRead(3))
     {
         attributes.push_back(3);
     }
     //ProposedBaudrate
-    if (!IsRead(4))
+    if (all || !IsRead(4))
     {
         attributes.push_back(4);
     }
     //ResponseTime
-    if (!IsRead(5))
+    if (all || !IsRead(5))
     {
         attributes.push_back(5);
     }
     //DeviceAddress
-    if (!IsRead(6))
+    if (all || !IsRead(6))
     {
         attributes.push_back(6);
     }
     //Password1
-    if (!IsRead(7))
+    if (all || !IsRead(7))
     {
         attributes.push_back(7);
     }
     //Password2
-    if (!IsRead(8))
+    if (all || !IsRead(8))
     {
         attributes.push_back(8);
     }
     //Password5
-    if (!IsRead(9))
+    if (all || !IsRead(9))
     {
         attributes.push_back(9);
     }
 }
 
-int CGXDLMSIECOpticalPortSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
+int CGXDLMSIECLocalPortSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
 {
     if (index == 1)
     {
@@ -252,7 +253,7 @@ int CGXDLMSIECOpticalPortSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
 }
 
 // Returns value of given attribute.
-int CGXDLMSIECOpticalPortSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
+int CGXDLMSIECLocalPortSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
@@ -309,7 +310,7 @@ int CGXDLMSIECOpticalPortSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValue
 }
 
 // Set value of given attribute.
-int CGXDLMSIECOpticalPortSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
+int CGXDLMSIECLocalPortSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {

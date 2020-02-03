@@ -152,5 +152,8 @@ public:
     int ToInteger();
     double ToDouble();
     int GetBytes(CGXByteBuffer& value);
+
+    //Returns true if value is number.
+    bool IsNumber();
 };
 #endif //GXDLMSVARIANT_H

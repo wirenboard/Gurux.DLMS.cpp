@@ -136,9 +136,30 @@ public:
         assert(0);
     }
 
-    virtual void GetAttributeIndexToRead(std::vector<int>& attributes)
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    virtual void GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
     {
         assert(0);
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    virtual void GetAttributeIndexToRead(std::vector<int>& attributes)
+    {
+        GetAttributeIndexToRead(false, attributes);
     }
 
     // Returns amount of attributes.

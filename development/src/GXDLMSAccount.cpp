@@ -140,98 +140,98 @@ void CGXDLMSAccount::GetValues(std::vector<std::string>& values)
     values.push_back(GXHelpers::IntToString(m_MaxProvisionPeriod));
 }
 
-void CGXDLMSAccount::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSAccount::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     // PaymentMode, AccountStatus
-    if (CanRead(2))
+    if (all || CanRead(2))
     {
         attributes.push_back(2);
     }
     // CurrentCreditInUse
-    if (CanRead(3))
+    if (all || CanRead(3))
     {
         attributes.push_back(3);
     }
     // CurrentCreditStatus
-    if (CanRead(4))
+    if (all || CanRead(4))
     {
         attributes.push_back(4);
     }
     // AvailableCredit
-    if (CanRead(5))
+    if (all || CanRead(5))
     {
         attributes.push_back(5);
     }
     // AmountToClear
-    if (CanRead(6))
+    if (all || CanRead(6))
     {
         attributes.push_back(6);
     }
     // ClearanceThreshold
-    if (CanRead(7))
+    if (all || CanRead(7))
     {
         attributes.push_back(7);
     }
     // AggregatedDebt
-    if (CanRead(8))
+    if (all || CanRead(8))
     {
         attributes.push_back(8);
     }
     // CreditReferences
-    if (CanRead(9))
+    if (all || CanRead(9))
     {
         attributes.push_back(9);
     }
     // ChargeReferences
-    if (CanRead(10))
+    if (all || CanRead(10))
     {
         attributes.push_back(10);
     }
     // CreditChargeConfigurations
-    if (CanRead(11))
+    if (all || CanRead(11))
     {
         attributes.push_back(11);
     }
     // TokenGatewayConfigurations
-    if (CanRead(12))
+    if (all || CanRead(12))
     {
         attributes.push_back(12);
     }
     // AccountActivationTime
-    if (CanRead(13))
+    if (all || CanRead(13))
     {
         attributes.push_back(13);
     }
     // AccountClosureTime
-    if (CanRead(14))
+    if (all || CanRead(14))
     {
         attributes.push_back(14);
     }
     // Currency
-    if (CanRead(15)) {
+    if (all || CanRead(15)) {
         attributes.push_back(15);
     }
     // LowCreditThreshold
-    if (CanRead(16)) {
+    if (all || CanRead(16)) {
         attributes.push_back(16);
     }
     // NextCreditAvailableThreshold
-    if (CanRead(17))
+    if (all || CanRead(17))
     {
         attributes.push_back(17);
     }
     // MaxProvision
-    if (CanRead(18))
+    if (all || CanRead(18))
     {
         attributes.push_back(18);
     }
     // MaxProvisionPeriod
-    if (CanRead(19))
+    if (all || CanRead(19))
     {
         attributes.push_back(19);
     }

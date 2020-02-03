@@ -37,6 +37,15 @@
 
 #include "GXDLMSObject.h"
 
+typedef enum
+{
+    DLMS_MBUS_ENCRYPTION_KEY_STATUS_NO_ENCRYPTION_KEY = 0,
+    DLMS_MBUS_ENCRYPTION_KEY_STATUS_ENCRYPTION_KEY_SET,
+    DLMS_MBUS_ENCRYPTION_KEY_STATUS_ENCRYPTION_KEY_TRANSFERRED,
+    DLMS_MBUS_ENCRYPTION_KEY_STATUS_ENCRYPTION_KEY_SET_AND_TRANSFERRED,
+    DLMS_MBUS_ENCRYPTION_KEY_STATUS_ENCRYPTION_KEY_INUSE
+}DLMS_MBUS_ENCRYPTION_KEY_STATUS;
+
 /**
 Online help:
 http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSMBusClient
@@ -54,7 +63,8 @@ class CGXDLMSMBusClient : public CGXDLMSObject
     int m_AccessNumber;
     int m_Status;
     int m_Alarm;
-
+    unsigned short m_Configuration;
+    DLMS_MBUS_ENCRYPTION_KEY_STATUS m_EncryptionKeyStatus;
 public:
     //Constructor.
     CGXDLMSMBusClient();
@@ -106,6 +116,12 @@ public:
     int GetAlarm();
     void SetAlarm(int value);
 
+    unsigned short GetConfiguration();
+    void SetConfiguration(unsigned short value);
+
+    DLMS_MBUS_ENCRYPTION_KEY_STATUS GetEncryptionKeyStatus();
+    void SetEncryptionKeyStatus(DLMS_MBUS_ENCRYPTION_KEY_STATUS value);
+
     // Returns amount of attributes.
     int GetAttributeCount();
 
@@ -115,7 +131,15 @@ public:
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
 
-    void GetAttributeIndexToRead(std::vector<int>& attributes);
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    void GetAttributeIndexToRead(bool all, std::vector<int>& attributes);
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 

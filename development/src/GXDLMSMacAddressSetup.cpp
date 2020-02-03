@@ -84,15 +84,15 @@ void CGXDLMSMacAddressSetup::GetValues(std::vector<std::string>& values)
     values.push_back(m_MacAddress);
 }
 
-void CGXDLMSMacAddressSetup::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSMacAddressSetup::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //MacAddress
-    if (!IsRead(2))
+    if (all || !IsRead(2))
     {
         attributes.push_back(2);
     }

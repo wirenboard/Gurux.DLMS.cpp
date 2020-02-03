@@ -84,60 +84,60 @@ void CGXDLMSCredit::GetValues(std::vector<std::string>& values)
     values.push_back(m_Period.ToString());
 }
 
-void CGXDLMSCredit::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSCredit::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     // CurrentCreditAmount
-    if (CanRead(2))
+    if (all || CanRead(2))
     {
         attributes.push_back(2);
     }
     // Type
-    if (CanRead(3))
+    if (all || CanRead(3))
     {
         attributes.push_back(3);
     }
     // Priority
-    if (CanRead(4))
+    if (all || CanRead(4))
     {
         attributes.push_back(4);
     }
     // WarningThreshold
-    if (CanRead(5))
+    if (all || CanRead(5))
     {
         attributes.push_back(5);
     }
     // Limit
-    if (CanRead(6))
+    if (all || CanRead(6))
     {
         attributes.push_back(6);
     }
     // creditConfiguration
-    if (CanRead(7))
+    if (all || CanRead(7))
     {
         attributes.push_back(7);
     }
     // Status
-    if (CanRead(8))
+    if (all || CanRead(8))
     {
         attributes.push_back(8);
     }
     // PresetCreditAmount
-    if (CanRead(9))
+    if (all || CanRead(9))
     {
         attributes.push_back(9);
     }
     // CreditAvailableThreshold
-    if (CanRead(10))
+    if (all || CanRead(10))
     {
         attributes.push_back(10);
     }
     // Period
-    if (CanRead(11))
+    if (all || CanRead(11))
     {
         attributes.push_back(11);
     }

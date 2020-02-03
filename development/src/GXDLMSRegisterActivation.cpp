@@ -134,25 +134,25 @@ void CGXDLMSRegisterActivation::GetValues(std::vector<std::string>& values)
     }
 }
 
-void CGXDLMSRegisterActivation::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSRegisterActivation::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //RegisterAssignment
-    if (!IsRead(2))
+    if (all || !IsRead(2))
     {
         attributes.push_back(2);
     }
     //MaskList
-    if (!IsRead(3))
+    if (all || !IsRead(3))
     {
         attributes.push_back(3);
     }
     //ActiveMask
-    if (!IsRead(4))
+    if (all || !IsRead(4))
     {
         attributes.push_back(4);
     }

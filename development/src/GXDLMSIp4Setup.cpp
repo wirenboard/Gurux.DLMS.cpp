@@ -214,55 +214,55 @@ void CGXDLMSIp4Setup::GetValues(std::vector<std::string>& values)
     values.push_back(CGXDLMSVariant(m_SecondaryDNSAddress).ToString());
 }
 
-void CGXDLMSIp4Setup::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSIp4Setup::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //DataLinkLayerReference
-    if (!IsRead(2))
+    if (all || !IsRead(2))
     {
         attributes.push_back(2);
     }
     //IPAddress
-    if (CanRead(3))
+    if (all || CanRead(3))
     {
         attributes.push_back(3);
     }
     //MulticastIPAddress
-    if (CanRead(4))
+    if (all || CanRead(4))
     {
         attributes.push_back(4);
     }
     //IPOptions
-    if (CanRead(5))
+    if (all || CanRead(5))
     {
         attributes.push_back(5);
     }
     //SubnetMask
-    if (CanRead(6))
+    if (all || CanRead(6))
     {
         attributes.push_back(6);
     }
     //GatewayIPAddress
-    if (CanRead(7))
+    if (all || CanRead(7))
     {
         attributes.push_back(7);
     }
     //UseDHCP
-    if (!IsRead(8))
+    if (all || !IsRead(8))
     {
         attributes.push_back(8);
     }
     //PrimaryDNSAddress
-    if (CanRead(9))
+    if (all || CanRead(9))
     {
         attributes.push_back(9);
     }
     //SecondaryDNSAddress
-    if (CanRead(10))
+    if (all || CanRead(10))
     {
         attributes.push_back(10);
     }

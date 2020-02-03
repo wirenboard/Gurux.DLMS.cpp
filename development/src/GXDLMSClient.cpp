@@ -807,6 +807,14 @@ int CGXDLMSClient::GetApplicationAssociationRequest(
     {
         pw = m_Settings.GetCipher()->GetSystemTitle();
     }
+    else if (m_Settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256)
+    {
+        pw.Set(&m_Settings.GetPassword());
+        pw.Set(&m_Settings.GetCipher()->GetSystemTitle());
+        pw.Set(&m_Settings.GetSourceSystemTitle());
+        pw.Set(&m_Settings.GetStoCChallenge());
+        pw.Set(&m_Settings.GetCtoSChallenge());
+    }
     else
     {
         pw = m_Settings.GetPassword();
@@ -862,6 +870,14 @@ int CGXDLMSClient::ParseApplicationAssociationResponse(
             {
                 return ret;
             }
+        }
+        else if (m_Settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256)
+        {
+            secret.Set(&m_Settings.GetPassword());
+            secret.Set(&m_Settings.GetSourceSystemTitle());
+            secret.Set(&m_Settings.GetCipher()->GetSystemTitle());
+            secret.Set(&m_Settings.GetCtoSChallenge());
+            secret.Set(&m_Settings.GetStoCChallenge());
         }
         else
         {

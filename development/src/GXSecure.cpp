@@ -199,23 +199,8 @@ int CGXSecure::Secure(
     // Get server Challenge.
     CGXByteBuffer challenge;
     // Get shared secret
-    if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256)
-    {
-        challenge.Set(&secret);
-        challenge.Set(&settings.GetCipher()->GetSystemTitle());
-        challenge.Set(&settings.GetSourceSystemTitle());
-        if (settings.IsServer())
-        {
-            challenge.Set(&settings.GetCtoSChallenge());
-            challenge.Set(&settings.GetStoCChallenge());
-        }
-        else
-        {
-            challenge.Set(&settings.GetStoCChallenge());
-            challenge.Set(&settings.GetCtoSChallenge());
-        }
-    }
-    else if (settings.GetAuthentication() != DLMS_AUTHENTICATION_HIGH_GMAC)
+    if (settings.GetAuthentication() != DLMS_AUTHENTICATION_HIGH_GMAC &&
+        settings.GetAuthentication() != DLMS_AUTHENTICATION_HIGH_SHA256)
     {
         challenge.Set(&data);
         challenge.Set(&secret);
@@ -230,7 +215,7 @@ int CGXSecure::Secure(
     }
     else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256)
     {
-        return CGXDLMSSha256::Encrypt(challenge, reply);
+        return CGXDLMSSha256::Encrypt(secret, reply);
     }
     else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
     {

@@ -284,40 +284,40 @@ void CGXDLMSImageTransfer::GetValues(std::vector<std::string>& values)
     values.push_back(sb.str());
 }
 
-void CGXDLMSImageTransfer::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSImageTransfer::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //ImageBlockSize
-    if (!IsRead(2))
+    if (all || !IsRead(2))
     {
         attributes.push_back(2);
     }
     //ImageTransferredBlocksStatus
-    if (!IsRead(3))
+    if (all || !IsRead(3))
     {
         attributes.push_back(3);
     }
     //ImageFirstNotTransferredBlockNumber
-    if (!IsRead(4))
+    if (all || !IsRead(4))
     {
         attributes.push_back(4);
     }
     //ImageTransferEnabled
-    if (!IsRead(5))
+    if (all || !IsRead(5))
     {
         attributes.push_back(5);
     }
     //ImageTransferStatus
-    if (!IsRead(6))
+    if (all || !IsRead(6))
     {
         attributes.push_back(6);
     }
     //ImageActivateInfo
-    if (!IsRead(7))
+    if (all || !IsRead(7))
     {
         attributes.push_back(7);
     }

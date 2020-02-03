@@ -39,9 +39,9 @@
 
 /**
 Online help:
-http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSIECOpticalPortSetup
+https://www.gurux.fi/Gurux.DLMS.Objects.CGXDLMSIECLocalPortSetup
 */
-class CGXDLMSIECOpticalPortSetup : public CGXDLMSObject
+class CGXDLMSIECLocalPortSetup : public CGXDLMSObject
 {
     std::string m_Password1;
     std::string m_Password2;
@@ -56,11 +56,11 @@ class CGXDLMSIECOpticalPortSetup : public CGXDLMSObject
 
 public:
     //Constructor.
-    CGXDLMSIECOpticalPortSetup();
+    CGXDLMSIECLocalPortSetup();
     //SN Constructor.
-    CGXDLMSIECOpticalPortSetup(std::string ln, unsigned short sn);
+    CGXDLMSIECLocalPortSetup(std::string ln, unsigned short sn);
     //LN Constructor.
-    CGXDLMSIECOpticalPortSetup(std::string ln);
+    CGXDLMSIECLocalPortSetup(std::string ln);
 
     DLMS_OPTICAL_PROTOCOL_MODE GetDefaultMode();
     void SetDefaultMode(DLMS_OPTICAL_PROTOCOL_MODE value);
@@ -95,7 +95,15 @@ public:
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
 
-    void GetAttributeIndexToRead(std::vector<int>& attributes);
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    void GetAttributeIndexToRead(bool all, std::vector<int>& attributes);
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
@@ -104,5 +112,10 @@ public:
 
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+};
+
+// This class is Obsolete. Use CGXDLMSIECLocalPortSetup instead.
+class CGXDLMSIECOpticalPortSetup : CGXDLMSIECLocalPortSetup
+{
 };
 #endif //GXDLMSIECOPTICALPORTSETUP_H

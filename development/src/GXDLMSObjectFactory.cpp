@@ -63,6 +63,7 @@
 #include "../include/GXDLMSHdlcSetup.h"
 #include "../include/GXDLMSIECOpticalPortSetup.h"
 #include "../include/GXDLMSIp4Setup.h"
+//#include "../include/GXDLMSIp6Setup.h"
 #include "../include/GXDLMSRegisterActivation.h"
 #include "../include/GXDLMSSchedule.h"
 #include "../include/GXDLMSModemConfiguration.h"
@@ -113,11 +114,13 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
     case DLMS_OBJECT_TYPE_IEC_HDLC_SETUP:
         return new CGXDLMSIecHdlcSetup();
     case DLMS_OBJECT_TYPE_IEC_LOCAL_PORT_SETUP:
-        return new CGXDLMSIECOpticalPortSetup();
+        return new CGXDLMSIECLocalPortSetup();
     case DLMS_OBJECT_TYPE_IEC_TWISTED_PAIR_SETUP:
         return new CGXDLMSCustomObject(type);
     case DLMS_OBJECT_TYPE_IP4_SETUP:
         return new CGXDLMSIp4Setup();
+//    case DLMS_OBJECT_TYPE_IP6_SETUP:
+//        return new CGXDLMSIp6Setup();
     case DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP:
         return new CGXDLMSMBusSlavePortSetup();
     case DLMS_OBJECT_TYPE_IMAGE_TRANSFER:

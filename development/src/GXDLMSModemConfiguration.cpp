@@ -152,25 +152,25 @@ void CGXDLMSModemConfiguration::GetValues(std::vector<std::string>& values)
 
 }
 
-void CGXDLMSModemConfiguration::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSModemConfiguration::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //CommunicationSpeed
-    if (!IsRead(2))
+    if (all || !IsRead(2))
     {
         attributes.push_back(2);
     }
     //InitialisationStrings
-    if (!IsRead(3))
+    if (all || !IsRead(3))
     {
         attributes.push_back(3);
     }
     //ModemProfile
-    if (!IsRead(4))
+    if (all || !IsRead(4))
     {
         attributes.push_back(4);
     }

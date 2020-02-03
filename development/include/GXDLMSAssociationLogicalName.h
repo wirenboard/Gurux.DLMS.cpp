@@ -136,16 +136,16 @@ public:
 
     // Add user to user list.
     int AddUser(
-        CGXDLMSClient* client, 
-        unsigned char id, 
-        std::string name, 
+        CGXDLMSClient* client,
+        unsigned char id,
+        std::string name,
         std::vector<CGXByteBuffer>& reply);
-    
+
     // Remove user fro user list.
     int RemoveUser(
-        CGXDLMSClient* client, 
-        unsigned char id, 
-        std::string name, 
+        CGXDLMSClient* client,
+        unsigned char id,
+        std::string name,
         std::vector<CGXByteBuffer>& reply);
 
 
@@ -165,7 +165,15 @@ public:
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
 
-    void GetAttributeIndexToRead(std::vector<int>& attributes);
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    void GetAttributeIndexToRead(bool all, std::vector<int>& attributes);
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 

@@ -1427,7 +1427,7 @@ int CGXCommunication::GetReadOut()
 
         WriteValue(m_Trace, buff);
         std::vector<int> attributes;
-        (*it)->GetAttributeIndexToRead(attributes);
+        (*it)->GetAttributeIndexToRead(true, attributes);
         for (std::vector<int>::iterator pos = attributes.begin(); pos != attributes.end(); ++pos)
         {
             value.clear();

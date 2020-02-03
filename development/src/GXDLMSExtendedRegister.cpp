@@ -119,16 +119,16 @@ void CGXDLMSExtendedRegister::GetValues(std::vector<std::string>& values)
     values.push_back(m_CaptureTime.ToString());
 }
 
-void CGXDLMSExtendedRegister::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSExtendedRegister::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
-    CGXDLMSRegister::GetAttributeIndexToRead(attributes);
+    CGXDLMSRegister::GetAttributeIndexToRead(all, attributes);
     //Status
-    if (!IsRead(4))
+    if (all || !IsRead(4))
     {
         attributes.push_back(4);
     }
     //CaptureTime
-    if (CanRead(5))
+    if (all || CanRead(5))
     {
         attributes.push_back(5);
     }

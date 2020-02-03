@@ -170,50 +170,50 @@ void CGXDLMSClock::GetValues(std::vector<std::string>& values)
     values.push_back(CGXDLMSConverter::ToString(m_ClockBase));
 }
 
-void CGXDLMSClock::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSClock::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //Time
-    if (CanRead(2))
+    if (all || CanRead(2))
     {
         attributes.push_back(2);
     }
     //TimeZone
-    if (!IsRead(3))
+    if (all || !IsRead(3))
     {
         attributes.push_back(3);
     }
     //Status
-    if (CanRead(4))
+    if (all || CanRead(4))
     {
         attributes.push_back(4);
     }
     //Begin
-    if (!IsRead(5))
+    if (all || !IsRead(5))
     {
         attributes.push_back(5);
     }
     //End
-    if (!IsRead(6))
+    if (all || !IsRead(6))
     {
         attributes.push_back(6);
     }
     //Deviation
-    if (!IsRead(7))
+    if (all || !IsRead(7))
     {
         attributes.push_back(7);
     }
     //Enabled
-    if (!IsRead(8))
+    if (all || !IsRead(8))
     {
         attributes.push_back(8);
     }
     //ClockBase
-    if (!IsRead(9))
+    if (all || !IsRead(9))
     {
         attributes.push_back(9);
     }

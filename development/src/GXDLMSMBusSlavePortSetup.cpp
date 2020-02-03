@@ -128,30 +128,30 @@ void CGXDLMSMBusSlavePortSetup::GetValues(std::vector<std::string>& values)
     values.push_back(CGXDLMSVariant(m_BusAddress).ToString());
 }
 
-void CGXDLMSMBusSlavePortSetup::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSMBusSlavePortSetup::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //DefaultBaud
-    if (!IsRead(2))
+    if (all || !IsRead(2))
     {
         attributes.push_back(2);
     }
     //AvailableBaud
-    if (!IsRead(3))
+    if (all || !IsRead(3))
     {
         attributes.push_back(3);
     }
     //m_AddressState
-    if (!IsRead(4))
+    if (all || !IsRead(4))
     {
         attributes.push_back(4);
     }
     //BusAddress
-    if (!IsRead(5))
+    if (all || !IsRead(5))
     {
         attributes.push_back(5);
     }

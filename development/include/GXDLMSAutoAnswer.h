@@ -42,31 +42,54 @@ enum AUTO_CONNECT_MODE
      * No auto dialling,
      */
     AUTO_CONNECT_MODE_NO_AUTO_DIALLING = 0,
-    /**
-     * Auto dialling allowed anytime,
-     */
+    /*
+    * Auto dialling allowed anytime,
+    */
     AUTO_CONNECT_MODE_AUTO_DIALLING_ALLOWED_ANYTIME = 1,
-    /**
-     * Auto dialling allowed within the validity time of the calling window.
-     */
+    /*
+    * Auto dialling allowed within the validity time of the calling window.
+    */
     AUTO_CONNECT_MODE_AUTO_DIALLING_ALLOWED_CALLING_WINDOW = 2,
-    /**
-     * “regular” auto dialling allowed within the validity time
-     * of the calling window; “alarm” initiated auto dialling allowed anytime,
-     */
+    /*
+    * “regular” auto dialling allowed within the validity time
+    * of the calling window; “alarm” initiated auto dialling allowed anytime,
+    */
     AUTO_CONNECT_MODE_REGULAR_AUTO_DIALLING_ALLOWED_CALLING_WINDOW = 3,
-    /**
-     * SMS sending via Public Land Mobile Network (PLMN),
-     */
+    /*
+    * SMS sending via Public Land Mobile Network (PLMN),
+    */
     AUTO_CONNECT_MODE_SMS_SENDING_PLMN = 4,
     /*
-     * SMS sending via PSTN.
-     */
+    * SMS sending via PSTN.
+    */
     AUTO_CONNECT_MODE_SMS_SENDING_PSTN = 5,
     /*
-     * Email sending.
-     */
-    AUTO_CONNECT_MODE_EMAIL_SENDING = 6
+    * Email sending.
+    */
+    AUTO_CONNECT_MODE_EMAIL_SENDING = 6,
+    /*
+    * The device is permanently connected to the communication network.
+    */
+    AUTO_CONNECT_MODE_PERMANENTLY_CONNECT = 101,
+    /*
+    * The device is permanently connected to the communication network. No
+    * connection possible outside the calling window.
+    */
+    AUTO_CONNECT_MODE_CONNECT_WITH_CALLING_WINDOW = 102,
+    /*
+    * The device is permanently connected to the communication network.
+    * Connection is possible as soon as the connect method is invoked.
+    */
+    AUTO_CONNECT_MODE_CONNECT_INVOKED = 103,
+    /*
+    * The device is usually disconnected. It connects to the communication
+    * network as soon as the connect method is invoked
+    */
+    AUTO_CONNECT_MODE_DISCONNECT_CONNECT_INVOKED = 104,
+    /*
+    * (200..255) manufacturer specific modes
+    */
+    AUTO_CONNECT_MODE_MANUFACTURE_SPESIFIC = 200
 };
 
 enum AUTO_ANSWER_STATUS
@@ -137,7 +160,15 @@ public:
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
 
-    void GetAttributeIndexToRead(std::vector<int>& attributes);
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    void GetAttributeIndexToRead(bool all, std::vector<int>& attributes);
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 

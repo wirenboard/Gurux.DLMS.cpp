@@ -295,6 +295,7 @@
     <ClInclude Include="..\include\GXDLMSImageTransfer.h" />
     <ClInclude Include="..\include\GXDLMSIp4Setup.h" />
     <ClInclude Include="..\include\GXDLMSIp4SetupIpOption.h" />
+    <ClInclude Include="..\include\GXDLMSIp6Setup.h" />
     <ClInclude Include="..\include\GXDLMSLimiter.h" />
     <ClInclude Include="..\include\GXDLMSLimits.h" />
     <ClInclude Include="..\include\GXDLMSLNCommandHandler.h" />
@@ -353,6 +354,7 @@
     <ClInclude Include="..\include\GXDLMSVariant.h" />
     <ClInclude Include="..\include\GXDLMSWeekProfile.h" />
     <ClInclude Include="..\include\GXHelpers.h" />
+    <ClInclude Include="..\include\GXNeighborDiscoverySetup.h" />
     <ClInclude Include="..\include\GXReplyData.h" />
     <ClInclude Include="..\include\GXSecure.h" />
     <ClInclude Include="..\include\GXSerialNumberCounter.h" />

@@ -68,8 +68,15 @@ public:
     void GetValues(
         std::vector<std::string>& values);
 
-    void GetAttributeIndexToRead(
-        std::vector<int>& attributes);
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    void GetAttributeIndexToRead(bool all, std::vector<int>& attributes);
 
     // Returns amount of attributes.
     int GetAttributeCount();

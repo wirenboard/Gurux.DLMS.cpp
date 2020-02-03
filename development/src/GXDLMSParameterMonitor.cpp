@@ -93,23 +93,23 @@ void CGXDLMSParameterMonitor::GetValues(std::vector<std::string>& values)
     values.push_back(tmp);
 }
 
-void CGXDLMSParameterMonitor::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSParameterMonitor::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     // ChangedParameter
-    if (CanRead(2)) {
+    if (all || CanRead(2)) {
         attributes.push_back(2);
     }
     // CaptureTime
-    if (CanRead(3)) {
+    if (all || CanRead(3)) {
         attributes.push_back(3);
     }
     // Parameters
-    if (CanRead(4)) {
+    if (all || CanRead(4)) {
         attributes.push_back(4);
     }
 }

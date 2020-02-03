@@ -106,25 +106,25 @@ void CGXDLMSGPRSSetup::GetValues(std::vector<std::string>& values)
     values.push_back(m_DefaultQualityOfService.ToString() + " " + m_RequestedQualityOfService.ToString());
 }
 
-void CGXDLMSGPRSSetup::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSGPRSSetup::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //APN
-    if (!IsRead(2))
+    if (all || !IsRead(2))
     {
         attributes.push_back(2);
     }
     //PINCode
-    if (!IsRead(3))
+    if (all || !IsRead(3))
     {
         attributes.push_back(3);
     }
     //DefaultQualityOfService + RequestedQualityOfService
-    if (!IsRead(4))
+    if (all || !IsRead(4))
     {
         attributes.push_back(4);
     }

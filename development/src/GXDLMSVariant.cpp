@@ -388,7 +388,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
     int toSize = GetSize(type);
     //If we try to change bigger value to smaller check that value is not too big.
     //Example Int16 to Int8.
-    if (fromSize > toSize && tmp.vt != DLMS_DATA_TYPE_FLOAT32 && tmp.vt != DLMS_DATA_TYPE_FLOAT64)
+    if (fromSize > toSize&& tmp.vt != DLMS_DATA_TYPE_FLOAT32 && tmp.vt != DLMS_DATA_TYPE_FLOAT64)
     {
         unsigned char* pValue = &tmp.bVal;
         for (int pos = toSize; pos != fromSize; ++pos)
@@ -402,12 +402,12 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
     item->Clear();
     if (tmp.vt == DLMS_DATA_TYPE_FLOAT32)
     {
-        long long value = (long long) tmp.fltVal;
+        long long value = (long long)tmp.fltVal;
         memcpy(&item->bVal, &value, toSize);
     }
     else if (tmp.vt == DLMS_DATA_TYPE_FLOAT64)
     {
-        long long value = (long long) tmp.dblVal;
+        long long value = (long long)tmp.dblVal;
         memcpy(&item->bVal, &value, toSize);
     }
     else
@@ -1482,4 +1482,25 @@ int CGXDLMSVariant::GetBytes(CGXByteBuffer& value)
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     return 0;
+}
+
+bool CGXDLMSVariant::IsNumber()
+{
+    switch (vt)
+    {
+    case DLMS_DATA_TYPE_UINT8:
+    case DLMS_DATA_TYPE_UINT16:
+    case DLMS_DATA_TYPE_UINT32:
+    case DLMS_DATA_TYPE_UINT64:
+    case DLMS_DATA_TYPE_INT8:
+    case DLMS_DATA_TYPE_INT16:
+    case DLMS_DATA_TYPE_INT32:
+    case DLMS_DATA_TYPE_INT64:
+    case DLMS_DATA_TYPE_FLOAT32:
+    case DLMS_DATA_TYPE_FLOAT64:
+        return true;
+    default:
+        break;
+    }
+    return false;
 }

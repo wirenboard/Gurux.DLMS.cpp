@@ -165,27 +165,27 @@ void CGXDLMSAssociationShortName::GetValues(std::vector<std::string>& values)
     values.push_back(m_SecuritySetupReference);
 }
 
-void CGXDLMSAssociationShortName::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSAssociationShortName::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //ObjectList is static and read only once.
-    if (!IsRead(2))
+    if (all || !IsRead(2))
     {
         attributes.push_back(2);
     }
     if (m_Version > 1)
     {
         //AccessRightsList is static and read only once.
-        if (!IsRead(3))
+        if (all || !IsRead(3))
         {
             attributes.push_back(3);
         }
         //SecuritySetupReference is static and read only once.
-        if (!IsRead(4))
+        if (all || !IsRead(4))
         {
             attributes.push_back(4);
         }
@@ -288,6 +288,7 @@ int CGXDLMSAssociationShortName::Invoke(CGXDLMSSettings& settings, CGXDLMSValueE
     {
         int ret;
         unsigned long ic = 0;
+        CGXByteBuffer secret;
         CGXByteBuffer* readSecret;
         if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
         {
@@ -303,6 +304,15 @@ int CGXDLMSAssociationShortName::Invoke(CGXDLMSSettings& settings, CGXDLMSValueE
             {
                 return ret;
             }
+        }
+        else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256)
+        {
+            secret.Set(&m_Secret);
+            secret.Set(&settings.GetSourceSystemTitle());
+            secret.Set(&settings.GetCipher()->GetSystemTitle());
+            secret.Set(&settings.GetStoCChallenge());
+            secret.Set(&settings.GetCtoSChallenge());
+            readSecret = &secret;
         }
         else
         {
@@ -321,6 +331,16 @@ int CGXDLMSAssociationShortName::Invoke(CGXDLMSSettings& settings, CGXDLMSValueE
             {
                 readSecret = &settings.GetCipher()->GetSystemTitle();
                 ic = settings.GetCipher()->GetFrameCounter();
+            }
+            else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256)
+            {
+                secret.Clear();
+                secret.Set(&m_Secret);
+                secret.Set(&settings.GetCipher()->GetSystemTitle());
+                secret.Set(&settings.GetSourceSystemTitle());
+                secret.Set(&settings.GetCtoSChallenge());
+                secret.Set(&settings.GetStoCChallenge());
+                readSecret = &secret;
             }
             else
             {
