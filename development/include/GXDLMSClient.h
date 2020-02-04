@@ -497,6 +497,17 @@ public:
         std::vector<CGXByteBuffer>& reply);
 
     /**
+    * Write list of COSEM objects.
+    *
+    * @param list
+    *            DLMS objects to read.
+    * @return Write request as byte array.
+    */
+    int WriteList(
+        std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list,
+        std::vector<CGXByteBuffer>& reply);
+
+    /**
     * Generates a write message.
     *
     * @param name

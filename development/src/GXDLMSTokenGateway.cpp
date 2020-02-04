@@ -168,7 +168,7 @@ int CGXDLMSTokenGateway::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventAr
         {
             bb.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
             bb.SetUInt8((unsigned char)it->length());
-            bb.Set(it->c_str(), it->length());
+            bb.Set(it->c_str(), (unsigned long)it->length());
         }
         e.SetValue(bb);
         break;

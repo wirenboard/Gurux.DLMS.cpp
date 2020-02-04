@@ -1034,9 +1034,9 @@ int CGXDLMS::GetLnMessages(
             }
             messages.push_back(tmp);
             tmp.Clear();
-            frame = 0;
         }
         reply.Clear();
+        frame = 0;
     } while (ret == 0 && p.GetData() != NULL && p.GetData()->GetPosition() != p.GetData()->GetSize());
     return ret;
 }
@@ -1113,7 +1113,7 @@ int CGXDLMS::GetSNPdu(
     {
         cnt = p.GetData()->GetSize() - p.GetData()->GetPosition();
     }
-    // Add DLMS_COMMAND_
+    // Add DLMS command.
     if (p.GetCommand() == DLMS_COMMAND_INFORMATION_REPORT)
     {
         reply.SetUInt8(p.GetCommand());
@@ -1237,13 +1237,10 @@ int CGXDLMS::GetSnMessages(
     int ret;
     CGXByteBuffer data, reply;
     unsigned char frame = 0x0;
-    if (p.GetCommand() == DLMS_COMMAND_INFORMATION_REPORT)
+    if (p.GetCommand() == DLMS_COMMAND_INFORMATION_REPORT ||
+        p.GetCommand() == DLMS_COMMAND_DATA_NOTIFICATION)
     {
         frame = 0x13;
-    }
-    else if (p.GetCommand() == DLMS_COMMAND_NONE)
-    {
-        frame = p.GetSettings()->GetNextSend(1);
     }
     do
     {
@@ -1269,9 +1266,9 @@ int CGXDLMS::GetSnMessages(
             }
             messages.push_back(reply);
             reply.Clear();
-            frame = 0;
         }
         reply.Clear();
+        frame = 0;
     } while (ret == 0 && p.GetData() != NULL && p.GetData()->GetPosition() != p.GetData()->GetSize());
     return 0;
 }
@@ -2453,7 +2450,11 @@ int CGXDLMS::HandleGeneralCiphering(
     // If all frames are read.
     if ((data.GetMoreData() & DLMS_DATA_REQUEST_TYPES_FRAME) == 0)
     {
-        int origPos = data.GetXml()->GetXmlLength();
+        int origPos = 0;
+        if (data.GetXml() != NULL)
+        {
+            origPos = data.GetXml()->GetXmlLength();
+        }
         data.GetData().SetPosition(data.GetData().GetPosition() - 1);
         DLMS_SECURITY security;
         DLMS_SECURITY_SUITE suite;
@@ -2653,7 +2654,8 @@ int CGXDLMS::GetPdu(
             ret = HandleGeneralCiphering(settings, data);
             break;
         default:
-            // Invalid DLMS DLMS_COMMAND_
+            // Invalid DLMS command.
+            data.SetCommand(DLMS_COMMAND_NONE);
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
     }

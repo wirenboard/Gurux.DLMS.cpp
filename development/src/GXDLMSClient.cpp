@@ -1214,13 +1214,6 @@ int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int a
     return ret;
 }
 
-/**
-* Read list of COSEM objects.
-*
-* @param list
-*            DLMS objects to read.
-* @return Read request as byte array.
-*/
 int CGXDLMSClient::ReadList(
     std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list,
     std::vector<CGXByteBuffer>& reply)
@@ -1302,6 +1295,130 @@ int CGXDLMSClient::ReadList(
         CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_READ_REQUEST,
             (unsigned long)list.size(), 0xFF, &bb, NULL);
         ret = CGXDLMS::GetSnMessages(p, reply);
+    }
+    return ret;
+}
+
+int CGXDLMSClient::WriteList(
+    std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list,
+    std::vector<CGXByteBuffer>& reply)
+{
+    if ((GetNegotiatedConformance() & DLMS_CONFORMANCE_MULTIPLE_REFERENCES) == 0) {
+        //Meter doesn't support multiple objects reading with one request.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+
+    if (list.size() == 0)
+    {
+        //Invalid parameter
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+
+    int ret = 0;
+    m_Settings.ResetBlockIndex();
+    if (m_AutoIncreaseInvokeID)
+    {
+        m_Settings.SetInvokeID((unsigned char)((m_Settings.GetInvokeID() + 1) & 0xF));
+    }
+    CGXByteBuffer bb;
+    if (GetUseLogicalNameReferencing())
+    {
+        CGXDLMSLNParameters p(&m_Settings, 0,
+            DLMS_COMMAND_SET_REQUEST, DLMS_SET_COMMAND_TYPE_WITH_LIST,
+            &bb, NULL, 0xff, DLMS_COMMAND_NONE);
+        // Add length.
+        GXHelpers::SetObjectCount((unsigned long) list.size(), bb);
+        for (std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = list.begin(); it != list.end(); ++it)
+        {
+            // CI.
+            bb.SetUInt16(it->first->GetObjectType());
+            bb.Set(it->first->m_LN, 6);
+            // Attribute ID.
+            bb.SetUInt8(it->second);
+            // Attribute selector is not used.
+            bb.SetUInt8(0);
+        }
+        // Add length.
+        GXHelpers::SetObjectCount((unsigned long)list.size(), bb);
+        for (std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = list.begin(); it != list.end(); ++it)
+        {
+            CGXDLMSValueEventArg e(it->first, it->second);
+            int ret = it->first->GetValue(m_Settings, e);
+            if (ret != 0)
+            {
+                break;
+            }
+            CGXDLMSVariant value = e.GetValue();
+            if (e.IsByteArray())
+            {
+                bb.Set(value.byteArr, value.GetSize());
+            }
+            else
+            {
+                DLMS_DATA_TYPE type = DLMS_DATA_TYPE_NONE;
+                if ((ret = it->first->GetDataType(it->second, type)) != 0)
+                {
+                    break;
+                }
+                if ((ret = GXHelpers::SetData(bb, type, value)) != 0)
+                {
+                    break;
+                }
+            }
+        }
+        if (ret == 0)
+        {
+            if ((ret = CGXDLMS::GetLnMessages(p, reply)) != 0)
+            {
+                return ret;
+            }
+        }
+    }
+    else
+    {
+        int sn;
+        for (std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = list.begin(); it != list.end(); ++it)
+        {
+            // Add variable type.
+            bb.SetUInt8(DLMS_VARIABLE_ACCESS_SPECIFICATION_VARIABLE_NAME);
+            sn = it->first->GetShortName();
+            sn += (it->second - 1) * 8;
+            bb.SetUInt16(sn);
+        }
+        // Add length.
+        GXHelpers::SetObjectCount((unsigned long)list.size(), bb);
+        for (std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = list.begin(); it != list.end(); ++it)
+        {
+            CGXDLMSValueEventArg e(it->first, it->second);
+            int ret = it->first->GetValue(m_Settings, e);
+            if (ret != 0)
+            {
+                break;
+            }
+            CGXDLMSVariant value = e.GetValue();
+            if (e.IsByteArray())
+            {
+                bb.Set(value.byteArr, value.GetSize());
+            }
+            else
+            {
+                DLMS_DATA_TYPE type = DLMS_DATA_TYPE_NONE;
+                if ((ret = it->first->GetDataType(it->second, type)) != 0)
+                {
+                    break;
+                }
+                if ((ret = GXHelpers::SetData(bb, type, value)) != 0)
+                {
+                    break;
+                }
+            }
+        }
+        if (ret == 0)
+        {
+            CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_READ_REQUEST,
+                (unsigned long)list.size(), 0xFF, &bb, NULL);
+            ret = CGXDLMS::GetSnMessages(p, reply);
+        }
     }
     return ret;
 }

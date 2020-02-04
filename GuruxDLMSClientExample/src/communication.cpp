@@ -1173,6 +1173,34 @@ int CGXCommunication::ReadList(
     return m_Parser->UpdateValues(list, values);
 }
 
+int CGXCommunication::WriteList(
+    std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list)
+{
+    int ret;
+    CGXReplyData reply;
+    std::vector<CGXByteBuffer> data;
+    if (list.size() == 0)
+    {
+        return 0;
+    }
+    //Get values from the meter.
+    if ((ret = m_Parser->WriteList(list, data)) != 0)
+    {
+        return ret;
+    }
+    std::vector<CGXDLMSVariant> values;
+    for (std::vector<CGXByteBuffer>::iterator it = data.begin(); it != data.end(); ++it)
+    {
+        if ((ret = ReadDataBlock(*it, reply)) != 0)
+        {
+            break;
+        }
+        reply.Clear();
+    }
+    return ret;
+}
+
+
 //Write selected object.
 int CGXCommunication::Write(CGXDLMSObject* pObject, int attributeIndex, CGXDLMSVariant& value)
 {

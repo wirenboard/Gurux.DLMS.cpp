@@ -827,7 +827,6 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
     unsigned char cipheredCommand)
 {
     std::string str;
-    CGXDLMSValueEventArg* e;
     int ret;
     unsigned long cnt;
     unsigned char attributeIndex, selection, selector;
@@ -839,14 +838,15 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
     {
         return ret;
     }
-    CGXDLMSValueEventCollection list;
+    std::map<unsigned short, unsigned char> status;
     if (xml != NULL)
     {
         xml->IntegerToHex(cnt, 2, str);
         xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_ATTRIBUTE_DESCRIPTOR_LIST, "Qty", str);
     }
-    for (unsigned long pos = 0; pos != cnt; ++pos)
+    for (unsigned short pos = 0; pos != cnt; ++pos)
     {
+        status[pos] = 0;
         if ((ret = data.GetUInt16(&tmp)) != 0)
         {
             return ret;
@@ -877,6 +877,10 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
                 return ret;
             }
         }
+        else
+        {
+            selector = 0;
+        }
         if (xml != NULL)
         {
             xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_ATTRIBUTE_DESCRIPTOR_WITH_SELECTION);
@@ -905,18 +909,14 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
             if (obj == NULL)
             {
                 // Access Error : Device reports a undefined object.
-                CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(server, obj, attributeIndex);
-                e->SetError(DLMS_ERROR_CODE_UNDEFINED_OBJECT);
-                list.push_back(e);
+                status[pos] = DLMS_ERROR_CODE_UNDEFINED_OBJECT;
             }
             else
             {
-                e = new CGXDLMSValueEventArg(server, obj, attributeIndex, selector, parameters);
-                list.push_back(e);
-                if (server->GetAttributeAccess(e) == DLMS_ACCESS_MODE_NONE)
+                CGXDLMSValueEventArg e (server, obj, attributeIndex, selector, parameters);
+                if ((server->GetAttributeAccess(&e) & DLMS_ACCESS_MODE_WRITE) == 0)
                 {
-                    // Read Write denied.
-                    e->SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+                    status[pos] = DLMS_ERROR_CODE_READ_WRITE_DENIED;
                 }
             }
         }
@@ -931,7 +931,7 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
         xml->IntegerToHex(cnt, 2, str);
         xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_VALUE_LIST, "Qty", str);
     }
-    for (unsigned long pos = 0; pos != cnt; ++pos)
+    for (unsigned short pos = 0; pos != cnt; ++pos)
     {
         CGXDLMSVariant value;
         CGXDataInfo di;
@@ -942,24 +942,37 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
         }
         if ((ret = GXHelpers::GetData(data, di, value)) != 0)
         {
-            return ret;
+            status[pos] = DLMS_ERROR_CODE_READ_WRITE_DENIED;
         }
-        if (!di.IsComplete())
+        if (ret == 0)
         {
-            value = data.ToHexString(data.GetPosition(), data.Available(), false);
-        }
-        else if (value.vt == DLMS_DATA_TYPE_OCTET_STRING)
-        {
-            value = GXHelpers::BytesToHex(value.byteArr, value.GetSize(), false);
-        }
-        if (xml != NULL && xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML)
-        {
-            xml->AppendEndTag(DLMS_COMMAND_WRITE_REQUEST, (unsigned long)DLMS_SINGLE_READ_RESPONSE_DATA);
+            if (!di.IsComplete())
+            {
+                value = data.ToHexString(data.GetPosition(), data.Available(), false);
+            }
+            else if (value.vt == DLMS_DATA_TYPE_OCTET_STRING)
+            {
+                value = GXHelpers::BytesToHex(value.byteArr, value.GetSize(), false);
+            }
+            if (xml != NULL && xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML)
+            {
+                xml->AppendEndTag(DLMS_COMMAND_WRITE_REQUEST, (unsigned long)DLMS_SINGLE_READ_RESPONSE_DATA);
+            }
         }
     }
     if (xml != NULL)
     {
         xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_VALUE_LIST);
+    }
+    else
+    {
+        p.SetStatus(0xFF);
+        GXHelpers::SetObjectCount((unsigned long) status.size(), *p.GetAttributeDescriptor());
+        for(std::map<unsigned short, unsigned char >::iterator it = status.begin(); it != status.end(); ++it)
+        {
+            p.GetAttributeDescriptor()->SetUInt8(it->second);
+        }
+        p.SetRequestType(DLMS_SET_RESPONSE_TYPE_WITH_LIST);
     }
     return 0;
 }
@@ -1005,7 +1018,8 @@ int CGXDLMSLNCommandHandler::HandleSetRequest(
         xml->AppendLine(DLMS_TRANSLATOR_TAGS_INVOKE_ID, "", str);
     }
 
-    CGXDLMSLNParameters p(&settings, invoke, DLMS_COMMAND_SET_RESPONSE, type, NULL, NULL, 0, cipheredCommand);
+    CGXByteBuffer attributeDescriptor;
+    CGXDLMSLNParameters p(&settings, invoke, DLMS_COMMAND_SET_RESPONSE, type, &attributeDescriptor, NULL, 0, cipheredCommand);
     if (type == DLMS_SET_COMMAND_TYPE_NORMAL || type == DLMS_SET_COMMAND_TYPE_FIRST_DATABLOCK)
     {
         ret = HandleSetRequestNormal(settings, server, data, type, p, xml);

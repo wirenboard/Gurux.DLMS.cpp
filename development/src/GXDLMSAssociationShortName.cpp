@@ -45,7 +45,7 @@ int CGXDLMSAssociationShortName::GetAccessRights(CGXDLMSObject* pObj, CGXDLMSSer
     CGXDLMSValueEventArg e(server, pObj, 0);
     data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
     data.SetUInt8(3);
-    GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, ln);
+    GXHelpers::SetData(data, DLMS_DATA_TYPE_INT16, ln);
     data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
     GXHelpers::SetObjectCount(cnt, data);
     CGXDLMSVariant empty, index, access;

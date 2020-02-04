@@ -139,7 +139,12 @@ public:
     //Read selected object.
     int Read(CGXDLMSObject* pObject, int attributeIndex, std::string& value);
 
+    //Read selected objects.
     int ReadList(
+        std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list);
+
+    //Write selected objects.
+    int WriteList(
         std::vector<std::pair<CGXDLMSObject*, unsigned char> >& list);
 
     //Write selected object.

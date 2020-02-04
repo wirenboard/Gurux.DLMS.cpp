@@ -115,7 +115,7 @@ public:
 };
 
 // This class is Obsolete. Use CGXDLMSIECLocalPortSetup instead.
-class CGXDLMSIECOpticalPortSetup : CGXDLMSIECLocalPortSetup
+class CGXDLMSIECOpticalPortSetup : public CGXDLMSIECLocalPortSetup
 {
 };
 #endif //GXDLMSIECOPTICALPORTSETUP_H
