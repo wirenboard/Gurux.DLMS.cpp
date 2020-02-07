@@ -200,6 +200,7 @@ void CGXDLMSTranslator::GetCiphering(CGXDLMSSettings& settings)
         c->SetBlockCipherKey(m_BlockCipherKey);
         c->SetAuthenticationKey(m_AuthenticationKey);
         c->SetFrameCounter(m_FrameCounter);
+        c->SetDedicatedKey(m_DedicatedKey);
         settings.SetSourceSystemTitle(m_ServerSystemTitle);
     }
     else
@@ -730,4 +731,26 @@ int CGXDLMSTranslator::DataToXml(CGXByteBuffer& data, std::string& xml)
     ret = GXHelpers::GetData(data, di, value);
     xml = di.GetXml()->ToString();
     return ret;
+}
+
+CGXByteBuffer& CGXDLMSTranslator::GetServerSystemTitle()
+{
+    return m_ServerSystemTitle;
+}
+
+void CGXDLMSTranslator::SetServerSystemTitle(CGXByteBuffer& value)
+{
+    m_ServerSystemTitle.Clear();
+    m_ServerSystemTitle.Set(value.GetData(), value.GetSize() - value.GetPosition());
+}
+
+CGXByteBuffer& CGXDLMSTranslator::GetDedicatedKey()
+{
+    return m_DedicatedKey;
+}
+
+void CGXDLMSTranslator::SetDedicatedKey(CGXByteBuffer& value)
+{
+    m_DedicatedKey.Clear();
+    m_DedicatedKey.Set(value.GetData(), value.GetSize() - value.GetPosition());
 }

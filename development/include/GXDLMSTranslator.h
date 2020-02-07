@@ -120,6 +120,11 @@ public:
     CGXByteBuffer m_ServerSystemTitle;
 
     /**
+    * Dedicated key.
+    */
+    CGXByteBuffer m_DedicatedKey;
+
+    /**
     * Is data encrypted.
     */
     bool m_Encrypt;
@@ -209,6 +214,28 @@ public:
     *  @param value System title.
     */
     void SetSystemTitle(CGXByteBuffer& value);
+
+
+    /*
+     * Returns System title.
+     */
+    CGXByteBuffer& GetServerSystemTitle();
+
+    /*
+    *  value: System title.
+    */
+    void SetServerSystemTitle(CGXByteBuffer& value);
+
+    /*
+     * Returns dedicated key.
+    */
+    CGXByteBuffer& GetDedicatedKey();
+
+    /*
+    *  value: Dedicated ky.
+    */
+    void SetDedicatedKey(CGXByteBuffer& value);
+
 
     /**
      * @return Block cipher key.
