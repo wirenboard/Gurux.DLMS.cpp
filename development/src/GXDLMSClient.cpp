@@ -1415,7 +1415,7 @@ int CGXDLMSClient::WriteList(
         }
         if (ret == 0)
         {
-            CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_READ_REQUEST,
+            CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_WRITE_REQUEST,
                 (unsigned long)list.size(), 0xFF, &bb, NULL);
             ret = CGXDLMS::GetSnMessages(p, reply);
         }
