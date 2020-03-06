@@ -75,6 +75,26 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules />
+    <CodeAnalysisRuleAssemblies />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules />
+    <CodeAnalysisRuleAssemblies />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules />
+    <CodeAnalysisRuleAssemblies />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules />
+    <CodeAnalysisRuleAssemblies />
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -238,6 +258,9 @@
     <ClCompile Include="..\src\GXStandardObisCodeCollection.cpp" />
     <ClCompile Include="..\src\GXTokenGatewayConfiguration.cpp" />
     <ClCompile Include="..\src\GXUnitCharge.cpp" />
+    <ClCompile Include="..\src\GXXmlReader.cpp" />
+    <ClCompile Include="..\src\GXXmlWriter.cpp" />
+    <ClCompile Include="..\src\GXXmlWriterSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\GXChargePerUnitScaling.h" />
@@ -365,6 +388,9 @@
     <ClInclude Include="..\include\GXTime.h" />
     <ClInclude Include="..\include\GXTokenGatewayConfiguration.h" />
     <ClInclude Include="..\include\GXUnitCharge.h" />
+    <ClInclude Include="..\include\GXXmlReader.h" />
+    <ClInclude Include="..\include\GXXmlWriter.h" />
+    <ClInclude Include="..\include\GXXmlWriterSettings.h" />
     <ClInclude Include="..\include\IGXDLMSBase.h" />
     <ClInclude Include="..\include\OBiscodes.h" />
     <ClInclude Include="..\include\TranslatorGeneralTags.h" />

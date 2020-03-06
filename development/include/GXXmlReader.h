@@ -32,58 +32,53 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSOBJECTCOLLECTION_H
-#define GXDLMSOBJECTCOLLECTION_H
+#ifndef GX_XML_READER_H
+#define GX_XML_READER_H
 
 #include <vector>
-#include "GXDLMSObject.h"
-#include "GXXmlWriterSettings.h"
+#include <string>
 
-class CGXDLMSObjectCollection : public std::vector<CGXDLMSObject*>
+class CGXXmlReader
 {
+    enum XML_EVENT_TYPE
+    {
+        XML_EVENT_TYPE_NONE,
+        XML_EVENT_TYPE_START_ELEMENT,
+        XML_EVENT_TYPE_END_ELEMENT,
+        XML_EVENT_TYPE_COMMENT,
+        XML_EVENT_TYPE_SPACE,
+        XML_EVENT_TYPE_CHARACTERS
+    };
+    XML_EVENT_TYPE m_EventType;
+    int m_Index;
+    int m_Size;
+    std::string m_Name;
+    std::string m_Value;
+    char m_Buffer[256];
+    FILE* m_f;
 public:
-    ~CGXDLMSObjectCollection();
+    //Constructor.
+    CGXXmlReader(FILE* f);
 
-    CGXDLMSObject* FindByLN(DLMS_OBJECT_TYPE type, std::string& ln);
+    bool IsEOF();
 
-    CGXDLMSObject* FindByLN(DLMS_OBJECT_TYPE type, unsigned char ln[6]);
+    bool Read();
 
-    CGXDLMSObject* FindBySN(unsigned short sn);
+    bool IsStartElement();
 
-    void GetObjects(DLMS_OBJECT_TYPE type, CGXDLMSObjectCollection& items);
+    std::string& GetText();
 
-    void push_back(
-        CGXDLMSObject* item);
+    void GetNext();
 
-    void Free();
+    std::string& ReadElementContentAsString(const char* name);
 
-    std::string ToString();
+    std::string& ReadElementContentAsString(const char* name, const char* defaultValue);
 
-    /**
-    * Save COSEM objects to the file.
-    *
-    * fileName: File name.
-    */
-    int Save(
-        const char* fileName);
+    int ReadElementContentAsInt(const char* name);
 
-    /**
-    * Save COSEM objects to the file.
-    *
-    * fileName: File name.
-    * settings: XML write settings.
-    */
-    int Save(
-        const char* fileName,
-        CGXXmlWriterSettings& settings);
+    int ReadElementContentAsInt(const char* name, int defaultValue);
 
-    /**
-    * Load COSEM objects from the file.
-    *
-    * fileName XML file name.
-    */
-    int Load(
-        const char* fileName);
+    std::string& GetName();
 };
 
-#endif //GXDLMSOBJECTCOLLECTION_H
+#endif //GX_XML_READER_H

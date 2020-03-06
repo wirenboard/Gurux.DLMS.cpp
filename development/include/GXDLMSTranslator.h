@@ -70,8 +70,7 @@ class CGXDLMSTranslator
     int PduToXml(CGXByteBuffer& value, bool omitDeclaration, bool omitNameSpace, std::string& output);
 
     int PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& value, bool omitDeclaration, bool omitNameSpace, bool allowUnknownCommand, std::string& output);
-    void GetCiphering(CGXDLMSSettings& settings);
-
+    void GetCiphering(CGXDLMSSettings& settings, bool force);
 public:
     // Are comments added.
     bool GetComments();

@@ -32,8 +32,13 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
+#include <stdio.h>
 #include "../include/GXDLMSObjectCollection.h"
-#include <sstream>
+#include "../include/GXDLMSConverter.h"
+
+#include "../include/GXXmlWriter.h"
+#include "../include/GXXmlReader.h"
+#include "../include/GXDLMSObjectFactory.h"
 
 CGXDLMSObjectCollection::~CGXDLMSObjectCollection()
 {
@@ -125,4 +130,132 @@ std::string CGXDLMSObjectCollection::ToString()
     }
     sb << ']';
     return sb.str();
+}
+
+int CGXDLMSObjectCollection::Save(const char* fileName)
+{
+    CGXXmlWriterSettings settings;
+    return Save(fileName, settings);
+}
+
+int CGXDLMSObjectCollection::Save(const char* fileName, CGXXmlWriterSettings& settings)
+{
+    std::string ln;
+#if defined(_WIN32) || defined(_WIN64)//Windows
+    FILE* f = NULL;
+    if (fopen_s(&f, fileName, "w") != 0)
+    {
+        return errno;
+    }
+#else
+    FILE* f = fopen(fileName, "w");
+    if (f == NULL)
+    {
+        return errno;
+    }
+#endif
+    CGXXmlWriter writer(f);
+    writer.WriteStartDocument();
+    writer.WriteStartElement("Objects");
+    for (CGXDLMSObjectCollection::iterator it = begin(); it != end(); ++it)
+    {
+        writer.WriteStartElement(CGXDLMSConverter::ToString((*it)->GetObjectType()));
+        // Add SN
+        if ((*it)->GetShortName() != 0)
+        {
+            writer.WriteElementString("SN", (*it)->GetShortName());
+        }
+        // Add LN
+        (*it)->GetLogicalName(ln);
+        writer.WriteElementString("LN", ln);
+        // Add description if given.
+        std::string& d = (*it)->GetDescription();
+        if (!d.empty())
+        {
+            writer.WriteElementString("Description", d);
+        }
+        // Close object.
+        writer.WriteEndElement();
+    }
+    writer.WriteEndElement();
+    writer.WriteEndDocument();
+    if (f != NULL)
+    {
+        fclose(f);
+    }
+    return 0;
+}
+
+int CGXDLMSObjectCollection::Load(const char* fileName)
+{
+    int ret = 0;
+    CGXDLMSObject* obj = NULL;
+    std::string  target;
+    DLMS_OBJECT_TYPE type = DLMS_OBJECT_TYPE_NONE;
+#if defined(_WIN32) || defined(_WIN64)//Windows
+    FILE* f = NULL;
+    if (fopen_s(&f, fileName, "r") != 0)
+    {
+        return errno;
+    }
+#else
+    FILE* f = fopen(fileName, "r");
+    if (f == NULL)
+    {
+        return errno;
+    }
+#endif
+    CGXXmlReader reader(f);
+    while (!reader.IsEOF())
+    {
+        if (reader.IsStartElement())
+        {
+            target = reader.GetName();
+            if (target == "Objects")
+            {
+                // Skip.
+                reader.Read();
+            }
+            else if (target.find("GXDLMS", 0, 5) == 0)
+            {
+                type = CGXDLMSConverter::ValueOfObjectType(target.c_str());
+                if (type == DLMS_OBJECT_TYPE_NONE)
+                {
+                    //Invalid object type.
+                    return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                }
+                reader.Read();
+                obj = CGXDLMSObjectFactory::CreateObject(type);
+                this->push_back(obj);
+            }
+            else if (target == "SN")
+            {
+                obj->SetShortName(reader.ReadElementContentAsInt("SN"));
+            }
+            else if (target == "LN")
+            {
+                if ((ret = CGXDLMSObject::SetLogicalName(obj, reader.ReadElementContentAsString("LN"))) != 0)
+                {
+                    break;
+                }
+            }
+            else if (target == "Description")
+            {
+                obj->SetDescription(reader.ReadElementContentAsString("Description"));
+            }
+            else
+            {
+                obj = NULL;
+            }
+        }
+        else
+        {
+            reader.Read();
+        }
+    }
+    if (f != NULL)
+    {
+        fclose(f);
+    }
+    return ret;
 }

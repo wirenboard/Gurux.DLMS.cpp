@@ -194,7 +194,7 @@ int GetInitiateRequest(
         data.SetUInt8(0x1);
         CGXByteBuffer& dedKey = settings.GetCipher()->GetDedicatedKey();
         GXHelpers::SetObjectCount(dedKey.GetSize(), data);
-        data.Set(&dedKey, 0, settings.GetCipher()->GetDedicatedKey().GetSize());
+        data.Set(&dedKey, 0, dedKey.GetSize());
     }
     // encoding of the response-allowed component (bool DEFAULT TRUE)
     // usage flag (FALSE, default value TRUE conveyed)
@@ -269,17 +269,6 @@ int CGXAPDU::GenerateUserInformation(
             if ((ret = GetInitiateRequest(settings, cipher, crypted)) != 0)
             {
                 return ret;
-            }
-            if ((settings.GetProposedConformance() & DLMS_CONFORMANCE_GENERAL_PROTECTION) != 0)
-            {
-                if (settings.GetCipher()->GetDedicatedKey().GetSize() == 0)
-                {
-                    cmd = DLMS_COMMAND_GENERAL_GLO_CIPHERING;
-                }
-                else
-                {
-                    cmd = DLMS_COMMAND_GENERAL_DED_CIPHERING;
-                }
             }
             if ((ret = cipher->Encrypt(cipher->GetSecurity(),
                 DLMS_COUNT_TYPE_PACKET,

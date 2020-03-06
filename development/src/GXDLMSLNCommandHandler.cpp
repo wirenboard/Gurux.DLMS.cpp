@@ -38,6 +38,7 @@
 #include "../include/GXDLMSValueEventCollection.h"
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSObjectFactory.h"
+#include "../include/GXDLMSSecuritySetup.h"
 
 void AppendAttributeDescriptor(CGXDLMSTranslatorStructure* xml, int ci, unsigned char* ln, unsigned char attributeIndex)
 {
@@ -1065,6 +1066,7 @@ int CGXDLMSLNCommandHandler::HandleMethodRequest(
     CGXDLMSTranslatorStructure* xml,
     unsigned char cipheredCommand)
 {
+    CGXDLMSValueEventArg* e = NULL;
     CGXByteBuffer bb;
     DLMS_ERROR_CODE error = DLMS_ERROR_CODE_OK;
     CGXDLMSVariant parameters;
@@ -1150,7 +1152,7 @@ int CGXDLMSLNCommandHandler::HandleMethodRequest(
     }
     else
     {
-        CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(server, obj, id, 0, parameters);
+        e = new CGXDLMSValueEventArg(server, obj, id, 0, parameters);
         CGXDLMSValueEventCollection arr;
         arr.push_back(e);
         if (server->GetMethodAccess(e) == DLMS_METHOD_ACCESS_MODE_NONE)
@@ -1188,7 +1190,7 @@ int CGXDLMSLNCommandHandler::HandleMethodRequest(
     }
     CGXDLMSLNParameters p(&settings, invokeId, DLMS_COMMAND_METHOD_RESPONSE, 1, NULL, &bb, error, cipheredCommand);
     ret = CGXDLMS::GetLNPdu(p, *replyData);
-    if (obj->GetObjectType() == DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME && id == 1)
+    if (error == 0 && obj->GetObjectType() == DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME && id == 1)
     {
         if (((CGXDLMSAssociationLogicalName*)obj)->GetAssociationStatus() == DLMS_ASSOCIATION_STATUS_ASSOCIATED)
         {
@@ -1201,6 +1203,10 @@ int CGXDLMSLNCommandHandler::HandleMethodRequest(
             server->InvalidConnection(*connectionInfo);
             settings.SetConnected((DLMS_CONNECTION_STATE)(settings.GetConnected() & ~DLMS_CONNECTION_STATE_DLMS));
         }
+    }
+    if (e != NULL && error == 0 && obj->GetObjectType() == DLMS_OBJECT_TYPE_SECURITY_SETUP && id == 2)
+    {
+        ((CGXDLMSSecuritySetup*)obj)->ApplyKeys(settings, *e);
     }
     return ret;
 }

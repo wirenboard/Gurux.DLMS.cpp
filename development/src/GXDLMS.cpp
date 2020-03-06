@@ -537,7 +537,7 @@ unsigned char GetGloMessage(DLMS_COMMAND command)
     return cmd;
 }
 
-unsigned char GetInvokeIDPriority(CGXDLMSSettings& settings)
+unsigned char GetInvokeIDPriority(CGXDLMSSettings& settings, bool increase)
 {
     unsigned char value = 0;
     if (settings.GetPriority() == DLMS_PRIORITY_HIGH)
@@ -547,6 +547,10 @@ unsigned char GetInvokeIDPriority(CGXDLMSSettings& settings)
     if (settings.GetServiceClass() == DLMS_SERVICE_CLASS_CONFIRMED)
     {
         value |= 0x40;
+    }
+    if (increase)
+    {
+        settings.SetInvokeID((unsigned char)((settings.GetInvokeID() + 1) & 0xF));
     }
     value |= settings.GetInvokeID() & 0xF;
     return value;
@@ -828,7 +832,7 @@ int CGXDLMS::GetLNPdu(
                 }
                 else
                 {
-                    reply.SetUInt8(GetInvokeIDPriority(*p.GetSettings()));
+                    reply.SetUInt8(GetInvokeIDPriority(*p.GetSettings(), p.GetSettings()->GetAutoIncreaseInvokeID()));
                 }
             }
         }
@@ -2878,6 +2882,17 @@ int CGXDLMS::HandleGetResponseWithList(
     reply.SetValue(values);
     return 0;
 }
+
+int VerifyInvokeId(CGXDLMSSettings& settings, CGXReplyData& reply)
+{
+    if (reply.GetXml() == NULL && settings.GetAutoIncreaseInvokeID() && reply.GetInvokeId() != GetInvokeIDPriority(settings, false))
+    {
+        //Invalid invoke ID.
+        return DLMS_ERROR_CODE_INVALID_INVOKE_ID;
+    }
+    return 0;
+}
+
 
 int CGXDLMS::HandleGetResponse(
     CGXDLMSSettings& settings,

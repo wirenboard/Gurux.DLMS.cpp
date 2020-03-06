@@ -112,5 +112,7 @@ public:
 
     //Convert object type enum value to string.
     static const char* ToString(DLMS_OBJECT_TYPE type);
+
+    static DLMS_OBJECT_TYPE ValueOfObjectType(const char* value);
 };
 #endif //GXDLMSCONVERTER_H

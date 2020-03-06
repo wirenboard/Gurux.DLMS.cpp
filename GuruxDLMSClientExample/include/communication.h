@@ -193,6 +193,6 @@ public:
     * Read all objects from the meter. This is only example. Usually there is
     * no need to read all data from the meter.
     */
-    int ReadAll();
+    int ReadAll(char* outputFile);
     };
 #endif //GXCOMMUNICATION_H

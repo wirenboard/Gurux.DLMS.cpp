@@ -70,6 +70,7 @@ protected:
     bool CanRead(int index);
     static int GetLogicalName(CGXDLMSObject * target, CGXDLMSVariant& value);
     static int SetLogicalName(CGXDLMSObject * target, CGXDLMSVariant& value);
+    static int SetLogicalName(CGXDLMSObject* target, std::string& value);
 public:
 
     static bool IsLogicalNameEmpty(unsigned char* pLN)
@@ -125,10 +126,10 @@ public:
 
 
     //Get description of the object.
-    std::string GetDescription();
+    std::string& GetDescription();
 
     //Set description of the object.
-    void SetDescription(std::string value);
+    void SetDescription(std::string& value);
 
     //Get values as std::string.
     virtual void GetValues(std::vector<std::string>& values)

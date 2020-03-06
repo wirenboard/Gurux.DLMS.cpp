@@ -57,6 +57,8 @@ static void ShowHelp()
     printf(" -g \"0.0.1.0.0.255:1; 0.0.1.0.0.255:2\" Get selected object(s) with given attribute index.\r\n");
     printf(" -C \t Security Level. (None, Authentication, Encrypted, AuthenticationEncryption)");
     printf(" -v \t Invocation counter data object Logical Name. Ex. 0.0.43.1.1.255");
+    printf(" -I \t Auto increase invoke ID");
+    printf(" -o \t Cache association view to make reading faster. Ex. -o C:\\device.xml");
     printf("Example:\r\n");
     printf("Read LG device using TCP/IP connection.\r\n");
     printf("GuruxDlmsSample -r SN -c 16 -s 1 -h [Meter IP Address] -p [Meter Port No]\r\n");
@@ -84,7 +86,6 @@ int main(int argc, char* argv[])
         }
 #endif
         int ret;
-
         //Remove trace file if exists.
         remove("trace.txt");
         remove("LogFile.txt");
@@ -102,8 +103,10 @@ int main(int argc, char* argv[])
         char* address = NULL;
         char* serialPort = NULL;
         bool iec = false;
+        bool autoIncreaseInvokeID = false;
         char* invocationCounter = NULL;
-        while ((opt = getopt(argc, argv, "h:p:c:s:r:it:a:wP:g:S:n:C:v:")) != -1)
+        char* outputFile = NULL;
+        while ((opt = getopt(argc, argv, "h:p:c:s:r:iIt:a:wP:g:S:n:C:v:o:")) != -1)
         {
             switch (opt)
             {
@@ -158,6 +161,10 @@ int main(int argc, char* argv[])
                 //IEC.
                 iec = 1;
                 break;
+            case 'I':
+                // AutoIncreaseInvokeID.
+                autoIncreaseInvokeID = true;
+                break;
             case 'C':
                 if (strcmp("None", optarg) == 0)
                 {
@@ -180,6 +187,9 @@ int main(int argc, char* argv[])
                     printf("Invalid Ciphering option '%s'. (None, Authentication, Encryption, AuthenticationEncryption)", optarg);
                     return 1;
                 }
+                break;
+            case 'o':
+                outputFile = optarg;
                 break;
             case 'v':
                 invocationCounter = optarg;
@@ -251,8 +261,6 @@ int main(int argc, char* argv[])
                     printf("Invalid Authentication option. (None, Low, High, HighMd5, HighSha1, HighGmac, HighSha256)\n");
                     return 1;
                 }
-                break;
-            case 'o':
                 break;
             case 'c':
                 clientAddress = atoi(optarg);
@@ -333,8 +341,15 @@ int main(int argc, char* argv[])
         {
             if ((ret = comm.Open(serialPort, iec)) != 0)
             {
-                printf("Serial port open failed %d.\r\n", ret);
-                return 1;
+                if (ret == DLMS_ERROR_CODE_RECEIVE_FAILED)
+                {
+                    printf("Failed to receive reply for IEC. Check is DLMS connection already established.\r\n");
+                }
+                else
+                {
+                    printf("Serial port open failed %d.\r\n", ret);
+                    return 1;
+                }
             }
         }
         else
@@ -395,7 +410,7 @@ int main(int argc, char* argv[])
             }
         }
         else {
-            ret = comm.ReadAll();
+            ret = comm.ReadAll(outputFile);
         }
         //Close connection.
         comm.Close();

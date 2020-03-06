@@ -109,6 +109,10 @@ public:
 
     int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 
+    //Start to use new keys after reply is generated.
+    int ApplyKeys(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+
+
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
 

@@ -77,6 +77,8 @@ class CGXDLMSSettings
 
     // Invoke ID.
     unsigned char m_InvokeID;
+    bool m_AutoIncreaseInvokeID;
+
     //Long Invoke ID.
     int m_LongInvokeID;
 
@@ -464,6 +466,12 @@ public:
 
     // Quality of service.
     void SetQualityOfService(unsigned char value);
+
+    //Auto increase Invoke ID.
+    bool GetAutoIncreaseInvokeID();
+
+    //Auto increase Invoke ID.
+    void SetAutoIncreaseInvokeID(bool value);
 
     /*
     * Block number acknowledged in GBT.

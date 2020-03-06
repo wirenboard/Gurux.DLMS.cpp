@@ -185,20 +185,17 @@ int CGXDLMSSecuritySetup::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg
                 e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
                 break;
             }
+            //Keys are take in action after reply is generated.
             switch (type) {
             case DLMS_GLOBAL_KEY_TYPE_UNICAST_ENCRYPTION:
-                settings.GetCipher()->SetBlockCipherKey(reply);
                 break;
             case DLMS_GLOBAL_KEY_TYPE_BROADCAST_ENCRYPTION:
                 // Invalid type
                 e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
                 break;
             case DLMS_GLOBAL_KEY_TYPE_AUTHENTICATION:
-                // if settings.Cipher is null non secure server is used.
-                settings.GetCipher()->SetAuthenticationKey(reply);
                 break;
             case DLMS_GLOBAL_KEY_TYPE_KEK:
-                settings.SetKek(reply);
                 break;
             default:
                 e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
@@ -208,6 +205,43 @@ int CGXDLMSSecuritySetup::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg
     else
     {
         e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+    }
+    return DLMS_ERROR_CODE_OK;
+}
+
+
+int CGXDLMSSecuritySetup::ApplyKeys(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
+{
+    for (std::vector<CGXDLMSVariant>::iterator it = e.GetParameters().Arr.begin(); it != e.GetParameters().Arr.end(); ++it)
+    {
+        DLMS_GLOBAL_KEY_TYPE type = (DLMS_GLOBAL_KEY_TYPE)it->Arr[0].ToInteger();
+        CGXByteBuffer data, reply;
+        CGXByteBuffer kek = settings.GetKek();
+        data.Set(it->Arr[1].byteArr, it->Arr[1].GetSize());
+        if (CGXDLMSSecureClient::Decrypt(kek, data, reply) != 0 ||
+            reply.GetSize() != 16)
+        {
+            e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+            break;
+        }
+        switch (type) {
+        case DLMS_GLOBAL_KEY_TYPE_UNICAST_ENCRYPTION:
+            settings.GetCipher()->SetBlockCipherKey(reply);
+            break;
+        case DLMS_GLOBAL_KEY_TYPE_BROADCAST_ENCRYPTION:
+            // Invalid type
+            e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+            break;
+        case DLMS_GLOBAL_KEY_TYPE_AUTHENTICATION:
+            // if settings.Cipher is null non secure server is used.
+            settings.GetCipher()->SetAuthenticationKey(reply);
+            break;
+        case DLMS_GLOBAL_KEY_TYPE_KEK:
+            settings.SetKek(reply);
+            break;
+        default:
+            e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+        }
     }
     return DLMS_ERROR_CODE_OK;
 }

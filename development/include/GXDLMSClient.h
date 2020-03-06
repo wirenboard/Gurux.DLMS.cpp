@@ -45,7 +45,6 @@ class CGXDLMSClient
 {
 protected:
     CGXDLMSSettings m_Settings;
-    bool m_AutoIncreaseInvokeID;
 private:
     bool m_IsAuthenticationRequired;
     static void UpdateOBISCodes(CGXDLMSObjectCollection& objects);

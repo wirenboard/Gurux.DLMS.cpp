@@ -62,6 +62,7 @@ CGXDLMSSettings::CGXDLMSSettings(bool isServer)
     m_UseUtc2NormalTime = false;
     m_BlockNumberAck = 0;
     m_WindowSize = 1;
+    m_AutoIncreaseInvokeID = false;
 }
 
 //Destructor.
@@ -584,4 +585,19 @@ unsigned char CGXDLMSSettings::GetQualityOfService()
 void CGXDLMSSettings::SetQualityOfService(unsigned char value)
 {
     m_QualityOfService = value;
+}
+
+/**
+ * @return Auto increase Invoke ID.
+ */
+bool CGXDLMSSettings::GetAutoIncreaseInvokeID() {
+    return m_AutoIncreaseInvokeID;
+}
+
+/**
+ * @param value
+ *            Auto increase Invoke ID.
+ */
+void CGXDLMSSettings::SetAutoIncreaseInvokeID(bool value) {
+    m_AutoIncreaseInvokeID = value;
 }

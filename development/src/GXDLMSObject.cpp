@@ -89,6 +89,11 @@ int CGXDLMSObject::SetLogicalName(CGXDLMSObject * target, CGXDLMSVariant& value)
     return DLMS_ERROR_CODE_OK;
 }
 
+int CGXDLMSObject::SetLogicalName(CGXDLMSObject* target, std::string& value)
+{
+    return GXHelpers::SetLogicalName(value.c_str(), target->m_LN);
+}
+
 void CGXDLMSObject::Initialize(short sn, unsigned short class_id, unsigned char version, CGXByteBuffer* ln)
 {
     m_SN = sn;
@@ -310,13 +315,13 @@ CGXAttributeCollection& CGXDLMSObject::GetMethodAttributes()
 }
 
 //Get Object's Logical Name.
-std::string CGXDLMSObject::GetDescription()
+std::string& CGXDLMSObject::GetDescription()
 {
     return m_Description;
 }
 
 //Set Object's Logical Name.
-void CGXDLMSObject::SetDescription(std::string value)
+void CGXDLMSObject::SetDescription(std::string& value)
 {
     m_Description = value;
 }

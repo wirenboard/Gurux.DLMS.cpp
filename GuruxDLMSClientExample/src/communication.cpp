@@ -251,7 +251,7 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
     int pos;
     unsigned long cnt = 1;
     bool bFound = false;
-    int lastReadIndex = 0;
+    int lastReadIndex = reply.GetPosition();
     do
     {
 #if defined(_WIN32) || defined(_WIN64)//Windows
@@ -594,14 +594,14 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         //Read reply data.
         if (Read('\n', reply) != 0)
         {
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+            return DLMS_ERROR_CODE_RECEIVE_FAILED;
         }
         //Remove echo.
         if (reply.Compare((unsigned char*)buff, len))
         {
             if (Read('\n', reply) != 0)
             {
-                return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                return DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
         }
 
@@ -765,7 +765,7 @@ int CGXCommunication::UpdateFrameCounter()
         unsigned long add = m_Parser->GetClientAddress();
         DLMS_AUTHENTICATION auth = m_Parser->GetAuthentication();
         DLMS_SECURITY security = m_Parser->GetCiphering()->GetSecurity();
-        CGXByteBuffer& challenge = m_Parser->GetCtoSChallenge();
+        CGXByteBuffer challenge = m_Parser->GetCtoSChallenge();
         std::vector<CGXByteBuffer> data;
         CGXReplyData reply;
         m_Parser->SetClientAddress(16);
@@ -919,7 +919,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             return DLMS_ERROR_CODE_SEND_FAILED;
         }
 #endif
-        }
+    }
     else if ((ret = send(m_socket, (const char*)data.GetData(), len, 0)) == -1)
     {
         //If error has occured
@@ -960,7 +960,8 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             unsigned short pos = (unsigned short)bb.GetSize();
             if (Read(0x7E, bb) != 0)
             {
-                printf("Read failed.\r\n");
+                tmp += bb.ToHexString(pos, bb.GetSize() - pos, true);
+                printf("Read failed.\r\n%s", tmp.c_str());
                 return DLMS_ERROR_CODE_SEND_FAILED;
             }
             if (tmp.size() == 0)
@@ -1313,12 +1314,14 @@ int CGXCommunication::ReadScalerAndUnits()
         // Read scalers and units from the device.
         for (std::vector<CGXDLMSObject*>::iterator it = m_Parser->GetObjects().begin(); it != m_Parser->GetObjects().end(); ++it)
         {
-            if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_REGISTER ||
-                (*it)->GetObjectType() == DLMS_OBJECT_TYPE_EXTENDED_REGISTER)
+            if (((*it)->GetObjectType() == DLMS_OBJECT_TYPE_REGISTER ||
+                (*it)->GetObjectType() == DLMS_OBJECT_TYPE_EXTENDED_REGISTER) &&
+                ((*it)->GetAccess(3) & DLMS_ACCESS_MODE_READ) != 0)
             {
                 list.push_back(std::make_pair(*it, 3));
             }
-            else if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_DEMAND_REGISTER)
+            else if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_DEMAND_REGISTER &&
+                ((*it)->GetAccess(4) & DLMS_ACCESS_MODE_READ) != 0)
             {
                 list.push_back(std::make_pair(*it, 4));
             }
@@ -1480,10 +1483,10 @@ int CGXCommunication::GetReadOut()
                 WriteValue(m_Trace, value.c_str());
                 WriteValue(m_Trace, "\r\n");
             }
-            }
         }
-    return ret;
     }
+    return ret;
+}
 
 int CGXCommunication::GetProfileGenerics()
 {
@@ -1584,25 +1587,36 @@ int CGXCommunication::GetProfileGenerics()
     return ret;
 }
 
-int CGXCommunication::ReadAll()
+int CGXCommunication::ReadAll(char* outputFile)
 {
+    bool read = false;
     int ret;
     if ((ret = InitializeConnection()) == 0)
     {
-        // Get list of objects that meter supports.
-        if ((ret = GetAssociationView()) != 0)
+        if (outputFile != NULL)
         {
-            printf("GetAssociationView failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+            if ((ret = m_Parser->GetObjects().Load(outputFile)) == 0)
+            {
+                read = true;
+            }
         }
-        // Read Scalers and units from the register objects.
-        if (ret == 0 && (ret = ReadScalerAndUnits()) != 0)
+        if (!read)
         {
-            printf("ReadScalerAndUnits failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
-        }
-        // Read Profile Generic columns.
-        if (ret == 0 && (ret = GetProfileGenericColumns()) != 0)
-        {
-            printf("GetProfileGenericColumns failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+            // Get list of objects that meter supports.
+            if ((ret = GetAssociationView()) != 0)
+            {
+                printf("GetAssociationView failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+            }
+            // Read Scalers and units from the register objects.
+            if (ret == 0 && (ret = ReadScalerAndUnits()) != 0)
+            {
+                printf("ReadScalerAndUnits failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+            }
+            // Read Profile Generic columns.
+            if (ret == 0 && (ret = GetProfileGenericColumns()) != 0)
+            {
+                printf("GetProfileGenericColumns failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+            }
         }
         if (ret == 0 && (ret = GetReadOut()) != 0)
         {
@@ -1615,5 +1629,9 @@ int CGXCommunication::ReadAll()
         }
     }
     Close();
+    if (outputFile != NULL && ret == 0)
+    {
+        ret = m_Parser->GetObjects().Save(outputFile);
+    }
     return ret;
 }

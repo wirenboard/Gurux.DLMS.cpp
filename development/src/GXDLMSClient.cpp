@@ -52,7 +52,6 @@ CGXDLMSClient::CGXDLMSClient(bool UseLogicalNameReferencing,
     const char* password,
     DLMS_INTERFACE_TYPE intefaceType) : m_Settings(false)
 {
-    m_AutoIncreaseInvokeID = false;
     m_IsAuthenticationRequired = false;
     m_Settings.SetUseLogicalNameReferencing(UseLogicalNameReferencing);
     m_Settings.SetClientAddress(clientAddress);
@@ -235,7 +234,7 @@ void CGXDLMSClient::SetInvokeID(unsigned char value) {
  * @return Auto increase Invoke ID.
  */
 bool CGXDLMSClient::GetAutoIncreaseInvokeID() {
-    return m_AutoIncreaseInvokeID;
+    return m_Settings.GetAutoIncreaseInvokeID();
 }
 
 /**
@@ -243,7 +242,7 @@ bool CGXDLMSClient::GetAutoIncreaseInvokeID() {
  *            Auto increase Invoke ID.
  */
 void CGXDLMSClient::SetAutoIncreaseInvokeID(bool value) {
-    m_AutoIncreaseInvokeID = value;
+    m_Settings.SetAutoIncreaseInvokeID(value);
 }
 
 CGXDLMSLimits& CGXDLMSClient::GetLimits()
@@ -722,7 +721,7 @@ int CGXDLMSClient::AARQRequest(std::vector<CGXByteBuffer>& packets)
         return ret;
     }
     m_Settings.GetStoCChallenge().Clear();
-    if (m_AutoIncreaseInvokeID)
+    if (GetAutoIncreaseInvokeID())
     {
         m_Settings.SetInvokeID(0);
     }
@@ -1160,10 +1159,6 @@ int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int a
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     m_Settings.ResetBlockIndex();
-    if (m_AutoIncreaseInvokeID)
-    {
-        m_Settings.SetInvokeID((unsigned char)((m_Settings.GetInvokeID() + 1) & 0xF));
-    }
     CGXByteBuffer attributeDescriptor;
     if (GetUseLogicalNameReferencing())
     {
@@ -1316,10 +1311,6 @@ int CGXDLMSClient::WriteList(
 
     int ret = 0;
     m_Settings.ResetBlockIndex();
-    if (m_AutoIncreaseInvokeID)
-    {
-        m_Settings.SetInvokeID((unsigned char)((m_Settings.GetInvokeID() + 1) & 0xF));
-    }
     CGXByteBuffer bb;
     if (GetUseLogicalNameReferencing())
     {
@@ -1467,10 +1458,6 @@ int CGXDLMSClient::Write(
         CGXDLMSVariant value = e.GetValue();
         int ret;
         m_Settings.ResetBlockIndex();
-        if (m_AutoIncreaseInvokeID)
-        {
-            m_Settings.SetInvokeID((unsigned char)((m_Settings.GetInvokeID() + 1) & 0xF));
-        }
         CGXByteBuffer bb, data;
         if (e.IsByteArray())
         {
@@ -1651,10 +1638,6 @@ int CGXDLMSClient::Method(
 
     CGXByteBuffer bb, data;
     m_Settings.ResetBlockIndex();
-    if (m_AutoIncreaseInvokeID)
-    {
-        m_Settings.SetInvokeID((unsigned char)((m_Settings.GetInvokeID() + 1) & 0xF));
-    }
     if ((ret = GXHelpers::SetData(data, dataType, value)) != 0)
     {
         return ret;

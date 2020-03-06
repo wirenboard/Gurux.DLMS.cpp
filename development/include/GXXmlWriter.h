@@ -32,58 +32,44 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSOBJECTCOLLECTION_H
-#define GXDLMSOBJECTCOLLECTION_H
-
+#ifndef GX_XMLWRITER_H
+#define GX_XMLWRITER_H
 #include <vector>
-#include "GXDLMSObject.h"
-#include "GXXmlWriterSettings.h"
+#include <string>
 
-class CGXDLMSObjectCollection : public std::vector<CGXDLMSObject*>
+class CGXXmlWriter
 {
+    FILE* m_f;
+    const char* NEW_LINE = "\n";
+    std::vector<std::string> m_Elements;
+
+    //
+    // Append spaces to the buffer.
+    // count: Amount of spaces.
+    int AppendSpaces();
+
+    int Write(const char* data);
 public:
-    ~CGXDLMSObjectCollection();
+    //Constructor.
+    CGXXmlWriter(FILE* f);
+    int WriteStartDocument();
 
-    CGXDLMSObject* FindByLN(DLMS_OBJECT_TYPE type, std::string& ln);
+    int WriteStartElement(const char* name);
 
-    CGXDLMSObject* FindByLN(DLMS_OBJECT_TYPE type, unsigned char ln[6]);
+    int WriteElementString(const char* name, int value);
 
-    CGXDLMSObject* FindBySN(unsigned short sn);
+    int WriteElementString(const char* name, const char* value);
 
-    void GetObjects(DLMS_OBJECT_TYPE type, CGXDLMSObjectCollection& items);
+    int WriteElementString(const char* name, const std::string& value);
 
-    void push_back(
-        CGXDLMSObject* item);
+    // Write End Element tag.
+    int WriteEndElement(bool addSpaces);
 
-    void Free();
+   // Write End Element tag.
+    int WriteEndElement();
 
-    std::string ToString();
-
-    /**
-    * Save COSEM objects to the file.
-    *
-    * fileName: File name.
-    */
-    int Save(
-        const char* fileName);
-
-    /**
-    * Save COSEM objects to the file.
-    *
-    * fileName: File name.
-    * settings: XML write settings.
-    */
-    int Save(
-        const char* fileName,
-        CGXXmlWriterSettings& settings);
-
-    /**
-    * Load COSEM objects from the file.
-    *
-    * fileName XML file name.
-    */
-    int Load(
-        const char* fileName);
+    // Write End document tag.
+    int WriteEndDocument();
 };
 
-#endif //GXDLMSOBJECTCOLLECTION_H
+#endif //GX_XMLWRITER_H

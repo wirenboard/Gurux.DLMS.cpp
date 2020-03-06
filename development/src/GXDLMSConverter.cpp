@@ -127,6 +127,8 @@ const char* CGXDLMSConverter::GetErrorMessage(int error)
         return "Data receive failed.";
     case DLMS_ERROR_CODE_NOT_IMPLEMENTED:
         return "Not implemeted.";
+    case DLMS_ERROR_CODE_INVALID_INVOKE_ID:
+        return "Invalid Invoke ID.";
     }
     return "Unknown error.";
 }
@@ -1063,4 +1065,114 @@ const char* CGXDLMSConverter::ToString(DLMS_OBJECT_TYPE type)
     default:
         return "Manufacture spesific.";
     }
+}
+
+DLMS_OBJECT_TYPE CGXDLMSConverter::ValueOfObjectType(const char* value)
+{
+    DLMS_OBJECT_TYPE type;
+    if (strcmp(value, "GXDLMSActionSchedule") == 0)
+        type = DLMS_OBJECT_TYPE_ACTION_SCHEDULE;
+    else if (strcmp(value, "GXDLMSActivityCalendar") == 0)
+        type = DLMS_OBJECT_TYPE_ACTIVITY_CALENDAR;
+    else if (strcmp(value, "GXDLMSAssociationLogicalName") == 0)
+        type = DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME;
+    else if (strcmp(value, "GXDLMSAssociationShortName") == 0)
+        type = DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME;
+    else if (strcmp(value, "GXDLMSAutoAnswer") == 0)
+        type = DLMS_OBJECT_TYPE_AUTO_ANSWER;
+    else if (strcmp(value, "GXDLMSAutoConnect") == 0)
+        type = DLMS_OBJECT_TYPE_AUTO_CONNECT;
+    else if (strcmp(value, "GXDLMSClock") == 0)
+        type = DLMS_OBJECT_TYPE_CLOCK;
+    else if (strcmp(value, "GXDLMSData") == 0)
+        type = DLMS_OBJECT_TYPE_DATA;
+    else if (strcmp(value, "GXDLMSDemandRegister") == 0)
+        type = DLMS_OBJECT_TYPE_DEMAND_REGISTER;
+    else if (strcmp(value, "GXDLMSMacAddressSetup") == 0)
+        type = DLMS_OBJECT_TYPE_MAC_ADDRESS_SETUP;
+    else if (strcmp(value, "GXDLMSExtendedRegister") == 0)
+        type = DLMS_OBJECT_TYPE_EXTENDED_REGISTER;
+    else if (strcmp(value, "GXDLMSGprsSetup") == 0)
+        type = DLMS_OBJECT_TYPE_GPRS_SETUP;
+    else if (strcmp(value, "GXDLMSSecuritySetup") == 0)
+        type = DLMS_OBJECT_TYPE_SECURITY_SETUP;
+    else if (strcmp(value, "GXDLMSHdlcSetup") == 0)
+        type = DLMS_OBJECT_TYPE_IEC_HDLC_SETUP;
+    else if (strcmp(value, "GXDLMSIECOpticalPortSetup") == 0)
+        type = DLMS_OBJECT_TYPE_IEC_LOCAL_PORT_SETUP;
+    else if (strcmp(value, "GXDLMSIEC_TWISTED_PAIR_SETUP") == 0)
+        type = DLMS_OBJECT_TYPE_IEC_TWISTED_PAIR_SETUP;
+    else if (strcmp(value, "GXDLMSIp4Setup") == 0)
+        type = DLMS_OBJECT_TYPE_IP4_SETUP;
+    else if (strcmp(value, "GXDLMSMBusSlavePortSetup") == 0)
+        type = DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP;
+    else if (strcmp(value, "GXDLMSImageTransfer") == 0)
+        type = DLMS_OBJECT_TYPE_IMAGE_TRANSFER;
+    else if (strcmp(value, "GXDLMSDisconnectControl") == 0)
+        type = DLMS_OBJECT_TYPE_DISCONNECT_CONTROL;
+    else if (strcmp(value, "GXDLMSLimiter") == 0)
+        type = DLMS_OBJECT_TYPE_LIMITER;
+    else if (strcmp(value, "GXDLMSMBusClient") == 0)
+        type = DLMS_OBJECT_TYPE_MBUS_CLIENT;
+    else if (strcmp(value, "GXDLMSModemConfiguration") == 0)
+        type = DLMS_OBJECT_TYPE_MODEM_CONFIGURATION;
+    else if (strcmp(value, "GXDLMSPppSetup") == 0)
+        type = DLMS_OBJECT_TYPE_PPP_SETUP;
+    else if (strcmp(value, "GXDLMSProfileGeneric") == 0)
+        type = DLMS_OBJECT_TYPE_PROFILE_GENERIC;
+    else if (strcmp(value, "GXDLMSRegister") == 0)
+        type = DLMS_OBJECT_TYPE_REGISTER;
+    else if (strcmp(value, "GXDLMSRegisterActivation") == 0)
+        type = DLMS_OBJECT_TYPE_REGISTER_ACTIVATION;
+    else if (strcmp(value, "GXDLMSRegisterMonitor") == 0)
+        type = DLMS_OBJECT_TYPE_REGISTER_MONITOR;
+    else if (strcmp(value, "GXDLMSRegisterTable") == 0)
+        type = DLMS_OBJECT_TYPE_REGISTER_TABLE;
+    else if (strcmp(value, "GXDLMSZigBeeSasStartup") == 0)
+        type = DLMS_OBJECT_TYPE_ZIG_BEE_SAS_STARTUP;
+    else if (strcmp(value, "GXDLMSZigBeeSasJoin") == 0)
+        type = DLMS_OBJECT_TYPE_ZIG_BEE_SAS_JOIN;
+    else if (strcmp(value, "GXDLMSZigBeeSasApsFragmentation") == 0)
+        type = DLMS_OBJECT_TYPE_ZIG_BEE_SAS_APS_FRAGMENTATION;
+    else if (strcmp(value, "GXDLMSZigBeeNetworkControl") == 0)
+        type = DLMS_OBJECT_TYPE_ZIG_BEE_NETWORK_CONTROL;
+    else if (strcmp(value, "GXDLMSSapAssignment") == 0)
+        type = DLMS_OBJECT_TYPE_SAP_ASSIGNMENT;
+    else if (strcmp(value, "GXDLMSSchedule") == 0)
+        type = DLMS_OBJECT_TYPE_SCHEDULE;
+    else if (strcmp(value, "GXDLMSScriptTable") == 0)
+        type = DLMS_OBJECT_TYPE_SCRIPT_TABLE;
+    else if (strcmp(value, "GXDLMSSMTPSetup") == 0)
+        type = DLMS_OBJECT_TYPE_SMTP_SETUP;
+    else if (strcmp(value, "GXDLMSSpecialDaysTable") == 0)
+        type = DLMS_OBJECT_TYPE_SPECIAL_DAYS_TABLE;
+    else if (strcmp(value, "GXDLMSStatusMapping") == 0)
+        type = DLMS_OBJECT_TYPE_STATUS_MAPPING;
+    else if (strcmp(value, "GXDLMSTcpUdpSetup") == 0)
+        type = DLMS_OBJECT_TYPE_TCP_UDP_SETUP;
+    else if (strcmp(value, "GXDLMSUtilityTables") == 0)
+        type = DLMS_OBJECT_TYPE_UTILITY_TABLES;
+    else if (strcmp(value, "GXDLMSMBusMasterPortSetup") == 0)
+        type = DLMS_OBJECT_TYPE_MBUS_MASTER_PORT_SETUP;
+    else if (strcmp(value, "GXDLMSMessageHandler") == 0)
+        type = DLMS_OBJECT_TYPE_MESSAGE_HANDLER;
+    else if (strcmp(value, "GXDLMSPushSetup") == 0)
+        type = DLMS_OBJECT_TYPE_PUSH_SETUP;
+    else if (strcmp(value, "GXDLMSAccount") == 0)
+        type = DLMS_OBJECT_TYPE_ACCOUNT;
+    else if (strcmp(value, "GXDLMSCredit") == 0)
+        type = DLMS_OBJECT_TYPE_CREDIT;
+    else if (strcmp(value, "GXDLMSCharge") == 0)
+        type = DLMS_OBJECT_TYPE_CHARGE;
+    else if (strcmp(value, "GXDLMSParameterMonitor") == 0)
+        type = DLMS_OBJECT_TYPE_PARAMETER_MONITOR;
+    else if (strcmp(value, "GXDLMSTokenGateway") == 0)
+        type = DLMS_OBJECT_TYPE_TOKEN_GATEWAY;
+    else if (strcmp(value, "GXDLMSGSMDiagnostic") == 0)
+        type = DLMS_OBJECT_TYPE_GSM_DIAGNOSTIC;
+    else if (strcmp(value, "GXDLMSCompactData") == 0)
+        type = DLMS_OBJECT_TYPE_COMPACT_DATA;
+    else
+        type = DLMS_OBJECT_TYPE_NONE;
+    return type;
 }
