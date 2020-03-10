@@ -773,6 +773,14 @@ int CGXDLMSClient::ParseAAREResponse(CGXByteBuffer& reply)
     {
         return ret;
     }
+    if (result != DLMS_ASSOCIATION_RESULT_ACCEPTED)
+    {
+        if (result == DLMS_ASSOCIATION_RESULT_TRANSIENT_REJECTED)
+        {
+            return DLMS_ERROR_CODE_REJECTED_TRANSIENT;
+        }
+        return DLMS_ERROR_CODE_REJECTED_PERMAMENT;
+    }
     m_IsAuthenticationRequired = (DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_REQUIRED == sd);
     if (m_Settings.GetDLMSVersion() != 6)
     {

@@ -1813,6 +1813,16 @@ int HandleActionResponseNormal(
     return 0;
 }
 
+int VerifyInvokeId(CGXDLMSSettings& settings, CGXReplyData& reply)
+{
+    if (reply.GetXml() == NULL && settings.GetAutoIncreaseInvokeID() && reply.GetInvokeId() != GetInvokeIDPriority(settings, false))
+    {
+        //Invalid invoke ID.
+        return DLMS_ERROR_CODE_INVALID_INVOKE_ID;
+    }
+    return 0;
+}
+
 int CGXDLMS::HandleMethodResponse(
     CGXDLMSSettings& settings,
     CGXReplyData& data)
@@ -1826,6 +1836,11 @@ int CGXDLMS::HandleMethodResponse(
     }
     // Get invoke ID and priority.
     if ((ret = data.GetData().GetUInt8(&invoke)) != 0)
+    {
+        return ret;
+    }
+    data.SetInvokeId(invoke);
+    if ((ret = VerifyInvokeId(settings, data)) != 0)
     {
         return ret;
     }
@@ -2078,6 +2093,11 @@ int CGXDLMS::HandleSetResponse(
     }
     //Invoke ID and priority.
     if ((ret = data.GetData().GetUInt8(&invokeId)) != 0)
+    {
+        return ret;
+    }
+    data.SetInvokeId(ch);
+    if ((ret = VerifyInvokeId(settings, data)) != 0)
     {
         return ret;
     }
@@ -2883,17 +2903,6 @@ int CGXDLMS::HandleGetResponseWithList(
     return 0;
 }
 
-int VerifyInvokeId(CGXDLMSSettings& settings, CGXReplyData& reply)
-{
-    if (reply.GetXml() == NULL && settings.GetAutoIncreaseInvokeID() && reply.GetInvokeId() != GetInvokeIDPriority(settings, false))
-    {
-        //Invalid invoke ID.
-        return DLMS_ERROR_CODE_INVALID_INVOKE_ID;
-    }
-    return 0;
-}
-
-
 int CGXDLMS::HandleGetResponse(
     CGXDLMSSettings& settings,
     CGXReplyData& reply,
@@ -2916,6 +2925,12 @@ int CGXDLMS::HandleGetResponse(
     type = ch;
     // Get invoke ID and priority.
     if ((ret = data.GetUInt8(&ch)) != 0)
+    {
+        return ret;
+    }
+    // Get invoke ID and priority.
+    reply.SetInvokeId(ch);
+    if ((ret = VerifyInvokeId(settings, reply)) != 0)
     {
         return ret;
     }

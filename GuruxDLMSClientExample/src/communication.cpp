@@ -91,7 +91,9 @@ int CGXCommunication::Close()
     int ret;
     std::vector<CGXByteBuffer> data;
     CGXReplyData reply;
-    if (m_hComPort != INVALID_HANDLE_VALUE || m_socket != -1)
+    if ((m_hComPort != INVALID_HANDLE_VALUE || m_socket != -1) &&
+        m_Parser->GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER
+        && m_Parser->GetCiphering()->GetSecurity() == DLMS_SECURITY_NONE)
     {
         if ((ret = m_Parser->ReleaseRequest(data)) != 0 ||
             (ret = ReadDataBlock(data, reply)) != 0)
@@ -611,7 +613,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         }
         if (reply.GetUInt8(&ch) != 0 || ch != '/')
         {
-            return DLMS_ERROR_CODE_SEND_FAILED;
+            return DLMS_ERROR_CODE_RECEIVE_FAILED;
         }
         //Get used baud rate.
         if ((ret = reply.GetUInt8(reply.GetPosition() + 3, &ch)) != 0)

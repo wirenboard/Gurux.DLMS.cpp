@@ -95,8 +95,8 @@ int main(int argc, char* argv[])
         DLMS_AUTHENTICATION authentication = DLMS_AUTHENTICATION_NONE;
         DLMS_INTERFACE_TYPE interfaceType = DLMS_INTERFACE_TYPE_HDLC;
         DLMS_SECURITY security = DLMS_SECURITY_NONE;
-        char *password = NULL;
-        char *p, *p2, *readObjects = NULL;
+        char* password = NULL;
+        char* p, * p2, * readObjects = NULL;
         int index, a, b, c, d, e, f;
         int opt = 0;
         int port = 0;
@@ -170,11 +170,11 @@ int main(int argc, char* argv[])
                 {
                     security = DLMS_SECURITY_NONE;
                 }
-                else if(strcmp("Authentication", optarg) == 0)
+                else if (strcmp("Authentication", optarg) == 0)
                 {
                     security = DLMS_SECURITY_AUTHENTICATION;
                 }
-                else if(strcmp("Encryption", optarg) == 0)
+                else if (strcmp("Encryption", optarg) == 0)
                 {
                     security = DLMS_SECURITY_ENCRYPTION;
                 }
@@ -317,6 +317,7 @@ int main(int argc, char* argv[])
         }
         CGXDLMSSecureClient cl(useLogicalNameReferencing, clientAddress, serverAddress, authentication, password, interfaceType);
         cl.GetCiphering()->SetSecurity(security);
+        cl.SetAutoIncreaseInvokeID(autoIncreaseInvokeID);
         CGXCommunication comm(&cl, 5000, trace, invocationCounter);
 
         if (port != 0 || address != NULL)
@@ -360,8 +361,21 @@ int main(int argc, char* argv[])
 
         if (readObjects != NULL)
         {
-            if ((ret = comm.InitializeConnection()) == 0 &&
-                (ret = comm.GetAssociationView()) == 0)
+            bool read = false;
+            if (outputFile != NULL)
+            {
+                if ((ret = cl.GetObjects().Load(outputFile)) == 0)
+                {
+                    ret = 0;
+                    read = true;
+                }
+            }
+            ret = comm.InitializeConnection();
+            if (ret == 0 && !read)
+            {
+                ret = comm.GetAssociationView();
+            }
+            if (ret == 0)
             {
                 std::string str;
                 std::string value;
@@ -383,30 +397,47 @@ int main(int argc, char* argv[])
 #endif
                     str.append(p, p2 - p);
                     CGXDLMSObject* obj = cl.GetObjects().FindByLN(DLMS_OBJECT_TYPE_ALL, str);
-                    value.clear();
-                    if ((ret = comm.Read(obj, index, value)) != DLMS_ERROR_CODE_OK)
+                    if (obj != NULL)
                     {
+                        value.clear();
+                        if ((ret = comm.Read(obj, index, value)) != DLMS_ERROR_CODE_OK)
+                        {
 #if _MSC_VER > 1000
-                        sprintf_s(buff, 100, "Error! Index: %d %s\r\n", index, CGXDLMSConverter::GetErrorMessage(ret));
+                            sprintf_s(buff, 100, "Error! Index: %d %s\r\n", index, CGXDLMSConverter::GetErrorMessage(ret));
 #else
-                        sprintf(buff, "Error! Index: %d read failed: %s\r\n", index, CGXDLMSConverter::GetErrorMessage(ret));
+                            sprintf(buff, "Error! Index: %d read failed: %s\r\n", index, CGXDLMSConverter::GetErrorMessage(ret));
 #endif
-                        comm.WriteValue(GX_TRACE_LEVEL_ERROR, buff);
-                        //Continue reading.
+                            comm.WriteValue(GX_TRACE_LEVEL_ERROR, buff);
+                            //Continue reading.
+                        }
+                        else
+                        {
+#if _MSC_VER > 1000
+                            sprintf_s(buff, 100, "Index: %d Value: ", index);
+#else
+                            sprintf(buff, "Index: %d Value: ", index);
+#endif
+                            comm.WriteValue(trace, buff);
+                            comm.WriteValue(trace, value.c_str());
+                            comm.WriteValue(trace, "\r\n");
+                        }
                     }
                     else
                     {
 #if _MSC_VER > 1000
-                        sprintf_s(buff, 100, "Index: %d Value: ", index);
+                        sprintf_s(buff, 100, "Unknown object: ", str);
 #else
-                        sprintf(buff, "Index: %d Value: ", index);
+                        sprintf(buff, 100, "Unknown object: ", str);
 #endif
-                        comm.WriteValue(trace, buff);
-                        comm.WriteValue(trace, value.c_str());
-                        comm.WriteValue(trace, "\r\n");
+                        comm.WriteValue(GX_TRACE_LEVEL_ERROR, str);
                     }
-
                 } while ((p = strchr(p, ',')) != NULL);
+                //Close connection.
+                comm.Close();
+                if (outputFile != NULL && ret == 0)
+                {
+                    ret = cl.GetObjects().Save(outputFile);
+                }
             }
         }
         else {
