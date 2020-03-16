@@ -47,7 +47,7 @@ CGXDLMSAutoConnect::CGXDLMSAutoConnect() :
 CGXDLMSAutoConnect::CGXDLMSAutoConnect(std::string ln, unsigned short sn) :
     CGXDLMSObject(DLMS_OBJECT_TYPE_AUTO_CONNECT, ln, sn)
 {
-    m_Mode = AUTO_CONNECT_MODE_NO_AUTO_DIALLING;
+    m_Mode = DLMS_AUTO_CONNECT_MODE_NO_AUTO_CONNECT;
     m_RepetitionDelay = m_Repetitions = 0;
     m_Version = 2;
 }
@@ -58,11 +58,11 @@ CGXDLMSAutoConnect::CGXDLMSAutoConnect(std::string ln) :
 {
 }
 
-AUTO_CONNECT_MODE CGXDLMSAutoConnect::GetMode()
+DLMS_AUTO_CONNECT_MODE CGXDLMSAutoConnect::GetMode()
 {
     return m_Mode;
 }
-void CGXDLMSAutoConnect::SetMode(AUTO_CONNECT_MODE value)
+void CGXDLMSAutoConnect::SetMode(DLMS_AUTO_CONNECT_MODE value)
 {
     m_Mode = value;
 }
@@ -326,7 +326,7 @@ int CGXDLMSAutoConnect::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
     }
     else if (e.GetIndex() == 2)
     {
-        SetMode((AUTO_CONNECT_MODE)e.GetValue().ToInteger());
+        SetMode((DLMS_AUTO_CONNECT_MODE)e.GetValue().ToInteger());
         return DLMS_ERROR_CODE_OK;
     }
     else if (e.GetIndex() == 3)

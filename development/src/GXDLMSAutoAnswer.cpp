@@ -51,16 +51,16 @@ CGXDLMSAutoAnswer::CGXDLMSAutoAnswer(std::string ln, unsigned short sn) :
     CGXDLMSObject(DLMS_OBJECT_TYPE_AUTO_ANSWER, ln, sn)
 {
     m_NumberOfRingsInListeningWindow = m_NumberOfRingsOutListeningWindow = 0;
-    m_Mode = AUTO_CONNECT_MODE_NO_AUTO_DIALLING;
+    m_Mode = DLMS_AUTO_ANSWER_MODE_DEVICE;
     m_Status = AUTO_ANSWER_STATUS_INACTIVE;
     m_NumberOfCalls = 0;
 }
 
-AUTO_CONNECT_MODE CGXDLMSAutoAnswer::GetMode()
+DLMS_AUTO_ANSWER_MODE CGXDLMSAutoAnswer::GetMode()
 {
     return m_Mode;
 }
-void CGXDLMSAutoAnswer::SetMode(AUTO_CONNECT_MODE value)
+void CGXDLMSAutoAnswer::SetMode(DLMS_AUTO_ANSWER_MODE value)
 {
     m_Mode = value;
 }
@@ -315,7 +315,7 @@ int CGXDLMSAutoAnswer::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg&
     }
     if (e.GetIndex() == 2)
     {
-        SetMode((AUTO_CONNECT_MODE)e.GetValue().lVal);
+        SetMode((DLMS_AUTO_ANSWER_MODE)e.GetValue().lVal);
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 3)

@@ -36,7 +36,7 @@
 
 //Constructor.
 CGXDLMSUtilityTables::CGXDLMSUtilityTables() :
-    CGXDLMSUtilityTables("", 0)
+    CGXDLMSUtilityTables("0.0.65.0.0.255", 0)
 {
 }
 

@@ -36,61 +36,19 @@
 
 #include "GXDLMSObject.h"
 
-enum AUTO_CONNECT_MODE
+typedef enum
 {
-    /*
-     * No auto dialling,
-     */
-    AUTO_CONNECT_MODE_NO_AUTO_DIALLING = 0,
-    /*
-    * Auto dialling allowed anytime,
-    */
-    AUTO_CONNECT_MODE_AUTO_DIALLING_ALLOWED_ANYTIME = 1,
-    /*
-    * Auto dialling allowed within the validity time of the calling window.
-    */
-    AUTO_CONNECT_MODE_AUTO_DIALLING_ALLOWED_CALLING_WINDOW = 2,
-    /*
-    * “regular” auto dialling allowed within the validity time
-    * of the calling window; “alarm” initiated auto dialling allowed anytime,
-    */
-    AUTO_CONNECT_MODE_REGULAR_AUTO_DIALLING_ALLOWED_CALLING_WINDOW = 3,
-    /*
-    * SMS sending via Public Land Mobile Network (PLMN),
-    */
-    AUTO_CONNECT_MODE_SMS_SENDING_PLMN = 4,
-    /*
-    * SMS sending via PSTN.
-    */
-    AUTO_CONNECT_MODE_SMS_SENDING_PSTN = 5,
-    /*
-    * Email sending.
-    */
-    AUTO_CONNECT_MODE_EMAIL_SENDING = 6,
-    /*
-    * The device is permanently connected to the communication network.
-    */
-    AUTO_CONNECT_MODE_PERMANENTLY_CONNECT = 101,
-    /*
-    * The device is permanently connected to the communication network. No
-    * connection possible outside the calling window.
-    */
-    AUTO_CONNECT_MODE_CONNECT_WITH_CALLING_WINDOW = 102,
-    /*
-    * The device is permanently connected to the communication network.
-    * Connection is possible as soon as the connect method is invoked.
-    */
-    AUTO_CONNECT_MODE_CONNECT_INVOKED = 103,
-    /*
-    * The device is usually disconnected. It connects to the communication
-    * network as soon as the connect method is invoked
-    */
-    AUTO_CONNECT_MODE_DISCONNECT_CONNECT_INVOKED = 104,
-    /*
-    * (200..255) manufacturer specific modes
-    */
-    AUTO_CONNECT_MODE_MANUFACTURE_SPESIFIC = 200
-};
+    // Line dedicated to the device.
+    DLMS_AUTO_ANSWER_MODE_DEVICE = 0,
+    // Shared line management with a limited number of calls allowed. Once the number of calls is reached,
+    // the window status becomes inactive until the next start date, whatever the result of the call,
+    DLMS_AUTO_ANSWER_MODE_CALL = 1,
+    // Shared line management with a limited number of successful calls allowed. Once the number of
+    //// successful communications is reached, the window status becomes inactive until the next start date,
+    DLMS_AUTO_ANSWER_MODE_CONNECTED = 2,
+    // Currently no modem connected.
+    DLMS_AUTO_ANSWER_MODE_NONE = 3
+} DLMS_AUTO_ANSWER_MODE;
 
 enum AUTO_ANSWER_STATUS
 {
@@ -106,7 +64,7 @@ http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSAutoAnswer
 class CGXDLMSAutoAnswer : public CGXDLMSObject
 {
     int m_NumberOfRingsInListeningWindow, m_NumberOfRingsOutListeningWindow;
-    AUTO_CONNECT_MODE m_Mode;
+    DLMS_AUTO_ANSWER_MODE m_Mode;
     std::vector<std::pair< CGXDateTime, CGXDateTime> > m_ListeningWindow;
     AUTO_ANSWER_STATUS m_Status;
     int m_NumberOfCalls;
@@ -131,8 +89,8 @@ public:
     */
     CGXDLMSAutoAnswer(std::string ln, unsigned short sn);
 
-    AUTO_CONNECT_MODE GetMode();
-    void SetMode(AUTO_CONNECT_MODE value);
+    DLMS_AUTO_ANSWER_MODE GetMode();
+    void SetMode(DLMS_AUTO_ANSWER_MODE value);
 
     std::vector<std::pair< CGXDateTime, CGXDateTime> >& GetListeningWindow();
     void SetListeningWindow(std::vector<std::pair< CGXDateTime, CGXDateTime> >& value);

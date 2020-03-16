@@ -36,7 +36,62 @@
 #define GXDLMSAUTOCONNECT_H
 
 #include "GXDLMSObject.h"
-#include "GXDLMSAutoAnswer.h"
+
+typedef enum
+{
+    /*
+     * The device never connects.
+     */
+    DLMS_AUTO_CONNECT_MODE_NO_AUTO_CONNECT = 0,
+    /**
+     * Auto dialling allowed anytime,
+    */
+    DLMS_AUTO_CONNECT_MODE_AUTO_DIALLING_ALLOWED_ANYTIME = 1,
+    /**
+     * Auto dialling allowed within the validity time of the calling window.
+    */
+    DLMS_AUTO_CONNECT_MODE_AUTO_DIALLING_ALLOWED_CALLING_WINDOW = 2,
+    /**
+     * Regular auto dialling allowed within the validity time
+     * of the calling window; alarm initiated auto dialling allowed anytime,
+    */
+    DLMS_AUTO_CONNECT_MODE_REGULAR_AUTO_DIALLING_ALLOWED_CALLING_WINDOW = 3,
+    /**
+     * SMS sending via Public Land Mobile Network (PLMN),
+    */
+    DLMS_AUTO_CONNECT_MODE_SMS_SENDING_PLMN = 4,
+    /*
+     * SMS sending via PSTN.
+    */
+    DLMS_AUTO_CONNECT_MODE_SMS_SENDING_PSTN = 5,
+    /*
+     * Email sending.
+    */
+    DLMS_AUTO_CONNECT_MODE_EMAIL_SENDING = 6,
+    /*
+   * The device is permanently connected to the communication network.
+   */
+   DLMS_AUTO_CONNECT_MODE_PERMANENTLY_CONNECT = 101,
+   /*
+   * The device is permanently connected to the communication network. No
+   * connection possible outside the calling window.
+   */
+   DLMS_AUTO_CONNECT_MODE_CONNECT_WITH_CALLING_WINDOW = 102,
+   /*
+   * The device is permanently connected to the communication network.
+   * Connection is possible as soon as the connect method is invoked.
+   */
+   DLMS_AUTO_CONNECT_MODE_CONNECT_INVOKED = 103,
+   /*
+   * The device is usually disconnected. It connects to the communication
+   * network as soon as the connect method is invoked
+   */
+   DLMS_AUTO_CONNECT_MODE_DISCONNECT_CONNECT_INVOKED = 104,
+   /*
+   * (200..255) manufacturer specific modes
+   */
+   DLMS_AUTO_CONNECT_MODE_MANUFACTURE_SPESIFIC = 200
+} DLMS_AUTO_CONNECT_MODE;
 
 /**
 Online help:
@@ -44,7 +99,7 @@ http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSAutoConnect
 */
 class CGXDLMSAutoConnect : public CGXDLMSObject
 {
-    AUTO_CONNECT_MODE m_Mode;
+    DLMS_AUTO_CONNECT_MODE m_Mode;
     std::vector<std::pair< CGXDateTime, CGXDateTime> > m_CallingWindow;
     std::vector< std::string > m_Destinations;
     int m_RepetitionDelay;
@@ -60,8 +115,8 @@ public:
     //LN Constructor.
     CGXDLMSAutoConnect(std::string ln);
 
-    AUTO_CONNECT_MODE GetMode();
-    void SetMode(AUTO_CONNECT_MODE value);
+    DLMS_AUTO_CONNECT_MODE GetMode();
+    void SetMode(DLMS_AUTO_CONNECT_MODE value);
 
     int GetRepetitions();
 
