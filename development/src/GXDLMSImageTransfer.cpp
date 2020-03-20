@@ -159,7 +159,7 @@ int CGXDLMSImageTransfer::ImageTransferInitiate(CGXDLMSClient* client, unsigned 
         (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT32, size)) == 0)
     {
         CGXDLMSVariant tmp = data;
-        ret = client->Method(this, 1, tmp, reply);
+        ret = client->Method(this, 1, tmp, DLMS_DATA_TYPE_ARRAY, reply);
     }
     return ret;
 }
@@ -222,7 +222,7 @@ int CGXDLMSImageTransfer::ImageBlockTransfer(CGXDLMSClient* client, CGXByteBuffe
         for (std::vector<CGXByteBuffer>::iterator it = blocks.begin(); it != blocks.end(); ++it)
         {
             tmp = *it;
-            if ((ret = client->Method(this, 2, tmp, reply)) != 0)
+            if ((ret = client->Method(this, 2, tmp, DLMS_DATA_TYPE_ARRAY, reply)) != 0)
             {
                 break;
             }

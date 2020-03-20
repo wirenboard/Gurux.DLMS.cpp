@@ -59,6 +59,10 @@ static void ShowHelp()
     printf(" -v \t Invocation counter data object Logical Name. Ex. 0.0.43.1.1.255");
     printf(" -I \t Auto increase invoke ID");
     printf(" -o \t Cache association view to make reading faster. Ex. -o C:\\device.xml");
+    printf(" -T \t System title that is used with chiphering. Ex -D 4775727578313233");
+    printf(" -A \t Authentication key that is used with chiphering. Ex -D D0D1D2D3D4D5D6D7D8D9DADBDCDDDEDF");
+    printf(" -B \t Block cipher key that is used with chiphering. Ex -D 000102030405060708090A0B0C0D0E0F");
+    printf(" -D \t Dedicated key that is used with chiphering. Ex -D 00112233445566778899AABBCCDDEEFF");
     printf("Example:\r\n");
     printf("Read LG device using TCP/IP connection.\r\n");
     printf("GuruxDlmsSample -r SN -c 16 -s 1 -h [Meter IP Address] -p [Meter Port No]\r\n");
@@ -106,7 +110,12 @@ int main(int argc, char* argv[])
         bool autoIncreaseInvokeID = false;
         char* invocationCounter = NULL;
         char* outputFile = NULL;
-        while ((opt = getopt(argc, argv, "h:p:c:s:r:iIt:a:wP:g:S:n:C:v:o:")) != -1)
+        char* systemTitle = NULL;
+        char* authenticationKey = NULL;
+        char* blockCipherKey = NULL;
+        char* dedicatedKey = NULL;
+
+        while ((opt = getopt(argc, argv, "h:p:c:s:r:iIt:a:wP:g:S:n:C:v:o:T:A:B:D:")) != -1)
         {
             switch (opt)
             {
@@ -187,6 +196,18 @@ int main(int argc, char* argv[])
                     printf("Invalid Ciphering option '%s'. (None, Authentication, Encryption, AuthenticationEncryption)", optarg);
                     return 1;
                 }
+                break;
+            case 'T':
+                systemTitle = optarg;
+                break;
+            case 'A':
+                authenticationKey = optarg;
+                break;
+            case 'B':
+                blockCipherKey = optarg;
+                break;
+            case 'D':
+                dedicatedKey = optarg;
                 break;
             case 'o':
                 outputFile = optarg;
@@ -303,6 +324,18 @@ int main(int argc, char* argv[])
                 else if (optarg[0] == 'v') {
                     printf("Missing mandatory invocation counter logical name option.\n");
                 }
+                else if (optarg[0] == 'T') {
+                    printf("Missing mandatory system title option.");
+                }
+                else if (optarg[0] == 'A') {
+                    printf("Missing mandatory authentication key option.");
+                }
+                else if (optarg[0] == 'B') {
+                    printf("Missing mandatory block cipher key option.");
+                }
+                else if (optarg[0] == 'D') {
+                    printf("Missing mandatory dedicated key option.");
+                }
                 else
                 {
                     ShowHelp();
@@ -318,6 +351,31 @@ int main(int argc, char* argv[])
         CGXDLMSSecureClient cl(useLogicalNameReferencing, clientAddress, serverAddress, authentication, password, interfaceType);
         cl.GetCiphering()->SetSecurity(security);
         cl.SetAutoIncreaseInvokeID(autoIncreaseInvokeID);
+        CGXByteBuffer bb;
+        if (systemTitle != NULL)
+        {
+            bb.Clear();
+            bb.SetHexString(systemTitle);
+            cl.GetCiphering()->SetSystemTitle(bb);
+        }
+        if (authenticationKey != NULL)
+        {
+            bb.Clear();
+            bb.SetHexString(authenticationKey);
+            cl.GetCiphering()->SetAuthenticationKey(bb);
+        }
+        if (blockCipherKey != NULL)
+        {
+            bb.Clear();
+            bb.SetHexString(blockCipherKey);
+            cl.GetCiphering()->SetBlockCipherKey(bb);
+        }
+        if (dedicatedKey != NULL)
+        {
+            bb.Clear();
+            bb.SetHexString(dedicatedKey);
+            cl.GetCiphering()->SetDedicatedKey(bb);
+        }
         CGXCommunication comm(&cl, 5000, trace, invocationCounter);
 
         if (port != 0 || address != NULL)
@@ -425,10 +483,11 @@ int main(int argc, char* argv[])
                     else
                     {
 #if _MSC_VER > 1000
-                        sprintf_s(buff, 100, "Unknown object: ", str);
+                        sprintf_s(buff, 100, "Unknown object: %s", str.c_str());
 #else
-                        sprintf(buff, 100, "Unknown object: ", str);
+                        sprintf(buff, 100, "Unknown object: %s", str.c_str());
 #endif
+                        str = buff;
                         comm.WriteValue(GX_TRACE_LEVEL_ERROR, str);
                     }
                 } while ((p = strchr(p, ',')) != NULL);
