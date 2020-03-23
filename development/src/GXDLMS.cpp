@@ -2097,7 +2097,7 @@ int CGXDLMS::HandleSetResponse(
     {
         return ret;
     }
-    data.SetInvokeId(ch);
+    data.SetInvokeId(invokeId);
     if ((ret = VerifyInvokeId(settings, data)) != 0)
     {
         return ret;
