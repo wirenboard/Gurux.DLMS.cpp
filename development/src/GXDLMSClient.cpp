@@ -314,7 +314,9 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
     return ret;
 }
 
-int CGXDLMSClient::ParseSNObjectItem(CGXDLMSVariant& value)
+int CGXDLMSClient::ParseSNObjectItem(
+    CGXDLMSVariant& value,
+    bool ignoreInactiveObjects)
 {
     if (value.vt != DLMS_DATA_TYPE_STRUCTURE || value.Arr.size() != 4)
     {
@@ -327,7 +329,7 @@ int CGXDLMSClient::ParseSNObjectItem(CGXDLMSVariant& value)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    short sn = value.Arr[0].ToInteger();
+    short sn = value.Arr[0].ToInteger() & 0xFFFF;
     unsigned short class_id = (unsigned short)value.Arr[1].ToInteger();
     unsigned char version = (unsigned char)value.Arr[2].ToInteger();
     CGXDLMSVariant ln = value.Arr[3];
@@ -339,13 +341,23 @@ int CGXDLMSClient::ParseSNObjectItem(CGXDLMSVariant& value)
         int cnt = ln.GetSize();
         assert(cnt == 6);
         CGXDLMSObject::SetLogicalName(pObj, ln);
+        std::string ln2;
+        pObj->GetLogicalName(ln2);
+        if (ignoreInactiveObjects && ln2.compare("0.0.127.0.0.0") == 0)
+        {
+            delete pObj;
+            return 0;
+        }
         m_Settings.GetObjects().push_back(pObj);
     }
     return 0;
 }
 
 // SN referencing
-int CGXDLMSClient::ParseSNObjects(CGXByteBuffer& buff, bool onlyKnownObjects)
+int CGXDLMSClient::ParseSNObjects(
+    CGXByteBuffer& buff,
+    bool onlyKnownObjects,
+    bool ignoreInactiveObjects)
 {
     int ret;
     CGXDataInfo info;
@@ -372,7 +384,7 @@ int CGXDLMSClient::ParseSNObjects(CGXByteBuffer& buff, bool onlyKnownObjects)
     {
         info.Clear();
         if ((ret = GXHelpers::GetData(buff, info, value)) != 0 ||
-            (ret = ParseSNObjectItem(value)) != 0)
+            (ret = ParseSNObjectItem(value, ignoreInactiveObjects)) != 0)
         {
             return ret;
         }
@@ -380,7 +392,9 @@ int CGXDLMSClient::ParseSNObjects(CGXByteBuffer& buff, bool onlyKnownObjects)
     return 0;
 }
 
-int CGXDLMSClient::ParseLNObjectItem(CGXDLMSVariant& value)
+int CGXDLMSClient::ParseLNObjectItem(
+    CGXDLMSVariant& value,
+    bool ignoreInactiveObjects)
 {
     int ret;
     if (value.Arr.size() != 4)
@@ -412,6 +426,17 @@ int CGXDLMSClient::ParseLNObjectItem(CGXDLMSVariant& value)
                 return DLMS_ERROR_CODE_INVALID_PARAMETER;
             }
             CGXDLMSVariant ln = value.Arr[2];
+            if ((ret = CGXDLMSObject::SetLogicalName(pObj, ln)) != 0)
+            {
+                return ret;
+            }
+            std::string ln2;
+            pObj->GetLogicalName(ln2);
+            if (ignoreInactiveObjects && ln2.compare("0.0.127.0.0.0") == 0)
+            {
+                delete pObj;
+                return 0;
+            }
             //Get Access rights...
             if (value.Arr[3].vt != DLMS_DATA_TYPE_STRUCTURE || value.Arr[3].Arr.size() != 2)
             {
@@ -489,17 +514,13 @@ int CGXDLMSClient::ParseLNObjectItem(CGXDLMSVariant& value)
             // method_access_item End
             cnt = ln.GetSize();
             assert(cnt == 6);
-            if ((ret = CGXDLMSObject::SetLogicalName(pObj, ln)) != 0)
-            {
-                return ret;
-            }
             m_Settings.GetObjects().push_back(pObj);
         }
     }
     return 0;
 }
 
-int CGXDLMSClient::ParseLNObjects(CGXByteBuffer& buff, bool onlyKnownObjects)
+int CGXDLMSClient::ParseLNObjects(CGXByteBuffer& buff, bool onlyKnownObjects, bool ignoreInactiveObjects)
 {
     int ret;
     unsigned long cnt;
@@ -533,7 +554,7 @@ int CGXDLMSClient::ParseLNObjects(CGXByteBuffer& buff, bool onlyKnownObjects)
         info.SetIndex(0);
         info.SetCount(0);
         if ((ret = GXHelpers::GetData(buff, info, value)) != 0 ||
-            (ret = ParseLNObjectItem(value)) != 0)
+            (ret = ParseLNObjectItem(value, ignoreInactiveObjects)) != 0)
         {
             return ret;
         }
@@ -543,18 +564,23 @@ int CGXDLMSClient::ParseLNObjects(CGXByteBuffer& buff, bool onlyKnownObjects)
 
 int CGXDLMSClient::ParseObjects(CGXByteBuffer& data, bool onlyKnownObjects)
 {
+    return ParseObjects(data, onlyKnownObjects, true);
+}
+
+int CGXDLMSClient::ParseObjects(CGXByteBuffer& data, bool onlyKnownObjects, bool ignoreInactiveObjects)
+{
     int ret;
     m_Settings.GetObjects().Free();
     if (GetUseLogicalNameReferencing())
     {
-        if ((ret = ParseLNObjects(data, onlyKnownObjects)) != 0)
+        if ((ret = ParseLNObjects(data, onlyKnownObjects, ignoreInactiveObjects)) != 0)
         {
             return ret;
         }
     }
     else
     {
-        if ((ret = ParseSNObjects(data, onlyKnownObjects)) != 0)
+        if ((ret = ParseSNObjects(data, onlyKnownObjects, ignoreInactiveObjects)) != 0)
         {
             return ret;
         }
@@ -564,13 +590,18 @@ int CGXDLMSClient::ParseObjects(CGXByteBuffer& data, bool onlyKnownObjects)
 
 int CGXDLMSClient::ParseObjects(std::vector<CGXDLMSVariant>& objects, bool onlyKnownObjects)
 {
+    return ParseObjects(objects, onlyKnownObjects, true);
+}
+
+int CGXDLMSClient::ParseObjects(std::vector<CGXDLMSVariant>& objects, bool onlyKnownObjects, bool ignoreInactiveObjects)
+{
     int ret;
     m_Settings.GetObjects().Free();
     if (GetUseLogicalNameReferencing())
     {
         for (std::vector< CGXDLMSVariant >::iterator it = objects.begin(); it != objects.end(); ++it)
         {
-            if ((ret = ParseLNObjectItem(*it)) != 0)
+            if ((ret = ParseLNObjectItem(*it, ignoreInactiveObjects)) != 0)
             {
                 return ret;
             }
@@ -580,7 +611,7 @@ int CGXDLMSClient::ParseObjects(std::vector<CGXDLMSVariant>& objects, bool onlyK
     {
         for (std::vector< CGXDLMSVariant >::iterator it = objects.begin(); it != objects.end(); ++it)
         {
-            if ((ret = ParseSNObjectItem(*it)) != 0)
+            if ((ret = ParseSNObjectItem(*it, ignoreInactiveObjects)) != 0)
             {
                 return ret;
             }
@@ -1326,7 +1357,7 @@ int CGXDLMSClient::WriteList(
             DLMS_COMMAND_SET_REQUEST, DLMS_SET_COMMAND_TYPE_WITH_LIST,
             &bb, NULL, 0xff, DLMS_COMMAND_NONE);
         // Add length.
-        GXHelpers::SetObjectCount((unsigned long) list.size(), bb);
+        GXHelpers::SetObjectCount((unsigned long)list.size(), bb);
         for (std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = list.begin(); it != list.end(); ++it)
         {
             // CI.

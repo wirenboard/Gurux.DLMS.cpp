@@ -2753,6 +2753,17 @@ int CGXDLMS::GetPdu(
             default:
                 break;
             }
+            if (cmd == DLMS_COMMAND_READ_RESPONSE && data.GetTotalCount() > 1)
+            {
+                if ((ret = HandleReadResponse(settings, data, 0)) != 0)
+                {
+                    if (ret == DLMS_ERROR_CODE_FALSE)
+                    {
+                        ret = 0;
+                    }
+                    return ret;
+                }
+            }
         }
     }
 
@@ -3252,36 +3263,29 @@ int CGXDLMS::HandleReadResponse(
         reply.GetXml()->IntegerToHex(cnt, 2, str);
         reply.GetXml()->AppendStartTag(DLMS_COMMAND_READ_RESPONSE, "Qty", str);
     }
+    if (cnt != 1)
+    {
+        //Parse data after all data is received when readlist is used.
+        if (reply.IsMoreData())
+        {
+            GetDataFromBlock(reply.GetData(), 0);
+            return DLMS_ERROR_CODE_FALSE;
+        }
+        reply.GetData().SetPosition(0);
+    }
     DLMS_SINGLE_READ_RESPONSE type;
     CGXDLMSVariant values;
     values.vt = DLMS_DATA_TYPE_ARRAY;
     bool standardXml = reply.GetXml() != NULL && reply.GetXml()->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML;
     for (pos = 0; pos != cnt; ++pos)
     {
-        if (reply.GetData().Available() == 0)
+        // Get response type code.
+        if ((ret = reply.GetData().GetUInt8(&ch)) != 0)
         {
-            if (cnt != 1)
-            {
-                GetDataFromBlock(reply.GetData(), 0);
-                reply.SetValue(values);
-                reply.SetReadPosition(reply.GetData().GetPosition());
-            }
-            return DLMS_ERROR_CODE_FALSE;
+            return ret;
         }
-        // Get status code. Status code is begin of each PDU.
-        if (first)
-        {
-            if ((ret = reply.GetData().GetUInt8(&ch)) != 0)
-            {
-                return ret;
-            }
-            reply.SetCommandType(ch);
-            type = (DLMS_SINGLE_READ_RESPONSE)ch;
-        }
-        else
-        {
-            type = (DLMS_SINGLE_READ_RESPONSE)reply.GetCommandType();
-        }
+        reply.SetCommandType(ch);
+        type = (DLMS_SINGLE_READ_RESPONSE)ch;
         switch (type)
         {
         case DLMS_SINGLE_READ_RESPONSE_DATA:
@@ -3314,21 +3318,6 @@ int CGXDLMS::HandleReadResponse(
                 // If read multiple items.
                 reply.SetReadPosition(reply.GetData().GetPosition());
                 GetValueFromData(settings, reply);
-                if (reply.GetData().GetPosition() == reply.GetReadPosition())
-                {
-                    // If multiple values remove DLMS_COMMAND_
-                    if (cnt != 1 && reply.GetTotalCount() == 0)
-                    {
-                        ++index;
-                    }
-                    reply.SetTotalCount(0);
-                    reply.GetData().SetPosition(index);
-                    GetDataFromBlock(reply.GetData(), 0);
-                    reply.GetValue().Clear();
-                    // Ask that data is parsed after last block is received.
-                    reply.SetCommandType(DLMS_SINGLE_READ_RESPONSE_DATA_BLOCK_RESULT);
-                    return DLMS_ERROR_CODE_FALSE;
-                }
                 reply.GetData().SetPosition(reply.GetReadPosition());
                 values.Arr.push_back(reply.GetValue());
                 reply.GetValue().Clear();

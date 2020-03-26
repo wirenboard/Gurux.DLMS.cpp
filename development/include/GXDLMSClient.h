@@ -49,12 +49,15 @@ private:
     bool m_IsAuthenticationRequired;
     static void UpdateOBISCodes(CGXDLMSObjectCollection& objects);
     // SN referencing
-    int ParseSNObjects(CGXByteBuffer& buff, bool onlyKnownObjects);
+    int ParseSNObjects(
+        CGXByteBuffer& buff,
+        bool onlyKnownObjects,
+        bool ignoreInactiveObjects);
 
     //Parse SN object item.
-    int ParseSNObjectItem(CGXDLMSVariant& value);
+    int ParseSNObjectItem(CGXDLMSVariant& value, bool ignoreInactiveObjects);
     //Parse LN object item.
-    int ParseLNObjectItem(CGXDLMSVariant& value);
+    int ParseLNObjectItem(CGXDLMSVariant& value, bool ignoreInactiveObjects);
 
     /**
     * Parse LN objects.
@@ -67,7 +70,8 @@ private:
     */
     int ParseLNObjects(
         CGXByteBuffer& buff,
-        bool onlyKnownObjects);
+        bool onlyKnownObjects,
+        bool ignoreInactiveObjects);
 
     /**
     * Generates a read message.
@@ -348,6 +352,19 @@ public:
     /**
     * Parses the COSEM objects of the received data.
     *
+    * objects : Read objects.
+    * objects : Collection of COSEM objects.
+    * onlyKnownObjects : Only known objects are parsed.
+    * ignoreInactiveObjects : Inactivity objects are ignored.
+    */
+    int ParseObjects(
+        std::vector<CGXDLMSVariant>& objects,
+        bool onlyKnownObjects,
+        bool ignoreInactiveObjects);
+
+    /**
+    * Parses the COSEM objects of the received data.
+    *
     * data : Received data, from the device, as byte array.
     * objects : Collection of COSEM objects.
     * onlyKnownObjects : Only known objects are parsed.
@@ -355,6 +372,19 @@ public:
     int ParseObjects(
         CGXByteBuffer& data,
         bool onlyKnownObjects);
+
+    /**
+    * Parses the COSEM objects of the received data.
+    *
+    * data : Received data, from the device, as byte array.
+    * objects : Collection of COSEM objects.
+    * onlyKnownObjects : Only known objects are parsed.
+    * ignoreInactiveObjects : Inactivity objects are ignored.
+    */
+    int ParseObjects(
+        CGXByteBuffer& data,
+        bool onlyKnownObjects,
+        bool ignoreInactiveObjects);
 
     /*
     * Get Value from byte array received from the meter.
