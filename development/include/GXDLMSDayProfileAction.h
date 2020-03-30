@@ -52,7 +52,7 @@ public:
     /**
      Constructor.
     */
-    CGXDLMSDayProfileAction(CGXTime& startTime, std::string scriptLogicalName, int scriptSelector);
+    CGXDLMSDayProfileAction(CGXTime& startTime, std::string& scriptLogicalName, int scriptSelector);
 
     /**
      Defines the time when the script is to be executed.
@@ -63,8 +63,8 @@ public:
     /**
      Defines the logical name of the "Script table" object;
     */
-    std::string GetScriptLogicalName();
-    void SetScriptLogicalName(std::string value);
+    std::string& GetScriptLogicalName();
+    void SetScriptLogicalName(std::string& value);
 
     /**
      Defines the script_identifier of the script to be executed.

@@ -50,9 +50,9 @@ public:
     {
         m_LogicalName.clear();
     }
-    std::string GetLogicalName();
+    std::string& GetLogicalName();
 
-    void SetLogicalName(std::string value);
+    void SetLogicalName(std::string& value);
 
     int GetScriptSelector();
 

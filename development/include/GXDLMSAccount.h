@@ -372,7 +372,7 @@ public:
      *
      * @return Credit references.
      */
-    std::vector<std::string>& getCreditReferences()
+    std::vector<std::string>& GetCreditReferences()
     {
         return m_CreditReferences;
     }

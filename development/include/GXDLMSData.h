@@ -55,7 +55,7 @@ public:
     CGXDLMSData(std::string ln);
 
     // Get value of COSEM Data object.
-    CGXDLMSVariant GetValue();
+    CGXDLMSVariant& GetValue();
 
     // Set value of COSEM Data object.
     void SetValue(CGXDLMSVariant& value);

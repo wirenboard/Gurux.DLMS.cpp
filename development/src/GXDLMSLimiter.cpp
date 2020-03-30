@@ -78,7 +78,7 @@ CGXDLMSVariant& CGXDLMSLimiter::GetThresholdActive()
 {
     return m_ThresholdActive;
 }
-void CGXDLMSLimiter::SetThresholdActive(CGXDLMSVariant value)
+void CGXDLMSLimiter::SetThresholdActive(CGXDLMSVariant& value)
 {
     m_ThresholdActive = value;
 }
@@ -91,7 +91,7 @@ CGXDLMSVariant& CGXDLMSLimiter::GetThresholdNormal()
 {
     return m_ThresholdNormal;
 }
-void CGXDLMSLimiter::SetThresholdNormal(CGXDLMSVariant value)
+void CGXDLMSLimiter::SetThresholdNormal(CGXDLMSVariant& value)
 {
     m_ThresholdNormal = value;
 }
@@ -104,7 +104,7 @@ CGXDLMSVariant& CGXDLMSLimiter::GetThresholdEmergency()
 {
     return m_ThresholdEmergency;
 }
-void CGXDLMSLimiter::SetThresholdEmergency(CGXDLMSVariant value)
+void CGXDLMSLimiter::SetThresholdEmergency(CGXDLMSVariant& value)
 {
     m_ThresholdEmergency = value;
 }

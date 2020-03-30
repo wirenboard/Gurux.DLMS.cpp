@@ -38,7 +38,7 @@
 
 CGXDLMSObjectDefinition::CGXDLMSObjectDefinition()
 {
-
+    m_ObjectType = DLMS_OBJECT_TYPE_NONE;
 }
 
 /*
@@ -46,27 +46,27 @@ CGXDLMSObjectDefinition::CGXDLMSObjectDefinition()
  */
 CGXDLMSObjectDefinition::CGXDLMSObjectDefinition(DLMS_OBJECT_TYPE classId, std::string logicalName)
 {
-    m_ClassId = classId;
+    m_ObjectType = classId;
     m_LogicalName = logicalName;
 }
 
 std::string CGXDLMSObjectDefinition::ToString()
 {
     std::stringstream sb;
-    sb << CGXDLMSConverter::ToString(m_ClassId);
+    sb << CGXDLMSConverter::ToString(m_ObjectType);
     sb << " ";
     sb << m_LogicalName.c_str();
     return sb.str();
 }
 
-DLMS_OBJECT_TYPE CGXDLMSObjectDefinition::GetClassId()
+DLMS_OBJECT_TYPE CGXDLMSObjectDefinition::GetObjectType()
 {
-    return m_ClassId;
+    return m_ObjectType;
 }
 
-void CGXDLMSObjectDefinition::SetClassId(DLMS_OBJECT_TYPE value)
+void CGXDLMSObjectDefinition::SetObjectType(DLMS_OBJECT_TYPE value)
 {
-    m_ClassId = value;
+    m_ObjectType = value;
 }
 
 std::string CGXDLMSObjectDefinition::GetLogicalName()

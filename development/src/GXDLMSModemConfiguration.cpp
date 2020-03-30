@@ -89,7 +89,7 @@ void CGXDLMSModemConfiguration::SetInitialisationStrings(std::vector<CGXDLMSMode
     m_InitialisationStrings = value;
 }
 
-std::vector< std::string > CGXDLMSModemConfiguration::GetModemProfile()
+std::vector< std::string >& CGXDLMSModemConfiguration::GetModemProfile()
 {
     return m_ModemProfile;
 }
@@ -137,16 +137,8 @@ void CGXDLMSModemConfiguration::GetValues(std::vector<std::string>& values)
     //Clear str.
     sb.str(std::string());
     sb << '[';
-    empty = true;
-    for (std::vector< std::string >::iterator it = m_ModemProfile.begin(); it != m_ModemProfile.end(); ++it)
-    {
-        if (!empty)
-        {
-            sb << ", ";
-        }
-        empty = false;
-        sb.write(it->c_str(), it->size());
-    }
+    GXHelpers::Join(", ", m_ModemProfile, ln);
+    sb << ln;
     sb << ']';
     values.push_back(sb.str());
 

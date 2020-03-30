@@ -71,27 +71,27 @@ CGXDLMSDemandRegister::CGXDLMSDemandRegister(std::string ln, unsigned short sn) 
 }
 
 /**
- Current avarage value of COSEM Data object.
+ Current Average value of COSEM Data object.
 */
-CGXDLMSVariant CGXDLMSDemandRegister::GetCurrentAvarageValue()
+CGXDLMSVariant& CGXDLMSDemandRegister::GetCurrentAverageValue()
 {
-    return m_CurrentAvarageValue;
+    return m_CurrentAverageValue;
 }
-void CGXDLMSDemandRegister::SetCurrentAvarageValue(CGXDLMSVariant value)
+void CGXDLMSDemandRegister::SetCurrentAverageValue(CGXDLMSVariant& value)
 {
-    m_CurrentAvarageValue = value;
+    m_CurrentAverageValue = value;
 }
 
 /**
- Last avarage value of COSEM Data object.
+ Last Average value of COSEM Data object.
 */
-CGXDLMSVariant CGXDLMSDemandRegister::GetLastAvarageValue()
+CGXDLMSVariant& CGXDLMSDemandRegister::GetLastAverageValue()
 {
-    return m_LastAvarageValue;
+    return m_LastAverageValue;
 }
-void CGXDLMSDemandRegister::SetLastAvarageValue(CGXDLMSVariant value)
+void CGXDLMSDemandRegister::SetLastAverageValue(CGXDLMSVariant& value)
 {
-    m_LastAvarageValue = value;
+    m_LastAverageValue = value;
 }
 
 /**
@@ -121,11 +121,11 @@ void CGXDLMSDemandRegister::SetUnit(unsigned char value)
 /**
  Scaler of COSEM Register object.
 */
-CGXDLMSVariant CGXDLMSDemandRegister::GetStatus()
+CGXDLMSVariant& CGXDLMSDemandRegister::GetStatus()
 {
     return m_Status;
 }
-void CGXDLMSDemandRegister::SetStatus(CGXDLMSVariant value)
+void CGXDLMSDemandRegister::SetStatus(CGXDLMSVariant& value)
 {
     m_Status = value;
 }
@@ -133,7 +133,7 @@ void CGXDLMSDemandRegister::SetStatus(CGXDLMSVariant value)
 /**
  Capture time of COSEM Register object.
 */
-CGXDateTime CGXDLMSDemandRegister::GetCaptureTime()
+CGXDateTime& CGXDLMSDemandRegister::GetCaptureTime()
 {
     return m_CaptureTime;
 }
@@ -145,11 +145,11 @@ void CGXDLMSDemandRegister::SetCaptureTime(CGXDateTime value)
 /**
  Current start time of COSEM Register object.
 */
-CGXDateTime CGXDLMSDemandRegister::GetStartTimeCurrent()
+CGXDateTime& CGXDLMSDemandRegister::GetStartTimeCurrent()
 {
     return m_StartTimeCurrent;
 }
-void CGXDLMSDemandRegister::SetStartTimeCurrent(CGXDateTime value)
+void CGXDLMSDemandRegister::SetStartTimeCurrent(CGXDateTime& value)
 {
     m_StartTimeCurrent = value;
 }
@@ -196,8 +196,8 @@ void CGXDLMSDemandRegister::GetValues(std::vector<std::string>& values)
     std::string ln;
     GetLogicalName(ln);
     values.push_back(ln);
-    values.push_back(m_CurrentAvarageValue.ToString());
-    values.push_back(m_LastAvarageValue.ToString());
+    values.push_back(m_CurrentAverageValue.ToString());
+    values.push_back(m_LastAverageValue.ToString());
     std::string str = "Scaler: ";
     //if there is no fractal part.
     double s = GetScaler();
@@ -231,12 +231,12 @@ void CGXDLMSDemandRegister::GetAttributeIndexToRead(bool all, std::vector<int>& 
     {
         attributes.push_back(4);
     }
-    //CurrentAvarageValue
+    //CurrentAverageValue
     if (all || CanRead(2))
     {
         attributes.push_back(2);
     }
-    //LastAvarageValue
+    //LastAverageValue
     if (all || CanRead(3))
     {
         attributes.push_back(3);
@@ -354,7 +354,7 @@ int CGXDLMSDemandRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     if (e.GetIndex() == 2)
     {
-        tmp = m_CurrentAvarageValue;
+        tmp = m_CurrentAverageValue;
         if (m_Scaler != 0)
         {
             DLMS_DATA_TYPE dt;
@@ -364,13 +364,13 @@ int CGXDLMSDemandRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
             }
             if (dt == DLMS_DATA_TYPE_NONE)
             {
-                dt = m_CurrentAvarageValue.vt;
+                dt = m_CurrentAverageValue.vt;
             }
             if ((ret = tmp.ChangeType(DLMS_DATA_TYPE_FLOAT64)) != 0)
             {
                 return ret;
             }
-            tmp = m_CurrentAvarageValue.dblVal / GetScaler();
+            tmp = m_CurrentAverageValue.dblVal / GetScaler();
             if ((ret = tmp.ChangeType(dt)) != 0)
             {
                 return ret;
@@ -381,7 +381,7 @@ int CGXDLMSDemandRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     if (e.GetIndex() == 3)
     {
-        tmp = m_LastAvarageValue;
+        tmp = m_LastAverageValue;
         if (m_Scaler != 0)
         {
             DLMS_DATA_TYPE dt;
@@ -391,13 +391,13 @@ int CGXDLMSDemandRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
             }
             if (dt == DLMS_DATA_TYPE_NONE)
             {
-                dt = m_LastAvarageValue.vt;
+                dt = m_LastAverageValue.vt;
             }
             if ((ret = tmp.ChangeType(DLMS_DATA_TYPE_FLOAT64)) != 0)
             {
                 return ret;
             }
-            tmp = m_LastAvarageValue.dblVal / GetScaler();
+            tmp = m_LastAverageValue.dblVal / GetScaler();
             if ((ret = tmp.ChangeType(dt)) != 0)
             {
                 return ret;
@@ -450,39 +450,30 @@ int CGXDLMSDemandRegister::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
 
 int CGXDLMSDemandRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
-    int ret;
     if (e.GetIndex() == 1)
     {
         return SetLogicalName(this, e.GetValue());
     }
     else if (e.GetIndex() == 2)
     {
-        if ((ret = CGXDLMSObject::SetDataType(2, e.GetValue().vt)) != 0)
-        {
-            return ret;
-        }
         if (m_Scaler != 0 && e.GetValue().IsNumber())
         {
-            SetCurrentAvarageValue(CGXDLMSVariant(e.GetValue().ToDouble() * GetScaler()));
+            m_CurrentAverageValue = e.GetValue().ToDouble() * GetScaler();
         }
         else
         {
-            SetCurrentAvarageValue(e.GetValue());
+            m_CurrentAverageValue = e.GetValue();
         }
     }
     else if (e.GetIndex() == 3)
     {
-        if ((ret = CGXDLMSObject::SetDataType(3, e.GetValue().vt)) != 0)
-        {
-            return ret;
-        }
         if (m_Scaler != 0 && e.GetValue().IsNumber())
         {
-            SetLastAvarageValue(CGXDLMSVariant(e.GetValue().ToDouble() * GetScaler()));
+            m_LastAverageValue = e.GetValue().ToDouble() * GetScaler();
         }
         else
         {
-            SetLastAvarageValue(e.GetValue());
+            m_LastAverageValue = e.GetValue();
         }
     }
     else if (e.GetIndex() == 4 && e.GetValue().vt == DLMS_DATA_TYPE_STRUCTURE)
@@ -492,7 +483,7 @@ int CGXDLMSDemandRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     else if (e.GetIndex() == 5)
     {
-        SetStatus(e.GetValue().lVal);
+        m_Status = e.GetValue();
     }
     else if (e.GetIndex() == 6)
     {

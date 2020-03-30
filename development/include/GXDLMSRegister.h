@@ -65,7 +65,7 @@ public:
     /// <summary>
     /// Get value of COSEM Data object.
     /// </summary>
-    CGXDLMSVariant GetValue();
+    CGXDLMSVariant& GetValue();
 
     /// <summary>
     /// Set value of COSEM Data object.
@@ -75,7 +75,7 @@ public:
     // Scaler of COSEM Register object.
     double GetScaler();
 
-    void SetScaler(double value);
+    virtual void SetScaler(double value);
 
     // Unit of COSEM Register object.
     int GetUnit();

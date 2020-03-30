@@ -140,6 +140,7 @@ int CGXDLMSObjectCollection::Save(const char* fileName)
 
 int CGXDLMSObjectCollection::Save(const char* fileName, CGXXmlWriterSettings& settings)
 {
+    int ret;
     std::string ln;
 #if defined(_WIN32) || defined(_WIN64)//Windows
     FILE* f = NULL;
@@ -154,36 +155,66 @@ int CGXDLMSObjectCollection::Save(const char* fileName, CGXXmlWriterSettings& se
         return errno;
     }
 #endif
-    CGXXmlWriter writer(f);
-    writer.WriteStartDocument();
-    writer.WriteStartElement("Objects");
-    for (CGXDLMSObjectCollection::iterator it = begin(); it != end(); ++it)
+    CGXXmlWriter writer(f, settings.GetSkipDefaults());
+    if ((ret = writer.WriteStartDocument()) == 0 &&
+        (ret = writer.WriteStartElement("Objects")) == 0)
     {
-        writer.WriteStartElement(CGXDLMSConverter::ToString((*it)->GetObjectType()));
-        // Add SN
-        if ((*it)->GetShortName() != 0)
+        for (CGXDLMSObjectCollection::iterator it = begin(); it != end(); ++it)
         {
-            writer.WriteElementString("SN", (*it)->GetShortName());
+            if ((ret = writer.WriteStartElement(CGXDLMSConverter::ToString((*it)->GetObjectType()))) != 0)
+            {
+                break;
+            }
+            // Add SN
+            if ((*it)->GetShortName() != 0)
+            {
+                if ((ret = writer.WriteElementString("SN", (*it)->GetShortName())) != 0)
+                {
+                    break;
+                }
+            }
+            // Add LN
+            (*it)->GetLogicalName(ln);
+            if ((ret = writer.WriteElementString("LN", ln)) != 0)
+            {
+                break;
+            }
+            // Add description if given.
+            std::string& d = (*it)->GetDescription();
+            if (!d.empty())
+            {
+                if ((ret = writer.WriteElementString("Description", d)) != 0)
+                {
+                    break;
+                }
+            }
+            if (settings.GetValues())
+            {
+                if ((ret = writer.Save(*it)) != 0)
+                {
+                    break;
+                }
+            }
+            // Close object.
+            if ((ret = writer.WriteEndElement()) != 0)
+            {
+                break;
+            }
         }
-        // Add LN
-        (*it)->GetLogicalName(ln);
-        writer.WriteElementString("LN", ln);
-        // Add description if given.
-        std::string& d = (*it)->GetDescription();
-        if (!d.empty())
+        if (ret == 0)
         {
-            writer.WriteElementString("Description", d);
+            if ((ret = writer.WriteEndElement()) != 0 ||
+                (ret = writer.WriteEndDocument()) != 0)
+            {
+
+            }
         }
-        // Close object.
-        writer.WriteEndElement();
     }
-    writer.WriteEndElement();
-    writer.WriteEndDocument();
     if (f != NULL)
     {
         fclose(f);
     }
-    return 0;
+    return ret;
 }
 
 int CGXDLMSObjectCollection::Load(const char* fileName)
@@ -230,18 +261,28 @@ int CGXDLMSObjectCollection::Load(const char* fileName)
             }
             else if (target == "SN")
             {
-                obj->SetShortName(reader.ReadElementContentAsInt("SN"));
+                if (obj != NULL)
+                {
+                    obj->SetShortName(reader.ReadElementContentAsInt("SN"));
+                }
             }
             else if (target == "LN")
             {
-                if ((ret = CGXDLMSObject::SetLogicalName(obj, reader.ReadElementContentAsString("LN"))) != 0)
+                if (obj != NULL)
                 {
-                    break;
+                    if ((ret = CGXDLMSObject::SetLogicalName(obj, reader.ReadElementContentAsString("LN"))) != 0)
+                    {
+                        break;
+                    }
+                    obj = NULL;
                 }
             }
             else if (target == "Description")
             {
-                obj->SetDescription(reader.ReadElementContentAsString("Description"));
+                if (obj != NULL)
+                {
+                    obj->SetDescription(reader.ReadElementContentAsString("Description"));
+                }
             }
             else
             {

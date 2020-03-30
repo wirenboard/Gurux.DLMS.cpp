@@ -55,19 +55,25 @@ public:
     //LN Constructor.
     CGXDLMSExtendedRegister(std::string ln);
 
+    // Get value of COSEM Data object.
+    CGXDLMSVariant& GetValue();
+
+    // Set value of COSEM Data object.
+    void SetValue(CGXDLMSVariant& value);
+
     /**
      Status of COSEM Extended Register object.
     */
-    CGXDLMSVariant GetStatus();
+    CGXDLMSVariant& GetStatus();
 
-    void SetStatus(CGXDLMSVariant value);
+    void SetStatus(CGXDLMSVariant& value);
 
     /**
      Capture time of COSEM Extended Register object.
     */
     CGXDateTime& GetCaptureTime();
 
-    void SetCaptureTime(CGXDateTime value);
+    void SetCaptureTime(CGXDateTime& value);
 
     // Returns amount of attributes.
     int GetAttributeCount();

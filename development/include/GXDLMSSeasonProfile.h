@@ -36,13 +36,13 @@
 #define GXDLMSSEASONPROFILE_H
 
 #include "GXDateTime.h"
+#include "GXByteBuffer.h"
 
 class CGXDLMSSeasonProfile
 {
-    std::string m_Name;
+    CGXByteBuffer m_Name;
     CGXDateTime m_Start;
-    std::string m_WeekName;
-
+    CGXByteBuffer m_WeekName;
 public:
     /**
      Constructor.
@@ -52,13 +52,18 @@ public:
     /**
      Constructor.
     */
-    CGXDLMSSeasonProfile(std::string name, CGXDateTime start, std::string weekName);
+    CGXDLMSSeasonProfile(std::string& name, CGXDateTime& start, std::string& weekName);
+
+    /**
+     Constructor.
+    */
+    CGXDLMSSeasonProfile(CGXByteBuffer& name, CGXDateTime& start, CGXByteBuffer& weekName);
 
     /**
      Name of season profile.
     */
-    std::string GetName();
-    void SetName(std::string value);
+    CGXByteBuffer& GetName();
+    void SetName(CGXByteBuffer& value);
 
     /**
      Season Profile start time.
@@ -69,8 +74,8 @@ public:
     /**
      Week name of season profile.
     */
-    std::string GetWeekName();
-    void SetWeekName(std::string value);
+    CGXByteBuffer& GetWeekName();
+    void SetWeekName(CGXByteBuffer& value);
 
     std::string ToString();
 };

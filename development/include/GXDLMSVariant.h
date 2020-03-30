@@ -112,7 +112,7 @@ public:
     CGXDLMSVariant(std::string value);
     CGXDLMSVariant(CGXByteBuffer& value);
     CGXDLMSVariant(const char* value);
-
+    CGXDLMSVariant(unsigned int value);
     //Destructor.
     ~CGXDLMSVariant();
 

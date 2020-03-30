@@ -53,11 +53,11 @@ void CGXDLMSPppSetupIPCPOption::SetLength(int value)
     m_Length = value;
 }
 
-CGXDLMSVariant CGXDLMSPppSetupIPCPOption::GetData()
+CGXDLMSVariant& CGXDLMSPppSetupIPCPOption::GetData()
 {
     return m_Data;
 }
-void CGXDLMSPppSetupIPCPOption::SetData(CGXDLMSVariant value)
+void CGXDLMSPppSetupIPCPOption::SetData(CGXDLMSVariant& value)
 {
     m_Data = value;
 }

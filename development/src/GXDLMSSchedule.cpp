@@ -56,14 +56,23 @@ CGXDLMSSchedule::CGXDLMSSchedule(std::string ln) :
 
 }
 
+CGXDLMSSchedule::~CGXDLMSSchedule()
+{
+    for (std::vector<CGXDLMSScheduleEntry*>::iterator it = m_Entries.begin(); it != m_Entries.end(); ++it)
+    {
+        delete* it;
+    }
+    m_Entries.clear();
+}
+
 // Get value of COSEM Data object.
-std::vector<CGXDLMSScheduleEntry>& CGXDLMSSchedule::GetEntries()
+std::vector<CGXDLMSScheduleEntry*>& CGXDLMSSchedule::GetEntries()
 {
     return m_Entries;
 }
 
 // Set value of COSEM Data object.
-void CGXDLMSSchedule::SetEntries(std::vector<CGXDLMSScheduleEntry>& value)
+void CGXDLMSSchedule::SetEntries(std::vector<CGXDLMSScheduleEntry*>& value)
 {
     m_Entries = value;
 }
@@ -146,25 +155,29 @@ int CGXDLMSSchedule::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     else if (e.GetIndex() == 2)
     {
+        for (std::vector<CGXDLMSScheduleEntry*>::iterator it = m_Entries.begin(); it != m_Entries.end(); ++it)
+        {
+            delete* it;
+        }
         m_Entries.clear();
         CGXDLMSVariant tmp;
         for (std::vector<CGXDLMSVariant >::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
         {
-            CGXDLMSScheduleEntry item;
-            item.SetIndex((*it).Arr[0].ToInteger());
-            item.SetEnable((*it).Arr[1].boolVal);
+            CGXDLMSScheduleEntry* item = new CGXDLMSScheduleEntry();
+            item->SetIndex((*it).Arr[0].ToInteger());
+            item->SetEnable((*it).Arr[1].boolVal);
             CGXDLMSClient::ChangeType((*it).Arr[2], DLMS_DATA_TYPE_OCTET_STRING, tmp);
-            item.SetLogicalName(tmp.ToString());
-            item.SetScriptSelector((*it).Arr[3].ToInteger());
+            item->SetLogicalName(tmp.ToString());
+            item->SetScriptSelector((*it).Arr[3].ToInteger());
             CGXDLMSClient::ChangeType((*it).Arr[4], DLMS_DATA_TYPE_DATETIME, tmp);
-            item.SetSwitchTime(tmp.dateTime);
-            item.SetValidityWindow((*it).Arr[5].ToInteger());
-            item.SetExecWeekdays((*it).Arr[6].strVal);
-            item.SetExecSpecDays((*it).Arr[7].strVal);
+            item->SetSwitchTime(tmp.dateTime);
+            item->SetValidityWindow((*it).Arr[5].ToInteger());
+            item->SetExecWeekdays((*it).Arr[6].strVal);
+            item->SetExecSpecDays((*it).Arr[7].strVal);
             CGXDLMSClient::ChangeType((*it).Arr[8], DLMS_DATA_TYPE_DATETIME, tmp);
-            item.SetBeginDate(tmp.dateTime);
+            item->SetBeginDate(tmp.dateTime);
             CGXDLMSClient::ChangeType((*it).Arr[9], DLMS_DATA_TYPE_DATETIME, tmp);
-            item.SetEndDate(tmp.dateTime);
+            item->SetEndDate(tmp.dateTime);
             m_Entries.push_back(item);
         }
     }

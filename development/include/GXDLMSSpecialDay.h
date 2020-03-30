@@ -35,20 +35,21 @@
 #ifndef GXDLMSSPECIALDAY_H
 #define GXDLMSSPECIALDAY_H
 
-#include "GXDateTime.h"
+#include "GXDate.h"
 
 class CGXDLMSSpecialDay
 {
     int m_Index;
-    CGXDateTime m_Date;
+    CGXDate m_Date;
     int m_DayId;
 
 public:
     int GetIndex();
     void SetIndex(int value);
 
-    CGXDateTime& GetDate();
-    void SetDate(CGXDateTime value);
+    CGXDate& GetDate();
+    void SetDate(CGXDate& value);
+    void SetDate(CGXDateTime& value);
 
     int GetDayId();
     void SetDayId(int value);

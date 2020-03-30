@@ -55,7 +55,7 @@ CGXDLMSData::CGXDLMSData(std::string ln) :
 }
 
 // Get value of COSEM Data object.
-CGXDLMSVariant CGXDLMSData::GetValue()
+CGXDLMSVariant&CGXDLMSData::GetValue()
 {
     return m_Value;
 }

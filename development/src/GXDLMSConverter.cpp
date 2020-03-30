@@ -987,9 +987,9 @@ const char* CGXDLMSConverter::ToString(DLMS_OBJECT_TYPE type)
     case DLMS_OBJECT_TYPE_SECURITY_SETUP:
         return "GXDLMSSecuritySetup";
     case DLMS_OBJECT_TYPE_IEC_HDLC_SETUP:
-        return "GXDLMSHdlcSetup";
+        return "GXDLMSIecHdlcSetup";
     case DLMS_OBJECT_TYPE_IEC_LOCAL_PORT_SETUP:
-        return "GXDLMSIECOpticalPortSetup";
+        return "GXDLMSIecLocalPortSetup";
     case DLMS_OBJECT_TYPE_IEC_TWISTED_PAIR_SETUP:
         return "GXDLMSIEC_TWISTED_PAIR_SETUP";
     case DLMS_OBJECT_TYPE_IP4_SETUP:
@@ -1096,9 +1096,9 @@ DLMS_OBJECT_TYPE CGXDLMSConverter::ValueOfObjectType(const char* value)
         type = DLMS_OBJECT_TYPE_GPRS_SETUP;
     else if (strcmp(value, "GXDLMSSecuritySetup") == 0)
         type = DLMS_OBJECT_TYPE_SECURITY_SETUP;
-    else if (strcmp(value, "GXDLMSHdlcSetup") == 0)
+    else if (strcmp(value, "GXDLMSIecHdlcSetup") == 0 || strcmp(value, "GXDLMSHdlcSetup") == 0)
         type = DLMS_OBJECT_TYPE_IEC_HDLC_SETUP;
-    else if (strcmp(value, "GXDLMSIECOpticalPortSetup") == 0)
+    else if (strcmp(value, "GXDLMSIecLocalPortSetup") == 0 || strcmp(value, "GXDLMSIECOpticalPortSetup") == 0)
         type = DLMS_OBJECT_TYPE_IEC_LOCAL_PORT_SETUP;
     else if (strcmp(value, "GXDLMSIEC_TWISTED_PAIR_SETUP") == 0)
         type = DLMS_OBJECT_TYPE_IEC_TWISTED_PAIR_SETUP;

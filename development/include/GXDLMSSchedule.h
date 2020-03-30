@@ -44,7 +44,7 @@ http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSSchedule
 */
 class CGXDLMSSchedule : public CGXDLMSObject
 {
-    std::vector<CGXDLMSScheduleEntry> m_Entries;
+    std::vector<CGXDLMSScheduleEntry*> m_Entries;
 public:
     //Constructor.
     CGXDLMSSchedule();
@@ -55,11 +55,14 @@ public:
     //LN Constructor.
     CGXDLMSSchedule(std::string ln);
 
+    //Destructor.
+    ~CGXDLMSSchedule();
+
     // Get value of COSEM Data object.
-    std::vector<CGXDLMSScheduleEntry>& GetEntries();
+    std::vector<CGXDLMSScheduleEntry*>& GetEntries();
 
     // Set value of COSEM Data object.
-    void SetEntries(std::vector<CGXDLMSScheduleEntry>& value);
+    void SetEntries(std::vector<CGXDLMSScheduleEntry*>& value);
 
     // Returns amount of attributes.
     int GetAttributeCount();

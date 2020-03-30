@@ -212,5 +212,7 @@ public:
 
     //Convert int value to string.
     static std::string IntToString(int value);
+    //Join list of strings to one string.
+    static void Join(std::string separator, std::vector< std::string >& list, std::string& res);
 };
 #endif //GXHELPERS_H

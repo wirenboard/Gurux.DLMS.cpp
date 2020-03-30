@@ -152,12 +152,12 @@ public:
     /**
      * @return
      */
-    CGXDateTime GetSwitchTime();
+    CGXDateTime& GetSwitchTime();
 
     /**
      * @param value
      */
-    void SetSwitchTime(CGXDateTime value);
+    void SetSwitchTime(CGXDateTime& value);
 
     /**
      * Defines a period in minutes, in which an entry shall be processed after
@@ -181,7 +181,7 @@ public:
      *
      * @return Bit array of valid week days.
      */
-    std::string GetExecWeekdays();
+    std::string& GetExecWeekdays();
 
     /**
      * Set days of the week on which the entry is valid.
@@ -189,14 +189,14 @@ public:
      * @param value
      *            Bit array of valid week days.
      */
-    void SetExecWeekdays(std::string value);
+    void SetExecWeekdays(std::string& value);
 
     /**
      * Perform the link to the IC Special days table.
      *
      * @return day_id.
      */
-    std::string GetExecSpecDays();
+    std::string& GetExecSpecDays();
 
     /**
      * Perform the link to the IC Special days table.
@@ -204,14 +204,14 @@ public:
      * @param value
      *            day_id
      */
-    void SetExecSpecDays(std::string value);
+    void SetExecSpecDays(std::string& value);
 
     /**
      * Date starting period in which the entry is valid.
      *
      * @return Begin date.
      */
-    CGXDateTime GetBeginDate();
+    CGXDateTime& GetBeginDate();
 
     /**
      * Date starting period in which the entry is valid.
@@ -219,14 +219,14 @@ public:
      * @param value
      *            Begin date.
      */
-    void SetBeginDate(CGXDateTime value);
+    void SetBeginDate(CGXDateTime& value);
 
     /**
      * Get date starting period in which the entry is valid.
      *
      * @return End date.
      */
-    CGXDateTime GetEndDate();
+    CGXDateTime& GetEndDate();
 
     /**
      * Set date starting period in which the entry is valid.
@@ -234,7 +234,7 @@ public:
      * @param value
      *            End date.
      */
-    void SetEndDate(CGXDateTime value);
+    void SetEndDate(CGXDateTime& value);
 };
 
 #endif //GXDLMSSCHEDULEENTRY_H

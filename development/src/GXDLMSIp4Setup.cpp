@@ -56,7 +56,7 @@ CGXDLMSIp4Setup::CGXDLMSIp4Setup() :
 CGXDLMSIp4Setup::CGXDLMSIp4Setup(std::string ln, unsigned short sn) :
     CGXDLMSObject(DLMS_OBJECT_TYPE_IP4_SETUP, ln, sn)
 {
-    m_IPAddress.clear();
+    m_IPAddress = 0;
     m_SubnetMask = 0;
     m_GatewayIPAddress = 0;
     m_UseDHCP = false;
@@ -79,17 +79,65 @@ void CGXDLMSIp4Setup::SetDataLinkLayerReference(std::string value)
     m_DataLinkLayerReference = value;
 }
 
-std::string& CGXDLMSIp4Setup::GetIPAddress()
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+unsigned int ToAddress(std::string& value)
+{
+    if (value.empty())
+    {
+        return 0;
+    }
+    struct sockaddr_in add;
+    add.sin_addr.s_addr = inet_addr(value.c_str());
+    //If address is give as name
+    if (add.sin_addr.s_addr == INADDR_NONE)
+    {
+        struct hostent* Hostent = gethostbyname(value.c_str());
+        if (Hostent == NULL)
+        {
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        };
+        add.sin_addr = *(in_addr*)(void*)Hostent->h_addr_list[0];
+    };
+    return add.sin_addr.s_addr;
+}
+#endif//defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+
+void GetAddress(unsigned int value, std::string& add)
+{
+    CGXByteBuffer bb;
+    bb.AddIntAsString((value >> 24) & 0xFF);
+    bb.SetInt8('.');
+    bb.AddIntAsString((value >> 16) & 0xFF);
+    bb.SetInt8('.');
+    bb.AddIntAsString((value >> 8) & 0xFF);
+    bb.SetInt8('.');
+    bb.AddIntAsString(value & 0xFF);
+    add = bb.ToString();
+}
+
+unsigned int CGXDLMSIp4Setup::GetIPAddress()
 {
     return m_IPAddress;
 }
 
-void CGXDLMSIp4Setup::SetIPAddress(std::string& value)
+void CGXDLMSIp4Setup::SetIPAddress(unsigned int value)
 {
     m_IPAddress = value;
 }
 
-std::vector<unsigned long>& CGXDLMSIp4Setup::GetMulticastIPAddress()
+void CGXDLMSIp4Setup::GetIPAddress(std::string& value)
+{
+    GetAddress(m_IPAddress, value);
+}
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+void CGXDLMSIp4Setup::SetIPAddress(std::string& value)
+{
+    m_IPAddress = ToAddress(value);
+}
+#endif//defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+
+std::vector<unsigned int>& CGXDLMSIp4Setup::GetMulticastIPAddress()
 {
     return m_MulticastIPAddress;
 }
@@ -107,24 +155,49 @@ void CGXDLMSIp4Setup::SetIPOptions(std::vector<CGXDLMSIp4SetupIpOption>& value)
     }
 }
 
-unsigned long CGXDLMSIp4Setup::GetSubnetMask()
+unsigned int CGXDLMSIp4Setup::GetSubnetMask()
 {
     return m_SubnetMask;
 }
 
-void CGXDLMSIp4Setup::SetSubnetMask(unsigned long value)
+void CGXDLMSIp4Setup::SetSubnetMask(unsigned int value)
 {
     m_SubnetMask = value;
 }
 
-unsigned long CGXDLMSIp4Setup::GetGatewayIPAddress()
+void CGXDLMSIp4Setup::GetSubnetMask(std::string& value)
+{
+    GetAddress(m_SubnetMask, value);
+}
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+void CGXDLMSIp4Setup::SetSubnetMask(std::string& value)
+{
+    m_SubnetMask = ToAddress(value);
+}
+#endif//defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+
+unsigned int CGXDLMSIp4Setup::GetGatewayIPAddress()
 {
     return m_GatewayIPAddress;
 }
-void CGXDLMSIp4Setup::SetGatewayIPAddress(unsigned long value)
+
+void CGXDLMSIp4Setup::SetGatewayIPAddress(unsigned int value)
 {
     m_GatewayIPAddress = value;
 }
+
+void CGXDLMSIp4Setup::GetGatewayIPAddress(std::string& value)
+{
+    GetAddress(m_GatewayIPAddress, value);
+}
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+void CGXDLMSIp4Setup::SetGatewayIPAddress(std::string& value)
+{
+    m_GatewayIPAddress = ToAddress(value);
+}
+#endif//defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 
 bool CGXDLMSIp4Setup::GetUseDHCP()
 {
@@ -135,24 +208,49 @@ void CGXDLMSIp4Setup::SetUseDHCP(bool value)
     m_UseDHCP = value;
 }
 
-unsigned long CGXDLMSIp4Setup::GetPrimaryDNSAddress()
+unsigned int CGXDLMSIp4Setup::GetPrimaryDNSAddress()
 {
     return m_PrimaryDNSAddress;
 }
-void CGXDLMSIp4Setup::SetPrimaryDNSAddress(unsigned long value)
+
+void CGXDLMSIp4Setup::SetPrimaryDNSAddress(unsigned int value)
 {
     m_PrimaryDNSAddress = value;
 }
+void CGXDLMSIp4Setup::GetPrimaryDNSAddress(std::string& value)
+{
+    GetAddress(m_PrimaryDNSAddress, value);
+}
 
-unsigned long CGXDLMSIp4Setup::GetSecondaryDNSAddress()
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+void CGXDLMSIp4Setup::SetPrimaryDNSAddress(std::string& value)
+{
+    m_PrimaryDNSAddress = ToAddress(value);
+}
+#endif//defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+
+unsigned int CGXDLMSIp4Setup::GetSecondaryDNSAddress()
 {
     return m_SecondaryDNSAddress;
 }
 
-void CGXDLMSIp4Setup::SetSecondaryDNSAddress(unsigned long value)
+void CGXDLMSIp4Setup::SetSecondaryDNSAddress(unsigned int value)
 {
     m_SecondaryDNSAddress = value;
 }
+
+void CGXDLMSIp4Setup::GetSecondaryDNSAddress(std::string& value)
+{
+    GetAddress(m_SecondaryDNSAddress, value);
+}
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+
+void CGXDLMSIp4Setup::SetSecondaryDNSAddress(std::string& value)
+{
+    m_SecondaryDNSAddress = ToAddress(value);
+}
+#endif//defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 
 // Returns amount of attributes.
 int CGXDLMSIp4Setup::GetAttributeCount()
@@ -173,11 +271,11 @@ void CGXDLMSIp4Setup::GetValues(std::vector<std::string>& values)
     GetLogicalName(ln);
     values.push_back(ln);
     values.push_back(m_DataLinkLayerReference);
-    values.push_back(m_IPAddress);
+    values.push_back(CGXDLMSVariant(m_IPAddress).ToString());
     std::stringstream sb;
     sb << '[';
     bool empty = true;
-    for (std::vector<unsigned long>::iterator it = m_MulticastIPAddress.begin(); it != m_MulticastIPAddress.end(); ++it)
+    for (std::vector<unsigned int>::iterator it = m_MulticastIPAddress.begin(); it != m_MulticastIPAddress.end(); ++it)
     {
         if (!empty)
         {
@@ -338,25 +436,7 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     else if (e.GetIndex() == 3)
     {
-        if (m_IPAddress.size() == 0)
-        {
-            return 0;
-        }
-#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
-        struct sockaddr_in add;
-        add.sin_addr.s_addr = inet_addr(m_IPAddress.c_str());
-        //If address is give as name
-        if (add.sin_addr.s_addr == INADDR_NONE)
-        {
-            struct hostent *Hostent = gethostbyname(m_IPAddress.c_str());
-            if (Hostent == NULL)
-            {
-                return DLMS_ERROR_CODE_INVALID_PARAMETER;
-            };
-            add.sin_addr = *(in_addr*)(void*)Hostent->h_addr_list[0];
-        };
-        e.SetValue((unsigned long)add.sin_addr.s_addr);
-#endif //defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+        e.SetValue((unsigned long)m_IPAddress);
     }
     else if (e.GetIndex() == 4)
     {
@@ -366,7 +446,7 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         GXHelpers::SetObjectCount((unsigned long)m_MulticastIPAddress.size(), data);
         int ret;
         CGXDLMSVariant tmp;
-        for (std::vector<unsigned long>::iterator it = m_MulticastIPAddress.begin(); it != m_MulticastIPAddress.end(); ++it)
+        for (std::vector<unsigned int>::iterator it = m_MulticastIPAddress.begin(); it != m_MulticastIPAddress.end(); ++it)
         {
             tmp = *it;
             if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT32, tmp)) != 0)
@@ -402,11 +482,11 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     else if (e.GetIndex() == 6)
     {
-        e.SetValue(m_SubnetMask);
+        e.SetValue((unsigned long)m_SubnetMask);
     }
     else if (e.GetIndex() == 7)
     {
-        e.SetValue(m_GatewayIPAddress);
+        e.SetValue((unsigned long)m_GatewayIPAddress);
     }
     else if (e.GetIndex() == 8)
     {
@@ -414,11 +494,11 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     else if (e.GetIndex() == 9)
     {
-        e.SetValue(m_PrimaryDNSAddress);
+        e.SetValue((unsigned long)m_PrimaryDNSAddress);
     }
     else if (e.GetIndex() == 10)
     {
-        e.SetValue(m_SecondaryDNSAddress);
+        e.SetValue((unsigned long)m_SecondaryDNSAddress);
     }
     else
     {
@@ -448,16 +528,11 @@ int CGXDLMSIp4Setup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     else if (e.GetIndex() == 3)
     {
-        long tmp = e.GetValue().ToInteger();
-        CGXByteBuffer bb;
-        bb.AddIntAsString(tmp & 0xFF);
-        bb.SetInt8('.');
-        bb.AddIntAsString((tmp >> 8) & 0xFF);
-        bb.SetInt8('.');
-        bb.AddIntAsString((tmp >> 16) & 0xFF);
-        bb.SetInt8('.');
-        bb.AddIntAsString((tmp >> 24) & 0xFF);
-        m_IPAddress = bb.ToString();
+        if (e.GetValue().vt != DLMS_DATA_TYPE_UINT32)
+        {
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+        m_IPAddress = e.GetValue().ulVal;
     }
     else if (e.GetIndex() == 4)
     {
@@ -489,11 +564,19 @@ int CGXDLMSIp4Setup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     else if (e.GetIndex() == 6)
     {
-        m_SubnetMask = e.GetValue().ToInteger();
+        if (e.GetValue().vt != DLMS_DATA_TYPE_UINT32)
+        {
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+        m_SubnetMask = e.GetValue().ulVal;
     }
     else if (e.GetIndex() == 7)
     {
-        m_GatewayIPAddress = e.GetValue().ToInteger();
+        if (e.GetValue().vt != DLMS_DATA_TYPE_UINT32)
+        {
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+        m_GatewayIPAddress = e.GetValue().ulVal;
     }
     else if (e.GetIndex() == 8)
     {
@@ -501,11 +584,19 @@ int CGXDLMSIp4Setup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     else if (e.GetIndex() == 9)
     {
-        m_PrimaryDNSAddress = e.GetValue().ToInteger();
+        if (e.GetValue().vt != DLMS_DATA_TYPE_UINT32)
+        {
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+        m_PrimaryDNSAddress = e.GetValue().ulVal;
     }
     else if (e.GetIndex() == 10)
     {
-        m_SecondaryDNSAddress = e.GetValue().ToInteger();
+        if (e.GetValue().vt != DLMS_DATA_TYPE_UINT32)
+        {
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+        m_SecondaryDNSAddress = e.GetValue().ulVal;
     }
     else
     {

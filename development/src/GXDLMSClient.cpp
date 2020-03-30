@@ -626,6 +626,13 @@ int CGXDLMSClient::UpdateValue(CGXDLMSObject& target, int attributeIndex, CGXDLM
     if (value.vt == DLMS_DATA_TYPE_OCTET_STRING)
     {
         DLMS_DATA_TYPE type;
+        if ((ret = target.GetDataType(attributeIndex, type)) == 0 && type == DLMS_DATA_TYPE_NONE)
+        {
+            if ((ret = target.SetDataType(attributeIndex, value.vt)) != 0)
+            {
+                return ret;
+            }
+        }
         if ((ret = target.GetUIDataType(attributeIndex, type)) != 0)
         {
             return ret;

@@ -413,13 +413,11 @@ int GetSeasonProfile(std::vector<CGXDLMSSeasonProfile*>& items, CGXByteBuffer& d
     {
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(3);
-        tmp.Clear();
-        tmp.Add((*it)->GetName());
+        tmp = (*it)->GetName();
         GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
         tmp = (*it)->GetStart();
         GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
-        tmp.Clear();
-        tmp.Add((*it)->GetWeekName());
+        tmp = (*it)->GetWeekName();
         GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
     }
     return 0;
@@ -573,19 +571,21 @@ void AddSeasonProfile(std::vector<CGXDLMSSeasonProfile*>& items, std::vector<CGX
         delete *item;
     }
     items.clear();
-    std::string name;
+    CGXByteBuffer bb;
     CGXDLMSVariant tmp;
     for (std::vector<CGXDLMSVariant>::iterator item = list.begin(); item != list.end(); ++item)
     {
         CGXDLMSSeasonProfile *it = new CGXDLMSSeasonProfile();
-        name.clear();
-        name.append((*item).Arr[0].byteArr, (*item).Arr[0].byteArr + (*item).Arr[0].GetSize());
-        it->SetName(name);
+        bb.Clear();
+        bb.Set(item->Arr[0].byteArr, item->Arr[0].GetSize());
+        it->SetName(bb);
+        tmp.Clear();
         CGXDLMSClient::ChangeType((*item).Arr[1], DLMS_DATA_TYPE_DATETIME, tmp);
         it->SetStart(tmp.dateTime);
-        name.clear();
-        name.append((*item).Arr[2].byteArr, (*item).Arr[2].byteArr + (*item).Arr[2].GetSize());
-        it->SetWeekName(name);
+        tmp.Clear();
+        bb.Clear();
+        bb.Set(item->Arr[2].byteArr, item->Arr[2].GetSize());
+        it->SetWeekName(bb);
         items.push_back(it);
     }
 }
@@ -597,14 +597,14 @@ void AddWeekProfileTable(std::vector<CGXDLMSWeekProfile*>& items, std::vector<CG
         delete *item;
     }
     items.clear();
-    std::string name;
+    CGXByteBuffer bb;
     for (std::vector<CGXDLMSVariant>::iterator item = list.begin(); item != list.end(); ++item)
     {
         CGXDLMSVariant tmp;
         CGXDLMSWeekProfile *it = new CGXDLMSWeekProfile();
-        name.clear();
-        name.append((*item).Arr[0].byteArr, (*item).Arr[0].byteArr + (*item).Arr[0].GetSize());
-        it->SetName(name);
+        bb.Clear();
+        bb.Set(item->Arr[0].byteArr, item->Arr[0].GetSize());
+        it->SetName(bb);
         it->SetMonday((*item).Arr[1].lVal);
         it->SetTuesday((*item).Arr[2].lVal);
         it->SetWednesday((*item).Arr[3].lVal);

@@ -74,7 +74,7 @@ public:
     std::vector<CGXDLMSModemInitialisation>& GetInitialisationStrings();
     void SetInitialisationStrings(std::vector<CGXDLMSModemInitialisation>& value);
 
-    std::vector< std::string > GetModemProfile();
+    std::vector< std::string >& GetModemProfile();
     void SetModemProfile(std::vector< std::string >& value);
 
     // Returns amount of attributes.

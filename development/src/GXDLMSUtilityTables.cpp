@@ -127,12 +127,16 @@ int CGXDLMSUtilityTables::GetDataType(int index, DLMS_DATA_TYPE& type)
     switch (index) {
     case 1:
         type = DLMS_DATA_TYPE_OCTET_STRING;
+        break;
     case 2:
         type = DLMS_DATA_TYPE_UINT16;
+        break;
     case 3:
         type = DLMS_DATA_TYPE_UINT32;
+        break;
     case 4:
         type = DLMS_DATA_TYPE_OCTET_STRING;
+        break;
     default:
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }

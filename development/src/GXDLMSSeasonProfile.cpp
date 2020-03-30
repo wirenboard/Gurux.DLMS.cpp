@@ -46,21 +46,31 @@ CGXDLMSSeasonProfile::CGXDLMSSeasonProfile()
 /**
  Constructor.
 */
-CGXDLMSSeasonProfile::CGXDLMSSeasonProfile(std::string name, CGXDateTime start, std::string weekName)
+CGXDLMSSeasonProfile::CGXDLMSSeasonProfile(std::string& name, CGXDateTime& start, std::string& weekName)
 {
-    SetName(name);
+    m_Name.AddString(name);
     SetStart(start);
-    SetWeekName(weekName);
+    m_WeekName.AddString(weekName);
+}
+
+/**
+ Constructor.
+*/
+CGXDLMSSeasonProfile::CGXDLMSSeasonProfile(CGXByteBuffer& name, CGXDateTime& start, CGXByteBuffer& weekName)
+{
+    m_Name.Set(&name);
+    SetStart(start);
+    m_WeekName.Set(&weekName);
 }
 
 /**
  Name of season profile.
 */
-std::string CGXDLMSSeasonProfile::GetName()
+CGXByteBuffer& CGXDLMSSeasonProfile::GetName()
 {
     return m_Name;
 }
-void CGXDLMSSeasonProfile::SetName(std::string value)
+void CGXDLMSSeasonProfile::SetName(CGXByteBuffer& value)
 {
     m_Name = value;
 }
@@ -80,11 +90,11 @@ void CGXDLMSSeasonProfile::SetStart(CGXDateTime value)
 /**
  Week name of season profile.
 */
-std::string CGXDLMSSeasonProfile::GetWeekName()
+CGXByteBuffer& CGXDLMSSeasonProfile::GetWeekName()
 {
     return m_WeekName;
 }
-void CGXDLMSSeasonProfile::SetWeekName(std::string value)
+void CGXDLMSSeasonProfile::SetWeekName(CGXByteBuffer& value)
 {
     m_WeekName = value;
 }
@@ -92,7 +102,14 @@ void CGXDLMSSeasonProfile::SetWeekName(std::string value)
 std::string CGXDLMSSeasonProfile::ToString()
 {
     std::stringstream sb;
-    sb << m_Name.c_str();
+    if (m_Name.IsAsciiString())
+    {
+        sb << m_Name.ToString();
+    }
+    else
+    {
+        sb << m_Name.ToHexString();
+    }
     sb << " ";
     sb << m_Start.ToString().c_str();
     return sb.str();

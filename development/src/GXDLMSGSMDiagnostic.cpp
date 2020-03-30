@@ -66,11 +66,11 @@ CGXDLMSGSMDiagnostic::~CGXDLMSGSMDiagnostic()
     m_AdjacentCells.clear();
 }
 
-std::string CGXDLMSGSMDiagnostic::GetOperator() {
+std::string& CGXDLMSGSMDiagnostic::GetOperator() {
     return m_Operator;
 }
 
-void CGXDLMSGSMDiagnostic::SetOperator(std::string value) {
+void CGXDLMSGSMDiagnostic::SetOperator(std::string& value) {
     m_Operator = value;
 }
 
@@ -110,7 +110,7 @@ std::vector<GXAdjacentCell*>& CGXDLMSGSMDiagnostic::GetAdjacentCells()
     return m_AdjacentCells;
 }
 
-CGXDateTime CGXDLMSGSMDiagnostic::GetCaptureTime()
+CGXDateTime& CGXDLMSGSMDiagnostic::GetCaptureTime()
 {
     return m_CaptureTime;
 }
@@ -356,7 +356,7 @@ int CGXDLMSGSMDiagnostic::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
         m_PacketSwitchStatus = (DLMS_GSM_PACKET_SWITCH_STATUS)e.GetValue().ToInteger();
         break;
     case 6:
-        if (e.GetValue().Arr.size() == 4)
+        if (e.GetValue().Arr.size() == 4 || e.GetValue().Arr.size() == 7)
         {
             std::vector<CGXDLMSVariant> tmp = (std::vector<CGXDLMSVariant>) e.GetValue().Arr;
             m_CellInfo.SetCellId(tmp[0].ToInteger());

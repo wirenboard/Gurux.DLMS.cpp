@@ -54,12 +54,12 @@ void CGXDLMSPppSetupLcpOption::SetLength(int value)
     m_Length = value;
 }
 
-CGXDLMSVariant CGXDLMSPppSetupLcpOption::GetData()
+CGXDLMSVariant& CGXDLMSPppSetupLcpOption::GetData()
 {
     return m_Data;
 }
 
-void CGXDLMSPppSetupLcpOption::SetData(CGXDLMSVariant value)
+void CGXDLMSPppSetupLcpOption::SetData(CGXDLMSVariant& value)
 {
     m_Data = value;
 }

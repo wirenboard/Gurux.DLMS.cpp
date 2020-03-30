@@ -62,14 +62,26 @@ CGXDLMSExtendedRegister::CGXDLMSExtendedRegister(std::string ln) :
 {
 }
 
+// Get value of COSEM Data object.
+CGXDLMSVariant& CGXDLMSExtendedRegister::GetValue()
+{
+    return CGXDLMSRegister::GetValue();
+}
+
+// Set value of COSEM Data object.
+void CGXDLMSExtendedRegister::SetValue(CGXDLMSVariant& value)
+{
+    CGXDLMSRegister::SetValue(value);
+}
+
 /**
  Status of COSEM Extended Register object.
 */
-CGXDLMSVariant CGXDLMSExtendedRegister::GetStatus()
+CGXDLMSVariant& CGXDLMSExtendedRegister::GetStatus()
 {
     return m_Status;
 }
-void CGXDLMSExtendedRegister::SetStatus(CGXDLMSVariant value)
+void CGXDLMSExtendedRegister::SetStatus(CGXDLMSVariant& value)
 {
     m_Status = value;
 }
@@ -82,7 +94,7 @@ CGXDateTime& CGXDLMSExtendedRegister::GetCaptureTime()
     return m_CaptureTime;
 }
 
-void CGXDLMSExtendedRegister::SetCaptureTime(CGXDateTime value)
+void CGXDLMSExtendedRegister::SetCaptureTime(CGXDateTime& value)
 {
     m_CaptureTime = value;
 }
@@ -95,7 +107,7 @@ int CGXDLMSExtendedRegister::GetUIDataType(int index, DLMS_DATA_TYPE& type)
     }
     else
     {
-        return CGXDLMSObject::GetUIDataType(index, type);
+        return CGXDLMSRegister::GetUIDataType(index, type);
     }
     return DLMS_ERROR_CODE_OK;
 }

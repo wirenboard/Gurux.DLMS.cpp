@@ -45,14 +45,14 @@ http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSIp4Setup
 class CGXDLMSIp4Setup : public CGXDLMSObject
 {
     std::string m_DataLinkLayerReference;
-    std::string m_IPAddress;
-    std::vector<unsigned long> m_MulticastIPAddress;
+    unsigned int m_IPAddress;
+    std::vector<unsigned int> m_MulticastIPAddress;
     std::vector<CGXDLMSIp4SetupIpOption> m_IPOptions;
-    unsigned long m_SubnetMask;
-    unsigned long m_GatewayIPAddress;
+    unsigned int m_SubnetMask;
+    unsigned int m_GatewayIPAddress;
     bool m_UseDHCP;
-    unsigned long m_PrimaryDNSAddress;
-    unsigned long m_SecondaryDNSAddress;
+    unsigned int m_PrimaryDNSAddress;
+    unsigned int m_SecondaryDNSAddress;
 
     CGXDLMSVariant m_Value;
 public:
@@ -68,29 +68,50 @@ public:
     std::string& GetDataLinkLayerReference();
     void SetDataLinkLayerReference(std::string value);
 
-    std::string& GetIPAddress();
-    void SetIPAddress(std::string& value);
+    unsigned int GetIPAddress();
+    void SetIPAddress(unsigned int value);
 
-    std::vector<unsigned long>& GetMulticastIPAddress();
+    void GetIPAddress(std::string& value);
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+    void SetIPAddress(std::string& value);
+#endif//defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+
+    std::vector<unsigned int>& GetMulticastIPAddress();
 
     std::vector<CGXDLMSIp4SetupIpOption>& GetIPOptions();
 
     void SetIPOptions(std::vector<CGXDLMSIp4SetupIpOption>& value);
 
-    unsigned long GetSubnetMask();
-    void SetSubnetMask(unsigned long value);
+    unsigned int GetSubnetMask();
+    void SetSubnetMask(unsigned int value);
+    void GetSubnetMask(std::string& value);
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+    void SetSubnetMask(std::string& value);
+#endif//defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 
-    unsigned long GetGatewayIPAddress();
-    void SetGatewayIPAddress(unsigned long value);
+    unsigned int GetGatewayIPAddress();
+    void SetGatewayIPAddress(unsigned int value);
+    void GetGatewayIPAddress(std::string& value);
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+    void SetGatewayIPAddress(std::string& value);
+#endif//defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 
     bool GetUseDHCP();
     void SetUseDHCP(bool value);
 
-    unsigned long GetPrimaryDNSAddress();
-    void SetPrimaryDNSAddress(unsigned long value);
+    unsigned int GetPrimaryDNSAddress();
+    void SetPrimaryDNSAddress(unsigned int value);
+    void GetPrimaryDNSAddress(std::string& value);
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+    void SetPrimaryDNSAddress(std::string& value);
+#endif//defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 
-    unsigned long GetSecondaryDNSAddress();
-    void SetSecondaryDNSAddress(unsigned long value);
+    unsigned int GetSecondaryDNSAddress();
+    void SetSecondaryDNSAddress(unsigned int value);
+    void GetSecondaryDNSAddress(std::string& value);
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+    void SetSecondaryDNSAddress(std::string& value);
+#endif//defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 
     // Returns amount of attributes.
     int GetAttributeCount();

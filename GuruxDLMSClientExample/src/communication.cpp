@@ -1433,7 +1433,7 @@ int CGXCommunication::GetProfileGenericColumns()
 
 int CGXCommunication::GetReadOut()
 {
-    int ret;
+    int ret = 0;
     char buff[200];
     std::string value;
     for (std::vector<CGXDLMSObject*>::iterator it = m_Parser->GetObjects().begin(); it != m_Parser->GetObjects().end(); ++it)
@@ -1633,7 +1633,9 @@ int CGXCommunication::ReadAll(char* outputFile)
     Close();
     if (outputFile != NULL && ret == 0)
     {
-        ret = m_Parser->GetObjects().Save(outputFile);
+        CGXXmlWriterSettings settings;
+        settings.SetSkipDefaults(false);
+        ret = m_Parser->GetObjects().Save(outputFile, settings);
     }
     return ret;
 }

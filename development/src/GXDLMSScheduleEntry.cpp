@@ -75,13 +75,12 @@ void CGXDLMSScheduleEntry::SetScriptSelector(unsigned short value)
     m_ScriptSelector = value;
 }
 
-CGXDateTime CGXDLMSScheduleEntry::GetSwitchTime()
+CGXDateTime& CGXDLMSScheduleEntry::GetSwitchTime()
 {
     return m_SwitchTime;
 }
 
-
-void CGXDLMSScheduleEntry::SetSwitchTime(CGXDateTime value)
+void CGXDLMSScheduleEntry::SetSwitchTime(CGXDateTime& value)
 {
     m_SwitchTime = value;
 }
@@ -96,42 +95,42 @@ void CGXDLMSScheduleEntry::SetValidityWindow(unsigned short value)
     m_ValidityWindow = value;
 }
 
-std::string CGXDLMSScheduleEntry::GetExecWeekdays()
+std::string& CGXDLMSScheduleEntry::GetExecWeekdays()
 {
     return m_ExecWeekdays;
 }
 
-void CGXDLMSScheduleEntry::SetExecWeekdays(std::string value)
+void CGXDLMSScheduleEntry::SetExecWeekdays(std::string& value)
 {
     m_ExecWeekdays = value;
 }
 
-std::string CGXDLMSScheduleEntry::GetExecSpecDays()
+std::string& CGXDLMSScheduleEntry::GetExecSpecDays()
 {
     return m_ExecSpecDays;
 }
 
-void CGXDLMSScheduleEntry::SetExecSpecDays(std::string value)
+void CGXDLMSScheduleEntry::SetExecSpecDays(std::string& value)
 {
     m_ExecSpecDays = value;
 }
 
-CGXDateTime CGXDLMSScheduleEntry::GetBeginDate()
+CGXDateTime& CGXDLMSScheduleEntry::GetBeginDate()
 {
     return m_BeginDate;
 }
 
-void CGXDLMSScheduleEntry::SetBeginDate(CGXDateTime value)
+void CGXDLMSScheduleEntry::SetBeginDate(CGXDateTime& value)
 {
     m_BeginDate = value;
 }
 
-CGXDateTime CGXDLMSScheduleEntry::GetEndDate()
+CGXDateTime& CGXDLMSScheduleEntry::GetEndDate()
 {
     return m_EndDate;
 }
 
-void CGXDLMSScheduleEntry::SetEndDate(CGXDateTime value)
+void CGXDLMSScheduleEntry::SetEndDate(CGXDateTime& value)
 {
     m_EndDate = value;
 }

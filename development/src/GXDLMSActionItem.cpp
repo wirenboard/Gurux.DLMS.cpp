@@ -40,11 +40,11 @@ CGXDLMSActionItem::CGXDLMSActionItem()
     m_ScriptSelector = 0;
 }
 
-std::string CGXDLMSActionItem::GetLogicalName()
+std::string& CGXDLMSActionItem::GetLogicalName()
 {
     return m_LogicalName;
 }
-void CGXDLMSActionItem::SetLogicalName(std::string value)
+void CGXDLMSActionItem::SetLogicalName(std::string& value)
 {
     m_LogicalName = value;
 }

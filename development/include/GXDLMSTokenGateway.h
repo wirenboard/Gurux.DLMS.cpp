@@ -111,7 +111,7 @@ public:
      *
      * @return Time.
      */
-    CGXDateTime GetTime()
+    CGXDateTime& GetTime()
     {
         return m_Time;
     }
@@ -134,7 +134,7 @@ public:
      *
      * @return Descriptions.
      */
-    std::vector<std::string>& getDescriptions()
+    std::vector<std::string>& GetDescriptions()
     {
         return m_Descriptions;
     }

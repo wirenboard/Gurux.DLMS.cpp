@@ -70,8 +70,8 @@ public:
     */
     CGXDLMSActionSchedule(std::string ln, unsigned short sn);
 
-    std::string GetExecutedScriptLogicalName();
-    void SetExecutedScriptLogicalName(std::string value);
+    std::string& GetExecutedScriptLogicalName();
+    void SetExecutedScriptLogicalName(std::string& value);
 
     int GetExecutedScriptSelector();
     void SetExecutedScriptSelector(int value);
@@ -79,8 +79,8 @@ public:
     DLMS_SINGLE_ACTION_SCHEDULE_TYPE GetType();
     void SetType(DLMS_SINGLE_ACTION_SCHEDULE_TYPE value);
 
-    std::vector<CGXDateTime> GetExecutionTime();
-    void SetExecutionTime(std::vector<CGXDateTime> value);
+    std::vector<CGXDateTime>& GetExecutionTime();
+    void SetExecutionTime(std::vector<CGXDateTime>& value);
 
     // Returns amount of attributes.
     int GetAttributeCount();

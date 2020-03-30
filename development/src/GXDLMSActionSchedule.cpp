@@ -57,11 +57,11 @@ CGXDLMSActionSchedule::CGXDLMSActionSchedule(std::string ln, unsigned short sn) 
     m_Type = DLMS_SINGLE_ACTION_SCHEDULE_TYPE1;
 }
 
-std::string CGXDLMSActionSchedule::GetExecutedScriptLogicalName()
+std::string& CGXDLMSActionSchedule::GetExecutedScriptLogicalName()
 {
     return m_ExecutedScriptLogicalName;
 }
-void CGXDLMSActionSchedule::SetExecutedScriptLogicalName(std::string value)
+void CGXDLMSActionSchedule::SetExecutedScriptLogicalName(std::string& value)
 {
     m_ExecutedScriptLogicalName = value;
 }
@@ -84,11 +84,11 @@ void CGXDLMSActionSchedule::SetType(DLMS_SINGLE_ACTION_SCHEDULE_TYPE value)
     m_Type = value;
 }
 
-std::vector<CGXDateTime> CGXDLMSActionSchedule::GetExecutionTime()
+std::vector<CGXDateTime>& CGXDLMSActionSchedule::GetExecutionTime()
 {
     return m_ExecutionTime;
 }
-void CGXDLMSActionSchedule::SetExecutionTime(std::vector<CGXDateTime> value)
+void CGXDLMSActionSchedule::SetExecutionTime(std::vector<CGXDateTime>& value)
 {
     m_ExecutionTime = value;
 }
@@ -285,6 +285,7 @@ int CGXDLMSActionSchedule::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
             val2.tm_sec = val.tm_sec;
             CGXDateTime tmp(val2);
             tmp.SetSkip((DATETIME_SKIPS)(time.dateTime.GetSkip() | date.dateTime.GetSkip()));
+            tmp.SetExtra((DATE_TIME_EXTRA_INFO)(time.dateTime.GetExtra() | date.dateTime.GetExtra()));
             m_ExecutionTime.push_back(tmp);
         }
         return DLMS_ERROR_CODE_OK;

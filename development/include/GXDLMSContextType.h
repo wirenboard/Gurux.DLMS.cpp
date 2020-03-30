@@ -65,7 +65,7 @@ public:
     */
     void SetConformance(DLMS_CONFORMANCE value);
 
-    int GetMaxPduSize();
+    int GetMaxReceivePduSize();
     void SetMaxReceivePduSize(int value);
 
     int GetMaxSendPduSize();

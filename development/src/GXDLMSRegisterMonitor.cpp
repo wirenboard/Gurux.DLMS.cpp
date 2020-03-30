@@ -61,11 +61,11 @@ CGXDLMSRegisterMonitor::~CGXDLMSRegisterMonitor()
     m_Thresholds.clear();
 }
 
-std::vector<CGXDLMSVariant> CGXDLMSRegisterMonitor::GetThresholds()
+std::vector<CGXDLMSVariant>& CGXDLMSRegisterMonitor::GetThresholds()
 {
     return m_Thresholds;
 }
-void CGXDLMSRegisterMonitor::SetThresholds(std::vector<CGXDLMSVariant> value)
+void CGXDLMSRegisterMonitor::SetThresholds(std::vector<CGXDLMSVariant>& value)
 {
     m_Thresholds = value;
 }

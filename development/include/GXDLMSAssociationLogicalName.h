@@ -38,6 +38,7 @@
 #include "GXApplicationContextName.h"
 #include "GXDLMSContextType.h"
 #include "GXAuthenticationMechanismName.h"
+#include "GXDLMSObjectCollection.h"
 
 /**
 Online help:

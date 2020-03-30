@@ -238,6 +238,7 @@ int GetDate(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         extra |= DATE_TIME_EXTRA_INFO_LAST_DAY;
     }
     CGXDate dt(year, month, day);
+    dt.SetExtra((DATE_TIME_EXTRA_INFO)(extra));
     // Skip week day
     if ((ret = buff.GetUInt8(&ch)) != 0)
     {
@@ -727,7 +728,7 @@ int GetInt8(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         info.SetComplete(false);
         return 0;
     }
-    if ((ret = buff.GetUInt8((unsigned char*)& val)) != 0)
+    if ((ret = buff.GetUInt8((unsigned char*)&val)) != 0)
     {
         return ret;
     }
@@ -2146,7 +2147,7 @@ static int SetOctetString(CGXByteBuffer& buff, CGXDLMSVariant& value)
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     return 0;
-    }
+}
 
 /**
 * Convert UTC string to DLMS bytes.
@@ -2588,4 +2589,18 @@ std::string GXHelpers::IntToString(int value)
     sprintf(buff, "%d", value);
 #endif
     return buff;
+}
+
+void GXHelpers::Join(std::string separator, std::vector< std::string >& list, std::string& res)
+{
+    bool empty = true;
+    for (std::vector< std::string >::iterator it = list.begin(); it != list.end(); ++it)
+    {
+        if (!empty)
+        {
+            res.append(separator);
+        }
+        empty = false;
+        res.append(*it);
+    }
 }

@@ -62,8 +62,8 @@ public:
     int GetLength();
     void SetLength(int value);
 
-    CGXDLMSVariant GetData();
-    void SetData(CGXDLMSVariant value);
+    CGXDLMSVariant& GetData();
+    void SetData(CGXDLMSVariant& value);
 
     std::string ToString();
 };

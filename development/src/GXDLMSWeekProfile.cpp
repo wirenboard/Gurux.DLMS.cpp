@@ -57,14 +57,26 @@ CGXDLMSWeekProfile::CGXDLMSWeekProfile(std::string name, int monday, int tuesday
     SetSunday(sunday);
 }
 
-std::string CGXDLMSWeekProfile::GetName()
+void CGXDLMSWeekProfile::GetName(CGXByteBuffer& value)
 {
-    return m_Name;
+    value.Clear();
+    value.Set(&m_Name, 0, m_Name.GetSize());
 }
-void CGXDLMSWeekProfile::SetName(std::string value)
+
+void CGXDLMSWeekProfile::SetName(CGXByteBuffer& value)
 {
     m_Name = value;
 }
+
+std::string CGXDLMSWeekProfile::GetName()
+{
+    return m_Name.ToString();
+}
+void CGXDLMSWeekProfile::SetName(std::string value)
+{
+    m_Name.AddString(value.c_str());
+}
+
 int CGXDLMSWeekProfile::GetMonday()
 {
     return m_Monday;
@@ -131,6 +143,13 @@ void CGXDLMSWeekProfile::SetSunday(int value)
 std::string CGXDLMSWeekProfile::ToString()
 {
     std::stringstream sb;
-    sb << m_Name;
+    if (m_Name.IsAsciiString())
+    {
+        sb << m_Name.ToString();
+    }
+    else
+    {
+        sb << m_Name.ToHexString();
+    }
     return sb.str();
 }

@@ -55,11 +55,11 @@ CGXDLMSGPRSSetup::CGXDLMSGPRSSetup(std::string ln) :
 {
 }
 
-std::string CGXDLMSGPRSSetup::GetAPN()
+std::string& CGXDLMSGPRSSetup::GetAPN()
 {
     return m_APN;
 }
-void CGXDLMSGPRSSetup::SetAPN(std::string value)
+void CGXDLMSGPRSSetup::SetAPN(std::string& value)
 {
     m_APN = value;
 }

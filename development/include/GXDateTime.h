@@ -143,98 +143,108 @@ public:
     // Get date time from string.
     int FromString(const char* value);
 
-    int ToFormatString(std::string& value);
+    /////////////////////////////////////////////////////////////////////////
+    //Convert date time value to the format string using given pattern.
+    int ToFormatString(
+        const char* pattern,
+        std::string& value);
 
+    /////////////////////////////////////////////////////////////////////////
+    //Convert date time value to the format using system date-time format.
+    int ToFormatString(
+        std::string& value);
+
+    /////////////////////////////////////////////////////////////////////////
     // Used date time value.
     struct tm& GetValue();
     void SetValue(const struct tm& value);
 
+    /////////////////////////////////////////////////////////////////////////
     // Skip selected date time fields.
     DATETIME_SKIPS GetSkip();
     void SetSkip(DATETIME_SKIPS value);
+
+    /////////////////////////////////////////////////////////////////////////
+    //Convert date time value to the string using system date-time format.
     std::string ToString();
 
+    /////////////////////////////////////////////////////////////////////////
     //Get currect time.
     static CGXDateTime Now();
 
+    /////////////////////////////////////////////////////////////////////////
     // Date time extra information.
     DATE_TIME_EXTRA_INFO GetExtra();
     void SetExtra(DATE_TIME_EXTRA_INFO value);
 
-    // Get deviation.
+    /////////////////////////////////////////////////////////////////////////
+    // Deviation.
     int GetDeviation();
-
-    // Set deviation.
     void SetDeviation(int value);
 
+    /////////////////////////////////////////////////////////////////////////
     // Status of the clock.
     DLMS_CLOCK_STATUS GetStatus();
     void SetStatus(DLMS_CLOCK_STATUS value);
 
-    /**
-    * Reset date and time fields.
-    */
+    /////////////////////////////////////////////////////////////////////////
+    // Reset date and time fields.
     void Reset();
 
-    /**
-    * Reset date fields.
-    */
+    /////////////////////////////////////////////////////////////////////////
+    //Reset date fields.
     void ResetDate();
 
-    /**
-    * Set time to midnight.
-    */
+    /////////////////////////////////////////////////////////////////////////
+    // Set time to midnight.
     void ResetTime();
-    /**
-    * Add hours to current time.
-    */
+
+    /////////////////////////////////////////////////////////////////////////
+    // Add hours to current time.
     int AddHours(int hours);
 
-    /**
-    * Add minutes to current time.
-    */
+    /////////////////////////////////////////////////////////////////////////
+    // Add minutes to current time.
     int AddMinutes(int minutes);
 
-    /**
-    * Add seconds to current time.
-    */
+    /////////////////////////////////////////////////////////////////////////
+    // Add seconds to current time.
     int AddSeconds(int seconds);
-    /**
-    * Add days to current time.
-    */
+
+    /////////////////////////////////////////////////////////////////////////
+    // Add days to current time.
     int AddDays(int hours);
 
-    /**
-    * Compare current time to another time.
-    */
+    /////////////////////////////////////////////////////////////////////////
+    // Compare current time to another time.
     int CompareTo(CGXDateTime& antherDate);
 
-    /**
-    * Get amount of days in given month.
-    */
+    /////////////////////////////////////////////////////////////////////////
+    // Get amount of days in given month.
     static unsigned char DaysInMonth(int year, short month);
 
-
-    /**
-    * Get difference between given time and run time in ms.
-    *
-    * @param start
-    *            Start date time.
-    * @param to
-    *            Compared time.
-    * @return Difference in milliseconds.
-    */
+    /////////////////////////////////////////////////////////////////////////
+    // Get difference between given time and run time in ms.
+    //
+    // start:  Start date time.
+    // to:  Compared time.
+    // Returns difference in milliseconds.
     static long GetDifference(struct tm& start, CGXDateTime& to);
 
+    /////////////////////////////////////////////////////////////////////////
     //Convert value to local time.
     int ToLocalTime(struct tm& localTime);
 
+    /////////////////////////////////////////////////////////////////////////
     //Get currect timezone.
     static short GetCurrentTimeZone();
 
+    /////////////////////////////////////////////////////////////////////////
     //Get currect deviation.
     static char GetCurrentDeviation();
 
+    /////////////////////////////////////////////////////////////////////////
+    //Return datetime as unix time.
     unsigned long ToUnixTime();
 };
 #endif //GXDATETIME_H

@@ -49,10 +49,10 @@ class CGXDLMSCharge : public CGXDLMSObject
     unsigned char m_Priority;
     CGXUnitCharge m_UnitChargeActive;
     CGXUnitCharge m_UnitChargePassive;
-    CGXTime m_UnitChargeActivationTime;
+    CGXDateTime m_UnitChargeActivationTime;
     unsigned long m_Period;
     std::string m_ChargeConfiguration;
-    CGXTime m_LastCollectionTime;
+    CGXDateTime m_LastCollectionTime;
     long m_LastCollectionAmount;
     long m_TotalAmountRemaining;
     unsigned short m_Proportion;
@@ -235,7 +235,7 @@ public:
      *
      * @return Last collection time.
      */
-    CGXDateTime GetLastCollectionTime()
+    CGXDateTime& GetLastCollectionTime()
     {
         return m_LastCollectionTime;
     }

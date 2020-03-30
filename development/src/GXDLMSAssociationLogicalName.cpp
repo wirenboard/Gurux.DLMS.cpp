@@ -758,7 +758,7 @@ int CGXDLMSAssociationLogicalName::GetValue(CGXDLMSSettings& settings, CGXDLMSVa
         bb.SetUInt32(m_XDLMSContextInfo.GetConformance());
         bb.Move(1, 0, 3);
         conformance = bb;
-        CGXDLMSVariant rx = m_XDLMSContextInfo.GetMaxPduSize();
+        CGXDLMSVariant rx = m_XDLMSContextInfo.GetMaxReceivePduSize();
         CGXDLMSVariant tx = m_XDLMSContextInfo.GetMaxSendPduSize();
         CGXDLMSVariant version = m_XDLMSContextInfo.GetDlmsVersionNumber();
         CGXDLMSVariant quality = m_XDLMSContextInfo.GetQualityOfService();

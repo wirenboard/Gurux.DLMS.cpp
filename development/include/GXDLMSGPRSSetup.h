@@ -60,8 +60,8 @@ public:
     //LN Constructor.
     CGXDLMSGPRSSetup(std::string ln);
 
-    std::string GetAPN();
-    void SetAPN(std::string value);
+    std::string& GetAPN();
+    void SetAPN(std::string& value);
 
     long GetPINCode();
     void SetPINCode(long value);

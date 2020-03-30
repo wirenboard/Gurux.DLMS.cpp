@@ -65,6 +65,40 @@ CGXDLMSParameterMonitor::~CGXDLMSParameterMonitor()
     m_Parameters.clear();
 }
 
+CGXDLMSTarget& CGXDLMSParameterMonitor::GetChangedParameter()
+{
+    return m_ChangedParameter;
+}
+void CGXDLMSParameterMonitor::SetChangedParameter(CGXDLMSTarget& value)
+{
+    m_ChangedParameter = value;
+}
+
+/**
+ * Capture time.
+ */
+CGXDateTime& CGXDLMSParameterMonitor::GetCaptureTime()
+{
+    return m_CaptureTime;
+}
+
+void CGXDLMSParameterMonitor::SetCaptureTime(CGXDateTime& value)
+{
+    m_CaptureTime = value;
+}
+
+/**
+ * Changed Parameter
+ */
+std::vector<CGXDLMSTarget*>& CGXDLMSParameterMonitor::GetParameters()
+{
+    return m_Parameters;
+}
+void CGXDLMSParameterMonitor::SetParameters(std::vector<CGXDLMSTarget*>& value)
+{
+    m_Parameters = value;
+}
+
 // Returns amount of attributes.
 int CGXDLMSParameterMonitor::GetAttributeCount()
 {

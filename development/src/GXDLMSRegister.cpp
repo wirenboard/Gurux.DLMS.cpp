@@ -73,7 +73,7 @@ CGXDLMSRegister::CGXDLMSRegister(std::string ln) :
 /// <summary>
 /// Get value of COSEM Data object.
 /// </summary>
-CGXDLMSVariant CGXDLMSRegister::GetValue()
+CGXDLMSVariant& CGXDLMSRegister::GetValue()
 {
     return m_Value;
 }
@@ -264,7 +264,6 @@ int CGXDLMSRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     else if (e.GetIndex() == 2)
     {
-        CGXDLMSObject::SetDataType(2, e.GetValue().vt);
         if (m_Scaler != 0 && e.GetValue().IsNumber())
         {
             double val = GetScaler();

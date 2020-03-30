@@ -35,10 +35,11 @@
 #define GXDLMSWEEKPROFILE_H
 
 #include <string>
+#include "GXByteBuffer.h"
 
 class CGXDLMSWeekProfile
 {
-    std::string m_Name;
+    CGXByteBuffer m_Name;
     int m_Monday;
     int m_Tuesday;
     int m_Wednesday;
@@ -60,6 +61,10 @@ public:
     std::string GetName();
 
     void SetName(std::string value);
+
+    void GetName(CGXByteBuffer& value);
+
+    void SetName(CGXByteBuffer& value);
 
     int GetMonday();
 

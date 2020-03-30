@@ -81,6 +81,10 @@ int CGXDLMSObject::GetLogicalName(CGXDLMSObject* target, CGXDLMSVariant& value)
 
 int CGXDLMSObject::SetLogicalName(CGXDLMSObject * target, CGXDLMSVariant& value)
 {
+    if (value.vt == DLMS_DATA_TYPE_STRING)
+    {
+        return GXHelpers::SetLogicalName(value.strVal.c_str(), target->m_LN);
+    }
     if (value.vt != DLMS_DATA_TYPE_OCTET_STRING || value.GetSize() != 6)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;

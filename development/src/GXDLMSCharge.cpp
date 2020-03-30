@@ -93,10 +93,65 @@ void CGXDLMSCharge::GetAttributeIndexToRead(bool all, std::vector<int>& attribut
     {
         attributes.push_back(1);
     }
-    //Value
+    //TotalAmountPaid
     if (all || CanRead(2))
     {
         attributes.push_back(2);
+    }
+    //ChargeType
+    if (all || CanRead(3))
+    {
+        attributes.push_back(3);
+    }
+    //Priority
+    if (all || CanRead(4))
+    {
+        attributes.push_back(4);
+    }
+    //UnitChargeActive
+    if (all || CanRead(5))
+    {
+        attributes.push_back(5);
+    }
+    //UnitChargePassive
+    if (all || CanRead(6))
+    {
+        attributes.push_back(6);
+    }
+    //UnitChargeActivationTime
+    if (all || CanRead(7))
+    {
+        attributes.push_back(7);
+    }
+    //Period
+    if (all || CanRead(8))
+    {
+        attributes.push_back(8);
+    }
+    //ChargeConfiguration
+    if (all || CanRead(9))
+    {
+        attributes.push_back(9);
+    }
+    //LastCollectionTime
+    if (all || CanRead(10))
+    {
+        attributes.push_back(10);
+    }
+    //LastCollectionAmount
+    if (all || CanRead(11))
+    {
+        attributes.push_back(11);
+    }
+    //TotalAmountRemaining
+    if (all || CanRead(12))
+    {
+        attributes.push_back(12);
+    }
+    //Proportion
+    if (all || CanRead(13))
+    {
+        attributes.push_back(13);
     }
 }
 
@@ -284,11 +339,11 @@ int CGXDLMSCharge::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 int CGXDLMSCharge::SetUnitCharge(CGXDLMSSettings& settings, CGXUnitCharge& charge, CGXDLMSValueEventArg& e)
 {
     std::vector<CGXDLMSVariant>& tmp = e.GetValue().Arr;
-    charge.GetChargePerUnitScaling().SetCommodityScale(tmp[0].Arr[0].Arr[0].ToInteger());
-    charge.GetChargePerUnitScaling().SetPriceScale(tmp[0].Arr[0].Arr[1].ToInteger());
-    charge.GetCommodity().SetType((DLMS_OBJECT_TYPE)tmp[1].Arr[0].Arr[0].ToInteger());
-    charge.GetCommodity().SetType((DLMS_OBJECT_TYPE)tmp[1].Arr[1].Arr[0].ToInteger());
-    charge.GetCommodity().SetIndex(tmp[1].Arr[2].Arr[0].ToInteger());
+    charge.GetChargePerUnitScaling().SetCommodityScale(tmp[0].Arr[0].ToInteger());
+    charge.GetChargePerUnitScaling().SetPriceScale(tmp[0].Arr[1].ToInteger());
+    charge.GetCommodity().SetType((DLMS_OBJECT_TYPE)tmp[1].Arr[0].ToInteger());
+    charge.GetCommodity().SetLogicalName(tmp[1].Arr[1].byteArr);
+    charge.GetCommodity().SetIndex(tmp[1].Arr[2].ToInteger());
     charge.GetChargeTables().clear();
     for (std::vector<CGXDLMSVariant>::iterator it = tmp[2].Arr.begin(); it != tmp[2].Arr.end(); ++it)
     {

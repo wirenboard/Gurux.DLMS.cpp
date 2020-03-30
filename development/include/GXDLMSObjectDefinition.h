@@ -41,12 +41,12 @@
 class CGXDLMSObjectDefinition
 {
 private:
-    DLMS_OBJECT_TYPE m_ClassId;
+    DLMS_OBJECT_TYPE m_ObjectType;
     std::string m_LogicalName;
 
 public:
-    DLMS_OBJECT_TYPE GetClassId();
-    void SetClassId(DLMS_OBJECT_TYPE value);
+    DLMS_OBJECT_TYPE GetObjectType();
+    void SetObjectType(DLMS_OBJECT_TYPE value);
 
     std::string GetLogicalName();
     void SetLogicalName(std::string value);

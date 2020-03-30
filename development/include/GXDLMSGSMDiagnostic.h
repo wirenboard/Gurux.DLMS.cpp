@@ -96,13 +96,13 @@ public:
     /**
     * @return Name of network operator.
     */
-    std::string GetOperator();
+    std::string& GetOperator();
 
     /**
     * @param value
     *            Name of network operator.
     */
-    void SetOperator(std::string value);
+    void SetOperator(std::string& value);
 
     /**
     * @return Registration status of the modem.
@@ -147,7 +147,7 @@ public:
     /**
     * @return Date and time when the data have been last captured.
     */
-    CGXDateTime GetCaptureTime();
+    CGXDateTime& GetCaptureTime();
 
     /**
     * @param value

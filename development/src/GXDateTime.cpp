@@ -138,7 +138,8 @@ CGXDateTime::CGXDateTime()
     GetUtcOffset(&dt, hours, minutes, deviation);
     m_Deviation = -(hours * 60 + minutes);
     m_Skip = DATETIME_SKIPS_NONE;
-    memset(&m_Value, 0xFF, sizeof(m_Value));
+    memset(&m_Value, 0, sizeof(m_Value));
+    m_Value.tm_mday = 1;
     m_Extra = DATE_TIME_EXTRA_INFO_NONE;
     m_Status = DLMS_CLOCK_STATUS_OK;
 }
@@ -668,7 +669,7 @@ int CGXDateTime::FromString(const char* datetime)
     return ret;
 }
 
-int CGXDateTime::ToFormatString(std::string& value)
+int CGXDateTime::ToFormatString(const char* pattern, std::string& value)
 {
     int ret;
     char buff[30];
@@ -676,9 +677,14 @@ int CGXDateTime::ToFormatString(std::string& value)
     if (m_Skip != 0 || m_Extra != 0)
     {
         std::string format;
+        if (pattern != NULL)
+        {
+            format.append(pattern);
+        }
         GXDLMS_DATE_FORMAT df;
-        char dateSeparator, timeSeparator, use24HourClock;
-        if ((ret = GetDateTimeFormat(format, df, dateSeparator, timeSeparator, use24HourClock)) == 0)
+        char dateSeparator = '/' , timeSeparator = ':', use24HourClock = 0;
+        if (pattern != NULL ||
+            (ret = GetDateTimeFormat(format, df, dateSeparator, timeSeparator, use24HourClock)) == 0)
         {
             Remove(this, format, dateSeparator, timeSeparator);
 
@@ -739,7 +745,7 @@ int CGXDateTime::ToFormatString(std::string& value)
     }
     else
     {
-        ret = (int)strftime(buff, sizeof(buff), "%x %X", &m_Value);
+        ret = (int)strftime(buff, sizeof(buff), pattern, &m_Value);
         if (ret == 7)
         {
             ret = 0;
@@ -751,6 +757,11 @@ int CGXDateTime::ToFormatString(std::string& value)
         }
     }
     return ret;
+}
+
+int CGXDateTime::ToFormatString(std::string& value)
+{
+    return ToFormatString(NULL, value);
 }
 
 // Constructor.

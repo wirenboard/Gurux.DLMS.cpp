@@ -78,21 +78,21 @@ public:
      Provides the active threshold value to which the attribute monitored is compared.
     */
     CGXDLMSVariant& GetThresholdActive();
-    void SetThresholdActive(CGXDLMSVariant value);
+    void SetThresholdActive(CGXDLMSVariant& value);
 
     /**
      Provides the threshold value to which the attribute monitored
      is compared when in normal operation.
     */
     CGXDLMSVariant& GetThresholdNormal();
-    void SetThresholdNormal(CGXDLMSVariant value);
+    void SetThresholdNormal(CGXDLMSVariant& value);
 
     /**
      Provides the threshold value to which the attribute monitored
      is compared when an emergency profile is active.
     */
     CGXDLMSVariant& GetThresholdEmergency();
-    void SetThresholdEmergency(CGXDLMSVariant value);
+    void SetThresholdEmergency(CGXDLMSVariant& value);
 
     /**
      Defines minimal over threshold duration in seconds required

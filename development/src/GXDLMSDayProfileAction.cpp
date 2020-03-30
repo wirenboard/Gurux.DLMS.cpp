@@ -48,7 +48,7 @@ CGXDLMSDayProfileAction::CGXDLMSDayProfileAction()
 /**
  Constructor.
 */
-CGXDLMSDayProfileAction::CGXDLMSDayProfileAction(CGXTime& startTime, std::string scriptLogicalName, int scriptSelector)
+CGXDLMSDayProfileAction::CGXDLMSDayProfileAction(CGXTime& startTime, std::string& scriptLogicalName, int scriptSelector)
 {
     SetStartTime(startTime);
     SetScriptLogicalName(scriptLogicalName);
@@ -70,11 +70,11 @@ void CGXDLMSDayProfileAction::SetStartTime(CGXTime& value)
 /**
  Defines the logical name of the "Script table" object;
 */
-std::string CGXDLMSDayProfileAction::GetScriptLogicalName()
+std::string& CGXDLMSDayProfileAction::GetScriptLogicalName()
 {
     return m_ScriptLogicalName;
 }
-void CGXDLMSDayProfileAction::SetScriptLogicalName(std::string value)
+void CGXDLMSDayProfileAction::SetScriptLogicalName(std::string& value)
 {
     m_ScriptLogicalName = value;
 }

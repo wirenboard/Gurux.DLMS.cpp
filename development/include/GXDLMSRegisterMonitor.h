@@ -74,9 +74,9 @@ public:
     */
     CGXDLMSRegisterMonitor(std::string ln, unsigned short sn);
 
-    std::vector<CGXDLMSVariant> GetThresholds();
+    std::vector<CGXDLMSVariant>& GetThresholds();
 
-    void SetThresholds(std::vector<CGXDLMSVariant> value);
+    void SetThresholds(std::vector<CGXDLMSVariant>& value);
 
 
     CGXDLMSMonitoredValue& GetMonitoredValue();

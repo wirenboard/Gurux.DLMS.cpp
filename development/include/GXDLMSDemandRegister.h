@@ -43,8 +43,8 @@ http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSDemandRegister
 */
 class CGXDLMSDemandRegister : public CGXDLMSObject
 {
-    CGXDLMSVariant m_CurrentAvarageValue;
-    CGXDLMSVariant m_LastAvarageValue;
+    CGXDLMSVariant m_CurrentAverageValue;
+    CGXDLMSVariant m_LastAverageValue;
     signed char m_Scaler;
     unsigned char m_Unit;
     CGXDLMSVariant m_Status;
@@ -78,16 +78,16 @@ public:
     CGXDLMSDemandRegister(std::string ln, unsigned short sn);
 
     /**
-     Current avarage value of COSEM Data object.
+     Current Average value of COSEM Data object.
     */
-    CGXDLMSVariant GetCurrentAvarageValue();
-    void SetCurrentAvarageValue(CGXDLMSVariant value);
+    CGXDLMSVariant& GetCurrentAverageValue();
+    void SetCurrentAverageValue(CGXDLMSVariant& value);
 
     /**
-     Last avarage value of COSEM Data object.
+     Last Average value of COSEM Data object.
     */
-    CGXDLMSVariant GetLastAvarageValue();
-    void SetLastAvarageValue(CGXDLMSVariant value);
+    CGXDLMSVariant& GetLastAverageValue();
+    void SetLastAverageValue(CGXDLMSVariant& value);
 
     /**
      Scaler of COSEM Register object.
@@ -102,20 +102,20 @@ public:
     /**
      Scaler of COSEM Register object.
     */
-    CGXDLMSVariant GetStatus();
-    void SetStatus(CGXDLMSVariant value);
+    CGXDLMSVariant& GetStatus();
+    void SetStatus(CGXDLMSVariant& value);
 
     /**
      Capture time of COSEM Register object.
     */
-    CGXDateTime GetCaptureTime();
+    CGXDateTime& GetCaptureTime();
     void SetCaptureTime(CGXDateTime value);
 
     /**
      Current start time of COSEM Register object.
     */
-    CGXDateTime GetStartTimeCurrent();
-    void SetStartTimeCurrent(CGXDateTime value);
+    CGXDateTime& GetStartTimeCurrent();
+    void SetStartTimeCurrent(CGXDateTime& value);
 
     unsigned long GetPeriod();
     void SetPeriod(unsigned long value);

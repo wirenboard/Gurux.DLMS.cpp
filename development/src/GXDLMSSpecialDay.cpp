@@ -44,11 +44,17 @@ void CGXDLMSSpecialDay::SetIndex(int value)
     m_Index = value;
 }
 
-CGXDateTime& CGXDLMSSpecialDay::GetDate()
+CGXDate& CGXDLMSSpecialDay::GetDate()
 {
     return m_Date;
 }
-void CGXDLMSSpecialDay::SetDate(CGXDateTime value)
+
+void CGXDLMSSpecialDay::SetDate(CGXDate& value)
+{
+    m_Date = value;
+}
+
+void CGXDLMSSpecialDay::SetDate(CGXDateTime& value)
 {
     m_Date = value;
 }
