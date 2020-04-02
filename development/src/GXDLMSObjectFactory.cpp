@@ -79,6 +79,13 @@
 #include "../include/GXDLMSTokenGateway.h"
 #include "../include/GXDLMSCompactData.h"
 #include "../include/GXDLMSUtilityTables.h"
+#include "../include/GXDLMSLlcSscsSetup.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcPhysicalLayerCounters.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcMacSetup.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcMacFunctionalParameters.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcMacCounters.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcApplicationsIdentification.h"
 
 // Reserved for internal use.
 CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
@@ -187,6 +194,20 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
         return new CGXDLMSTokenGateway();
     case DLMS_OBJECT_TYPE_COMPACT_DATA:
         return new CGXDLMSCompactData();
+    case DLMS_OBJECT_TYPE_LLC_SSCS_SETUP:
+        return new CGXDLMSLlcSscsSetup();
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS:
+        return new CGXDLMSPrimeNbOfdmPlcPhysicalLayerCounters();
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_SETUP:
+        return new CGXDLMSPrimeNbOfdmPlcMacSetup();
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS:
+        return new CGXDLMSPrimeNbOfdmPlcMacFunctionalParameters();
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_COUNTERS:
+        return new CGXDLMSPrimeNbOfdmPlcMacCounters();
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA:
+        return new CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData();
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION:
+        return new CGXDLMSPrimeNbOfdmPlcApplicationsIdentification();
     default:
 #ifdef _DEBUG
         printf("Unknown object: %d\r\n", type);

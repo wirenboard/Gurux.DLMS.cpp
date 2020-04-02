@@ -2320,6 +2320,11 @@ int GXHelpers::SetBitString(CGXByteBuffer& buff, CGXDLMSVariant& value, bool add
     return DLMS_ERROR_CODE_OK;
 }
 
+int GXHelpers::SetData2(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant value)
+{
+    return SetData(buff, type, value);
+}
+
 int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant& value)
 {
     if ((type == DLMS_DATA_TYPE_ARRAY || type == DLMS_DATA_TYPE_STRUCTURE)

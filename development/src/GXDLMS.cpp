@@ -2224,7 +2224,7 @@ int CGXDLMS::HandleGbt(CGXDLMSSettings& settings, CGXReplyData& data)
     int ret;
     unsigned char bc, windowSize;
     unsigned long len;
-    unsigned short bn;
+    unsigned short bn, bna;
     int index = data.GetData().GetPosition() - 1;
     data.SetWindowSize(settings.GetWindowSize());
     // BlockControl
@@ -2241,13 +2241,28 @@ int CGXDLMS::HandleGbt(CGXDLMSSettings& settings, CGXReplyData& data)
     {
         return ret;
     }
-    data.SetBlockNumber(bn);
     // Block number acknowledged.
-    if ((ret = data.GetData().GetUInt16(&bn)) != 0)
+    if ((ret = data.GetData().GetUInt16(&bna)) != 0)
     {
         return ret;
     }
-    data.SetBlockNumberAck(bn);
+    if (data.GetXml() == NULL)
+    {
+        // Remove existing data when first block is received.
+        if (bn == 1)
+        {
+            index = 0;
+        }
+        else if (bna != settings.GetBlockIndex() - 1)
+        {
+            // If this block is already received.
+            data.GetData().SetSize(index);
+            data.SetCommand(DLMS_COMMAND_NONE);
+            return 0;
+        }
+    }
+    data.SetBlockNumber(bn);
+    data.SetBlockNumberAck(bna);
     settings.SetBlockNumberAck(data.GetBlockNumber());
     data.SetCommand(DLMS_COMMAND_NONE);
 
@@ -2816,7 +2831,10 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
         }
         if (ret == DLMS_ERROR_CODE_FALSE && target->IsComplete())
         {
-            target = notify;
+            if (notify != NULL)
+            {
+                target = notify;
+            }
             isNotify = true;
         }
     }
@@ -2842,7 +2860,7 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
     }
     ret = GetPdu(settings, *target);
 
-    if (ret == 0 && !isNotify)
+    if (notify != NULL && ret == 0 && !isNotify)
     {
         CGXByteBuffer& d = data.GetData();
         //Check command to make sure it's not notify message.

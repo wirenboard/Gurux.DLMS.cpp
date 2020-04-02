@@ -845,20 +845,63 @@ typedef enum
     DLMS_OBJECT_TYPE_MBUS_MASTER_PORT_SETUP = 74,
 
     /*
-     * Configure a ZigBee PRO device with information necessary to create or
-     * join the network.
-     */
+    * Addresses that are provided by the base node during the opening of the
+    * convergence layer.
+    */
+    DLMS_OBJECT_TYPE_LLC_SSCS_SETUP = 80,
+
+    /*
+    * Counters related to the physical layers exchanges.
+    */
+    DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS = 81,
+
+    /*
+    * A necessary parameters to set up and manage the PRIME NB OFDM PLC MAC
+    * layer.
+    */
+    DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_SETUP = 82,
+
+    /*
+    * Functional behaviour of MAC.
+    */
+    DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS = 83,
+
+    /*
+    * Statistical information on the operation of the MAC layer for management
+    * purposes.
+    */
+    DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_COUNTERS = 84,
+
+    /*
+    * Parameters related to the management of the devices connected to the
+    * network.
+    */
+    DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA = 85,
+
+    /*
+    * Identification information related to administration and maintenance of
+    * PRIME NB OFDM PLC devices.
+    */
+    DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION = 86,
+
+    /*
+    * Configure a ZigBee PRO device with information necessary to create or
+    * join the network.
+    */
     DLMS_OBJECT_TYPE_ZIG_BEE_SAS_STARTUP = 101,
 
     /*
-     * Configure the behavior of a ZigBee PRO device on joining or loss of
-     * connection to the network.
-     */
+    * Configure the behavior of a ZigBee PRO device on joining or loss of
+    * connection to the network.
+    */
     DLMS_OBJECT_TYPE_ZIG_BEE_SAS_JOIN = 102,
+
     /*
-     * Configure the fragmentation feature of ZigBee PRO transport layer.
-     */
+    * Configure the fragmentation feature of ZigBee PRO transport layer.
+    */
     DLMS_OBJECT_TYPE_ZIG_BEE_SAS_APS_FRAGMENTATION = 103,
+
+
     DLMS_OBJECT_TYPE_ZIG_BEE_NETWORK_CONTROL = 104,
 
     DLMS_OBJECT_TYPE_ACCOUNT = 111,

@@ -36,7 +36,7 @@
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
 #include <tchar.h>
 #include <conio.h>
-#include <Winsock.h> //Add support for sockets	
+#include <Winsock.h> //Add support for sockets
 #include <time.h>
 #include <process.h>//Add support for threads
 #else //Linux includes.
@@ -65,9 +65,9 @@ void ListenerThread(void* pVoid)
     CGXByteBuffer reply;
     // Client used to parse received data.
     CGXDLMSClient cl(true, -1, -1, DLMS_AUTHENTICATION_NONE, NULL, DLMS_INTERFACE_TYPE_WRAPPER);
-    CGXDLMSPushListener* server = (CGXDLMSPushListener*) pVoid;
+    CGXDLMSPushListener* server = (CGXDLMSPushListener*)pVoid;
 
-    sockaddr_in add = {0};
+    sockaddr_in add = { 0 };
     int ret;
     char tmp[10];
     CGXByteBuffer bb;
@@ -80,7 +80,7 @@ void ListenerThread(void* pVoid)
     socklen_t AddrLen = sizeof(add);
 #endif
     struct sockaddr_in client;
-    memset(&client,0,sizeof(client));
+    memset(&client, 0, sizeof(client));
     //Get buffer data
     basic_string<char> senderInfo;
 
@@ -91,14 +91,14 @@ void ListenerThread(void* pVoid)
     CGXReplyData data;
     CGXReplyData notify;
 
-    while(server->IsConnected())
+    while (server->IsConnected())
     {
         len = sizeof(client);
         senderInfo.clear();
-        int socket = accept(server->GetSocket(),(struct sockaddr*)&client, &len);
+        int socket = accept(server->GetSocket(), (struct sockaddr*) & client, &len);
         if (server->IsConnected())
         {
-            if ((ret = getpeername(socket, (sockaddr*) &add, &AddrLen)) == -1)
+            if ((ret = getpeername(socket, (sockaddr*)&add, &AddrLen)) == -1)
             {
 #if defined(_WIN32) || defined(_WIN64)//If Windows
                 closesocket(socket);
@@ -122,9 +122,10 @@ void ListenerThread(void* pVoid)
             {
                 //If client is left wait for next client.
                 if ((ret = recv(socket, (char*)
-                                bb.GetData() + bb.GetSize(),
-                                bb.Capacity() - bb.GetSize(), 0)) == -1)
+                    bb.GetData() + bb.GetSize(),
+                    bb.Capacity() - bb.GetSize(), 0)) == -1)
                 {
+                    bb.SetSize(0);
 #if defined(_WIN32) || defined(_WIN64)//If Windows
                     closesocket(socket);
                     socket = INVALID_SOCKET;
@@ -137,6 +138,7 @@ void ListenerThread(void* pVoid)
                 //If client is closed the connection.
                 if (ret == 0)
                 {
+                    bb.SetSize(0);
 #if defined(_WIN32) || defined(_WIN64)//If Windows
                     closesocket(socket);
                     socket = INVALID_SOCKET;
@@ -149,6 +151,7 @@ void ListenerThread(void* pVoid)
                 bb.SetSize(bb.GetSize() + ret);
                 if ((ret = cl.GetData(bb, data, notify)) != 0 && ret != DLMS_ERROR_CODE_FALSE)
                 {
+                    bb.SetSize(0);
 #if defined(_WIN32) || defined(_WIN64)//If Windows
                     closesocket(socket);
                     socket = INVALID_SOCKET;
@@ -159,38 +162,42 @@ void ListenerThread(void* pVoid)
                 }
 
                 // If all data is received.
-                if (notify.IsComplete() && !notify.IsMoreData())
+                if (notify.IsComplete())
                 {
-                    //Show data as XML.
-                    string xml;
-                    CGXDLMSTranslator t(DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML);
-                    t.DataToXml(notify.GetData(), xml);
-                    printf(xml.c_str());
-                    //Example is sending list of push messages in first parameter.
-                    if (notify.GetValue().vt == DLMS_DATA_TYPE_STRUCTURE)
+                    bb.Clear();
+                    if (!notify.IsMoreData())
                     {
-                        std::vector<std::pair<CGXDLMSObject*, unsigned char> > objects;
-                        ret = cl.ParsePushObjects(notify.GetValue().Arr[0].Arr, objects);
-                        //Remove first item because it's not needed anymore.
-                        objects.erase(objects.begin());
-                        //Update clock.
-                        int Valueindex = 1;
-                        std::vector<std::string> values;
-                        for(std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = objects.begin(); it != objects.end(); ++it)
+                        //Show data as XML.
+                        string xml;
+                        CGXDLMSTranslator t(DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML);
+                        t.DataToXml(notify.GetData(), xml);
+                        printf(xml.c_str());
+                        //Example is sending list of push messages in first parameter.
+                        if (notify.GetValue().vt == DLMS_DATA_TYPE_STRUCTURE)
                         {
-                            values.clear();
-                            cl.UpdateValue(*it->first, it->second, notify.GetValue().Arr[Valueindex]);
-                            ++Valueindex;
-                            //Print value
-                            std::string ln;
-                            it->first->GetLogicalName(ln);
-                            it->first->GetValues(values);
-                            printf("%s %s %d: %s\r\n", CGXDLMSConverter::ToString(it->first->GetObjectType()), ln.c_str(), it->second, values.at(it->second-1).c_str());
+                            std::vector<std::pair<CGXDLMSObject*, unsigned char> > objects;
+                            ret = cl.ParsePushObjects(notify.GetValue().Arr[0].Arr, objects);
+                            //Remove first item because it's not needed anymore.
+                            objects.erase(objects.begin());
+                            //Update clock.
+                            int Valueindex = 1;
+                            std::vector<std::string> values;
+                            for (std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = objects.begin(); it != objects.end(); ++it)
+                            {
+                                values.clear();
+                                cl.UpdateValue(*it->first, it->second, notify.GetValue().Arr[Valueindex]);
+                                ++Valueindex;
+                                //Print value
+                                std::string ln;
+                                it->first->GetLogicalName(ln);
+                                it->first->GetValues(values);
+                                printf("%s %s %d: %s\r\n", CGXDLMSConverter::ToString(it->first->GetObjectType()), ln.c_str(), it->second, values.at(it->second - 1).c_str());
+                            }
                         }
+                        printf("Server address: %d Client Address: %d\r\n", notify.GetServerAddress(), notify.GetClientAddress());
+                        notify.Clear();
+                        bb.Trim();
                     }
-                    printf("Server address: %d Client Address: %d\r\n", notify.GetServerAddress(), notify.GetClientAddress());
-                    notify.Clear();
-                    bb.Trim();                  
                 }
             }
         }
@@ -199,7 +206,7 @@ void ListenerThread(void* pVoid)
 
 #if defined(_WIN32) || defined(_WIN64)//If Windows
 #else //If Linux
-void * UnixListenerThread(void * pVoid)
+void* UnixListenerThread(void* pVoid)
 {
     ListenerThread(pVoid);
     return NULL;
@@ -234,12 +241,12 @@ int CGXDLMSPushListener::StartServer(int port)
         return -1;
     }
     int fFlag = 1;
-    if (setsockopt(m_ServerSocket, SOL_SOCKET, SO_REUSEADDR, (char *)&fFlag, sizeof(fFlag)) == -1)
+    if (setsockopt(m_ServerSocket, SOL_SOCKET, SO_REUSEADDR, (char*)&fFlag, sizeof(fFlag)) == -1)
     {
         //setsockopt.
         return -1;
     }
-    sockaddr_in add = {0};
+    sockaddr_in add = { 0 };
     add.sin_port = htons(port);
     add.sin_addr.s_addr = htonl(INADDR_ANY);
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
@@ -247,20 +254,20 @@ int CGXDLMSPushListener::StartServer(int port)
 #else
     add.sin_family = AF_INET;
 #endif
-    if((ret = ::bind(m_ServerSocket, (sockaddr*) &add, sizeof(add))) == -1)
+    if ((ret = ::bind(m_ServerSocket, (sockaddr*)&add, sizeof(add))) == -1)
     {
         //bind;
         return -1;
     }
-    if((ret = listen(m_ServerSocket, 1)) == -1)
+    if ((ret = listen(m_ServerSocket, 1)) == -1)
     {
         //socket listen failed.
         return -1;
     }
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
-    m_ReceiverThread = (HANDLE) _beginthread(ListenerThread, 0, (LPVOID) this);
+    m_ReceiverThread = (HANDLE)_beginthread(ListenerThread, 0, (LPVOID)this);
 #else
-    ret = pthread_create(&m_ReceiverThread, NULL, UnixListenerThread, (void *) this);
+    ret = pthread_create(&m_ReceiverThread, NULL, UnixListenerThread, (void*)this);
 #endif
     return ret;
 }
@@ -280,8 +287,8 @@ int CGXDLMSPushListener::StopServer()
 #else
         close(m_ServerSocket);
         m_ServerSocket = -1;
-        void *res;
-        pthread_join(m_ReceiverThread, (void **)&res);
+        void* res;
+        pthread_join(m_ReceiverThread, (void**)&res);
         free(res);
 #endif
     }

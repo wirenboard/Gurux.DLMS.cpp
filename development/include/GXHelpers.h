@@ -91,6 +91,15 @@ public:
     * type : Data type.
     * value : Added Value.
     */
+    static int SetData2(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant value);
+
+    /**
+    * Convert object to DLMS bytes.
+    *
+    * buff : Byte buffer where data is write.
+    * type : Data type.
+    * value : Added Value.
+    */
     static int SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant& value);
 
     /**

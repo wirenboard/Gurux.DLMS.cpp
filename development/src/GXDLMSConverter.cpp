@@ -1062,6 +1062,20 @@ const char* CGXDLMSConverter::ToString(DLMS_OBJECT_TYPE type)
         return "GXDLMSGSMDiagnostic";
     case DLMS_OBJECT_TYPE_COMPACT_DATA:
         return "GXDLMSCompactData";
+    case DLMS_OBJECT_TYPE_LLC_SSCS_SETUP:
+        return "GXDLMSLlcSscsSetup";
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS:
+        return "GXDLMSPrimeNbOfdmPlcPhysicalLayerCounters";
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_SETUP:
+        return "GXDLMSPrimeNbOfdmPlcMacSetup";
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS:
+        return "GXDLMSPrimeNbOfdmPlcMacFunctionalParameters";
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_COUNTERS:
+        return "GXDLMSPrimeNbOfdmPlcMacCounters";
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA:
+        return "GXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData";
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION:
+        return "GXDLMSPrimeNbOfdmPlcApplicationsIdentification";
     default:
         return "Manufacture spesific.";
     }

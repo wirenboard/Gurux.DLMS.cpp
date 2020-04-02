@@ -78,6 +78,13 @@
 #include "../include/GXDLMSTokenGateway.h"
 #include "../include/GXDLMSCompactData.h"
 #include "../include/GXDLMSUtilityTables.h"
+#include "../include/GXDLMSLlcSscsSetup.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcPhysicalLayerCounters.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcMacSetup.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcMacFunctionalParameters.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcMacCounters.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcApplicationsIdentification.h"
 
 CGXXmlWriter::CGXXmlWriter(FILE* f, bool skipDefaults)
 {
@@ -277,13 +284,13 @@ int CGXXmlWriter::WriteEndDocument()
 int CGXXmlWriter::WriteAttributeString(const char* name, const char* value)
 {
     return 0;
-    //writer.WriteAttributeString(name, value);
+    //writer->WriteAttributeString(name, value);
 }
 
 int CGXXmlWriter::WriteAttributeString(const char* name, const int value)
 {
     return 0;
-    //writer.WriteAttributeString(name, value);
+    //writer->WriteAttributeString(name, value);
 }
 
 int CGXXmlWriter::WriteArray(CGXDLMSVariant& data)
@@ -1352,6 +1359,237 @@ int SaveCompactData(CGXXmlWriter* writer, CGXDLMSCompactData* obj)
     return 0;
 }
 
+int SaveLlcSscsSetup(CGXXmlWriter* writer, CGXDLMSLlcSscsSetup* obj)
+{
+    int ret;
+    if ((ret = writer->WriteElementString("ServiceNodeAddress", obj->GetServiceNodeAddress())) == 0)
+    {
+        ret = writer->WriteElementString("BaseNodeAddress", obj->GetBaseNodeAddress());
+    }
+    return ret;
+}
+
+int SavePrimeNbOfdmPlcPhysicalLayerCounters(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcPhysicalLayerCounters* obj)
+{
+    int ret;
+    if ((ret = writer->WriteElementString("CrcIncorrectCount", obj->GetCrcIncorrectCount())) != 0 ||
+        (ret = writer->WriteElementString("CrcFailedCount", obj->GetCrcFailedCount())) != 0 ||
+        (ret = writer->WriteElementString("TxDropCount", obj->GetTxDropCount())) != 0 ||
+        (ret = writer->WriteElementString("RxDropCount", obj->GetRxDropCount())) != 0)
+    {
+
+    }
+    return ret;
+}
+
+int SavePrimeNbOfdmPlcMacSetup(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacSetup* obj)
+{
+    int ret;
+    if ((ret = writer->WriteElementString("MacMinSwitchSearchTime", obj->GetMacMinSwitchSearchTime())) != 0 ||
+        (ret = writer->WriteElementString("MacMaxPromotionPdu", obj->GetMacMaxPromotionPdu())) != 0 ||
+        (ret = writer->WriteElementString("MacPromotionPduTxPeriod", obj->GetMacPromotionPduTxPeriod())) != 0 ||
+        (ret = writer->WriteElementString("MacBeaconsPerFrame", obj->GetMacBeaconsPerFrame())) != 0 ||
+        (ret = writer->WriteElementString("MacScpMaxTxAttempts", obj->GetMacScpMaxTxAttempts())) != 0 ||
+        (ret = writer->WriteElementString("MacCtlReTxTimer", obj->GetMacCtlReTxTimer())) != 0 ||
+        (ret = writer->WriteElementString("MacMaxCtlReTx", obj->GetMacMaxCtlReTx())) != 0)
+    {
+
+    }
+    return ret;
+}
+
+int SavePrimeNbOfdmPlcMacFunctionalParameters(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacFunctionalParameters* obj)
+{
+    int ret;
+    if ((ret = writer->WriteElementString("LnId", obj->GetLnId())) != 0 ||
+        (ret = writer->WriteElementString("LsId", obj->GetLsId())) != 0 ||
+        (ret = writer->WriteElementString("SId", obj->GetSId())) != 0 ||
+        (ret = writer->WriteElementString("SNa", obj->GetSna().ToHexString())) != 0 ||
+        (ret = writer->WriteElementString("State", obj->GetState())) != 0 ||
+        (ret = writer->WriteElementString("ScpLength", obj->GetScpLength())) != 0 ||
+        (ret = writer->WriteElementString("NodeHierarchyLevel", obj->GetNodeHierarchyLevel())) != 0 ||
+        (ret = writer->WriteElementString("BeaconSlotCount", obj->GetBeaconSlotCount())) != 0 ||
+        (ret = writer->WriteElementString("BeaconRxSlot", obj->GetBeaconRxSlot())) != 0 ||
+        (ret = writer->WriteElementString("BeaconTxSlot", obj->GetBeaconTxSlot())) != 0 ||
+        (ret = writer->WriteElementString("BeaconRxFrequency", obj->GetBeaconRxFrequency())) != 0 ||
+        (ret = writer->WriteElementString("BeaconTxFrequency", obj->GetBeaconTxFrequency())) != 0 ||
+        (ret = writer->WriteElementString("Capabilities", obj->GetCapabilities())) != 0)
+    {
+
+    }
+    return ret;
+}
+
+int SavePrimeNbOfdmPlcMacCounters(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacCounters* obj)
+{
+    int ret;
+    if ((ret = writer->WriteElementString("TxDataPktCount", obj->GetTxDataPktCount())) != 0 ||
+        (ret = writer->WriteElementString("RxDataPktCount", obj->GetRxDataPktCount())) != 0 ||
+        (ret = writer->WriteElementString("TxCtrlPktCount", obj->GetTxCtrlPktCount())) != 0 ||
+        (ret = writer->WriteElementString("RxCtrlPktCount", obj->GetRxCtrlPktCount())) != 0 ||
+        (ret = writer->WriteElementString("CsmaFailCount", obj->GetCsmaFailCount())) != 0 ||
+        (ret = writer->WriteElementString("CsmaChBusyCount", obj->GetCsmaChBusyCount())) != 0)
+    {
+
+    }
+    return ret;
+    return 0;
+}
+
+int SaveMulticastEntries(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData* obj)
+{
+    int ret;
+    if ((ret = writer->WriteStartElement("MulticastEntries")) == 0)
+    {
+        for (std::vector<CGXMacMulticastEntry*>::iterator it = obj->GetMulticastEntries().begin(); it != obj->GetMulticastEntries().end(); ++it)
+        {
+            if ((ret = writer->WriteStartElement("Item")) != 0 ||
+                (ret = writer->WriteElementString("Id", (*it)->GetId())) != 0 ||
+                (ret = writer->WriteElementString("Members", (*it)->GetMembers())) != 0 ||
+                (ret = writer->WriteEndElement()) != 0)
+            {
+                break;
+            }
+        }
+        if (ret == 0)
+        {
+            ret = writer->WriteEndElement();
+        }
+    }
+    return ret;
+}
+
+int SaveSwitchTable(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData* obj)
+{
+    int ret;
+    if ((ret = writer->WriteStartElement("SwitchTable")) == 0)
+    {
+        for (std::vector<short>::iterator it = obj->GetSwitchTable().begin(); it != obj->GetSwitchTable().end(); ++it)
+        {
+            if ((ret = writer->WriteElementString("Item", *it)) != 0)
+            {
+                break;
+            }
+        }
+        if (ret == 0)
+        {
+            ret = writer->WriteEndElement();
+        }
+    }
+    return ret;
+}
+
+int SaveDirectTable(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData* obj)
+{
+    int ret;
+    if ((ret = writer->WriteStartElement("DirectTable")) == 0)
+    {
+        for (std::vector<CGXMacDirectTable*>::iterator it = obj->GetDirectTable().begin(); it != obj->GetDirectTable().end(); ++it)
+        {
+            if ((ret = writer->WriteStartElement("Item")) != 0 ||
+                (ret = writer->WriteElementString("SourceSId", (*it)->GetSourceSId())) != 0 ||
+                (ret = writer->WriteElementString("SourceLnId", (*it)->GetSourceLnId())) != 0 ||
+                (ret = writer->WriteElementString("SourceLcId", (*it)->GetSourceLcId())) != 0 ||
+                (ret = writer->WriteElementString("DestinationSId", (*it)->GetDestinationSId())) != 0 ||
+                (ret = writer->WriteElementString("DestinationLnId", (*it)->GetDestinationLnId())) != 0 ||
+                (ret = writer->WriteElementString("DestinationLcId", (*it)->GetDestinationLcId())) != 0 ||
+                (ret = writer->WriteElementString("Did", (*it)->GetDid().ToHexString())) != 0 ||
+                (ret = writer->WriteEndElement()) != 0)
+            {
+                break;
+            }
+        }
+        if (ret == 0)
+        {
+            ret = writer->WriteEndElement();
+        }
+    }
+    return ret;
+}
+
+int SaveAvailableSwitches(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData* obj)
+{
+    int ret;
+    if ((ret = writer->WriteStartElement("AvailableSwitches")) == 0)
+    {
+        for (std::vector<CGXMacAvailableSwitch*>::iterator it = obj->GetAvailableSwitches().begin(); it != obj->GetAvailableSwitches().end(); ++it)
+        {
+            if ((ret = writer->WriteStartElement("Item")) != 0 ||
+                (ret = writer->WriteElementString("Sna", (*it)->GetSna().ToHexString())) != 0 ||
+                (ret = writer->WriteElementString("LsId", (*it)->GetLsId())) != 0 ||
+                (ret = writer->WriteElementString("Level", (*it)->GetLevel())) != 0 ||
+                (ret = writer->WriteElementString("RxLevel", (*it)->GetRxLevel())) != 0 ||
+                (ret = writer->WriteElementString("RxSnr", (*it)->GetRxSnr())) != 0 ||
+                (ret = writer->WriteEndElement()) != 0)
+            {
+                break;
+            }
+        }
+        if (ret == 0)
+        {
+            ret = writer->WriteEndElement();
+        }
+    }
+    return ret;
+}
+
+int SaveCommunications(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData* obj)
+{
+    int ret;
+    if ((ret = writer->WriteStartElement("Communications")) == 0)
+    {
+        for (std::vector<CGXMacPhyCommunication*>::iterator it = obj->GetCommunications().begin(); it != obj->GetCommunications().end(); ++it)
+        {
+            if ((ret = writer->WriteStartElement("Item")) != 0 ||
+                (ret = writer->WriteElementString("Eui", (*it)->GetEui().ToHexString())) != 0 ||
+                (ret = writer->WriteElementString("TxPower", (*it)->GetTxPower())) != 0 ||
+                (ret = writer->WriteElementString("TxCoding", (*it)->GetTxCoding())) != 0 ||
+                (ret = writer->WriteElementString("RxCoding", (*it)->GetRxCoding())) != 0 ||
+                (ret = writer->WriteElementString("RxLvl", (*it)->GetRxLvl())) != 0 ||
+                (ret = writer->WriteElementString("Snr", (*it)->GetSnr())) != 0 ||
+                (ret = writer->WriteElementString("TxPowerModified", (*it)->GetTxPowerModified())) != 0 ||
+                (ret = writer->WriteElementString("TxCodingModified", (*it)->GetTxCodingModified())) != 0 ||
+                (ret = writer->WriteElementString("RxCodingModified", (*it)->GetRxCodingModified())) != 0 ||
+                (ret = writer->WriteEndElement()) != 0)
+            {
+                break;
+            }
+        }
+        if (ret == 0)
+        {
+            ret = writer->WriteEndElement();
+        }
+    }
+    return ret;
+}
+
+int SavePrimeNbOfdmPlcMacNetworkAdministrationData(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData* obj)
+{
+    int ret;
+    if ((ret = SaveMulticastEntries(writer, obj)) != 0 ||
+        (ret = SaveSwitchTable(writer, obj)) != 0 ||
+        (ret = SaveDirectTable(writer, obj)) != 0 ||
+        (ret = SaveAvailableSwitches(writer, obj)) != 0 ||
+        (ret = SaveCommunications(writer, obj)) != 0)
+    {
+
+    }
+    return ret;
+}
+
+int SavePrimeNbOfdmPlcApplicationsIdentification(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcApplicationsIdentification* obj)
+{
+    int ret;
+    if ((ret = writer->WriteElementString("FirmwareVersion", obj->GetFirmwareVersion())) != 0 ||
+        (ret = writer->WriteElementString("VendorId", obj->GetVendorId())) != 0 ||
+        (ret = writer->WriteElementString("ProductId", obj->GetProductId())) != 0)
+    {
+
+    }
+    return ret;
+}
+
+
 int SaveParameterMonitor(CGXXmlWriter* writer, CGXDLMSParameterMonitor* obj)
 {
     int ret = 0;
@@ -1965,6 +2203,20 @@ int CGXXmlWriter::Save(CGXDLMSObject* obj)
         return SaveGSMDiagnostic(this, (CGXDLMSGSMDiagnostic*)obj);
     case DLMS_OBJECT_TYPE_COMPACT_DATA:
         return SaveCompactData(this, (CGXDLMSCompactData*)obj);
+    case DLMS_OBJECT_TYPE_LLC_SSCS_SETUP:
+        return SaveLlcSscsSetup(this, (CGXDLMSLlcSscsSetup*)obj);
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS:
+        return SavePrimeNbOfdmPlcPhysicalLayerCounters(this, (CGXDLMSPrimeNbOfdmPlcPhysicalLayerCounters*)obj);
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_SETUP:
+        return SavePrimeNbOfdmPlcMacSetup(this, (CGXDLMSPrimeNbOfdmPlcMacSetup*)obj);
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS:
+        return SavePrimeNbOfdmPlcMacFunctionalParameters(this, (CGXDLMSPrimeNbOfdmPlcMacFunctionalParameters*)obj);
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_COUNTERS:
+        return SavePrimeNbOfdmPlcMacCounters(this, (CGXDLMSPrimeNbOfdmPlcMacCounters*)obj);
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA:
+        return SavePrimeNbOfdmPlcMacNetworkAdministrationData(this, (CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData*)obj);
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION:
+        return SavePrimeNbOfdmPlcApplicationsIdentification(this, (CGXDLMSPrimeNbOfdmPlcApplicationsIdentification*)obj);
     default:
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }

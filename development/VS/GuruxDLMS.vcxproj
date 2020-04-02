@@ -196,6 +196,7 @@
     <ClCompile Include="..\src\GXDLMSIp4SetupIpOption.cpp" />
     <ClCompile Include="..\src\GXDLMSLimiter.cpp" />
     <ClCompile Include="..\src\GXDLMSLimits.cpp" />
+    <ClCompile Include="..\src\GXDLMSLlcSscsSetup.cpp" />
     <ClCompile Include="..\src\GXDLMSLNCommandHandler.cpp" />
     <ClCompile Include="..\src\GXDLMSLNParameters.cpp" />
     <ClCompile Include="..\src\GXDLMSMacAddressSetup.cpp" />
@@ -216,6 +217,12 @@
     <ClCompile Include="..\src\GXDLMSPppSetup.cpp" />
     <ClCompile Include="..\src\GXDLMSPppSetupIPCPOption.cpp" />
     <ClCompile Include="..\src\GXDLMSPppSetupLcpOption.cpp" />
+    <ClCompile Include="..\src\GXDLMSPrimeNbOfdmPlcApplicationsIdentification.cpp" />
+    <ClCompile Include="..\src\GXDLMSPrimeNbOfdmPlcMacCounters.cpp" />
+    <ClCompile Include="..\src\GXDLMSPrimeNbOfdmPlcMacFunctionalParameters.cpp" />
+    <ClCompile Include="..\src\GXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData.cpp" />
+    <ClCompile Include="..\src\GXDLMSPrimeNbOfdmPlcMacSetup.cpp" />
+    <ClCompile Include="..\src\GXDLMSPrimeNbOfdmPlcPhysicalLayerCounters.cpp" />
     <ClCompile Include="..\src\GXDLMSProfileGeneric.cpp" />
     <ClCompile Include="..\src\GXDLMSPushSetup.cpp" />
     <ClCompile Include="..\src\GXDLMSQualityOfService.cpp" />
@@ -321,6 +328,7 @@
     <ClInclude Include="..\include\GXDLMSIp6Setup.h" />
     <ClInclude Include="..\include\GXDLMSLimiter.h" />
     <ClInclude Include="..\include\GXDLMSLimits.h" />
+    <ClInclude Include="..\include\GXDLMSLlcSscsSetup.h" />
     <ClInclude Include="..\include\GXDLMSLNCommandHandler.h" />
     <ClInclude Include="..\include\GXDLMSLNParameters.h" />
     <ClInclude Include="..\include\GXDLMSLongTransaction.h" />
@@ -342,6 +350,12 @@
     <ClInclude Include="..\include\GXDLMSPppSetup.h" />
     <ClInclude Include="..\include\GXDLMSPppSetupIPCPOption.h" />
     <ClInclude Include="..\include\GXDLMSPppSetupLcpOption.h" />
+    <ClInclude Include="..\include\GXDLMSPrimeNbOfdmPlcApplicationsIdentification.h" />
+    <ClInclude Include="..\include\GXDLMSPrimeNbOfdmPlcMacCounters.h" />
+    <ClInclude Include="..\include\GXDLMSPrimeNbOfdmPlcMacFunctionalParameters.h" />
+    <ClInclude Include="..\include\GXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData.h" />
+    <ClInclude Include="..\include\GXDLMSPrimeNbOfdmPlcMacSetup.h" />
+    <ClInclude Include="..\include\GXDLMSPrimeNbOfdmPlcPhysicalLayerCounters.h" />
     <ClInclude Include="..\include\GXDLMSProfileGeneric.h" />
     <ClInclude Include="..\include\GXDLMSPushSetup.h" />
     <ClInclude Include="..\include\GXDLMSQualityOfService.h" />
@@ -377,6 +391,10 @@
     <ClInclude Include="..\include\GXDLMSVariant.h" />
     <ClInclude Include="..\include\GXDLMSWeekProfile.h" />
     <ClInclude Include="..\include\GXHelpers.h" />
+    <ClInclude Include="..\include\GXMacAvailableSwitch.h" />
+    <ClInclude Include="..\include\GXMacDirectTable.h" />
+    <ClInclude Include="..\include\GXMacMulticastEntry.h" />
+    <ClInclude Include="..\include\GXMacPhyCommunication.h" />
     <ClInclude Include="..\include\GXNeighborDiscoverySetup.h" />
     <ClInclude Include="..\include\GXReplyData.h" />
     <ClInclude Include="..\include\GXSecure.h" />
