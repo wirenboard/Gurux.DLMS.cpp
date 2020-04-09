@@ -83,6 +83,8 @@
 #include "../../development/include/GXDLMSAssociationLogicalName.h"
 #include "../../development/include/GXDLMSAssociationShortName.h"
 #include "../../development/include/GXDLMSImageTransfer.h"
+#include "../../development/include/GXDLMSScriptTable.h"
+#include "../../development/include/GXDLMSSchedule.h"
 
 using namespace std;
 #if defined(_WIN32) || defined(_WIN64)//Windows
@@ -402,7 +404,7 @@ void AddElectricityID2(CGXDLMSObjectCollection& items, unsigned long sn)
 void AddAutoConnect(CGXDLMSObjectCollection& items)
 {
     CGXDLMSAutoConnect* pAC = new CGXDLMSAutoConnect();
-    pAC->SetMode(AUTO_CONNECT_MODE_AUTO_DIALLING_ALLOWED_ANYTIME);
+    pAC->SetMode(DLMS_AUTO_CONNECT_MODE_NO_AUTO_CONNECT);
     pAC->SetRepetitions(10);
     pAC->SetRepetitionDelay(60);
     //Calling is allowed between 1am to 6am.
@@ -418,7 +420,7 @@ void AddActivityCalendar(CGXDLMSObjectCollection& items)
 {
     CGXDLMSActivityCalendar* pActivity = new CGXDLMSActivityCalendar();
     pActivity->SetCalendarNameActive("Active");
-    pActivity->GetSeasonProfileActive().push_back(new CGXDLMSSeasonProfile("Summer time", CGXDate(-1, 3, 31), ""));
+    pActivity->GetSeasonProfileActive().push_back(new CGXDLMSSeasonProfile("Summer time", CGXDateTime(-1, 3, 31, 0, 0, 0, 0), ""));
     pActivity->GetWeekProfileTableActive().push_back(new CGXDLMSWeekProfile("Monday", 1, 1, 1, 1, 1, 1, 1));
     CGXDLMSDayProfile *aDp = new CGXDLMSDayProfile();
     aDp->SetDayId(1);
@@ -427,7 +429,7 @@ void AddActivityCalendar(CGXDLMSObjectCollection& items)
     aDp->GetDaySchedules().push_back(new CGXDLMSDayProfileAction(time, "test", 1));
     pActivity->GetDayProfileTableActive().push_back(aDp);
     pActivity->SetCalendarNamePassive("Passive");
-    pActivity->GetSeasonProfilePassive().push_back(new CGXDLMSSeasonProfile("Winter time", CGXDate(-1, 10, 30), ""));
+    pActivity->GetSeasonProfilePassive().push_back(new CGXDLMSSeasonProfile("Winter time", CGXDateTime(-1, 10, 30, 0, 0, 0, 0), ""));
     pActivity->GetWeekProfileTablePassive().push_back(new CGXDLMSWeekProfile("Tuesday", 1, 1, 1, 1, 1, 1, 1));
 
     CGXDLMSDayProfile* passive = new CGXDLMSDayProfile();
@@ -462,8 +464,8 @@ void AddOpticalPortSetup(CGXDLMSObjectCollection& items)
 void AddDemandRegister(CGXDLMSObjectCollection& items)
 {
     CGXDLMSDemandRegister* pDr = new CGXDLMSDemandRegister("1.0.31.4.0.255");
-    pDr->SetCurrentAvarageValue(10);
-    pDr->SetLastAvarageValue(20);
+    pDr->SetCurrentAverageValue(10);
+    pDr->SetLastAverageValue(20);
     pDr->SetStatus(1);
     pDr->SetStartTimeCurrent(CGXDateTime::Now());
     pDr->SetCaptureTime(CGXDateTime::Now());
@@ -507,7 +509,7 @@ void AddRegisterMonitor(CGXDLMSObjectCollection& items, CGXDLMSRegister* pRegist
 void AddActionSchedule(CGXDLMSObjectCollection& items)
 {
     CGXDLMSActionSchedule* pActionS = new CGXDLMSActionSchedule();
-    pActionS->SetExecutedScriptLogicalName("1.2.3.4.5.6");
+    pActionS->SetExecutedScriptLogicalName("0.1.10.1.101.255");
     pActionS->SetExecutedScriptSelector(1);
     pActionS->SetType(DLMS_SINGLE_ACTION_SCHEDULE_TYPE1);
     pActionS->GetExecutionTime().push_back(CGXDateTime::Now());
@@ -533,7 +535,7 @@ void AddSapAssignment(CGXDLMSObjectCollection& items)
 void AddAutoAnswer(CGXDLMSObjectCollection& items)
 {
     CGXDLMSAutoAnswer* pAa = new CGXDLMSAutoAnswer();
-    pAa->SetMode(AUTO_CONNECT_MODE_EMAIL_SENDING);
+    pAa->SetMode(DLMS_AUTO_ANSWER_MODE_NONE);
     pAa->GetListeningWindow().push_back(std::pair<CGXDateTime, CGXDateTime>(CGXDateTime(-1, -1, -1, 6, -1, -1, -1), CGXDateTime(-1, -1, -1, 8, -1, -1, -1)));
     pAa->SetStatus(AUTO_ANSWER_STATUS_INACTIVE);
     pAa->SetNumberOfCalls(0);
@@ -720,6 +722,15 @@ int CGXDLMSBase::Init(int port, GX_TRACE_LEVEL trace)
     //Add image transfer object.
     CGXDLMSImageTransfer* image = new CGXDLMSImageTransfer();
     GetItems().push_back(image);
+    ///////////////////////////////////////////////////////////////////////
+    //Add script table object.
+    CGXDLMSScriptTable* st = new CGXDLMSScriptTable();
+    GetItems().push_back(st);
+
+    ///////////////////////////////////////////////////////////////////////
+    //Add Schedule object.
+    CGXDLMSSchedule* schedule = new CGXDLMSSchedule();
+    GetItems().push_back(schedule);
     ///////////////////////////////////////////////////////////////////////
     //Server must initialize after all objects are added.
     ret = Initialize();

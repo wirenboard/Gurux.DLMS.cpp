@@ -71,7 +71,7 @@ public:
     CGXDLMSActionSchedule(std::string ln, unsigned short sn);
 
     std::string& GetExecutedScriptLogicalName();
-    void SetExecutedScriptLogicalName(std::string& value);
+    void SetExecutedScriptLogicalName(std::string value);
 
     int GetExecutedScriptSelector();
     void SetExecutedScriptSelector(int value);

@@ -44,6 +44,7 @@
 class CGXDLMSClient
 {
 protected:
+    friend class CGXDLMSSchedule;
     CGXDLMSSettings m_Settings;
 private:
     bool m_IsAuthenticationRequired;

@@ -64,9 +64,9 @@ private:
     unsigned short m_ScriptSelector;
 
     /**
-    *
+    * Switch time.
     */
-    CGXDateTime m_SwitchTime;
+    CGXTime m_SwitchTime;
 
     /**
      * Defines a period in minutes, in which an entry shall be processed after
@@ -77,7 +77,7 @@ private:
     /**
      * Days of the week on which the entry is valid.
      */
-    std::string m_ExecWeekdays;
+    DLMS_WEEKDAYS m_ExecWeekdays;
 
     /**
      * Perform the link to the IC “Special days table”, day_id.
@@ -87,25 +87,25 @@ private:
     /**
      * Date starting period in which the entry is valid.
      */
-    CGXDateTime m_BeginDate;
+    CGXDate m_BeginDate;
 
     /**
      * Date starting period in which the entry is valid.
      */
-    CGXDateTime m_EndDate;
+    CGXDate m_EndDate;
 
 public:
     /**
      * Get schedule entry index.
      *
-     * @return Entry index.
+     * Returns Entry index.
      */
     unsigned short GetIndex();
 
     /**
      * Set schedule entry index.
      *
-     * @param value
+     * value:
      *            Entry index.
      */
     void SetIndex(unsigned short value);
@@ -113,14 +113,14 @@ public:
     /**
      * Is Schedule entry enabled.
      *
-     * @return True, if schedule entry is enabled.
+     * Returns True, if schedule entry is enabled.
      */
     bool GetEnable();
 
     /**
      * Enable schedule entry.
      *
-     * @param value
+     * value:
      *            Is Schedule entry enabled.
      */
     void SetEnable(bool value);
@@ -128,7 +128,7 @@ public:
     /**
      * Returns logical name of the Script table object.
      *
-     * @return Logical name of the Script table object.
+     * Returns Logical name of the Script table object.
      */
     std::string GetLogicalName();
 
@@ -137,33 +137,33 @@ public:
     /**
      * Get script identifier of the script to be executed.
      *
-     * @return Script identifier.
+     * Returns Script identifier.
      */
     unsigned short GetScriptSelector();
 
     /**
      * Set script identifier of the script to be executed.
      *
-     * @param value
+     * value:
      *            Script identifier.
      */
     void SetScriptSelector(unsigned short value);
 
     /**
-     * @return
+     * Returns Switch time.
      */
-    CGXDateTime& GetSwitchTime();
+    CGXTime& GetSwitchTime();
 
     /**
-     * @param value
+     * value: Switch time.
      */
-    void SetSwitchTime(CGXDateTime& value);
+    void SetSwitchTime(CGXTime& value);
 
     /**
      * Defines a period in minutes, in which an entry shall be processed after
      * power fail.
      *
-     * @return Validity period in minutes.
+     * Returns Validity period in minutes.
      */
     unsigned short GetValidityWindow();
 
@@ -171,7 +171,7 @@ public:
      * Defines a period in minutes, in which an entry shall be processed after
      * power fail.
      *
-     * @param value
+     * value:
      *            Validity period in minutes.
      */
     void SetValidityWindow(unsigned short value);
@@ -179,29 +179,29 @@ public:
     /**
      * Get days of the week on which the entry is valid.
      *
-     * @return Bit array of valid week days.
+     * Returns Bit array of valid week days.
      */
-    std::string& GetExecWeekdays();
+    DLMS_WEEKDAYS GetExecWeekdays();
 
     /**
      * Set days of the week on which the entry is valid.
      *
-     * @param value
+     * value:
      *            Bit array of valid week days.
      */
-    void SetExecWeekdays(std::string& value);
+    void SetExecWeekdays(DLMS_WEEKDAYS value);
 
     /**
      * Perform the link to the IC Special days table.
      *
-     * @return day_id.
+     * Returns day_id.
      */
     std::string& GetExecSpecDays();
 
     /**
      * Perform the link to the IC Special days table.
      *
-     * @param value
+     * value:
      *            day_id
      */
     void SetExecSpecDays(std::string& value);
@@ -209,32 +209,32 @@ public:
     /**
      * Date starting period in which the entry is valid.
      *
-     * @return Begin date.
+     * Returns Begin date.
      */
-    CGXDateTime& GetBeginDate();
+    CGXDate& GetBeginDate();
 
     /**
      * Date starting period in which the entry is valid.
      *
-     * @param value
+     * value:
      *            Begin date.
      */
-    void SetBeginDate(CGXDateTime& value);
+    void SetBeginDate(CGXDate& value);
 
     /**
      * Get date starting period in which the entry is valid.
      *
-     * @return End date.
+     * Returns End date.
      */
-    CGXDateTime& GetEndDate();
+    CGXDate& GetEndDate();
 
     /**
      * Set date starting period in which the entry is valid.
      *
-     * @param value
+     * value:
      *            End date.
      */
-    void SetEndDate(CGXDateTime& value);
+    void SetEndDate(CGXDate& value);
 };
 
 #endif //GXDLMSSCHEDULEENTRY_H

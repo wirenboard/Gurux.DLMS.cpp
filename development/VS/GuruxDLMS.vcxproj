@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\GXAdjacentCell.cpp" />
+    <ClCompile Include="..\src\GXBitString.cpp" />
     <ClCompile Include="..\src\GXChargePerUnitScaling.cpp" />
     <ClCompile Include="..\src\GXChargeTable.cpp" />
     <ClCompile Include="..\src\GXCommodity.cpp" />
@@ -270,6 +271,7 @@
     <ClCompile Include="..\src\GXXmlWriterSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\GXBitString.h" />
     <ClInclude Include="..\include\GXChargePerUnitScaling.h" />
     <ClInclude Include="..\include\chipperingenums.h" />
     <ClInclude Include="..\include\Enums.h" />

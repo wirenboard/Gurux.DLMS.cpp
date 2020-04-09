@@ -32,46 +32,66 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSDAYPROFILEACTION_H
-#define GXDLMSDAYPROFILEACTION_H
+#include "../include/errorcodes.h"
+#include "../include/GXBitString.h"
+#include "../include/GXHelpers.h"
 
-#include "GXTime.h"
-
-//Activity Calendar's Day Profile Action is defined on the standard.
-class CGXDLMSDayProfileAction
+CGXBitString::CGXBitString()
 {
-    CGXTime m_StartTime;
-    std::string m_ScriptLogicalName;
-    int m_ScriptSelector;
-public:
-    /**
-     Constructor.
-    */
-    CGXDLMSDayProfileAction();
+}
 
-    /**
-     Constructor.
-    */
-    CGXDLMSDayProfileAction(CGXTime& startTime, std::string scriptLogicalName, int scriptSelector);
+CGXBitString::CGXBitString(std::string value)
+{
+    m_Value = value;
+}
 
-    /**
-     Defines the time when the script is to be executed.
-    */
-    CGXTime& GetStartTime();
-    void SetStartTime(CGXTime& value);
+std::string& CGXBitString::ToString()
+{
+    return m_Value;
+}
 
-    /**
-     Defines the logical name of the "Script table" object;
-    */
-    std::string& GetScriptLogicalName();
-    void SetScriptLogicalName(std::string& value);
+CGXBitString::CGXBitString(unsigned char value, unsigned char count)
+{
+    CGXByteBuffer sb;
+    GXHelpers::ToBitString(sb, value, count);
+    m_Value = sb.ToString();
+}
 
-    /**
-     Defines the script_identifier of the script to be executed.
-    */
-    int GetScriptSelector();
-    void SetScriptSelector(int value);
+int CGXBitString::ToInteger(int& value, unsigned char maxSize)
+{
+    value = 0;
+    int index = maxSize - 1;
+    for (std::string::iterator it = m_Value.begin(); it != m_Value.end(); ++it)
+    {
+        if (*it == '1')
+        {
+            value |= (1 << index);
+        }
+        else if (*it != '0')
+        {
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+        --index;
+    }
+    return 0;
+}
 
-    std::string ToString();
-};
-#endif //GXDLMSDAYPROFILEACTION_H
+int CGXBitString::ToInteger(int& value)
+{
+    return ToInteger(value, 32);
+}
+
+int CGXBitString::ToByte(unsigned char& value)
+{
+    int ret, tmp = 0;
+    ret = ToInteger(tmp, 8);
+    if (ret == 0)
+    {
+        value = tmp;
+    }
+    else
+    {
+        value = 0;
+    }
+    return ret;
+}

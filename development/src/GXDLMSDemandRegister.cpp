@@ -46,19 +46,11 @@ bool CGXDLMSDemandRegister::IsRead(int index)
     return CGXDLMSObject::IsRead(index);
 }
 
-/**
- Constructor.
-*/
 CGXDLMSDemandRegister::CGXDLMSDemandRegister() :
     CGXDLMSDemandRegister("", 0)
 {
 }
 
-/**
- Constructor.
-
- @param ln Logical Name of the object.
-*/
 CGXDLMSDemandRegister::CGXDLMSDemandRegister(std::string ln) :
     CGXDLMSDemandRegister(ln, 0)
 {
@@ -70,9 +62,6 @@ CGXDLMSDemandRegister::CGXDLMSDemandRegister(std::string ln, unsigned short sn) 
     m_Period = m_NumberOfPeriods = m_Unit = m_Scaler = 0;
 }
 
-/**
- Current Average value of COSEM Data object.
-*/
 CGXDLMSVariant& CGXDLMSDemandRegister::GetCurrentAverageValue()
 {
     return m_CurrentAverageValue;
@@ -82,9 +71,11 @@ void CGXDLMSDemandRegister::SetCurrentAverageValue(CGXDLMSVariant& value)
     m_CurrentAverageValue = value;
 }
 
-/**
- Last Average value of COSEM Data object.
-*/
+void CGXDLMSDemandRegister::SetCurrentAverageValue(CGXDLMSVariant value)
+{
+    m_CurrentAverageValue = value;
+}
+
 CGXDLMSVariant& CGXDLMSDemandRegister::GetLastAverageValue()
 {
     return m_LastAverageValue;
@@ -93,10 +84,11 @@ void CGXDLMSDemandRegister::SetLastAverageValue(CGXDLMSVariant& value)
 {
     m_LastAverageValue = value;
 }
+void CGXDLMSDemandRegister::SetLastAverageValue(CGXDLMSVariant value)
+{
+    m_LastAverageValue = value;
+}
 
-/**
- Scaler of COSEM Register object.
-*/
 double CGXDLMSDemandRegister::GetScaler()
 {
     return pow((float)10, m_Scaler);
@@ -107,7 +99,6 @@ void CGXDLMSDemandRegister::SetScaler(double value)
     m_Scaler = (signed char)log10(value);
 }
 
-// Unit of COSEM Register object.
 int CGXDLMSDemandRegister::GetUnit()
 {
     return m_Unit;
@@ -118,9 +109,6 @@ void CGXDLMSDemandRegister::SetUnit(unsigned char value)
     m_Unit = value;
 }
 
-/**
- Scaler of COSEM Register object.
-*/
 CGXDLMSVariant& CGXDLMSDemandRegister::GetStatus()
 {
     return m_Status;
@@ -130,9 +118,11 @@ void CGXDLMSDemandRegister::SetStatus(CGXDLMSVariant& value)
     m_Status = value;
 }
 
-/**
- Capture time of COSEM Register object.
-*/
+void CGXDLMSDemandRegister::SetStatus(CGXDLMSVariant value)
+{
+    m_Status = value;
+}
+
 CGXDateTime& CGXDLMSDemandRegister::GetCaptureTime()
 {
     return m_CaptureTime;
@@ -142,9 +132,6 @@ void CGXDLMSDemandRegister::SetCaptureTime(CGXDateTime value)
     m_CaptureTime = value;
 }
 
-/**
- Current start time of COSEM Register object.
-*/
 CGXDateTime& CGXDLMSDemandRegister::GetStartTimeCurrent()
 {
     return m_StartTimeCurrent;
@@ -174,17 +161,11 @@ void CGXDLMSDemandRegister::SetNumberOfPeriods(int value)
     m_NumberOfPeriods = value;
 }
 
-/*
- * Reset e.GetValue().
- */
 void CGXDLMSDemandRegister::Reset()
 {
 
 }
 
-/*
- * Next period.
- */
 void CGXDLMSDemandRegister::NextPeriod()
 {
 
@@ -268,13 +249,11 @@ void CGXDLMSDemandRegister::GetAttributeIndexToRead(bool all, std::vector<int>& 
     }
 }
 
-// Returns amount of attributes.
 int CGXDLMSDemandRegister::GetAttributeCount()
 {
     return 9;
 }
 
-// Returns amount of methods.
 int CGXDLMSDemandRegister::GetMethodCount()
 {
     return 2;

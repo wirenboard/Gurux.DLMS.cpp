@@ -82,12 +82,14 @@ public:
     */
     CGXDLMSVariant& GetCurrentAverageValue();
     void SetCurrentAverageValue(CGXDLMSVariant& value);
+    void SetCurrentAverageValue(CGXDLMSVariant value);
 
     /**
      Last Average value of COSEM Data object.
     */
     CGXDLMSVariant& GetLastAverageValue();
     void SetLastAverageValue(CGXDLMSVariant& value);
+    void SetLastAverageValue(CGXDLMSVariant value);
 
     /**
      Scaler of COSEM Register object.
@@ -104,6 +106,7 @@ public:
     */
     CGXDLMSVariant& GetStatus();
     void SetStatus(CGXDLMSVariant& value);
+    void SetStatus(CGXDLMSVariant value);
 
     /**
      Capture time of COSEM Register object.

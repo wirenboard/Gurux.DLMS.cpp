@@ -46,7 +46,7 @@ CGXDLMSSeasonProfile::CGXDLMSSeasonProfile()
 /**
  Constructor.
 */
-CGXDLMSSeasonProfile::CGXDLMSSeasonProfile(std::string& name, CGXDateTime& start, std::string& weekName)
+CGXDLMSSeasonProfile::CGXDLMSSeasonProfile(std::string name, CGXDateTime& start, std::string weekName)
 {
     m_Name.AddString(name);
     SetStart(start);
@@ -56,7 +56,7 @@ CGXDLMSSeasonProfile::CGXDLMSSeasonProfile(std::string& name, CGXDateTime& start
 /**
  Constructor.
 */
-CGXDLMSSeasonProfile::CGXDLMSSeasonProfile(CGXByteBuffer& name, CGXDateTime& start, CGXByteBuffer& weekName)
+CGXDLMSSeasonProfile::CGXDLMSSeasonProfile(CGXByteBuffer& name, CGXDateTime& start, CGXByteBuffer weekName)
 {
     m_Name.Set(&name);
     SetStart(start);

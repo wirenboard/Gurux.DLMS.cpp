@@ -61,7 +61,7 @@ std::string& CGXDLMSActionSchedule::GetExecutedScriptLogicalName()
 {
     return m_ExecutedScriptLogicalName;
 }
-void CGXDLMSActionSchedule::SetExecutedScriptLogicalName(std::string& value)
+void CGXDLMSActionSchedule::SetExecutedScriptLogicalName(std::string value)
 {
     m_ExecutedScriptLogicalName = value;
 }

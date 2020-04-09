@@ -237,29 +237,17 @@ typedef enum
 
 typedef enum
 {
-    /// <summary>
-    /// Not defined
-    /// </summary>
+    // Not defined
     DLMS_CLOCK_BASE_NONE,
-    /// <summary>
-    /// Internal Crystal
-    /// </summary>
+    // Internal Crystal
     DLMS_CLOCK_BASE_CRYSTAL,
-    /// <summary>
-    /// Mains frequency 50 Hz,
-    /// </summary>
+    // Mains frequency 50 Hz,
     DLMS_CLOCK_BASE_FREQUENCY_50,
-    /// <summary>
-    /// Mains frequency 60 Hz,
-    /// </summary>
+    // Mains frequency 60 Hz,
     DLMS_CLOCK_BASE_FREQUENCY_60,
-    /// <summary>
-    /// Global Positioning System.
-    /// </summary>
+    // Global Positioning System.
     DLMS_CLOCK_BASE_GPS,
-    /// <summary>
-    /// Radio controlled.
-    /// </summary>
+    // Radio controlled.
     DLMS_CLOCK_BASE_RADIO
 } DLMS_CLOCK_BASE;
 
@@ -1249,21 +1237,21 @@ typedef enum
 
 typedef enum
 {
-    /// <summary>
+
     /// No access.
-    /// </summary>
+
     DLMS_ACCESS_MODE_NONE = 0,
-    /// <summary>
+
     /// The client is allowed only reading from the server.
-    /// </summary>
+
     DLMS_ACCESS_MODE_READ = 1,
-    /// <summary>
+
     /// The client is allowed only writing to the server.
-    /// </summary>
+
     DLMS_ACCESS_MODE_WRITE = 2,
-    /// <summary>
+
     /// The client is allowed both reading from the server and writing to it.
-    /// </summary>
+
     DLMS_ACCESS_MODE_READ_WRITE = 3,
     DLMS_ACCESS_MODE_AUTHENTICATED_READ = 4,
     DLMS_ACCESS_MODE_AUTHENTICATED_WRITE = 5,
@@ -1272,17 +1260,17 @@ typedef enum
 
 typedef enum
 {
-    /// <summary>
+
     /// No access.
-    /// </summary>
+
     DLMS_METHOD_ACCESS_MODE_NONE = 0,
-    /// <summary>
+
     /// Access.
-    /// </summary>
+
     DLMS_METHOD_ACCESS_MODE_ACCESS = 1,
-    /// <summary>
+
     /// Authenticated Access.
-    /// </summary>
+
     DLMS_METHOD_ACCESS_MODE_AUTHENTICATED_ACCESS = 2
 } DLMS_METHOD_ACCESS_MODE;
 
@@ -2811,5 +2799,26 @@ typedef enum
      */
     DLMS_CHARGE_TYPE_PAYMENT_EVENT_BASED_COLLECTION
 }DLMS_CHARGE_TYPE;
+
+// Defines the weekdays.
+typedef enum
+{
+    /// No day of week is selected.
+    DLMS_WEEKDAYS_NONE = 0,
+    // Indicates Monday.
+    DLMS_WEEKDAYS_MONDAY = 0x80,
+    // Indicates Tuesday.
+    DLMS_WEEKDAYS_TUESDAY = 0x40,
+    // Indicates Wednesday.
+    DLMS_WEEKDAYS_WEDNESDAY = 0x20,
+    // Indicates Thursday.
+    DLMS_WEEKDAYS_THURSDAY = 0x10,
+    // Indicates Friday.
+    DLMS_WEEKDAYS_FRIDAY = 0x8,
+    // Indicates Saturday.
+    DLMS_WEEKDAYS_SATURDAY = 0x4,
+    // Indicates Sunday.
+    DLMS_WEEKDAYS_SUNDAY = 0x2
+}DLMS_WEEKDAYS;
 
 #endif //ENUMS_H

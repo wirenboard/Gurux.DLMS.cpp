@@ -372,6 +372,9 @@
     <ClCompile Include="..\src\GXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\GXBitString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Enums.h">
@@ -810,6 +813,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\GXMacPhyCommunication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GXBitString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

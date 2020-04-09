@@ -37,7 +37,7 @@
 #include <sstream>
 
 //Constructor.
-CGXDLMSScriptTable::CGXDLMSScriptTable() : CGXDLMSScriptTable("", 0)
+CGXDLMSScriptTable::CGXDLMSScriptTable() : CGXDLMSScriptTable("0.0.10.0.100.255", 0)
 {
 }
 

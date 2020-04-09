@@ -32,46 +32,36 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSDAYPROFILEACTION_H
-#define GXDLMSDAYPROFILEACTION_H
+#ifndef GXBIT_STRING_H
+#define GXBIT_STRING_H
 
-#include "GXTime.h"
-
-//Activity Calendar's Day Profile Action is defined on the standard.
-class CGXDLMSDayProfileAction
+#include <string>
+/**
+* Date object. Time part is ignored.
+*/
+class CGXBitString
 {
-    CGXTime m_StartTime;
-    std::string m_ScriptLogicalName;
-    int m_ScriptSelector;
+private:
+    std::string m_Value;
+    //Convert bit string to Integer.
+    int ToInteger(int& value, unsigned char maxSize);
 public:
-    /**
-     Constructor.
-    */
-    CGXDLMSDayProfileAction();
+    //Constructor.
+    CGXBitString();
 
-    /**
-     Constructor.
-    */
-    CGXDLMSDayProfileAction(CGXTime& startTime, std::string scriptLogicalName, int scriptSelector);
+    //Constructor.
+    CGXBitString(std::string value);
 
-    /**
-     Defines the time when the script is to be executed.
-    */
-    CGXTime& GetStartTime();
-    void SetStartTime(CGXTime& value);
+    //Constructor.
+    CGXBitString(unsigned char value, unsigned char count);
 
-    /**
-     Defines the logical name of the "Script table" object;
-    */
-    std::string& GetScriptLogicalName();
-    void SetScriptLogicalName(std::string& value);
+    //Convert bit string to string.
+    std::string& ToString();
 
-    /**
-     Defines the script_identifier of the script to be executed.
-    */
-    int GetScriptSelector();
-    void SetScriptSelector(int value);
+    //Convert bit string to Integer.
+    int ToInteger(int& value);
 
-    std::string ToString();
+    //Convert bit string to byte.
+    int ToByte(unsigned char& value);
 };
-#endif //GXDLMSDAYPROFILEACTION_H
+#endif //GXBIT_STRING_H

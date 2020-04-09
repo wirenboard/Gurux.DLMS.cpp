@@ -45,6 +45,8 @@ http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSSchedule
 class CGXDLMSSchedule : public CGXDLMSObject
 {
     std::vector<CGXDLMSScheduleEntry*> m_Entries;
+    int RemoveEntry(unsigned short index);
+    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 public:
     //Constructor.
     CGXDLMSSchedule();
@@ -57,6 +59,38 @@ public:
 
     //Destructor.
     ~CGXDLMSSchedule();
+
+    //
+    // Add entry to entries list.
+    //
+    // client: DLMS client.
+    // entry: Schedule entry.
+    // reply: Action bytes.
+    int Insert(CGXDLMSClient* client, CGXDLMSScheduleEntry* entry, std::vector<CGXByteBuffer>& reply);
+
+    //
+    // Remove entry from entries list.
+    //
+    // client: DLMS client.
+    // entry: Schedule entry.
+    // reply: Action bytes.
+    int Delete(CGXDLMSClient* client, CGXDLMSScheduleEntry* entry, std::vector<CGXByteBuffer>& reply);
+
+    //
+    // Enable entry from entries list.
+    //
+    // client: DLMS client.
+    // entry: Schedule entry.
+    // reply: Action bytes.
+    int Enable(CGXDLMSClient* client, CGXDLMSScheduleEntry* entry, std::vector<CGXByteBuffer>& reply);
+
+    //
+    // Disable entry from entries list.
+    //
+    // client: DLMS client.
+    // entry: Schedule entries.
+    // reply: Action bytes.
+    int Disable(CGXDLMSClient* client, CGXDLMSScheduleEntry* entry, std::vector<CGXByteBuffer>& reply);
 
     // Get value of COSEM Data object.
     std::vector<CGXDLMSScheduleEntry*>& GetEntries();
