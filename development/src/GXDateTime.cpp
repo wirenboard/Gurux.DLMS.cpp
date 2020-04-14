@@ -746,7 +746,7 @@ int CGXDateTime::ToFormatString(const char* pattern, std::string& value)
     else
     {
         ret = (int)strftime(buff, sizeof(buff), pattern, &m_Value);
-        if (ret == 7)
+        if (ret != 0)
         {
             ret = 0;
             value = buff;
