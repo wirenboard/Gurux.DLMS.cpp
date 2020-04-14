@@ -33,6 +33,7 @@
 //---------------------------------------------------------------------------
 
 #include "../include/GXDLMSAccount.h"
+#include "../include/GXDLMSClient.h"
 
 //Constructor.
 CGXDLMSAccount::CGXDLMSAccount() :
@@ -335,7 +336,7 @@ int CGXDLMSAccount::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         e.SetValue(m_CurrentCreditInUse);
         break;
     case 4:
-        e.SetValue((unsigned char) m_CurrentCreditStatus);
+        e.SetValue((unsigned char)m_CurrentCreditStatus);
         break;
     case 5:
         e.SetValue(m_AvailableCredit);
@@ -351,7 +352,7 @@ int CGXDLMSAccount::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         break;
     case 9:
         bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount((unsigned long) m_CreditReferences.size(), bb);
+        GXHelpers::SetObjectCount((unsigned long)m_CreditReferences.size(), bb);
         for (std::vector<std::string>::iterator it = m_CreditReferences.begin(); it != m_CreditReferences.end(); ++it)
         {
             bb.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
@@ -400,7 +401,7 @@ int CGXDLMSAccount::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
                 return ret;
             }
             bb.Set(ln, 6);
-            tmp = (unsigned char) it->GetCollectionConfiguration();
+            tmp = (unsigned char)it->GetCollectionConfiguration();
             if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_BIT_STRING, tmp)) != 0)
             {
                 return ret;
@@ -470,6 +471,52 @@ int CGXDLMSAccount::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
     }
     return DLMS_ERROR_CODE_OK;
 }
+
+int CGXDLMSAccount::Activate(
+    CGXDLMSClient* client,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 1, data, reply);
+}
+
+int CGXDLMSAccount::Close(
+    CGXDLMSClient* client,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 2, data, reply);
+}
+
+int CGXDLMSAccount::Reset(
+    CGXDLMSClient* client,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 3, data, reply);
+}
+
+int CGXDLMSAccount::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
+{
+    if (e.GetIndex() == 1)
+    {
+        m_AccountStatus = DLMS_ACCOUNT_STATUS_ACTIVE;
+    }
+    else if (e.GetIndex() == 2)
+    {
+        m_AccountStatus = DLMS_ACCOUNT_STATUS_CLOSED;
+    }
+    else if (e.GetIndex() == 3)
+    {
+        //Meter must handle this.
+    }
+    else
+    {
+        e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+    }
+    return DLMS_ERROR_CODE_OK;
+}
+
 
 // Set value of given attribute.
 int CGXDLMSAccount::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)

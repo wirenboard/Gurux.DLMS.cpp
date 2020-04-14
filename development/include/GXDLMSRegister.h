@@ -93,6 +93,12 @@ public:
     // Returns amount of methods.
     int GetMethodCount();
 
+    /////////////////////////////////////////////////////////////////////////
+    //Reset the register value.
+    int Reset(
+        CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
+
     int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 
     //Get attribute values of object.

@@ -128,6 +128,14 @@ int CGXDLMSRegister::GetMethodCount()
     return 1;
 }
 
+int CGXDLMSRegister::Reset(
+    CGXDLMSClient* client,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 1, data, reply);
+}
+
 int CGXDLMSRegister::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)

@@ -175,6 +175,8 @@ class CGXDLMSAccount : public CGXDLMSObject
      * http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSAccount
      */
     int m_MaxProvisionPeriod;
+
+    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 public:
     //Constructor.
     CGXDLMSAccount();
@@ -631,5 +633,23 @@ public:
 
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+
+    /////////////////////////////////////////////////////////////////////////
+    //Activate the account value.
+    int Activate(
+        CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
+
+    /////////////////////////////////////////////////////////////////////////
+    //Close the account value.
+    int Close(
+        CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
+
+    /////////////////////////////////////////////////////////////////////////
+    //Reset the account value.
+    int Reset(
+        CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
 };
 #endif //GXACCOUNT_H
