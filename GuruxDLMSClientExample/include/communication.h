@@ -94,6 +94,8 @@ public:
 
     //Disconnect from the meter.
     int Disconnect();
+    //Release connection to the meter.
+    int Release();
 
     int Close();
     int Connect(const char* pAddress, unsigned short port = 4059);

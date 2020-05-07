@@ -195,6 +195,7 @@ public:
     */
     static int GetWrapperFrame(
         CGXDLMSSettings& settings,
+        DLMS_COMMAND command,
         CGXByteBuffer& data,
         CGXByteBuffer& reply);
 

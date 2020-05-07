@@ -260,6 +260,7 @@ int CGXDLMS::ReceiverReady(
 */
 int CGXDLMS::GetWrapperFrame(
     CGXDLMSSettings& settings,
+    DLMS_COMMAND command,
     CGXByteBuffer& data,
     CGXByteBuffer& reply)
 {
@@ -269,7 +270,14 @@ int CGXDLMS::GetWrapperFrame(
     if (settings.IsServer())
     {
         reply.SetUInt16((unsigned short)settings.GetServerAddress());
-        reply.SetUInt16((unsigned short)settings.GetClientAddress());
+        if (settings.GetPushClientAddress() != 0 && (command == DLMS_COMMAND_DATA_NOTIFICATION || command == DLMS_COMMAND_EVENT_NOTIFICATION))
+        {
+            reply.SetUInt16((unsigned short)settings.GetPushClientAddress());
+        }
+        else
+        {
+            reply.SetUInt16((unsigned short)settings.GetClientAddress());
+        }
     }
     else
     {
@@ -320,9 +328,19 @@ int CGXDLMS::GetHdlcFrame(
     CGXByteBuffer primaryAddress, secondaryAddress;
     if (settings.IsServer())
     {
-        if ((ret = GetAddressBytes(settings.GetClientAddress(), primaryAddress)) != 0)
+        if (frame == 0x13 && settings.GetPushClientAddress() != 0)
         {
-            return ret;
+            if ((ret = GetAddressBytes(settings.GetPushClientAddress(), primaryAddress)) != 0)
+            {
+                return ret;
+            }
+        }
+        else
+        {
+            if ((ret = GetAddressBytes(settings.GetClientAddress(), primaryAddress)) != 0)
+            {
+                return ret;
+            }
         }
         if ((ret = GetAddressBytes(settings.GetServerAddress(), secondaryAddress)) != 0)
         {
@@ -1023,7 +1041,7 @@ int CGXDLMS::GetLnMessages(
         {
             if (p.GetSettings()->GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER)
             {
-                ret = GetWrapperFrame(*p.GetSettings(), reply, tmp);
+                ret = GetWrapperFrame(*p.GetSettings(), p.GetCommand(), reply, tmp);
             }
             else
             {
@@ -1255,7 +1273,7 @@ int CGXDLMS::GetSnMessages(
         {
             if (p.GetSettings()->GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER)
             {
-                ret = GetWrapperFrame(*p.GetSettings(), data, reply);
+                ret = GetWrapperFrame(*p.GetSettings(), p.GetCommand(), data, reply);
             }
             else
             {
@@ -1389,9 +1407,21 @@ int CGXDLMS::GetHdlcData(
             notify->SetServerAddress((int)source);
         }
     }
-
     // Is there more data available.
-    if ((frame & 0x8) != 0)
+    bool moreData = (frame & 0x8) != 0;
+    // Get frame type.
+    if ((ret = reply.GetUInt8(&frame)) != 0)
+    {
+        return ret;
+    }
+    //If server is using same client and server address for notifications.
+    if (frame == 0x13 && !isNotify && notify != NULL)
+    {
+        isNotify = true;
+        notify->SetClientAddress((unsigned short)target);
+        notify->SetServerAddress((int)source);
+    }
+    if (moreData)
     {
         if (isNotify)
         {
@@ -1412,11 +1442,6 @@ int CGXDLMS::GetHdlcData(
         {
             data.SetMoreData((DLMS_DATA_REQUEST_TYPES)(data.GetMoreData() & ~DLMS_DATA_REQUEST_TYPES_FRAME));
         }
-    }
-    // Get frame type.
-    if ((ret = reply.GetUInt8(&frame)) != 0)
-    {
-        return ret;
     }
     if (!settings.CheckFrame(frame))
     {

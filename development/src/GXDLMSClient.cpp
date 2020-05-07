@@ -1114,6 +1114,11 @@ int CGXDLMSClient::ReleaseRequest(std::vector<CGXByteBuffer>& packets)
     buff.SetUInt8(0x80);
     buff.SetUInt8(01);
     buff.SetUInt8(00);
+    //Increase IC.
+    if (m_Settings.GetCipher() != NULL && m_Settings.GetCipher()->IsCiphered())
+    {
+        m_Settings.GetCipher()->SetInvocationCounter(1 + m_Settings.GetCipher()->GetInvocationCounter());
+    }
     CGXAPDU::GenerateUserInformation(m_Settings, m_Settings.GetCipher(), NULL, buff);
     buff.SetUInt8(0, (unsigned char)(buff.GetSize() - 1));
     if (GetUseLogicalNameReferencing())

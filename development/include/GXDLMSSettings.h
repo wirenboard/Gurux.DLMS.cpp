@@ -90,6 +90,8 @@ class CGXDLMSSettings
 
     // Client address.
     unsigned long m_ClientAddress;
+    // Client address.
+    unsigned long m_PushClientAddress;
 
     // Server address.
     unsigned long m_ServerAddress;
@@ -275,6 +277,12 @@ public:
 
     // Sets client address.
     void SetClientAddress(unsigned long value);
+
+    // Gets push client address.
+    unsigned long GetPushClientAddress();
+
+    // Sets push client address.
+    void SetPushClientAddress(unsigned long value);
 
     // Server address.
     unsigned long GetServerAddress();

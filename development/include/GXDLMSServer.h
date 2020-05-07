@@ -486,6 +486,11 @@ public:
     */
     ~CGXDLMSServer();
 
+    //Server is using push client address when sending push messages. Client address is used if PushAddress is zero.
+    unsigned long GetPushClientAddress();
+    void SetPushClientAddress(unsigned long value);
+
+
     /**
      * @return List of objects that meter supports.
      */

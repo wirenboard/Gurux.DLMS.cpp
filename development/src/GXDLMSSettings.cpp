@@ -48,6 +48,7 @@ CGXDLMSSettings::CGXDLMSSettings(bool isServer)
     m_ServiceClass = DLMS_SERVICE_CLASS_UN_CONFIRMED;
     m_ClientAddress = 0;
     m_ServerAddress = 0;
+    m_PushClientAddress = 0;
     m_InterfaceType = DLMS_INTERFACE_TYPE_HDLC;
     m_Authentication = DLMS_AUTHENTICATION_NONE;
     m_MaxServerPDUSize = m_MaxReceivePDUSize = 0xFFFF;
@@ -277,6 +278,16 @@ unsigned long CGXDLMSSettings::GetClientAddress()
 void CGXDLMSSettings::SetClientAddress(unsigned long value)
 {
     m_ClientAddress = value;
+}
+
+unsigned long CGXDLMSSettings::GetPushClientAddress()
+{
+    return m_PushClientAddress;
+}
+
+void CGXDLMSSettings::SetPushClientAddress(unsigned long value)
+{
+    m_PushClientAddress = value;
 }
 
 unsigned long CGXDLMSSettings::GetServerAddress()

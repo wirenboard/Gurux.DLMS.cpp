@@ -59,9 +59,9 @@ static void ShowHelp()
     printf(" -v \t Invocation counter data object Logical Name. Ex. 0.0.43.1.1.255");
     printf(" -I \t Auto increase invoke ID");
     printf(" -o \t Cache association view to make reading faster. Ex. -o C:\\device.xml");
-    printf(" -T \t System title that is used with chiphering. Ex -D 4775727578313233");
-    printf(" -A \t Authentication key that is used with chiphering. Ex -D D0D1D2D3D4D5D6D7D8D9DADBDCDDDEDF");
-    printf(" -B \t Block cipher key that is used with chiphering. Ex -D 000102030405060708090A0B0C0D0E0F");
+    printf(" -T \t System title that is used with chiphering. Ex -T 4775727578313233");
+    printf(" -A \t Authentication key that is used with chiphering. Ex -A D0D1D2D3D4D5D6D7D8D9DADBDCDDDEDF");
+    printf(" -B \t Block cipher key that is used with chiphering. Ex -B 000102030405060708090A0B0C0D0E0F");
     printf(" -D \t Dedicated key that is used with chiphering. Ex -D 00112233445566778899AABBCCDDEEFF");
     printf("Example:\r\n");
     printf("Read LG device using TCP/IP connection.\r\n");

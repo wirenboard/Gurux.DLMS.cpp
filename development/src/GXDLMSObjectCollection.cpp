@@ -179,6 +179,14 @@ int CGXDLMSObjectCollection::Save(const char* fileName, CGXXmlWriterSettings& se
             {
                 break;
             }
+            // Add Version
+            if ((*it)->GetVersion() != 0)
+            {
+                if ((ret = writer.WriteElementString("Version", (*it)->GetVersion())) != 0)
+                {
+                    break;
+                }
+            }
             // Add description if given.
             std::string& d = (*it)->GetDescription();
             if (!d.empty())
@@ -282,6 +290,13 @@ int CGXDLMSObjectCollection::Load(const char* fileName)
                 if (obj != NULL)
                 {
                     obj->SetDescription(reader.ReadElementContentAsString("Description"));
+                }
+            }
+            else if (target == "Version")
+            {
+                if (obj != NULL)
+                {
+                    obj->SetVersion(reader.ReadElementContentAsInt("Version"));
                 }
             }
             else

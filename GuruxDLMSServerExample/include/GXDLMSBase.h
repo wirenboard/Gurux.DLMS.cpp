@@ -51,6 +51,8 @@ extern char IMAGEFILE[FILENAME_MAX];
 
 class CGXDLMSBase : public CGXDLMSSecureServer
 {
+    int SendPush(CGXDLMSPushSetup* target);
+
 private:
 #if defined(_WIN32) || defined(_WIN64)//If Windows
     SOCKET m_ServerSocket;

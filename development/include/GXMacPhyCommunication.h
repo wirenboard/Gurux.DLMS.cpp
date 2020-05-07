@@ -46,37 +46,37 @@ class CGXMacPhyCommunication
     /*
      * The tx power of GPDU packets sent to the device.
      */
-    short m_TxPower;
+    signed char m_TxPower;
 
     /*
      * The Tx coding of GPDU packets sent to the device.
      */
-    short m_TxCoding;
+    signed char m_TxCoding;
 
     /*
      * The Rx coding of GPDU packets received from the device.
      */
-    short m_RxCoding;
+    signed char m_RxCoding;
     /*
      * The Rx power level of GPDU packets received from the device.
      */
-    short m_RxLvl;
+    signed char m_RxLvl;
     /*
      * SNR of GPDU packets received from the device.
      */
-    short m_Snr;
+    signed char m_Snr;
     /*
      * The number of times the Tx power was modified.
      */
-    short m_TxPowerModified;
+    signed char m_TxPowerModified;
     /*
      * The number of times the Tx coding was modified.
      */
-    short m_TxCodingModified;
+    signed char m_TxCodingModified;
     /*
      * The number of times the Rx coding was modified.
      */
-    short m_RxCodingModified;
+    signed char m_RxCodingModified;
 public:
     /*
      * Returns EUI is the EUI-48 of the other device.
@@ -98,7 +98,7 @@ public:
     /*
      * Returns The tx power of GPDU packets sent to the device.
      */
-    short GetTxPower()
+    signed char GetTxPower()
     {
         return m_TxPower;
     }
@@ -107,7 +107,7 @@ public:
      * value:
      *            The tx power of GPDU packets sent to the device.
      */
-    void SetTxPower(short value)
+    void SetTxPower(signed char value)
     {
         m_TxPower = value;
     }
@@ -115,7 +115,7 @@ public:
     /*
      * Returns The Tx coding of GPDU packets sent to the device.
      */
-    short GetTxCoding()
+    signed char GetTxCoding()
     {
         return m_TxCoding;
     }
@@ -124,7 +124,7 @@ public:
      * value:
      *            The Tx coding of GPDU packets sent to the device.
      */
-    void SetTxCoding(short value)
+    void SetTxCoding(signed char value)
     {
         m_TxCoding = value;
     }
@@ -132,7 +132,7 @@ public:
     /*
      * Returns The Rx coding of GPDU packets received from the device.
      */
-    short GetRxCoding()
+    signed char GetRxCoding()
     {
         return m_RxCoding;
     }
@@ -141,7 +141,7 @@ public:
      * value:
      *            The Rx coding of GPDU packets received from the device.
      */
-    void SetRxCoding(short value)
+    void SetRxCoding(signed char value)
     {
         m_RxCoding = value;
     }
@@ -149,7 +149,7 @@ public:
     /*
      * Returns The Rx power level of GPDU packets received from the device.
      */
-    short GetRxLvl()
+    signed char GetRxLvl()
     {
         return m_RxLvl;
     }
@@ -158,7 +158,7 @@ public:
      * value:
      *            The Rx power level of GPDU packets received from the device.
      */
-    void SetRxLvl(short value)
+    void SetRxLvl(signed char value)
     {
         m_RxLvl = value;
     }
@@ -166,7 +166,7 @@ public:
     /*
      * Returns SNR of GPDU packets received from the device.
      */
-    short GetSnr()
+    signed char GetSnr()
     {
         return m_Snr;
     }
@@ -175,7 +175,7 @@ public:
      * value:
      *            SNR of GPDU packets received from the device.
      */
-    void SetSnr(short value)
+    void SetSnr(signed char value)
     {
         m_Snr = value;
     }
@@ -183,7 +183,7 @@ public:
     /*
      * Returns The number of times the Tx power was modified.
      */
-    short GetTxPowerModified()
+    signed char GetTxPowerModified()
     {
         return m_TxPowerModified;
     }
@@ -192,7 +192,7 @@ public:
      * value:
      *            The number of times the Tx power was modified.
      */
-    void SetTxPowerModified(short value)
+    void SetTxPowerModified(signed char value)
     {
         m_TxPowerModified = value;
     }
@@ -200,7 +200,7 @@ public:
     /*
      * Returns The number of times the Tx coding was modified.
      */
-    short GetTxCodingModified()
+    signed char GetTxCodingModified()
     {
         return m_TxCodingModified;
     }
@@ -209,7 +209,7 @@ public:
      * value:
      *            The number of times the Tx coding was modified.
      */
-    void SetTxCodingModified(short value)
+    void SetTxCodingModified(signed char value)
     {
         m_TxCodingModified = value;
     }
@@ -217,7 +217,7 @@ public:
     /*
      * Returns The number of times the Rx coding was modified.
      */
-    short GetRxCodingModified()
+    signed char GetRxCodingModified()
     {
         return m_RxCodingModified;
     }
@@ -226,7 +226,7 @@ public:
      * value:
      *            The number of times the Rx coding was modified.
      */
-    void SetRxCodingModified(short value)
+    void SetRxCodingModified(signed char value)
     {
         m_RxCodingModified = value;
     }

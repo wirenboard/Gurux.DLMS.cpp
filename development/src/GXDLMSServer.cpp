@@ -119,6 +119,16 @@ CGXDLMSServer::~CGXDLMSServer()
 
 }
 
+unsigned long CGXDLMSServer::GetPushClientAddress()
+{
+    return m_Settings.GetPushClientAddress();
+}
+
+void CGXDLMSServer::SetPushClientAddress(unsigned long value)
+{
+    m_Settings.SetPushClientAddress(value);
+}
+
 /**
 * @return HDLC settings.
 */
@@ -669,7 +679,7 @@ int CGXDLMSServer::ReportError(DLMS_COMMAND command, DLMS_ERROR_CODE error, CGXB
     {
         if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER)
         {
-            ret = CGXDLMS::GetWrapperFrame(m_Settings, data, reply);
+            ret = CGXDLMS::GetWrapperFrame(m_Settings, command, data, reply);
         }
         else
         {
@@ -961,7 +971,7 @@ int CGXDLMSServer::HandleCommand(
         CGXByteBuffer& reply = sr.GetReply();
         if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER)
         {
-            ret = CGXDLMS::GetWrapperFrame(m_Settings, m_ReplyData, reply);
+            ret = CGXDLMS::GetWrapperFrame(m_Settings, cmd, m_ReplyData, reply);
         }
         else
         {

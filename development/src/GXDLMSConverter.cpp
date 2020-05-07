@@ -37,465 +37,534 @@
 
 const char* CGXDLMSConverter::GetErrorMessage(int error)
 {
+    const char* str;
     switch (error)
     {
     case DLMS_ERROR_CODE_OK:
-        return "OK";
+        str = "OK";
+        break;
     case DLMS_ERROR_CODE_INVALID_PARAMETER:
-        return "Invalid parameter.";
+        str = "Invalid parameter.";
+        break;
     case DLMS_ERROR_CODE_NOT_INITIALIZED:
-        return "Server is not initialized.";
+        str = "Server is not initialized.";
+        break;
     case DLMS_ERROR_CODE_OUTOFMEMORY:
-        return "Not enough memory available.";
+        str = "Not enough memory available.";
+        break;
     case DLMS_ERROR_CODE_NOT_REPLY:
-        return "Packet is not a reply for a send packet.";
+        str = "Packet is not a reply for a send packet.";
+        break;
     case DLMS_ERROR_CODE_REJECTED:
-        return "Meter rejects send packet.";
+        str = "Meter rejects send packet.";
+        break;
     case DLMS_ERROR_CODE_INVALID_LOGICAL_NAME:
-        return "Invalid Logical Name.";
+        str = "Invalid Logical Name.";
+        break;
     case DLMS_ERROR_CODE_INVALID_CLIENT_ADDRESS:
-        return "Client HDLC Address is not set.";
+        str = "Client HDLC Address is not set.";
+        break;
     case DLMS_ERROR_CODE_INVALID_SERVER_ADDRESS:
-        return "Server HDLC Address is not set.";
+        str = "Server HDLC Address is not set.";
+        break;
     case DLMS_ERROR_CODE_INVALID_DATA_FORMAT:
-        return "Not a HDLC frame.";
+        str = "Not a HDLC frame.";
+        break;
     case DLMS_ERROR_CODE_INVALID_VERSION_NUMBER:
-        return "Invalid DLMS version number.";
+        str = "Invalid DLMS version number.";
+        break;
     case DLMS_ERROR_CODE_CLIENT_ADDRESS_NO_NOT_MATCH:
-        return "Client addresses do not match.";
+        str = "Client addresses do not match.";
+        break;
     case DLMS_ERROR_CODE_SERVER_ADDRESS_NO_NOT_MATCH:
-        return "Server addresses do not match.";
+        str = "Server addresses do not match.";
+        break;
     case DLMS_ERROR_CODE_WRONG_CRC:
-        return "CRC do not match.";
+        str = "CRC do not match.";
+        break;
     case DLMS_ERROR_CODE_INVALID_RESPONSE:
-        return "Invalid response";
+        str = "Invalid response";
+        break;
     case DLMS_ERROR_CODE_INVALID_TAG:
-        return "Invalid Tag.";
+        str = "Invalid Tag.";
+        break;
     case DLMS_ERROR_CODE_ENCODING_FAILED:
-        return "Encoding failed. Not enough data.";
+        str = "Encoding failed. Not enough data.";
+        break;
     case DLMS_ERROR_CODE_REJECTED_PERMAMENT:
-        return "Rejected permament.";
+        str = "Rejected permament.";
+        break;
     case DLMS_ERROR_CODE_REJECTED_TRANSIENT:
-        return "Rejected transient.";
+        str = "Rejected transient.";
+        break;
     case DLMS_ERROR_CODE_NO_REASON_GIVEN:
-        return "No reason given.";
+        str = "No reason given.";
+        break;
     case DLMS_ERROR_CODE_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED:
-        return "Application context name not supported.";
+        str = "Application context name not supported.";
+        break;
     case DLMS_ERROR_CODE_AUTHENTICATION_MECHANISM_NAME_NOT_RECOGNISED:
-        return "Authentication mechanism name not recognised.";
+        str = "Authentication mechanism name not recognised.";
+        break;
     case DLMS_ERROR_CODE_AUTHENTICATION_MECHANISM_NAME_REQUIRED:
-        return "Authentication mechanism name required.";
+        str = "Authentication mechanism name required.";
+        break;
     case DLMS_ERROR_CODE_AUTHENTICATION_FAILURE:
-        return "Authentication failure.";
+        str = "Authentication failure.";
+        break;
     case DLMS_ERROR_CODE_AUTHENTICATION_REQUIRED:
-        return "Authentication required.";
+        str = "Authentication required.";
+        break;
     case DLMS_ERROR_CODE_HARDWARE_FAULT:
-        return "Access Error : Device reports a hardware fault.";
+        str = "Access Error : Device reports a hardware fault.";
+        break;
     case DLMS_ERROR_CODE_TEMPORARY_FAILURE:
-        return "Access Error : Device reports a temporary failure.";
+        str = "Access Error : Device reports a temporary failure.";
+        break;
     case DLMS_ERROR_CODE_READ_WRITE_DENIED:
-        return "Access Error : Device reports Read-Write denied.";
+        str = "Access Error : Device reports Read-Write denied.";
+        break;
     case DLMS_ERROR_CODE_UNDEFINED_OBJECT:
-        return "Access Error : Device reports a undefined object.";
+        str = "Access Error : Device reports a undefined object.";
+        break;
     case DLMS_ERROR_CODE_INCONSISTENT_CLASS:
-        return "Access Error : Device reports a inconsistent Class or Object.";
+        str = "Access Error : Device reports a inconsistent Class or Object.";
+        break;
     case DLMS_ERROR_CODE_UNAVAILABLE_OBJECT:
-        return "Access Error : Device reports a unavailable object.";
+        str = "Access Error : Device reports a unavailable object.";
+        break;
     case DLMS_ERROR_CODE_UNMATCH_TYPE:
-        return "Access Error : Device reports a unmatched type.";
+        str = "Access Error : Device reports a unmatched type.";
+        break;
     case DLMS_ERROR_CODE_ACCESS_VIOLATED:
-        return "Access Error : Device reports scope of access violated.";
+        str = "Access Error : Device reports scope of access violated.";
+        break;
     case DLMS_ERROR_CODE_DATA_BLOCK_UNAVAILABLE:
-        return "Access Error : Data Block Unavailable.";
+        str = "Access Error : Data Block Unavailable.";
+        break;
     case DLMS_ERROR_CODE_LONG_GET_OR_READ_ABORTED:
-        return "Access Error : Long Get Or Read Aborted.";
+        str = "Access Error : Long Get Or Read Aborted.";
+        break;
     case DLMS_ERROR_CODE_NO_LONG_GET_OR_READ_IN_PROGRESS:
-        return "Access Error : No Long Get Or Read In Progress.";
+        str = "Access Error : No Long Get Or Read In Progress.";
+        break;
     case DLMS_ERROR_CODE_LONG_SET_OR_WRITE_ABORTED:
-        return "Access Error : Long Set Or Write Aborted.";
+        str = "Access Error : Long Set Or Write Aborted.";
+        break;
     case DLMS_ERROR_CODE_NO_LONG_SET_OR_WRITE_IN_PROGRESS:
-        return "Access Error : No Long Set Or Write In Progress.";
+        str = "Access Error : No Long Set Or Write In Progress.";
+        break;
     case DLMS_ERROR_CODE_DATA_BLOCK_NUMBER_INVALID:
-        return "Access Error : Data Block Number Invalid.";
+        str = "Access Error : Data Block Number Invalid.";
+        break;
     case DLMS_ERROR_CODE_OTHER_REASON:
-        return "Access Error : Other Reason.";
+        str = "Access Error : Other Reason.";
+        break;
     case DLMS_ERROR_CODE_UNKNOWN:
-        return "Unknown error.";
+        str = "Unknown error.";
+        break;
     case DLMS_ERROR_CODE_SEND_FAILED:
-        return "Data send failed.";
+        str = "Data send failed.";
+        break;
     case DLMS_ERROR_CODE_RECEIVE_FAILED:
-        return "Data receive failed.";
+        str = "Data receive failed.";
+        break;
     case DLMS_ERROR_CODE_NOT_IMPLEMENTED:
-        return "Not implemeted.";
+        str = "Not implemeted.";
+        break;
     case DLMS_ERROR_CODE_INVALID_INVOKE_ID:
-        return "Invalid Invoke ID.";
+        str = "Invalid Invoke ID.";
+        break;
+    default:
+        str = "Unknown error.";
+        break;
     }
-    return "Unknown error.";
+    return str;
 }
+
 const char* CGXDLMSConverter::ToString(DLMS_BAUD_RATE value)
 {
+    const char* str;
     switch (value)
     {
     case 0:
-        return "Baudrate300";
+        str = "Baudrate300";
         break;
     case 1:
-        return "Baudrate600";
+        str = "Baudrate600";
         break;
     case 2:
-        return "Baudrate1200";
+        str = "Baudrate1200";
         break;
     case 3:
-        return "Baudrate2400";
+        str = "Baudrate2400";
         break;
     case 4:
-        return "Baudrate4000";
+        str = "Baudrate4000";
         break;
     case 5:
-        return "Baudrate9600";
+        str = "Baudrate9600";
         break;
     case 6:
-        return "Baudrate19200";
+        str = "Baudrate19200";
         break;
     case 7:
-        return "Baudrate38400";
+        str = "Baudrate38400";
         break;
     case 8:
-        return "Baudrate57600";
+        str = "Baudrate57600";
         break;
     case 9:
-        return "Baudrate115200";
+        str = "Baudrate115200";
         break;
     default:
+        str = "Unknown baudrate";
         break;
     }
-    return "Unknown baudrate";
+    return str;
 }
 
 const char* CGXDLMSConverter::ToString(DLMS_CLOCK_STATUS value)
 {
+    const char* str;
     switch (value)
     {
     case 0:
-        return "None";
+        str = "None";
         break;
     case 0x1:
-        return "InvalidValue";
+        str = "InvalidValue";
         break;
     case 0x2:
-        return "DoubtfulValue";
+        str = "DoubtfulValue";
         break;
     case 0x4:
-        return "DifferentClockBase";
+        str = "DifferentClockBase";
         break;
     case 0x8:
-        return "Reserved1";
+        str = "Reserved1";
         break;
     case 0x10:
-        return "Reserved2";
+        str = "Reserved2";
         break;
     case 0x20:
-        return "Reserved3";
+        str = "Reserved3";
         break;
     case 0x40:
-        return "Reserved4";
+        str = "Reserved4";
         break;
     case 0x80:
-        return "DaylightSaveActive";
+        str = "DaylightSaveActive";
         break;
     default:
+        str = "Unknown Clock status";
         break;
     }
-    return "Unknown Clock status";
+    return str;
 }
 
 const char* CGXDLMSConverter::ToString(DLMS_CLOCK_BASE value)
 {
+    const char* str;
     switch (value)
     {
     case 0:
-        return "None";
+        str = "None";
         break;
     case 1:
-        return "Crystal";
+        str = "Crystal";
         break;
     case 2:
-        return "Frequency50";
+        str = "Frequency50";
         break;
     case 3:
-        return "Frequency60";
+        str = "Frequency60";
         break;
     case 4:
-        return "GPS";
+        str = "GPS";
         break;
     case 5:
-        return "Radio";
+        str = "Radio";
         break;
     default:
+        str = "Unknown Clock base";
         break;
     }
-    return "Unknown Clock base";
+    return str;
 }
 
 const char* CGXDLMSConverter::GetUnitAsString(int unit)
 {
+    const char* str;
     switch (unit)
     {
     case 0:
-        return "None";
+        str = "None";
+        break;
     case 1:
-        return "Year";
+        str = "Year";
         break;
     case 2:
-        return "Month";
+        str = "Month";
         break;
     case 3:
-        return "Week";
+        str = "Week";
         break;
     case 4:
-        return "Day";
+        str = "Day";
         break;
     case 5:
-        return "Hour";
+        str = "Hour";
         break;
     case 6:
-        return "Minute";
+        str = "Minute";
         break;
     case 7:
-        return "Second";
+        str = "Second";
         break;
     case 8:
-        return "PhaseAngle";
+        str = "PhaseAngle";
         break;
     case 9:
-        return "Temperature";
+        str = "Temperature";
         break;
     case 10:
-        return "LocalCurrency";
+        str = "LocalCurrency";
         break;
     case 11:
-        return "Length";
+        str = "Length";
         break;
     case 12:
-        return "Speed";
+        str = "Speed";
         break;
     case 13:
-        return "Volume";
+        str = "Volume";
         break;
     case 14:
-        return "CorrectedVolume";
+        str = "CorrectedVolume";
         break;
     case 15:
-        return "VolumeFlux";
+        str = "VolumeFlux";
         break;
     case 16:
-        return "CorrectedVolumeFlux";
+        str = "CorrectedVolumeFlux";
         break;
     case 17:
-        return "VolumeFlux";
+        str = "VolumeFlux";
         break;
     case 18:
-        return "CorrectedVolumeFlux";
+        str = "CorrectedVolumeFlux";
         break;
     case 19:
-        return "Volume";
+        str = "Volume";
         break;
     case 20:
-        return "MassKg";
+        str = "MassKg";
         break;
     case 21:
-        return "Force";
+        str = "Force";
         break;
     case 22:
-        return "Energy";
+        str = "Energy";
         break;
     case 23:
-        return "PressurePascal";
+        str = "PressurePascal";
         break;
     case 24:
-        return "PressureBar";
+        str = "PressureBar";
         break;
     case 25:
-        return "Energy";
+        str = "Energy";
         break;
     case 26:
-        return "ThermalPower";
+        str = "ThermalPower";
         break;
     case 27:
-        return "ActivePower";
+        str = "ActivePower";
         break;
     case 28:
-        return "ApparentPower";
+        str = "ApparentPower";
         break;
     case 29:
-        return "ReactivePower";
+        str = "ReactivePower";
         break;
     case 30:
-        return "ActiveEnergy";
+        str = "ActiveEnergy";
         break;
     case 31:
-        return "ApparentEnergy";
+        str = "ApparentEnergy";
         break;
     case 32:
-        return "ReactiveEnergy";
+        str = "ReactiveEnergy";
         break;
     case 33:
-        return "Current";
+        str = "Current";
         break;
     case 34:
-        return "ElectricalCharge";
+        str = "ElectricalCharge";
         break;
     case 35:
-        return "Voltage";
+        str = "Voltage";
         break;
     case 36:
-        return "Electrical field strength E V/m";
+        str = "Electrical field strength E V/m";
         break;
     case 37:
-        return "Capacity C farad C/V = As/V";
+        str = "Capacity C farad C/V = As/V";
         break;
     case 38:
-        return "Resistance";
+        str = "Resistance";
         break;
     case 39:
-        return "Resistivity";
+        str = "Resistivity";
         break;
     case 40:
-        return "Magnetic flux F weber Wb = Vs";
+        str = "Magnetic flux F weber Wb = Vs";
         break;
     case 41:
-        return "Induction T tesla Wb/m2";
+        str = "Induction T tesla Wb/m2";
         break;
     case 42:
-        return "Magnetic field strength H A/m";
+        str = "Magnetic field strength H A/m";
         break;
     case 43:
-        return "Inductivity L henry H = Wb/A";
+        str = "Inductivity L henry H = Wb/A";
         break;
     case 44:
-        return "Frequency";
+        str = "Frequency";
         break;
     case 45:
-        return "ActiveEnergy";
+        str = "ActiveEnergy";
         break;
     case 46:
-        return "ReactiveEnergy";
+        str = "ReactiveEnergy";
         break;
     case 47:
-        return "ApparentEnergy";
+        str = "ApparentEnergy";
         break;
     case 48:
-        return "V260*60s";
+        str = "V260*60s";
         break;
     case 49:
-        return "A260*60s";
+        str = "A260*60s";
         break;
     case 50:
-        return "Mass";
+        str = "Mass";
         break;
     case 51:
-        return "ConductanceSiemens";
+        str = "ConductanceSiemens";
         break;
     case 254:
-        return "OtherUnit";
+        str = "OtherUnit";
         break;
     case 255:
-        return "NoUnit";
+        str = "NoUnit";
+        break;
+    default:
+        str = "";
         break;
     }
-    return "";
+    return str;
 }
 
 
 const char* CGXDLMSConverter::ToString(DLMS_ADDRESS_STATE value)
 {
+    const char* str;
     switch (value)
     {
     case 0:
-        return "None";
+        str = "None";
         break;
     case 1:
-        return "Assigned";
+        str = "Assigned";
         break;
     default:
+        str = "Unknown Clock base";
         break;
     }
-    return "Unknown Clock base";
+    return str;
 }
 
 //Get Disconnect control control state as a std::string.
 const char* CGXDLMSConverter::ToString(DLMS_CONTROL_STATE value)
 {
+    const char* str;
     switch (value)
     {
     case 0:
-        return "Disconnected";
+        str = "Disconnected";
         break;
     case 1:
-        return "Connected";
+        str = "Connected";
         break;
     case 2:
-        return "ReadyForReconnection";
+        str = "ReadyForReconnection";
         break;
     default:
+        str = "Unknown control state";
         break;
     }
-    return "Unknown control state";
+    return str;
 }
 
 //Get Disconnect control control mode as a std::string.
 const char* CGXDLMSConverter::ToString(DLMS_CONTROL_MODE value)
 {
+    const char* str;
     switch (value)
     {
     case 0:
-        return "None";
+        str = "None";
         break;
     case 1:
-        return "Mode1";
+        str = "Mode1";
         break;
     case 2:
-        return "Mode2";
+        str = "Mode2";
         break;
     case 3:
-        return "Mode3";
+        str = "Mode3";
         break;
     case 4:
-        return "Mode4";
+        str = "Mode4";
         break;
     case 5:
-        return "Mode5";
+        str = "Mode5";
         break;
     case 6:
-        return "Mode6";
+        str = "Mode6";
         break;
     default:
+        str = "Unknown control mode";
         break;
     }
-    return "Unknown control mode";
+    return str;
 }
 
 //Get Security Setup security policy as a std::string.
 const char* CGXDLMSConverter::ToString(DLMS_SECURITY_POLICY value)
 {
+    const char* str;
     switch (value)
     {
     case DLMS_SECURITY_POLICY_NOTHING:
-        return "Nothing";
+        str = "Nothing";
         break;
     case DLMS_SECURITY_POLICY_AUTHENTICATED:
-        return "Authenticated";
+        str = "Authenticated";
         break;
     case DLMS_SECURITY_POLICY_ENCRYPTED:
-        return "Encrypted";
+        str = "Encrypted";
         break;
     case DLMS_SECURITY_POLICY_AUTHENTICATED_ENCRYPTED:
-        return "AuthenticatedEncrypted";
+        str = "AuthenticatedEncrypted";
         break;
     default:
+        str = "Unknown security policy";
         break;
     }
-    return "Unknown security policy";
+    return str;
 }
 
 //Get Security Setup security policy v1 as a std::string.
@@ -605,7 +674,7 @@ const char* CGXDLMSConverter::ToString(DLMS_OPTICAL_PROTOCOL_MODE value)
     default:
         break;
     }
-    return "Unknown ptotocol mode";
+    return "Unknown protocol mode";
 }
 
 const char* CGXDLMSConverter::ToString(DLMS_LOCAL_PORT_RESPONSE_TIME value)
@@ -958,127 +1027,188 @@ const char* CGXDLMSConverter::ToString(DLMS_SECURITY value)
 
 const char* CGXDLMSConverter::ToString(DLMS_OBJECT_TYPE type)
 {
+    const char* str;
     switch (type)
     {
     case DLMS_OBJECT_TYPE_ACTION_SCHEDULE:
-        return "GXDLMSActionSchedule";
+        str = "GXDLMSActionSchedule";
+        break;
     case DLMS_OBJECT_TYPE_ACTIVITY_CALENDAR:
-        return "GXDLMSActivityCalendar";
+        str = "GXDLMSActivityCalendar";
+        break;
     case DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME:
-        return "GXDLMSAssociationLogicalName";
+        str = "GXDLMSAssociationLogicalName";
+        break;
     case DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME:
-        return "GXDLMSAssociationShortName";
+        str = "GXDLMSAssociationShortName";
+        break;
     case DLMS_OBJECT_TYPE_AUTO_ANSWER:
-        return "GXDLMSAutoAnswer";
+        str = "GXDLMSAutoAnswer";
+        break;
     case DLMS_OBJECT_TYPE_AUTO_CONNECT:
-        return "GXDLMSAutoConnect";
+        str = "GXDLMSAutoConnect";
+        break;
     case DLMS_OBJECT_TYPE_CLOCK:
-        return "GXDLMSClock";
+        str = "GXDLMSClock";
+        break;
     case DLMS_OBJECT_TYPE_DATA:
-        return "GXDLMSData";
+        str = "GXDLMSData";
+        break;
     case DLMS_OBJECT_TYPE_DEMAND_REGISTER:
-        return "GXDLMSDemandRegister";
+        str = "GXDLMSDemandRegister";
+        break;
     case DLMS_OBJECT_TYPE_MAC_ADDRESS_SETUP:
-        return "GXDLMSMacAddressSetup";
+        str = "GXDLMSMacAddressSetup";
+        break;
     case DLMS_OBJECT_TYPE_EXTENDED_REGISTER:
-        return "GXDLMSExtendedRegister";
+        str = "GXDLMSExtendedRegister";
+        break;
     case DLMS_OBJECT_TYPE_GPRS_SETUP:
-        return "GXDLMSGprsSetup";
+        str = "GXDLMSGprsSetup";
+        break;
     case DLMS_OBJECT_TYPE_SECURITY_SETUP:
-        return "GXDLMSSecuritySetup";
+        str = "GXDLMSSecuritySetup";
+        break;
     case DLMS_OBJECT_TYPE_IEC_HDLC_SETUP:
-        return "GXDLMSIecHdlcSetup";
+        str = "GXDLMSIecHdlcSetup";
+        break;
     case DLMS_OBJECT_TYPE_IEC_LOCAL_PORT_SETUP:
-        return "GXDLMSIecLocalPortSetup";
+        str = "GXDLMSIecLocalPortSetup";
+        break;
     case DLMS_OBJECT_TYPE_IEC_TWISTED_PAIR_SETUP:
-        return "GXDLMSIEC_TWISTED_PAIR_SETUP";
+        str = "GXDLMSIEC_TWISTED_PAIR_SETUP";
+        break;
     case DLMS_OBJECT_TYPE_IP4_SETUP:
-        return "GXDLMSIp4Setup";
+        str = "GXDLMSIp4Setup";
+        break;
     case DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP:
-        return "GXDLMSMBusSlavePortSetup";
+        str = "GXDLMSMBusSlavePortSetup";
+        break;
     case DLMS_OBJECT_TYPE_IMAGE_TRANSFER:
-        return "GXDLMSImageTransfer";
+        str = "GXDLMSImageTransfer";
+        break;
     case DLMS_OBJECT_TYPE_DISCONNECT_CONTROL:
-        return "GXDLMSDisconnectControl";
+        str = "GXDLMSDisconnectControl";
+        break;
     case DLMS_OBJECT_TYPE_LIMITER:
-        return "GXDLMSLimiter";
+        str = "GXDLMSLimiter";
+        break;
     case DLMS_OBJECT_TYPE_MBUS_CLIENT:
-        return "GXDLMSMBusClient";
+        str = "GXDLMSMBusClient";
+        break;
     case DLMS_OBJECT_TYPE_MODEM_CONFIGURATION:
-        return "GXDLMSModemConfiguration";
+        str = "GXDLMSModemConfiguration";
+        break;
     case DLMS_OBJECT_TYPE_PPP_SETUP:
-        return "GXDLMSPppSetup";
+        str = "GXDLMSPppSetup";
+        break;
     case DLMS_OBJECT_TYPE_PROFILE_GENERIC:
-        return "GXDLMSProfileGeneric";
+        str = "GXDLMSProfileGeneric";
+        break;
     case DLMS_OBJECT_TYPE_REGISTER:
-        return "GXDLMSRegister";
+        str = "GXDLMSRegister";
+        break;
     case DLMS_OBJECT_TYPE_REGISTER_ACTIVATION:
-        return "GXDLMSRegisterActivation";
+        str = "GXDLMSRegisterActivation";
+        break;
     case DLMS_OBJECT_TYPE_REGISTER_MONITOR:
-        return "GXDLMSRegisterMonitor";
+        str = "GXDLMSRegisterMonitor";
+        break;
     case DLMS_OBJECT_TYPE_REGISTER_TABLE:
-        return "GXDLMSRegisterTable";
+        str = "GXDLMSRegisterTable";
+        break;
     case DLMS_OBJECT_TYPE_ZIG_BEE_SAS_STARTUP:
-        return "GXDLMSZigBeeSasStartup";
+        str = "GXDLMSZigBeeSasStartup";
+        break;
     case DLMS_OBJECT_TYPE_ZIG_BEE_SAS_JOIN:
-        return "GXDLMSZigBeeSasJoin";
+        str = "GXDLMSZigBeeSasJoin";
+        break;
     case DLMS_OBJECT_TYPE_ZIG_BEE_SAS_APS_FRAGMENTATION:
-        return "GXDLMSZigBeeSasApsFragmentation";
+        str = "GXDLMSZigBeeSasApsFragmentation";
+        break;
     case DLMS_OBJECT_TYPE_ZIG_BEE_NETWORK_CONTROL:
-        return "GXDLMSZigBeeNetworkControl";
+        str = "GXDLMSZigBeeNetworkControl";
+        break;
     case DLMS_OBJECT_TYPE_SAP_ASSIGNMENT:
-        return "GXDLMSSapAssignment";
+        str = "GXDLMSSapAssignment";
+        break;
     case DLMS_OBJECT_TYPE_SCHEDULE:
-        return "GXDLMSSchedule";
+        str = "GXDLMSSchedule";
+        break;
     case DLMS_OBJECT_TYPE_SCRIPT_TABLE:
-        return "GXDLMSScriptTable";
+        str = "GXDLMSScriptTable";
+        break;
     case DLMS_OBJECT_TYPE_SMTP_SETUP:
-        return "GXDLMSSMTPSetup";
+        str = "GXDLMSSMTPSetup";
+        break;
     case DLMS_OBJECT_TYPE_SPECIAL_DAYS_TABLE:
-        return "GXDLMSSpecialDaysTable";
+        str = "GXDLMSSpecialDaysTable";
+        break;
     case DLMS_OBJECT_TYPE_STATUS_MAPPING:
-        return "GXDLMSStatusMapping";
+        str = "GXDLMSStatusMapping";
+        break;
     case DLMS_OBJECT_TYPE_TCP_UDP_SETUP:
-        return "GXDLMSTcpUdpSetup";
+        str = "GXDLMSTcpUdpSetup";
+        break;
     case DLMS_OBJECT_TYPE_UTILITY_TABLES:
-        return "GXDLMSUtilityTables";
+        str = "GXDLMSUtilityTables";
+        break;
     case DLMS_OBJECT_TYPE_MBUS_MASTER_PORT_SETUP:
-        return "GXDLMSMBusMasterPortSetup";
+        str = "GXDLMSMBusMasterPortSetup";
+        break;
     case DLMS_OBJECT_TYPE_MESSAGE_HANDLER:
-        return "GXDLMSMessageHandler";
+        str = "GXDLMSMessageHandler";
+        break;
     case DLMS_OBJECT_TYPE_PUSH_SETUP:
-        return "GXDLMSPushSetup";
+        str = "GXDLMSPushSetup";
+        break;
     case DLMS_OBJECT_TYPE_ACCOUNT:
-        return "GXDLMSAccount";
+        str = "GXDLMSAccount";
+        break;
     case DLMS_OBJECT_TYPE_CREDIT:
-        return "GXDLMSCredit";
+        str = "GXDLMSCredit";
+        break;
     case DLMS_OBJECT_TYPE_CHARGE:
-        return "GXDLMSCharge";
+        str = "GXDLMSCharge";
+        break;
     case DLMS_OBJECT_TYPE_PARAMETER_MONITOR:
-        return "GXDLMSParameterMonitor";
+        str = "GXDLMSParameterMonitor";
+        break;
     case DLMS_OBJECT_TYPE_TOKEN_GATEWAY:
-        return "GXDLMSTokenGateway";
+        str = "GXDLMSTokenGateway";
+        break;
     case DLMS_OBJECT_TYPE_GSM_DIAGNOSTIC:
-        return "GXDLMSGSMDiagnostic";
+        str = "GXDLMSGSMDiagnostic";
+        break;
     case DLMS_OBJECT_TYPE_COMPACT_DATA:
-        return "GXDLMSCompactData";
+        str = "GXDLMSCompactData";
+        break;
     case DLMS_OBJECT_TYPE_LLC_SSCS_SETUP:
-        return "GXDLMSLlcSscsSetup";
+        str = "GXDLMSLlcSscsSetup";
+        break;
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS:
-        return "GXDLMSPrimeNbOfdmPlcPhysicalLayerCounters";
+        str = "GXDLMSPrimeNbOfdmPlcPhysicalLayerCounters";
+        break;
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_SETUP:
-        return "GXDLMSPrimeNbOfdmPlcMacSetup";
+        str = "GXDLMSPrimeNbOfdmPlcMacSetup";
+        break;
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS:
-        return "GXDLMSPrimeNbOfdmPlcMacFunctionalParameters";
+        str = "GXDLMSPrimeNbOfdmPlcMacFunctionalParameters";
+        break;
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_COUNTERS:
-        return "GXDLMSPrimeNbOfdmPlcMacCounters";
+        str = "GXDLMSPrimeNbOfdmPlcMacCounters";
+        break;
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA:
-        return "GXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData";
+        str = "GXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData";
+        break;
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION:
-        return "GXDLMSPrimeNbOfdmPlcApplicationsIdentification";
+        str = "GXDLMSPrimeNbOfdmPlcApplicationsIdentification";
+        break;
     default:
-        return "Manufacture spesific.";
+        str = "Manufacture spesific.";
+        break;
     }
+    return str;
 }
 
 DLMS_OBJECT_TYPE CGXDLMSConverter::ValueOfObjectType(const char* value)

@@ -45,21 +45,21 @@ class CGXMacAvailableSwitch
     /*
      * SID of this switch.
      */
-    int m_LsId;
+    short m_LsId;
 
     /*
      * Level of this switch in subnetwork hierarchy.
      */
-    short m_Level;
+    signed char m_Level;
 
     /*
      * The received signal level for this switch;
      */
-    short m_RxLevel;
+    signed char m_RxLevel;
     /*
      * The signal to noise ratio for this switch.
      */
-    short m_RxSnr;
+    signed char m_RxSnr;
 public:
     /*
      * Returns EUI-48 of the subnetwork.
@@ -81,7 +81,7 @@ public:
     /*
      * Returns SID of this switch.
      */
-    int GetLsId()
+    short GetLsId()
     {
         return m_LsId;
     }
@@ -89,7 +89,7 @@ public:
     /*
      * value: SID of this switch.
      */
-    void SetLsId(int value)
+    void SetLsId(short value)
     {
         m_LsId = value;
     }
@@ -97,7 +97,7 @@ public:
     /*
      * Returns Level of this switch in subnetwork hierarchy.
      */
-    short GetLevel()
+    signed char GetLevel()
     {
         return m_Level;
     }
@@ -105,7 +105,7 @@ public:
     /*
      * value: Level of this switch in subnetwork hierarchy.
      */
-    void SetLevel(short value)
+    void SetLevel(signed char value)
     {
         m_Level = value;
     }
@@ -113,7 +113,7 @@ public:
     /*
      * Returns The received signal level for this switch;
      */
-    short GetRxLevel()
+    signed char GetRxLevel()
     {
         return m_RxLevel;
     }
@@ -121,7 +121,7 @@ public:
     /*
      * value: The received signal level for this switch;
      */
-    void SetRxLevel(short value)
+    void SetRxLevel(signed char value)
     {
         m_RxLevel = value;
     }
@@ -129,7 +129,7 @@ public:
     /*
      * Returns The signal to noise ratio for this switch.
      */
-    short GetRxSnr()
+    signed char GetRxSnr()
     {
         return m_RxSnr;
     }
@@ -137,7 +137,7 @@ public:
     /*
      * value: The signal to noise ratio for this switch.
      */
-    void SetRxSnr(short value)
+    void SetRxSnr(signed char value)
     {
         m_RxSnr = value;
     }

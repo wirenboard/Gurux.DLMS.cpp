@@ -85,6 +85,24 @@ int CGXCommunication::Disconnect()
     return 0;
 }
 
+//Release connection to the meter.
+int CGXCommunication::Release()
+{
+    int ret;
+    std::vector<CGXByteBuffer> data;
+    CGXReplyData reply;
+    if (m_hComPort != INVALID_HANDLE_VALUE || m_socket != -1)
+    {
+        if ((ret = m_Parser->ReleaseRequest(data)) != 0 ||
+            (ret = ReadDataBlock(data, reply)) != 0)
+        {
+            //Show error but continue close.
+            printf("DisconnectRequest failed (%d) %s.\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+        }
+    }
+    return 0;
+}
+
 //Close connection to the meter and close the communcation channel.
 int CGXCommunication::Close()
 {
@@ -92,8 +110,8 @@ int CGXCommunication::Close()
     std::vector<CGXByteBuffer> data;
     CGXReplyData reply;
     if ((m_hComPort != INVALID_HANDLE_VALUE || m_socket != -1) &&
-        m_Parser->GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER
-        && m_Parser->GetCiphering()->GetSecurity() == DLMS_SECURITY_NONE)
+        (m_Parser->GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER ||
+            m_Parser->GetCiphering()->GetSecurity() != DLMS_SECURITY_NONE))
     {
         if ((ret = m_Parser->ReleaseRequest(data)) != 0 ||
             (ret = ReadDataBlock(data, reply)) != 0)
@@ -613,7 +631,20 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         }
         if (reply.GetUInt8(&ch) != 0 || ch != '/')
         {
-            return DLMS_ERROR_CODE_RECEIVE_FAILED;
+            //Send disc
+            buff[0] = 1;
+            buff[1] = 'B';
+            buff[2] = '0';
+            buff[3] = 3;
+            buff[4] = '\r';
+            buff[5] = '\n';
+            len = 6;
+            ret = WriteFile(m_hComPort, buff, len, &sendSize, &m_osWrite);
+            if (Read('\n', reply) != 0)
+            {
+                return DLMS_ERROR_CODE_SEND_FAILED;
+            }
+            return DLMS_ERROR_CODE_SEND_FAILED;
         }
         //Get used baud rate.
         if ((ret = reply.GetUInt8(reply.GetPosition() + 3, &ch)) != 0)

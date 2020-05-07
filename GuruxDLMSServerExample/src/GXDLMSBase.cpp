@@ -122,7 +122,7 @@ void ListenerThread(void* pVoid)
     {
         len = sizeof(client);
         senderInfo.clear();
-        socket = accept(server->GetSocket(), (struct sockaddr*)&client, &len);
+        socket = accept(server->GetSocket(), (struct sockaddr*) & client, &len);
         server->Reset();
         if (server->IsConnected())
         {
@@ -221,7 +221,7 @@ void ListenerThread(void* pVoid)
 
 #if defined(_WIN32) || defined(_WIN64)//If Windows
 #else //If Linux
-void * UnixListenerThread(void * pVoid)
+void* UnixListenerThread(void* pVoid)
 {
     ListenerThread(pVoid);
     return NULL;
@@ -244,6 +244,7 @@ int CGXDLMSBase::GetSocket()
 
 int CGXDLMSBase::StartServer(int port)
 {
+    SetPushClientAddress(60);
     int ret;
     if ((ret = StopServer()) != 0)
     {
@@ -256,7 +257,7 @@ int CGXDLMSBase::StartServer(int port)
         return -1;
     }
     int fFlag = 1;
-    if (setsockopt(m_ServerSocket, SOL_SOCKET, SO_REUSEADDR, (char *)&fFlag, sizeof(fFlag)) == -1)
+    if (setsockopt(m_ServerSocket, SOL_SOCKET, SO_REUSEADDR, (char*)&fFlag, sizeof(fFlag)) == -1)
     {
         //setsockopt.
         return -1;
@@ -282,7 +283,7 @@ int CGXDLMSBase::StartServer(int port)
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
     m_ReceiverThread = (HANDLE)_beginthread(ListenerThread, 0, (LPVOID)this);
 #else
-    ret = pthread_create(&m_ReceiverThread, NULL, UnixListenerThread, (void *)this);
+    ret = pthread_create(&m_ReceiverThread, NULL, UnixListenerThread, (void*)this);
 #endif
     return ret;
 }
@@ -302,8 +303,8 @@ int CGXDLMSBase::StopServer()
 #else
         close(m_ServerSocket);
         m_ServerSocket = -1;
-        void *res;
-        pthread_join(m_ReceiverThread, (void **)&res);
+        void* res;
+        pthread_join(m_ReceiverThread, (void**)&res);
         free(res);
 #endif
     }
@@ -313,7 +314,7 @@ int CGXDLMSBase::StopServer()
 int GetIpAddress(std::string& address)
 {
     int ret;
-    struct hostent *phe;
+    struct hostent* phe;
     char ac[80];
     if ((ret = gethostname(ac, sizeof(ac))) == 0)
     {
@@ -422,7 +423,7 @@ void AddActivityCalendar(CGXDLMSObjectCollection& items)
     pActivity->SetCalendarNameActive("Active");
     pActivity->GetSeasonProfileActive().push_back(new CGXDLMSSeasonProfile("Summer time", CGXDateTime(-1, 3, 31, 0, 0, 0, 0), ""));
     pActivity->GetWeekProfileTableActive().push_back(new CGXDLMSWeekProfile("Monday", 1, 1, 1, 1, 1, 1, 1));
-    CGXDLMSDayProfile *aDp = new CGXDLMSDayProfile();
+    CGXDLMSDayProfile* aDp = new CGXDLMSDayProfile();
     aDp->SetDayId(1);
     CGXDateTime now = CGXDateTime::Now();
     CGXTime time = now;
@@ -491,7 +492,7 @@ void AddRegisterMonitor(CGXDLMSObjectCollection& items, CGXDLMSRegister* pRegist
     CGXDLMSMonitoredValue mv;
     mv.Update(pRegister, 2);
     pRm->SetMonitoredValue(mv);
-    CGXDLMSActionSet * action = new CGXDLMSActionSet();
+    CGXDLMSActionSet* action = new CGXDLMSActionSet();
     string ln;
     pRm->GetLogicalName(ln);
     action->GetActionDown().SetLogicalName(ln);
@@ -630,7 +631,7 @@ int CGXDLMSBase::Init(int port, GX_TRACE_LEVEL trace)
     profileGeneric->SetSortObject(pClock);
     //Add colums.
     //Set saved attribute index.
-    CGXDLMSCaptureObject * capture = new CGXDLMSCaptureObject(2, 0);
+    CGXDLMSCaptureObject* capture = new CGXDLMSCaptureObject(2, 0);
     profileGeneric->GetCaptureObjects().push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*>(pClock, capture));
     //Set saved attribute index.
     capture = new CGXDLMSCaptureObject(2, 0);
@@ -707,6 +708,7 @@ int CGXDLMSBase::Init(int port, GX_TRACE_LEVEL trace)
     ///////////////////////////////////////////////////////////////////////
     //Add Push Setup object.
     CGXDLMSPushSetup* pPush = new CGXDLMSPushSetup();
+    address += ":7000";
     pPush->SetDestination(address);
     GetItems().push_back(pPush);
 
@@ -1058,7 +1060,7 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
 {
     CGXDLMSImageTransfer* i = (CGXDLMSImageTransfer*)e->GetTarget();
     //Image name and size to transfer
-    FILE *f;
+    FILE* f;
     if (e->GetIndex() == 1)
     {
         i->SetImageTransferStatus(DLMS_IMAGE_TRANSFER_STATUS_NOT_INITIATED);
@@ -1068,7 +1070,7 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
             return;
         }
         imageSize = e->GetParameters().Arr[1].ToInteger();
-        char *p = strrchr(IMAGEFILE, '\\');
+        char* p = strrchr(IMAGEFILE, '\\');
         ++p;
         *p = '\0';
 #if defined(_WIN32) || defined(_WIN64)//If Windows
@@ -1196,6 +1198,79 @@ void HandleImageTransfer(CGXDLMSValueEventArg* e)
     }
 }
 
+
+/**
+* Connect to Push listener.
+*/
+int Connect(const char* address, int port, int& s)
+{
+    //create socket.
+    s = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+    if (s == -1)
+    {
+        assert(0);
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    sockaddr_in add;
+    add.sin_port = htons(port);
+    add.sin_family = AF_INET;
+    add.sin_addr.s_addr = inet_addr(address);
+    //If address is give as name
+    if (add.sin_addr.s_addr == INADDR_NONE)
+    {
+        hostent* Hostent = gethostbyname(address);
+        if (Hostent == NULL)
+        {
+#if defined(_WIN32) || defined(_WIN64)//If Windows
+            int err = WSAGetLastError();
+#else
+            int err = errno;
+#endif
+            closesocket(s);
+            return err;
+        };
+        add.sin_addr = *(in_addr*)(void*)Hostent->h_addr_list[0];
+    };
+
+    //Connect to the meter.
+    int ret = connect(s, (sockaddr*)&add, sizeof(sockaddr_in));
+    if (ret == -1)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    };
+    return DLMS_ERROR_CODE_OK;
+}
+
+int CGXDLMSBase::SendPush(CGXDLMSPushSetup* target)
+{
+    int ret;
+    char host[20];
+    int port;
+    if (sscanf(target->GetDestination().c_str(), "%[^:]:%d", host, &port) != 2)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+
+    int socket = -1;
+    std::vector<CGXByteBuffer> reply;
+    if ((ret = GeneratePushSetupMessages(NULL, target, reply)) == 0)
+    {
+        if ((ret = Connect(host, port, socket)) != 0)
+        {
+            return ret;
+        }
+        for (std::vector<CGXByteBuffer>::iterator it = reply.begin(); it != reply.end(); ++it)
+        {
+            if ((ret = send(socket, (const char*)it->GetData(), it->GetSize(), 0)) == -1)
+            {
+                break;
+            }
+        }
+        closesocket(socket);
+    }
+    return ret;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -1206,6 +1281,14 @@ void CGXDLMSBase::PreAction(std::vector<CGXDLMSValueEventArg*>& args)
         if ((*it)->GetTarget()->GetObjectType() == DLMS_OBJECT_TYPE_IMAGE_TRANSFER)
         {
             HandleImageTransfer(*it);
+        }
+        if ((*it)->GetTarget()->GetObjectType() == DLMS_OBJECT_TYPE_PUSH_SETUP)
+        {
+            if (SendPush((CGXDLMSPushSetup*)(*it)->GetTarget()) != 0)
+            {
+
+            }
+            (*it)->SetHandled(true);
         }
     }
 }
@@ -1232,7 +1315,7 @@ void Capture(CGXDLMSProfileGeneric* pg)
         else
         {
             fprintf(f, ";");
-            values.clear();
+                values.clear();
         }
         if (it->first->GetObjectType() == DLMS_OBJECT_TYPE_CLOCK && it->second->GetAttributeIndex() == 2)
         {
@@ -1257,10 +1340,10 @@ void Capture(CGXDLMSProfileGeneric* pg)
             }
         }
         fprintf(f, "%s", value.c_str());
-    }
+            }
     fprintf(f, "\n");
     fclose(f);
-}
+        }
 
 void HandleProfileGenericActions(CGXDLMSValueEventArg* it)
 {
@@ -1280,7 +1363,7 @@ void HandleProfileGenericActions(CGXDLMSValueEventArg* it)
     {
         // Profile generic Capture is called.
     }
-}
+    }
 
 /////////////////////////////////////////////////////////////////////////////
 //
