@@ -639,7 +639,27 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
             buff[4] = '\r';
             buff[5] = '\n';
             len = 6;
+#if defined(_WIN32) || defined(_WIN64)
             ret = WriteFile(m_hComPort, buff, len, &sendSize, &m_osWrite);
+            if (ret == 0)
+            {
+                DWORD err = GetLastError();
+                //If error occurs...
+                if (err != ERROR_IO_PENDING)
+                {
+                    return DLMS_ERROR_CODE_SEND_FAILED;
+                }
+                //Wait until data is actually sent
+                WaitForSingleObject(m_osWrite.hEvent, INFINITE);
+            }
+#else //#if defined(__LINUX__)
+            ret = write(m_hComPort, buff, len);
+            if (ret != len)
+            {
+                printf("write failed %d\r\n", errno);
+                return DLMS_ERROR_CODE_SEND_FAILED;
+            }
+#endif
             if (Read('\n', reply) != 0)
             {
                 return DLMS_ERROR_CODE_SEND_FAILED;

@@ -485,7 +485,7 @@ int main(int argc, char* argv[])
 #if _MSC_VER > 1000
                         sprintf_s(buff, 100, "Unknown object: %s", str.c_str());
 #else
-                        sprintf(buff, 100, "Unknown object: %s", str.c_str());
+                        sprintf(buff, "Unknown object: %s", str.c_str());
 #endif
                         str = buff;
                         comm.WriteValue(GX_TRACE_LEVEL_ERROR, str);
