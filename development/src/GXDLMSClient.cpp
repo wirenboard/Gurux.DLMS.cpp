@@ -1141,19 +1141,18 @@ int CGXDLMSClient::ReleaseRequest(std::vector<CGXByteBuffer>& packets)
         }
         CGXAPDU::GenerateUserInformation(m_Settings, m_Settings.GetCipher(), NULL, buff);
         buff.SetUInt8(0, (unsigned char)(buff.GetSize() - 1));
-        if (GetUseLogicalNameReferencing())
-        {
-            CGXDLMSLNParameters p(&m_Settings, 0, DLMS_COMMAND_RELEASE_REQUEST, 0, NULL, &buff, 0xff, DLMS_COMMAND_NONE);
-            ret = CGXDLMS::GetLnMessages(p, packets);
-        }
-        else
-        {
-            CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_RELEASE_REQUEST, 0xFF, 0xFF, NULL, &buff);
-            ret = CGXDLMS::GetSnMessages(p, packets);
-        }
-        m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() & ~DLMS_CONNECTION_STATE_DLMS));
-
     }
+    if (GetUseLogicalNameReferencing())
+    {
+        CGXDLMSLNParameters p(&m_Settings, 0, DLMS_COMMAND_RELEASE_REQUEST, 0, NULL, &buff, 0xff, DLMS_COMMAND_NONE);
+        ret = CGXDLMS::GetLnMessages(p, packets);
+    }
+    else
+    {
+        CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_RELEASE_REQUEST, 0xFF, 0xFF, NULL, &buff);
+        ret = CGXDLMS::GetSnMessages(p, packets);
+    }
+    m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() & ~DLMS_CONNECTION_STATE_DLMS));
     return ret;
 }
 
