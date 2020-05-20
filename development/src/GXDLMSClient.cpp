@@ -52,6 +52,7 @@ CGXDLMSClient::CGXDLMSClient(bool UseLogicalNameReferencing,
     const char* password,
     DLMS_INTERFACE_TYPE intefaceType) : m_Settings(false)
 {
+    m_UseProtectedRelease = false;
     m_IsAuthenticationRequired = false;
     m_Settings.SetUseLogicalNameReferencing(UseLogicalNameReferencing);
     m_Settings.SetClientAddress(clientAddress);
@@ -212,6 +213,16 @@ void CGXDLMSClient::SetServerAddress(unsigned long value)
 void CGXDLMSClient::SetServiceClass(DLMS_SERVICE_CLASS value)
 {
     m_Settings.SetServiceClass(value);
+}
+
+bool CGXDLMSClient::GetUseProtectedRelease()
+{
+    return m_UseProtectedRelease;
+}
+
+void CGXDLMSClient::SetUseProtectedRelease(bool value)
+{
+    m_UseProtectedRelease = value;
 }
 
 /**
@@ -1101,7 +1112,7 @@ void CGXDLMSClient::UpdateOBISCodes(CGXDLMSObjectCollection& objects)
 
 int CGXDLMSClient::ReleaseRequest(std::vector<CGXByteBuffer>& packets)
 {
-    int ret;
+    int ret = 0;
     CGXByteBuffer buff;
     packets.clear();
     // If connection is not established, there is no need to send DisconnectRequest.
@@ -1109,29 +1120,40 @@ int CGXDLMSClient::ReleaseRequest(std::vector<CGXByteBuffer>& packets)
     {
         return 0;
     }
-    //Length.
-    buff.SetUInt8(0);
-    buff.SetUInt8(0x80);
-    buff.SetUInt8(01);
-    buff.SetUInt8(00);
-    //Increase IC.
-    if (m_Settings.GetCipher() != NULL && m_Settings.GetCipher()->IsCiphered())
+    if (!m_UseProtectedRelease)
     {
-        m_Settings.GetCipher()->SetInvocationCounter(1 + m_Settings.GetCipher()->GetInvocationCounter());
-    }
-    CGXAPDU::GenerateUserInformation(m_Settings, m_Settings.GetCipher(), NULL, buff);
-    buff.SetUInt8(0, (unsigned char)(buff.GetSize() - 1));
-    if (GetUseLogicalNameReferencing())
-    {
-        CGXDLMSLNParameters p(&m_Settings, 0, DLMS_COMMAND_RELEASE_REQUEST, 0, NULL, &buff, 0xff, DLMS_COMMAND_NONE);
-        ret = CGXDLMS::GetLnMessages(p, packets);
+        buff.SetUInt8(3);
+        buff.SetUInt8(0x80);
+        buff.SetUInt8(1);
+        buff.SetUInt8(0);
     }
     else
     {
-        CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_RELEASE_REQUEST, 0xFF, 0xFF, NULL, &buff);
-        ret = CGXDLMS::GetSnMessages(p, packets);
+        //Length.
+        buff.SetUInt8(0);
+        buff.SetUInt8(0x80);
+        buff.SetUInt8(01);
+        buff.SetUInt8(00);
+        //Increase IC.
+        if (m_Settings.GetCipher() != NULL && m_Settings.GetCipher()->IsCiphered())
+        {
+            m_Settings.GetCipher()->SetInvocationCounter(1 + m_Settings.GetCipher()->GetInvocationCounter());
+        }
+        CGXAPDU::GenerateUserInformation(m_Settings, m_Settings.GetCipher(), NULL, buff);
+        buff.SetUInt8(0, (unsigned char)(buff.GetSize() - 1));
+        if (GetUseLogicalNameReferencing())
+        {
+            CGXDLMSLNParameters p(&m_Settings, 0, DLMS_COMMAND_RELEASE_REQUEST, 0, NULL, &buff, 0xff, DLMS_COMMAND_NONE);
+            ret = CGXDLMS::GetLnMessages(p, packets);
+        }
+        else
+        {
+            CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_RELEASE_REQUEST, 0xFF, 0xFF, NULL, &buff);
+            ret = CGXDLMS::GetSnMessages(p, packets);
+        }
+        m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() & ~DLMS_CONNECTION_STATE_DLMS));
+
     }
-    m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() & ~DLMS_CONNECTION_STATE_DLMS));
     return ret;
 }
 

@@ -94,6 +94,8 @@ public:
     // attributes: Collection of attributes to read.
     void GetAttributeIndexToRead(bool all, std::vector<int>& attributes);
 
+    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
     int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);

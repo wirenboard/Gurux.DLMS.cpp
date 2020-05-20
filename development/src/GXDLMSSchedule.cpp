@@ -430,7 +430,7 @@ int CGXDLMSSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         int ret = 0;
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(m_Entries.size(), data);
+        GXHelpers::SetObjectCount((unsigned long) m_Entries.size(), data);
         for (std::vector<CGXDLMSScheduleEntry*>::iterator it = m_Entries.begin(); it != m_Entries.end(); ++it)
         {
             if ((ret = AddEntry(settings, *it, data)) != 0)

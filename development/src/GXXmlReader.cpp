@@ -54,7 +54,7 @@ bool CGXXmlReader::IsEOF()
         {
             return true;
         }
-        m_Size = strlen(m_Buffer);
+        m_Size = (int) strlen(m_Buffer);
     }
     return false;
 }
@@ -87,7 +87,7 @@ bool CGXXmlReader::IsStartElement()
         {
             m_Name.clear();
             m_Name.append(m_Buffer + m_Index + 1, s - m_Buffer - m_Index - 1);
-            m_Index = s - m_Buffer + 1;
+            m_Index = (int)(s - m_Buffer + 1);
             return true;
         }
     }
@@ -102,7 +102,7 @@ std::string& CGXXmlReader::GetText()
     strcat(tag, ">");
     char* s = strstr(m_Buffer + m_Index, tag);
     m_Value.append(m_Buffer + m_Index, s);
-    m_Index = s - m_Buffer;
+    m_Index = (int)(s - m_Buffer);
     Read();
     GetNext();
     return m_Value;

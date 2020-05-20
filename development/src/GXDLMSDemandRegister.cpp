@@ -161,14 +161,18 @@ void CGXDLMSDemandRegister::SetNumberOfPeriods(int value)
     m_NumberOfPeriods = value;
 }
 
-void CGXDLMSDemandRegister::Reset()
+int CGXDLMSDemandRegister::Reset(CGXDLMSClient* client,
+    std::vector<CGXByteBuffer>& reply)
 {
-
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 1, data, reply);
 }
 
-void CGXDLMSDemandRegister::NextPeriod()
+int CGXDLMSDemandRegister::NextPeriod(CGXDLMSClient* client,
+    std::vector<CGXByteBuffer>& reply)
 {
-
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 2, data, reply);
 }
 
 void CGXDLMSDemandRegister::GetValues(std::vector<std::string>& values)
@@ -263,10 +267,22 @@ int CGXDLMSDemandRegister::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventAr
 {
     if (e.GetIndex() == 1)
     {
-        Reset();
-        return DLMS_ERROR_CODE_OK;
+        m_CurrentAverageValue.Clear();
+        m_LastAverageValue.Clear();
+        m_CaptureTime = CGXDateTime(CGXDateTime::Now());
+        m_StartTimeCurrent = CGXDateTime(CGXDateTime::Now());
     }
-    e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+    else if (e.GetIndex() == 2)
+    {
+        m_LastAverageValue = m_CurrentAverageValue;
+        m_CurrentAverageValue.Clear();
+        m_CaptureTime = CGXDateTime(CGXDateTime::Now());
+        m_StartTimeCurrent = CGXDateTime(CGXDateTime::Now());
+    }
+    else
+    {
+        e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+    }
     return DLMS_ERROR_CODE_OK;
 }
 

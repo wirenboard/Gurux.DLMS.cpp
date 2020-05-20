@@ -47,6 +47,8 @@ protected:
     friend class CGXDLMSSchedule;
     CGXDLMSSettings m_Settings;
 private:
+    // If protected release is used release is including a ciphered xDLMS Initiate request.
+    bool m_UseProtectedRelease;
     bool m_IsAuthenticationRequired;
     static void UpdateOBISCodes(CGXDLMSObjectCollection& objects);
     // SN referencing
@@ -179,6 +181,12 @@ public:
 
     // Maximum client PDU size.
     unsigned short GetMaxPduSize();
+
+    // If protected release is used release is including a ciphered xDLMS Initiate request.
+    bool GetUseProtectedRelease();
+
+    // If protected release is used release is including a ciphered xDLMS Initiate request.
+    void SetUseProtectedRelease(bool value);
 
     /////////////////////////////////////////////////////////////////////////////
     // Standard says that Time zone is from normal time to UTC in minutes.

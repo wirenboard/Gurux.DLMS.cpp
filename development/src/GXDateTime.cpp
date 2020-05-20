@@ -507,7 +507,7 @@ int CGXDateTime::FromString(const char* datetime)
                         ++lastFormatIndex;
                         c = format[lastFormatIndex + 1];
                         std::string val = "1";
-                        while (lastFormatIndex + cnt + 1 < (int) format.size() && format[lastFormatIndex + cnt + 1] == c)
+                        while (lastFormatIndex + cnt + 1 < (int)format.size() && format[lastFormatIndex + cnt + 1] == c)
                         {
                             val += "0";
                             ++cnt;
@@ -556,11 +556,11 @@ int CGXDateTime::FromString(const char* datetime)
                     }
                     else
                     {
-                        lastFormatIndex = format.find(c, lastFormatIndex + 1);
+                        lastFormatIndex = (int)format.find(c, lastFormatIndex + 1);
                         //Dot is used time separator in some countries.
                         if (lastFormatIndex == -1 && c == ':')
                         {
-                            lastFormatIndex = format.find('.', lastFormatIndex + 1);
+                            lastFormatIndex = (int)format.find('.', lastFormatIndex + 1);
                         }
                     }
                 }
@@ -682,7 +682,7 @@ int CGXDateTime::ToFormatString(const char* pattern, std::string& value)
             format.append(pattern);
         }
         GXDLMS_DATE_FORMAT df;
-        char dateSeparator = '/' , timeSeparator = ':', use24HourClock = 0;
+        char dateSeparator = '/', timeSeparator = ':', use24HourClock = 0;
         if (pattern != NULL ||
             (ret = GetDateTimeFormat(format, df, dateSeparator, timeSeparator, use24HourClock)) == 0)
         {

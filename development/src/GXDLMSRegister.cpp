@@ -140,10 +140,12 @@ int CGXDLMSRegister::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
     {
-        Reset();
-        return DLMS_ERROR_CODE_OK;
+        m_Value.Clear();
     }
-    e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+    else
+    {
+        e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+    }
     return DLMS_ERROR_CODE_OK;
 }
 

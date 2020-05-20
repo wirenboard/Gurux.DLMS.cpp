@@ -129,12 +129,14 @@ public:
     /*
      * Reset value.
      */
-    void Reset();
+    int Reset(CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
 
     /*
      * Next period.
      */
-    void NextPeriod();
+    int NextPeriod(CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
 
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);

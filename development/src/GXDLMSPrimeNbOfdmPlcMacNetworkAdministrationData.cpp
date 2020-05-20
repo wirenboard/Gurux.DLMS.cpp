@@ -277,7 +277,7 @@ int CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData::GetMulticastEntries(CGXDL
     int ret = 0;
     CGXByteBuffer bb;
     bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-    GXHelpers::SetObjectCount(m_MulticastEntries.size(), bb);
+    GXHelpers::SetObjectCount((unsigned long)m_MulticastEntries.size(), bb);
     for (std::vector<CGXMacMulticastEntry*>::iterator it = m_MulticastEntries.begin(); it != m_MulticastEntries.end(); ++it)
     {
         CGXDLMSVariant a = (*it)->GetId(), b = (*it)->GetMembers();
@@ -301,7 +301,7 @@ int CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData::GetSwitchTable(CGXDLMSSet
     int ret = 0;
     CGXByteBuffer bb;
     bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-    GXHelpers::SetObjectCount(m_SwitchTable.size(), bb);
+    GXHelpers::SetObjectCount((unsigned long)m_SwitchTable.size(), bb);
     for (std::vector<short>::iterator it = m_SwitchTable.begin(); it != m_SwitchTable.end(); ++it)
     {
         if ((ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT16, *it)) != 0)
@@ -321,7 +321,7 @@ int CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData::GetDirectTable(CGXDLMSSet
     int ret = 0;
     CGXByteBuffer bb;
     bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-    GXHelpers::SetObjectCount(m_DirectTable.size(), bb);
+    GXHelpers::SetObjectCount((unsigned long)m_DirectTable.size(), bb);
     for (std::vector<CGXMacDirectTable*>::iterator it = m_DirectTable.begin(); it != m_DirectTable.end(); ++it)
     {
         if ((ret = bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE)) != 0 ||
@@ -349,7 +349,7 @@ int CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData::GetAvailableSwitches(CGXD
     int ret = 0;
     CGXByteBuffer bb;
     bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-    GXHelpers::SetObjectCount(m_AvailableSwitches.size(), bb);
+    GXHelpers::SetObjectCount((unsigned long)m_AvailableSwitches.size(), bb);
     for (std::vector<CGXMacAvailableSwitch*>::iterator it = m_AvailableSwitches.begin(); it != m_AvailableSwitches.end(); ++it)
     {
         if ((ret = bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE)) != 0 ||
@@ -375,7 +375,7 @@ int CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData::GetCommunications(CGXDLMS
     int ret = 0;
     CGXByteBuffer bb;
     bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-    GXHelpers::SetObjectCount(m_Communications.size(), bb);
+    GXHelpers::SetObjectCount((unsigned long)m_Communications.size(), bb);
     for (std::vector<CGXMacPhyCommunication*>::iterator it = m_Communications.begin(); it != m_Communications.end(); ++it)
     {
         if ((ret = bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE)) != 0 ||
