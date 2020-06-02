@@ -861,7 +861,8 @@ int CGXDLMSProfileGeneric::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
                         row->Arr[pos] = data;
                     }
                     std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> item = m_CaptureObjects[pos];
-                    if (item.first->GetObjectType() == DLMS_OBJECT_TYPE_REGISTER && item.second->GetAttributeIndex() == 2)
+                    if ((item.first->GetObjectType() == DLMS_OBJECT_TYPE_REGISTER || item.first->GetObjectType() == DLMS_OBJECT_TYPE_EXTENDED_REGISTER)
+                        && item.second->GetAttributeIndex() == 2)
                     {
                         double scaler = ((CGXDLMSRegister*)item.first)->GetScaler();
                         if (scaler != 1)
