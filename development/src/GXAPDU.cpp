@@ -1227,9 +1227,7 @@ int CGXAPDU::GetUserInformation(
     data.SetUInt8(0x04);
     // encoding the number of unused bits in the bit string
     data.SetUInt8(0x00);
-    CGXByteBuffer bb(4);
-    bb.SetUInt32((unsigned long)settings.GetNegotiatedConformance());
-    data.Set(&bb, 1, 3);
+    SetConformanceToArray((unsigned int)settings.GetNegotiatedConformance(), data);
     data.SetUInt16(settings.GetMaxPduSize());
     // VAA Name VAA name (0x0007 for LN referencing and 0xFA00 for SN)
     if (settings.GetUseLogicalNameReferencing())

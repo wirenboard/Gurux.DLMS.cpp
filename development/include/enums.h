@@ -2792,16 +2792,16 @@ typedef enum
 typedef enum
 {
     /*
-      * Consumption based collection.
-      */
+    * Consumption based collection.
+    */
     DLMS_CHARGE_TYPE_CONSUMPTION_BASED_COLLECTION,
     /*
-     * Time based collection.
-     */
+    * Time based collection.
+    */
     DLMS_CHARGE_TYPE_TIME_BASED_COLLECTION,
     /*
-     * Payment based collection.
-     */
+    * Payment based collection.
+    */
     DLMS_CHARGE_TYPE_PAYMENT_EVENT_BASED_COLLECTION
 }DLMS_CHARGE_TYPE;
 
