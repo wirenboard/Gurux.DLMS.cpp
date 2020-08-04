@@ -447,13 +447,21 @@ int CGXDLMSTranslatorStructure::IntegerToHex(long value, int desimals, bool forc
 #else
         sprintf(tmp, f.c_str(), value);
 #endif
+        //Negative values are handled wrong.
+        if (value < 0)
+        {
+            f.clear();
+            f.append(tmp);
+            result = f.substr(f.length() - desimals);
+            return 0;
+        }
     }
     else
     {
 #if _MSC_VER > 1000
-        sprintf_s(tmp, 20, "%d", value);
+            sprintf_s(tmp, 20, "%ld", value);
 #else
-        sprintf(tmp, "%ld", value);
+            sprintf(tmp, "%ld", value);
 #endif
     }
     result = tmp;

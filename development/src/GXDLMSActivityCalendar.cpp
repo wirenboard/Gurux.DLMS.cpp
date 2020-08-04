@@ -414,11 +414,11 @@ int GetSeasonProfile(std::vector<CGXDLMSSeasonProfile*>& items, CGXByteBuffer& d
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(3);
         tmp = (*it)->GetName();
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
+        GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
         tmp = (*it)->GetStart();
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
+        GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
         tmp = (*it)->GetWeekName();
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
+        GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
     }
     return 0;
 }
@@ -436,21 +436,21 @@ int GetWeekProfile(std::vector<CGXDLMSWeekProfile*>& items, CGXByteBuffer& data)
         data.SetUInt8(8);
         tmp.Clear();
         tmp.Add((*it)->GetName());
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
+        GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
         tmp = (*it)->GetMonday();
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, tmp);
+        GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_UINT8, tmp);
         tmp = (*it)->GetTuesday();
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, tmp);
+        GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_UINT8, tmp);
         tmp = (*it)->GetWednesday();
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, tmp);
+        GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_UINT8, tmp);
         tmp = (*it)->GetThursday();
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, tmp);
+        GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_UINT8, tmp);
         tmp = (*it)->GetFriday();
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, tmp);
+        GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_UINT8, tmp);
         tmp = (*it)->GetSaturday();
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, tmp);
+        GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_UINT8, tmp);
         tmp = (*it)->GetSunday();
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, tmp);
+        GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_UINT8, tmp);
     }
     return 0;
 }
@@ -466,7 +466,7 @@ int GetDayProfile(std::vector<CGXDLMSDayProfile*>& items, CGXByteBuffer& data)
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(2);
         CGXDLMSVariant tmp2 = (*it)->GetDayId();
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, tmp2);
+        GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_UINT8, tmp2);
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         //Add count
         std::vector<CGXDLMSDayProfileAction*>& schedules = (*it)->GetDaySchedules();
@@ -479,9 +479,9 @@ int GetDayProfile(std::vector<CGXDLMSDayProfile*>& items, CGXByteBuffer& data)
             selector = (*action)->GetScriptSelector();
             data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
             data.SetUInt8(3);
-            GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, time);
-            GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln);
-            GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, selector);
+            GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_OCTET_STRING, time);
+            GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_OCTET_STRING, ln);
+            GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_UINT16, selector);
         }
     }
     return 0;

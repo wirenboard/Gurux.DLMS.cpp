@@ -87,6 +87,9 @@ public:
         list[TRANSLATOR_GENERAL_TAGS_CALLING_AE_INVOCATION_ID] = "CallingAEInvocationId";
         list[TRANSLATOR_GENERAL_TAGS_CALLED_AE_INVOCATION_ID] = "CalledAEInvocationId";
         list[TRANSLATOR_GENERAL_TAGS_RESPONDING_AE_INVOCATION_ID] = "RespondingAEInvocationId";
+        list[TRANSLATOR_GENERAL_TAGS_CALLING_AE_QUALIFIER] = "CallingAEQualifier";
+        list[DLMS_COMMAND_EXCEPTION_RESPONSE] = "ExceptionResponse";
+        list[DLMS_TRANSLATOR_TAGS_STATE_ERROR] = "StateError";
     }
 
     // Get SN tags.
@@ -1093,6 +1096,67 @@ public:
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         return 0;
+    }
+
+
+    // Gets state error description.
+    static std::string StateErrorToString(DLMS_EXCEPTION_STATE_ERROR error)
+    {
+        switch (error)
+        {
+        case DLMS_EXCEPTION_STATE_ERROR_SERVICE_NOT_ALLOWED:
+            return "ServiceNotAllowed";
+        case DLMS_EXCEPTION_STATE_ERROR_SERVICE_UNKNOWN:
+            return "ServiceUnknown";
+        default:
+            return "";
+        }
+    }
+
+    //  Gets service error description.
+    static std::string ExceptionServiceErrorToString(DLMS_EXCEPTION_SERVICE_ERROR error)
+    {
+        switch (error)
+        {
+        case DLMS_EXCEPTION_SERVICE_ERROR_OPERATION_NOT_POSSIBLE:
+            return "OperationNotPossible";
+        case DLMS_EXCEPTION_SERVICE_ERROR_SERVICE_NOT_SUPPORTED:
+            return "ServiceNotSupported";
+        case DLMS_EXCEPTION_SERVICE_ERROR_OTHER_REASON:
+            return "OtherReason";
+        default:
+            return "";
+        }
+    }
+
+    static DLMS_EXCEPTION_STATE_ERROR ValueofStateError(std::string& value)
+    {
+        if ("ServiceNotAllowed" == value)
+        {
+            return DLMS_EXCEPTION_STATE_ERROR_SERVICE_NOT_ALLOWED;
+        }
+        if ("ServiceUnknown" == value)
+        {
+            return DLMS_EXCEPTION_STATE_ERROR_SERVICE_UNKNOWN;
+        }
+        return DLMS_EXCEPTION_STATE_ERROR_SERVICE_INVALID;
+    }
+
+    static DLMS_EXCEPTION_SERVICE_ERROR ValueOfExceptionServiceError(std::string& value)
+    {
+        if ("OperationNotPossible" == value)
+        {
+            return DLMS_EXCEPTION_SERVICE_ERROR_OPERATION_NOT_POSSIBLE;
+        }
+        if ("ServiceNotSupported" == value)
+        {
+            return DLMS_EXCEPTION_SERVICE_ERROR_SERVICE_NOT_SUPPORTED;
+        }
+        if ("OtherReason" == value)
+        {
+            return DLMS_EXCEPTION_SERVICE_ERROR_OTHER_REASON;
+        }
+        return DLMS_EXCEPTION_SERVICE_ERROR_INVALID;
     }
 };
 #endif //TRANSLATOR_SIMPLE_TAGS_H

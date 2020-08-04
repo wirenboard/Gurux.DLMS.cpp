@@ -267,7 +267,7 @@ int CGXDLMSSNCommandHandler::HandleWriteRequest(
             {
                 xml->AppendStartTag(DLMS_COMMAND_WRITE_REQUEST, (unsigned long)DLMS_SINGLE_READ_RESPONSE_DATA);
             }
-            if ((ret = GXHelpers::GetData(data, di, value)) != 0)
+            if ((ret = GXHelpers::GetData(&settings, data, di, value)) != 0)
             {
                 return ret;
             }
@@ -291,7 +291,7 @@ int CGXDLMSSNCommandHandler::HandleWriteRequest(
             {
                 // If object has found.
                 CGXSNInfo target = *(targets.begin() + pos);
-                ret = GXHelpers::GetData(data, di, value);
+                ret = GXHelpers::GetData(&settings, data, di, value);
                 if (value.vt == DLMS_DATA_TYPE_OCTET_STRING)
                 {
                     DLMS_DATA_TYPE dt;
@@ -451,7 +451,7 @@ int CGXDLMSSNCommandHandler::GetReadData(CGXDLMSSettings& settings,
             }
             else
             {
-                ret = CGXDLMS::AppendData((*e)->GetTarget(), (*e)->GetIndex(), data, value);
+                ret = CGXDLMS::AppendData(&settings, (*e)->GetTarget(), (*e)->GetIndex(), data, value);
             }
         }
         else
@@ -512,7 +512,7 @@ int CGXDLMSSNCommandHandler::HandleRead(
             di.SetXml(xml);
             xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_PARAMETER);
             CGXDLMSVariant value;
-            if ((ret = GXHelpers::GetData(data, di, value)) != 0)
+            if ((ret = GXHelpers::GetData(&settings, data, di, value)) != 0)
             {
                 return ret;
             }
@@ -549,7 +549,7 @@ int CGXDLMSSNCommandHandler::HandleRead(
             return ret;
         }
         e->SetSelector(ch);
-        if ((ret = GXHelpers::GetData(data, di, params)) != 0)
+        if ((ret = GXHelpers::GetData(&settings, data, di, params)) != 0)
         {
             return ret;
         }
@@ -908,7 +908,7 @@ int CGXDLMSSNCommandHandler::HandleInformationReport(
         di.Clear();
         if (reply.GetXml() != NULL)
         {
-            if ((ret = GXHelpers::GetData(reply.GetData(), di, value)) != 0)
+            if ((ret = GXHelpers::GetData(&settings, reply.GetData(), di, value)) != 0)
             {
                 return ret;
             }

@@ -215,7 +215,7 @@ int CGXDLMSRegisterMonitor::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEven
         for (std::vector<CGXDLMSVariant>::iterator it = m_Thresholds.begin(); it != m_Thresholds.end(); ++it)
         {
             tmp = *it;
-            if ((ret = GXHelpers::SetData(data, it->vt, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, data, it->vt, tmp)) != 0)
             {
                 return ret;
             }
@@ -232,9 +232,9 @@ int CGXDLMSRegisterMonitor::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEven
         GXHelpers::SetLogicalName(m_MonitoredValue.GetLogicalName().c_str(), ln);
         CGXDLMSVariant type = m_MonitoredValue.GetObjectType();
         CGXDLMSVariant index = m_MonitoredValue.GetAttributeIndex();
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, type)) != DLMS_ERROR_CODE_OK ||  //ClassID
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != DLMS_ERROR_CODE_OK || //LN
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_INT8, index)) != DLMS_ERROR_CODE_OK)
+        if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, type)) != DLMS_ERROR_CODE_OK ||  //ClassID
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != DLMS_ERROR_CODE_OK || //LN
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_INT8, index)) != DLMS_ERROR_CODE_OK)
         {
             return ret;
         }
@@ -257,8 +257,8 @@ int CGXDLMSRegisterMonitor::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEven
             data.SetUInt8(2);
             GXHelpers::SetLogicalName((*it)->GetActionUp().GetLogicalName().c_str(), ln);
             selector = (*it)->GetActionUp().GetScriptSelector();
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != DLMS_ERROR_CODE_OK ||
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, selector)) != DLMS_ERROR_CODE_OK)
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != DLMS_ERROR_CODE_OK ||
+                (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, selector)) != DLMS_ERROR_CODE_OK)
             {
                 return ret;
             }
@@ -266,8 +266,8 @@ int CGXDLMSRegisterMonitor::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEven
             data.SetUInt8(2);
             GXHelpers::SetLogicalName((*it)->GetActionDown().GetLogicalName().c_str(), ln);
             selector = (*it)->GetActionDown().GetScriptSelector();
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != DLMS_ERROR_CODE_OK ||
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, selector)) != DLMS_ERROR_CODE_OK)
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != DLMS_ERROR_CODE_OK ||
+                (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, selector)) != DLMS_ERROR_CODE_OK)
             {
                 return ret;
             }

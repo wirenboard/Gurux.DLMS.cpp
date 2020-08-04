@@ -146,13 +146,13 @@ int CGXDLMSSecuritySetup::GlobalKeyTransfer(
         bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         bb.SetUInt8(2);
         data = (char)it->first;
-        if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_ENUM, data)) != 0 ||
+        if ((ret = GXHelpers::SetData(NULL, bb, DLMS_DATA_TYPE_ENUM, data)) != 0 ||
             (ret = CGXDLMSSecureClient::Encrypt(kek, it->second, tmp)) != 0)
         {
             break;
         }
         data = tmp;
-        if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_OCTET_STRING, data)) != 0)
+        if ((ret = GXHelpers::SetData(NULL, bb, DLMS_DATA_TYPE_OCTET_STRING, data)) != 0)
         {
             break;
         }

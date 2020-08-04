@@ -179,12 +179,12 @@ int CGXDLMSTokenGateway::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventAr
         bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         bb.SetUInt8(2);
         tmp = m_Status;
-        if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_ENUM, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, bb, DLMS_DATA_TYPE_ENUM, tmp)) != 0)
         {
             return ret;
         }
         tmp = m_DataValue;
-        if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_BIT_STRING, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, bb, DLMS_DATA_TYPE_BIT_STRING, tmp)) != 0)
         {
             return ret;
         }
@@ -218,7 +218,7 @@ int CGXDLMSTokenGateway::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventAr
             e.GetValue().GetBytes(bb);
             CGXDataInfo info;
             info.SetType(DLMS_DATA_TYPE_DATETIME);
-            if ((ret = GXHelpers::GetData(bb, info, tmp)) != 0)
+            if ((ret = GXHelpers::GetData(&settings, bb, info, tmp)) != 0)
             {
                 return ret;
             }

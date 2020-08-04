@@ -137,7 +137,7 @@ int CGXDLMSLNCommandHandler::GetRequestNormal(
             xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_ACCESS_SELECTION);
             xml->AppendLine(DLMS_TRANSLATOR_TAGS_ACCESS_SELECTOR, "", tmp);
             xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_ACCESS_PARAMETERS);
-            if ((ret = GXHelpers::GetData(data, info, value)) != 0)
+            if ((ret = GXHelpers::GetData(&settings, data, info, value)) != 0)
             {
                 return ret;
             }
@@ -150,7 +150,7 @@ int CGXDLMSLNCommandHandler::GetRequestNormal(
     if (selection != 0)
     {
         CGXDataInfo i;
-        if ((ret = GXHelpers::GetData(data, i, parameters)) != 0)
+        if ((ret = GXHelpers::GetData(&settings, data, i, parameters)) != 0)
         {
             return ret;
         }
@@ -203,7 +203,7 @@ int CGXDLMSLNCommandHandler::GetRequestNormal(
                 // If byte array is added do not add type.
                 bb.Set(value.byteArr, value.GetSize());
             }
-            else if ((ret = CGXDLMS::AppendData(obj, attributeIndex, bb, value)) != 0)
+            else if ((ret = CGXDLMS::AppendData(&settings, obj, attributeIndex, bb, value)) != 0)
             {
                 status = DLMS_ERROR_CODE_HARDWARE_FAULT;
             }
@@ -303,7 +303,7 @@ int CGXDLMSLNCommandHandler::GetRequestNextDataBlock(
                         // If byte array is added do not add type.
                         bb.Set(value.byteArr, value.GetSize());
                     }
-                    else if ((ret = CGXDLMS::AppendData((*arg)->GetTarget(), (*arg)->GetIndex(), bb, value)) != 0)
+                    else if ((ret = CGXDLMS::AppendData(&settings, (*arg)->GetTarget(), (*arg)->GetIndex(), bb, value)) != 0)
                     {
                         return DLMS_ERROR_CODE_HARDWARE_FAULT;
                     }
@@ -382,7 +382,7 @@ int CGXDLMSLNCommandHandler::GetRequestWithList(
                 return ret;
             }
             CGXDataInfo i;
-            if ((ret = GXHelpers::GetData(data, i, parameters)) != 0)
+            if ((ret = GXHelpers::GetData(&settings, data, i, parameters)) != 0)
             {
                 return ret;
             }
@@ -452,7 +452,7 @@ int CGXDLMSLNCommandHandler::GetRequestWithList(
             // If byte array is added do not add type.
             bb.Set(value.byteArr, value.GetSize());
         }
-        else if ((ret = CGXDLMS::AppendData((*it)->GetTarget(), (*it)->GetIndex(), bb, value)) != 0)
+        else if ((ret = CGXDLMS::AppendData(&settings, (*it)->GetTarget(), (*it)->GetIndex(), bb, value)) != 0)
         {
             return DLMS_ERROR_CODE_HARDWARE_FAULT;
         }
@@ -634,7 +634,7 @@ int CGXDLMSLNCommandHandler::HandleSetRequestNormal(
         CGXDLMSVariant value;
         CGXDataInfo di;
         di.SetXml(xml);
-        if ((ret = GXHelpers::GetData(data, di, value)) != 0)
+        if ((ret = GXHelpers::GetData(&settings, data, di, value)) != 0)
         {
             return ret;
         }
@@ -652,7 +652,7 @@ int CGXDLMSLNCommandHandler::HandleSetRequestNormal(
     if (!p.IsMultipleBlocks())
     {
         settings.ResetBlockIndex();
-        ret = GXHelpers::GetData(data, i, value);
+        ret = GXHelpers::GetData(&settings, data, i, value);
         if (ret != 0)
         {
             return ret;
@@ -779,7 +779,7 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithDataBlock(
         if (!p.IsMultipleBlocks())
         {
             CGXDLMSVariant value;
-            if ((ret != GXHelpers::GetData(server->m_Transaction->GetData(), reply, value)) != 0)
+            if ((ret != GXHelpers::GetData(&settings, server->m_Transaction->GetData(), reply, value)) != 0)
             {
                 return ret;
             }
@@ -873,7 +873,7 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
                 return ret;
             }
             CGXDataInfo info;
-            if ((ret = GXHelpers::GetData(data, info, parameters)) != 0)
+            if ((ret = GXHelpers::GetData(&settings, data, info, parameters)) != 0)
             {
                 return ret;
             }
@@ -941,7 +941,7 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
         {
             xml->AppendStartTag(DLMS_COMMAND_WRITE_REQUEST, DLMS_SINGLE_READ_RESPONSE_DATA);
         }
-        if ((ret = GXHelpers::GetData(data, di, value)) != 0)
+        if ((ret = GXHelpers::GetData(&settings, data, di, value)) != 0)
         {
             status[pos] = DLMS_ERROR_CODE_READ_WRITE_DENIED;
         }
@@ -1119,7 +1119,7 @@ int CGXDLMSLNCommandHandler::HandleMethodRequest(
                 xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_METHOD_INVOCATION_PARAMETERS);
                 CGXDataInfo di;
                 di.SetXml(xml);
-                if ((ret = GXHelpers::GetData(data, di, value)) != 0)
+                if ((ret = GXHelpers::GetData(&settings, data, di, value)) != 0)
                 {
                     return ret;
                 }
@@ -1134,7 +1134,7 @@ int CGXDLMSLNCommandHandler::HandleMethodRequest(
     if (selection != 0)
     {
         CGXDataInfo i;
-        if ((ret = GXHelpers::GetData(data, i, parameters)) != 0)
+        if ((ret = GXHelpers::GetData(&settings, data, i, parameters)) != 0)
         {
             return ret;
         }
@@ -1178,7 +1178,7 @@ int CGXDLMSLNCommandHandler::HandleMethodRequest(
                 bb.SetUInt8(1);
                 //Add parameters error code.
                 bb.SetUInt8(0);
-                GXHelpers::SetData(bb, actionReply.vt, actionReply);
+                GXHelpers::SetData(&settings, bb, actionReply.vt, actionReply);
             }
             else
             {
@@ -1261,7 +1261,7 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
             CGXDataInfo info;
             CGXDLMSVariant value;
             info.SetType(dt);
-            if ((ret = GXHelpers::GetData(data, info, value)) != 0)
+            if ((ret = GXHelpers::GetData(&settings, data, info, value)) != 0)
             {
                 return ret;
             }
@@ -1345,7 +1345,7 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
         {
             xml->AppendStartTag(DLMS_COMMAND_WRITE_REQUEST, DLMS_SINGLE_READ_RESPONSE_DATA);
         }
-        if ((ret = GXHelpers::GetData(data, di, value)) != 0)
+        if ((ret = GXHelpers::GetData(&settings, data, di, value)) != 0)
         {
             return ret;
         }
@@ -1429,7 +1429,7 @@ int CGXDLMSLNCommandHandler::HandleEventNotification(
     CGXDataInfo di;
     CGXDLMSVariant value;
     di.SetXml(reply.GetXml());
-    if ((ret = GXHelpers::GetData(reply.GetData(), di, value)) != 0)
+    if ((ret = GXHelpers::GetData(&settings, reply.GetData(), di, value)) != 0)
     {
         return ret;
     }

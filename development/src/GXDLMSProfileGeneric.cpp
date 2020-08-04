@@ -115,7 +115,7 @@ int CGXDLMSProfileGeneric::GetColumns(CGXByteBuffer& data)
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(4); //Count
         tmp = it->first->GetObjectType();
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, tmp)) != 0) //ClassID
+        if ((ret = GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_UINT16, tmp)) != 0) //ClassID
         {
             return ret;
         }
@@ -126,9 +126,9 @@ int CGXDLMSProfileGeneric::GetColumns(CGXByteBuffer& data)
         }
         ai = (*it).second->GetAttributeIndex();
         di = (*it).second->GetDataIndex();
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0 || //LN
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_INT8, ai)) != 0 || //Attribute Index
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, di)) != 0) //Data Index
+        if ((ret = GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0 || //LN
+            (ret = GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_INT8, ai)) != 0 || //Attribute Index
+            (ret = GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_UINT16, di)) != 0) //Data Index
         {
             return ret;
         }
@@ -189,7 +189,7 @@ int CGXDLMSProfileGeneric::GetData(
             if (columns.size() == 0 ||
                 std::find(columns.begin(), columns.end(), m_CaptureObjects.at(pos)) != columns.end())
             {
-                if ((ret = GXHelpers::SetData(data, tp, *value)) != 0)
+                if ((ret = GXHelpers::SetData(&settings, data, tp, *value)) != 0)
                 {
                     return ret;
                 }

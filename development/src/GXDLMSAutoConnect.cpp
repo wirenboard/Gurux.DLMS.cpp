@@ -283,8 +283,8 @@ int CGXDLMSAutoConnect::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
                 data.SetUInt8(2); //Count
                 s = it->first;
                 e = it->second;
-                if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, s)) != 0 || //start_time
-                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, e)) != 0) //end_time
+                if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, s)) != 0 || //start_time
+                    (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, e)) != 0) //end_time
                 {
                     return ret;
                 }
@@ -306,7 +306,7 @@ int CGXDLMSAutoConnect::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
         {
             CGXDLMSVariant value;
             e.GetValue().Add(&(*it)[0], (int)it->size());
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, value)) != 0) //destination
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, value)) != 0) //destination
             {
                 return ret;
             }

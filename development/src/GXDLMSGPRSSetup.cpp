@@ -195,11 +195,11 @@ int CGXDLMSGPRSSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
         CGXDLMSVariant reliability = m_DefaultQualityOfService.GetReliability();
         CGXDLMSVariant peak = m_DefaultQualityOfService.GetPeakThroughput();
         CGXDLMSVariant mean = m_DefaultQualityOfService.GetMeanThroughput();
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, precedence)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, delay)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, reliability)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, peak)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, mean)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, precedence)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, delay)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, reliability)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, peak)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, mean)) != 0)
         {
             return ret;
         }
@@ -211,11 +211,11 @@ int CGXDLMSGPRSSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
         peak = m_RequestedQualityOfService.GetPeakThroughput();
         mean = m_RequestedQualityOfService.GetMeanThroughput();
 
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, precedence)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, delay)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, reliability)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, peak)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, mean)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, precedence)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, delay)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, reliability)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, peak)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, mean)) != 0)
         {
             return ret;
         }

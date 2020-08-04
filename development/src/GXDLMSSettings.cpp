@@ -61,6 +61,7 @@ CGXDLMSSettings::CGXDLMSSettings(bool isServer)
     m_QualityOfService = 0;
     m_UserId = 0;
     m_UseUtc2NormalTime = false;
+    m_DateTimeSkips = DATETIME_SKIPS_NONE;
     m_BlockNumberAck = 0;
     m_WindowSize = 1;
     m_AutoIncreaseInvokeID = false;
@@ -454,18 +455,11 @@ void CGXDLMSSettings::SetCipher(CGXCipher* value)
     m_Cipher = value;
 }
 
-/**
-     * @return Source system title.
-     */
 CGXByteBuffer& CGXDLMSSettings::GetSourceSystemTitle()
 {
     return m_SourceSystemTitle;
 }
 
-/**
- * @param value
- *            Source system title.
- */
 int  CGXDLMSSettings::SetSourceSystemTitle(CGXByteBuffer& value)
 {
     if (value.GetSize() != 8)
@@ -474,6 +468,22 @@ int  CGXDLMSSettings::SetSourceSystemTitle(CGXByteBuffer& value)
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     m_SourceSystemTitle = value;
+    return DLMS_ERROR_CODE_OK;
+}
+
+CGXByteBuffer& CGXDLMSSettings::GetPreEstablishedSystemTitle()
+{
+    return m_PreEstablishedSystemTitle;
+}
+
+int  CGXDLMSSettings::SetPreEstablishedSystemTitle(CGXByteBuffer& value)
+{
+    if (value.GetSize() != 8 && value.GetSize() != 0)
+    {
+        //Invalid client system title.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    m_PreEstablishedSystemTitle = value;
     return DLMS_ERROR_CODE_OK;
 }
 
@@ -578,6 +588,17 @@ void CGXDLMSSettings::SetUseUtc2NormalTime(bool value)
 {
     m_UseUtc2NormalTime = value;
 }
+
+DATETIME_SKIPS CGXDLMSSettings::GetDateTimeSkips()
+{
+    return m_DateTimeSkips;
+}
+
+void CGXDLMSSettings::SetDateTimeSkips(DATETIME_SKIPS value)
+{
+    m_DateTimeSkips = value;
+}
+
 
 unsigned char CGXDLMSSettings::GetUserID()
 {

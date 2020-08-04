@@ -257,7 +257,7 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
             buff.SetUInt8(4);
 
             tmp = it->first->GetObjectType();
-            if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT16, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, buff, DLMS_DATA_TYPE_UINT16, tmp)) != 0)
             {
                 return ret;
             }
@@ -266,17 +266,17 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
             {
                 return ret;
             }
-            if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
             {
                 return ret;
             }
             tmp = (it->second).GetAttributeIndex();
-            if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_INT8, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, buff, DLMS_DATA_TYPE_INT8, tmp)) != 0)
             {
                 return ret;
             }
             tmp = (it->second).GetDataIndex();
-            if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT16, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, buff, DLMS_DATA_TYPE_UINT16, tmp)) != 0)
             {
                 return ret;
             }
@@ -290,7 +290,7 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
         buff.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         buff.SetUInt8(3);
         tmp = GetService();
-        if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_ENUM, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, buff, DLMS_DATA_TYPE_ENUM, tmp)) != 0)
         {
             return ret;
         }
@@ -298,13 +298,13 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
         CGXByteBuffer bb;
         bb.AddString(GetDestination().c_str());
         tmp = bb;
-        if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
         {
             return ret;
         }
 
         tmp = GetMessage();
-        if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_ENUM, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, buff, DLMS_DATA_TYPE_ENUM, tmp)) != 0)
         {
             return ret;
         }
@@ -321,13 +321,13 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
             buff.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
             buff.SetUInt8(2);
             tmp = it->first;
-            if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
             {
                 return ret;
             }
 
             tmp = it->second;
-            if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
             {
                 return ret;
             }

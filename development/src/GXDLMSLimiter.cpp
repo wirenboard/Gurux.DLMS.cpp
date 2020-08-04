@@ -396,9 +396,9 @@ int CGXDLMSLimiter::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         CGXDLMSVariant index = m_MonitoredAttributeIndex;
         CGXDLMSVariant tmp;
         GXHelpers::SetLogicalName(ln.c_str(), tmp);
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, type)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_INT8, index)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, type)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_INT8, index)) != 0)
         {
             return ret;
         }
@@ -435,9 +435,9 @@ int CGXDLMSLimiter::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         CGXDLMSVariant id = m_EmergencyProfile.GetID();
         CGXDLMSVariant time = m_EmergencyProfile.GetActivationTime();
         CGXDLMSVariant duration = m_EmergencyProfile.GetDuration();
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, id)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, time)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT32, duration)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, id)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, time)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT32, duration)) != 0)
         {
             return ret;
         }
@@ -454,7 +454,7 @@ int CGXDLMSLimiter::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         for (std::vector<int>::iterator it = m_EmergencyProfileGroupIDs.begin(); it != m_EmergencyProfileGroupIDs.end(); ++it)
         {
             tmp = *it;
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, tmp)) != 0)
             {
                 return ret;
             }
@@ -477,8 +477,8 @@ int CGXDLMSLimiter::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         CGXDLMSVariant ln;
         GXHelpers::SetLogicalName(m_ActionOverThreshold.GetLogicalName().c_str(), ln);
         CGXDLMSVariant selector = m_ActionOverThreshold.GetScriptSelector();
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, selector)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, selector)) != 0)
         {
             return ret;
         }
@@ -486,8 +486,8 @@ int CGXDLMSLimiter::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         data.SetUInt8(2);
         GXHelpers::SetLogicalName(m_ActionUnderThreshold.GetLogicalName().c_str(), ln);
         selector = m_ActionUnderThreshold.GetScriptSelector();
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, selector)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, selector)) != 0)
         {
             return ret;
         }

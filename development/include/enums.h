@@ -1411,20 +1411,33 @@ typedef enum
  */
 typedef enum
 {
+    //Invalid error.
+    DLMS_EXCEPTION_SERVICE_ERROR_INVALID = 0,
     /*
      * Operation is not possible
-     */
+    */
     DLMS_EXCEPTION_SERVICE_ERROR_OPERATION_NOT_POSSIBLE = 1,
     /*
      * Service is not supported.
-     */
+    */
     DLMS_EXCEPTION_SERVICE_ERROR_SERVICE_NOT_SUPPORTED = 2,
     /*
      * Other reason.
-     */
-    DLMS_EXCEPTION_SERVICE_ERROR_OTHER_REASON = 3
+    */
+    DLMS_EXCEPTION_SERVICE_ERROR_OTHER_REASON = 3,
+    /*
+     * PDU is too long.
+    */
+    DLMS_EXCEPTION_SERVICE_ERROR_PDU_TOO_LONG = 4,
+    /*
+     * Ciphering failed.
+    */
+    DLMS_EXCEPTION_SERVICE_ERROR_DECIPHERING_ERROR = 5,
+    /*
+     * Invocation counter is invalid.
+    */
+    DLMS_EXCEPTION_SERVICE_ERROR_INVOCATION_COUNTER_ERROR = 6
 } DLMS_EXCEPTION_SERVICE_ERROR;
-
 
 /*
  * Hardware resource describes hardware errors.
@@ -2834,5 +2847,15 @@ typedef enum
     // Continuous collection.
     DLMS_CHARGE_CONFIGURATION_CONTINUOUS_COLLECTION = 0x2
 }DLMS_CHARGE_CONFIGURATION;
+
+// DLMS state errors.
+typedef enum {
+    //Invalid value.
+    DLMS_EXCEPTION_STATE_ERROR_SERVICE_INVALID = 0,
+    //Service is not allowed.
+    DLMS_EXCEPTION_STATE_ERROR_SERVICE_NOT_ALLOWED = 1,
+    //Unknown service.
+    DLMS_EXCEPTION_STATE_ERROR_SERVICE_UNKNOWN = 2
+}DLMS_EXCEPTION_STATE_ERROR;
 
 #endif //ENUMS_H

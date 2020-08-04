@@ -270,9 +270,9 @@ int CGXDLMSPppSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
             type = it->GetType();
             len = it->GetLength();
             CGXDLMSVariant tmp = it->GetData();
-            GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, type);
-            GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, len);
-            GXHelpers::SetData(data, it->GetData().vt, tmp);
+            GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, type);
+            GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, len);
+            GXHelpers::SetData(&settings, data, it->GetData().vt, tmp);
         }
         e.SetValue(data);
         return DLMS_ERROR_CODE_OK;
@@ -289,9 +289,9 @@ int CGXDLMSPppSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
             data.SetUInt8(3);
             type = it->GetType();
             len = it->GetLength();
-            GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, type);
-            GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, len);
-            GXHelpers::SetData(data, it->GetData().vt, it->m_Data);
+            GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, type);
+            GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, len);
+            GXHelpers::SetData(&settings, data, it->GetData().vt, it->m_Data);
         }
         e.SetValue(data);
         return DLMS_ERROR_CODE_OK;

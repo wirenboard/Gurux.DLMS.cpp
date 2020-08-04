@@ -89,6 +89,9 @@ public:
         list[TRANSLATOR_GENERAL_TAGS_CALLING_AE_INVOCATION_ID] = "calling-AE-invocation-id";
         list[TRANSLATOR_GENERAL_TAGS_CALLED_AE_INVOCATION_ID] = "called-AE-invocation-id";
         list[TRANSLATOR_GENERAL_TAGS_RESPONDING_AE_INVOCATION_ID] = "responding-AE-invocation-id";
+        list[TRANSLATOR_GENERAL_TAGS_CALLING_AE_QUALIFIER] = "calling-Ae-qualifier";
+        list[DLMS_COMMAND_EXCEPTION_RESPONSE] = "exception-response";
+        list[DLMS_TRANSLATOR_TAGS_STATE_ERROR] = "state-error";
     }
 
     // Get SN tags.
@@ -436,7 +439,7 @@ public:
         return v;
     }
 
-    static void GetServiceErrors(std::map <DLMS_SERVICE_ERROR, std::string > &list)
+    static void GetServiceErrors(std::map <DLMS_SERVICE_ERROR, std::string >& list)
     {
         list[DLMS_SERVICE_ERROR_APPLICATION_REFERENCE] = "application-reference";
         list[DLMS_SERVICE_ERROR_HARDWARE_RESOURCE] = "hardware-resource";
@@ -449,7 +452,7 @@ public:
         list[DLMS_SERVICE_ERROR_TASK] = "task";
     }
 
-    static void GetApplicationReference(std::map < DLMS_APPLICATION_REFERENCE, std::string > &list)
+    static void GetApplicationReference(std::map < DLMS_APPLICATION_REFERENCE, std::string >& list)
     {
         list[DLMS_APPLICATION_REFERENCE_APPLICATION_CONTEXT_UNSUPPORTED] = "application-context-unsupported";
         list[DLMS_APPLICATION_REFERENCE_APPLICATION_REFERENCE_INVALID] = "application-reference-invalid";
@@ -460,7 +463,7 @@ public:
         list[DLMS_APPLICATION_REFERENCE_TIME_ELAPSED] = "time-elapsed";
     }
 
-    static void GetHardwareResource(std::map < DLMS_HARDWARE_RESOURCE, std::string > &list)
+    static void GetHardwareResource(std::map < DLMS_HARDWARE_RESOURCE, std::string >& list)
     {
         list[DLMS_HARDWARE_RESOURCE_MASS_STORAGE_UNAVAILABLE] = "mass-storage-unavailable";
         list[DLMS_HARDWARE_RESOURCE_MEMORY_UNAVAILABLE] = "memory-unavailable";
@@ -469,7 +472,7 @@ public:
         list[DLMS_HARDWARE_RESOURCE_PROCESSOR_RESOURCE_UNAVAILABLE] = "processor-resource-unavailable";
     }
 
-    static void GetVdeStateError(std::map < DLMS_VDE_STATE_ERROR, std::string > &list)
+    static void GetVdeStateError(std::map < DLMS_VDE_STATE_ERROR, std::string >& list)
     {
         list[DLMS_VDE_STATE_ERROR_LOADING_DATASET] = "loading-data-set";
         list[DLMS_VDE_STATE_ERROR_NO_DLMS_CONTEXT] = "no-dlms-context";
@@ -478,14 +481,14 @@ public:
         list[DLMS_VDE_STATE_ERROR_STATUS_NO_CHANGE] = "status-nochange";
     }
 
-    static void GetService(std::map < DLMS_SERVICE, std::string > &list)
+    static void GetService(std::map < DLMS_SERVICE, std::string >& list)
     {
         list[DLMS_SERVICE_OTHER] = "other";
         list[DLMS_SERVICE_PDU_SIZE] = "pdu-size";
         list[DLMS_SERVICE_UNSUPPORTED] = "service-unsupported";
     }
 
-    static void GetDefinition(std::map < DLMS_DEFINITION, std::string > &list)
+    static void GetDefinition(std::map < DLMS_DEFINITION, std::string >& list)
     {
         list[DLMS_DEFINITION_OBJECT_ATTRIBUTE_INCONSISTENT] = "object-attribute-inconsistent";
         list[DLMS_DEFINITION_OBJECT_CLASS_INCONSISTENT] = "object-class-inconsistent";
@@ -493,7 +496,7 @@ public:
         list[DLMS_DEFINITION_OTHER] = "other";
     }
 
-    static void GetAccess(std::map < DLMS_ACCESS, std::string > &list)
+    static void GetAccess(std::map < DLMS_ACCESS, std::string >& list)
     {
         list[DLMS_ACCESS_HARDWARE_FAULT] = "hardware-fault";
         list[DLMS_ACCESS_OBJECT_ACCESS_INVALID] = "object-access-violated";
@@ -502,7 +505,7 @@ public:
         list[DLMS_ACCESS_SCOPE_OF_ACCESS_VIOLATED] = "scope-of-access-violated";
     }
 
-    static void GetInitiate(std::map < DLMS_INITIATE, std::string > &list)
+    static void GetInitiate(std::map < DLMS_INITIATE, std::string >& list)
     {
         list[DLMS_INITIATE_DLMS_VERSION_TOO_LOW] = "dlms-version-too-low";
         list[DLMS_INITIATE_INCOMPATIBLE_CONFORMANCE] = "incompatible-conformance";
@@ -511,7 +514,7 @@ public:
         list[DLMS_INITIATE_REFUSED_BY_THE_VDE_HANDLER] = "refused-by-the-VDE-Handler";
     }
 
-    static void GetLoadDataSet(std::map < DLMS_LOAD_DATASET, std::string > &list)
+    static void GetLoadDataSet(std::map < DLMS_LOAD_DATASET, std::string >& list)
     {
         list[DLMS_LOAD_DATASET_NOT_READY] = "data-set-not-ready";
         list[DLMS_LOAD_DATASET_SIZE_TOO_LARGE] = "dataset-size-too-large";
@@ -523,7 +526,7 @@ public:
         list[DLMS_LOAD_DATASET_STORAGE_FAILURE] = "storage-failure";
     }
 
-    static void GetTask(std::map < DLMS_TASK, std::string > &list)
+    static void GetTask(std::map < DLMS_TASK, std::string >& list)
     {
         list[DLMS_TASK_NO_REMOTE_CONTROL] = "no-remote-control";
         list[DLMS_TASK_OTHER] = "other";
@@ -1098,5 +1101,66 @@ public:
         }
         return ret;
     }
+
+    // Gets state error description.
+    static std::string StateErrorToString(DLMS_EXCEPTION_STATE_ERROR error)
+    {
+        switch (error)
+        {
+        case DLMS_EXCEPTION_STATE_ERROR_SERVICE_NOT_ALLOWED:
+            return "service-not-allowed";
+        case DLMS_EXCEPTION_STATE_ERROR_SERVICE_UNKNOWN:
+            return "service-unknown";
+        default:
+            return "";
+        }
+    }
+
+    //  Gets service error description.
+    static std::string ExceptionServiceErrorToString(DLMS_EXCEPTION_SERVICE_ERROR error)
+    {
+        switch (error)
+        {
+        case DLMS_EXCEPTION_SERVICE_ERROR_OPERATION_NOT_POSSIBLE:
+            return "operation-not-possible";
+        case DLMS_EXCEPTION_SERVICE_ERROR_SERVICE_NOT_SUPPORTED:
+            return "service-not-supported";
+        case DLMS_EXCEPTION_SERVICE_ERROR_OTHER_REASON:
+            return "other-reason";
+        default:
+            return "";
+        }
+    }
+
+    static DLMS_EXCEPTION_STATE_ERROR ValueofStateError(std::string& value)
+    {
+        if ("service-not-allowed" == value)
+        {
+            return DLMS_EXCEPTION_STATE_ERROR_SERVICE_NOT_ALLOWED;
+        }
+        if ("service-unknown" == value)
+        {
+            return DLMS_EXCEPTION_STATE_ERROR_SERVICE_UNKNOWN;
+        }
+        return DLMS_EXCEPTION_STATE_ERROR_SERVICE_INVALID;
+    }
+
+    static DLMS_EXCEPTION_SERVICE_ERROR ValueOfExceptionServiceError(std::string& value)
+    {
+        if ("operation-not-possible" == value)
+        {
+            return DLMS_EXCEPTION_SERVICE_ERROR_OPERATION_NOT_POSSIBLE;
+        }
+        if ("service-not-supported" == value)
+        {
+            return DLMS_EXCEPTION_SERVICE_ERROR_SERVICE_NOT_SUPPORTED;
+        }
+        if ("other-reason" == value)
+        {
+            return DLMS_EXCEPTION_SERVICE_ERROR_OTHER_REASON;
+        }
+        return DLMS_EXCEPTION_SERVICE_ERROR_INVALID;
+    }
+
 };
 #endif //TRANSLATOR_STANDARD_TAGS_H

@@ -279,10 +279,10 @@ int CGXDLMSGSMDiagnostic::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
         locationId = m_CellInfo.GetLocationId();
         signalQuality = m_CellInfo.GetSignalQuality();
         ber = m_CellInfo.GetBer();
-        if ((ret = GXHelpers::SetData(bb, m_Version == 0 ? DLMS_DATA_TYPE_UINT16 : DLMS_DATA_TYPE_UINT32, cellId)) != 0 ||
-            (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT16, locationId)) != 0 ||
-            (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT8, signalQuality)) != 0 ||
-            (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT8, ber)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, bb, m_Version == 0 ? DLMS_DATA_TYPE_UINT16 : DLMS_DATA_TYPE_UINT32, cellId)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, bb, DLMS_DATA_TYPE_UINT16, locationId)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, bb, DLMS_DATA_TYPE_UINT8, signalQuality)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, bb, DLMS_DATA_TYPE_UINT8, ber)) != 0)
         {
             return ret;
         }
@@ -291,9 +291,9 @@ int CGXDLMSGSMDiagnostic::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
             mcc = m_CellInfo.GetMobileCountryCode();
             mnc = m_CellInfo.GetMobileNetworkCode();
             channel = m_CellInfo.GetChannelNumber();
-            if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT16, mcc)) != 0 ||
-                (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT16, mnc)) != 0 ||
-                (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT32, channel)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, bb, DLMS_DATA_TYPE_UINT16, mcc)) != 0 ||
+                (ret = GXHelpers::SetData(&settings, bb, DLMS_DATA_TYPE_UINT16, mnc)) != 0 ||
+                (ret = GXHelpers::SetData(&settings, bb, DLMS_DATA_TYPE_UINT32, channel)) != 0)
             {
                 return ret;
             }
@@ -309,8 +309,8 @@ int CGXDLMSGSMDiagnostic::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
             bb.SetUInt8(2);
             cellId = (*it)->GetCellId();
             signalQuality = (*it)->GetSignalQuality();
-            if ((ret = GXHelpers::SetData(bb, m_Version == 0 ? DLMS_DATA_TYPE_UINT16 : DLMS_DATA_TYPE_UINT32, cellId)) != 0 ||
-                (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT8, locationId)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, bb, m_Version == 0 ? DLMS_DATA_TYPE_UINT16 : DLMS_DATA_TYPE_UINT32, cellId)) != 0 ||
+                (ret = GXHelpers::SetData(&settings, bb, DLMS_DATA_TYPE_UINT8, locationId)) != 0)
             {
                 return ret;
             }

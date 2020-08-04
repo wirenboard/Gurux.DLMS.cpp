@@ -45,7 +45,7 @@ int CGXDLMSAssociationShortName::GetAccessRights(CGXDLMSObject* pObj, CGXDLMSSer
     CGXDLMSValueEventArg e(server, pObj, 0);
     data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
     data.SetUInt8(3);
-    GXHelpers::SetData(data, DLMS_DATA_TYPE_INT16, ln);
+    GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_INT16, ln);
     data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
     GXHelpers::SetObjectCount(cnt, data);
     CGXDLMSVariant empty, index, access;
@@ -64,9 +64,9 @@ int CGXDLMSAssociationShortName::GetAccessRights(CGXDLMSObject* pObj, CGXDLMSSer
         //attribute_access_item
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(3);
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_INT8, index)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_ENUM, access)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_NONE, empty)) != 0)
+        if ((ret = GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_INT8, index)) != 0 ||
+            (ret = GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_ENUM, access)) != 0 ||
+            (ret = GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_NONE, empty)) != 0)
         {
             return ret;
         }
@@ -89,8 +89,8 @@ int CGXDLMSAssociationShortName::GetAccessRights(CGXDLMSObject* pObj, CGXDLMSSer
         //attribute_access_item
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(2);
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_INT8, index);
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_ENUM, access);
+        GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_INT8, index);
+        GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_ENUM, access);
     }
     return DLMS_ERROR_CODE_OK;
 }
@@ -260,10 +260,10 @@ int CGXDLMSAssociationShortName::GetObjects(
             CGXDLMSVariant version = (*it)->GetVersion();
             CGXDLMSVariant sn = (*it)->GetShortName();
             CGXDLMSVariant ln((*it)->m_LN, 6, DLMS_DATA_TYPE_OCTET_STRING);
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_INT16, sn)) != 0 || //base address.
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, type)) != 0 || //ClassID
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, version)) != 0 || //Version
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0) //LN
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_INT16, sn)) != 0 || //base address.
+                (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, type)) != 0 || //ClassID
+                (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, version)) != 0 || //Version
+                (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0) //LN
             {
                 return ret;
             }
@@ -416,7 +416,7 @@ int CGXDLMSAssociationShortName::GetValue(CGXDLMSSettings& settings, CGXDLMSValu
         CGXByteBuffer data;
         CGXDLMSVariant tmp;
         GXHelpers::SetLogicalName(m_SecuritySetupReference.c_str(), tmp);
-        GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
+        GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
         e.SetValue(data);
     }
     else

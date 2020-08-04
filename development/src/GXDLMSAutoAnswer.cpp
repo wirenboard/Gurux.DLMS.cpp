@@ -265,8 +265,8 @@ int CGXDLMSAutoAnswer::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg&
             data.SetUInt8(2); //Count
             f = it->first;
             s = it->second;
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, f)) != 0 || //start_time
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, s)) != 0) //end_time
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, f)) != 0 || //start_time
+                (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, s)) != 0) //end_time
             {
                 return ret;
             }
@@ -293,8 +293,8 @@ int CGXDLMSAutoAnswer::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg&
         CGXDLMSVariant in = m_NumberOfRingsInListeningWindow;
         CGXDLMSVariant out = m_NumberOfRingsOutListeningWindow;
         int ret;
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, in)) != DLMS_ERROR_CODE_OK ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, out)) != DLMS_ERROR_CODE_OK)
+        if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, in)) != DLMS_ERROR_CODE_OK ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, out)) != DLMS_ERROR_CODE_OK)
         {
             return ret;
         }

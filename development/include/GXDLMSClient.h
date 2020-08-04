@@ -194,6 +194,11 @@ public:
     bool GetUseUtc2NormalTime();
     void SetUseUtc2NormalTime(bool value);
 
+    /////////////////////////////////////////////////////////////////////////
+    // Skip selected date time fields.
+    DATETIME_SKIPS GetDateTimeSkips();
+    void SetDateTimeSkips(DATETIME_SKIPS value);
+
     /////////////////////////////////////////////////////////////////////////////
     //User id is the identifier of the user.
     unsigned char GetUserID();

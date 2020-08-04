@@ -145,7 +145,7 @@ int CGXDLMSNotify::AddData(
     {
         dt = e.GetValue().vt;
     }
-    return GXHelpers::SetData(buff, e.GetValue().vt, e.GetValue());
+    return GXHelpers::SetData(&m_Settings, buff, e.GetValue().vt, e.GetValue());
 }
 
 int CGXDLMSNotify::GenerateDataNotificationMessages(

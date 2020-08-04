@@ -677,8 +677,8 @@ int Cipher0(CGXDLMSLNParameters& p,
     unsigned char cmd;
     // If client.
     if (p.GetCipheredCommand() == DLMS_COMMAND_NONE) {
-        if ((p.GetSettings()->GetProposedConformance() & DLMS_CONFORMANCE_GENERAL_PROTECTION) == 0
-            && (p.GetSettings()->GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_PROTECTION) == 0)
+        if ((p.GetSettings()->GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_PROTECTION) == 0 &&
+            (p.GetSettings()->GetPreEstablishedSystemTitle().GetSize() == 0 ||  p.GetSettings()->GetProposedConformance() & DLMS_CONFORMANCE_GENERAL_PROTECTION) == 0)
         {
             if (p.GetSettings()->GetCipher()->GetDedicatedKey().GetSize() != 0 &&
                 (p.GetSettings()->GetConnected() & DLMS_CONNECTION_STATE_DLMS) != 0)
@@ -794,7 +794,7 @@ int CGXDLMS::GetLNPdu(
                 // Data is send in octet string. Remove data type except from event Notification.
                 int pos = reply.GetSize();
                 CGXDLMSVariant tmp = *p.GetTime();
-                if ((ret = GXHelpers::SetData(reply, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+                if ((ret = GXHelpers::SetData(p.GetSettings(), reply, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
                 {
                     return ret;
                 }
@@ -1149,7 +1149,7 @@ int CGXDLMS::GetSNPdu(
             // Data is send in octet string. Remove data type.
             int pos = reply.GetSize();
             CGXDLMSVariant tmp = *p.GetTime();
-            if ((ret = GXHelpers::SetData(reply, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(p.GetSettings(), reply, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
             {
                 return ret;
             }
@@ -1822,7 +1822,7 @@ int HandleActionResponseNormal(
                 CGXDLMSVariant value;
                 data.GetXml()->AppendStartTag(DLMS_COMMAND_READ_RESPONSE, DLMS_SINGLE_READ_RESPONSE_DATA);
                 di.SetXml(data.GetXml());
-                if ((ret = GXHelpers::GetData(data.GetData(), di, value)) != 0)
+                if ((ret = GXHelpers::GetData(&settings, data.GetData(), di, value)) != 0)
                 {
                     return ret;
                 }
@@ -1974,7 +1974,7 @@ int CGXDLMS::HandleAccessResponse(
             CGXDataInfo di;
             di.SetXml(reply.GetXml());
             CGXDLMSVariant value;
-            if ((ret = GXHelpers::GetData(reply.GetData(), di, value)) != 0)
+            if ((ret = GXHelpers::GetData(&settings, reply.GetData(), di, value)) != 0)
             {
                 return ret;
             }
@@ -2086,7 +2086,7 @@ int CGXDLMS::HandleDataNotification(
         CGXDataInfo di;
         di.SetXml(reply.GetXml());
         CGXDLMSVariant value;
-        if ((ret = GXHelpers::GetData(reply.GetData(), di, value)) != 0)
+        if ((ret = GXHelpers::GetData(&settings, reply.GetData(), di, value)) != 0)
         {
             return ret;
         }
@@ -2654,12 +2654,12 @@ int CGXDLMS::GetPdu(
             break;
         case DLMS_COMMAND_RELEASE_RESPONSE:
             break;
+        case DLMS_COMMAND_CONFIRMED_SERVICE_ERROR:
+            ret = HandleConfirmedServiceError(data);
+            break;
         case DLMS_COMMAND_EXCEPTION_RESPONSE:
-            /* TODO:
-            throw new GXDLMSException(
-                StateError.values()[data.GetData().getUInt8() - 1],
-                ServiceError.values()[data.GetData().getUInt8() - 1]);
-                */
+            ret = HandleExceptionResponse(data);
+            break;
         case DLMS_COMMAND_GET_REQUEST:
         case DLMS_COMMAND_READ_REQUEST:
         case DLMS_COMMAND_WRITE_REQUEST:
@@ -2804,6 +2804,10 @@ int CGXDLMS::GetPdu(
                 }
             }
         }
+    }
+    if (ret != 0)
+    {
+        return ret;
     }
 
     // Get data only blocks if SN is used. This is faster.
@@ -3039,7 +3043,7 @@ int CGXDLMS::HandleGetResponse(
                     CGXDataInfo di;
                     di.SetXml(reply.GetXml());
                     CGXDLMSVariant value;
-                    if ((ret = GXHelpers::GetData(reply.GetData(), di, value)) != 0)
+                    if ((ret = GXHelpers::GetData(&settings, reply.GetData(), di, value)) != 0)
                     {
                         return ret;
                     }
@@ -3341,7 +3345,7 @@ int CGXDLMS::HandleReadResponse(
                 CGXDataInfo di;
                 di.SetXml(reply.GetXml());
                 CGXDLMSVariant value;
-                if ((ret = GXHelpers::GetData(reply.GetData(), di, value)) != 0)
+                if ((ret = GXHelpers::GetData(&settings, reply.GetData(), di, value)) != 0)
                 {
                     return ret;
                 }
@@ -3549,7 +3553,7 @@ int CGXDLMS::GetValueFromData(CGXDLMSSettings& settings, CGXReplyData& reply)
     CGXDLMSVariant value;
     int index = reply.GetData().GetPosition();
     reply.GetData().SetPosition(reply.GetReadPosition());
-    if ((ret = GXHelpers::GetData(reply.GetData(), info, value)) != 0)
+    if ((ret = GXHelpers::GetData(&settings, reply.GetData(), info, value)) != 0)
     {
         return ret;
     }
@@ -3845,6 +3849,7 @@ int CGXDLMS::GetActionInfo(DLMS_OBJECT_TYPE objectType, unsigned char& value, un
 }
 
 int CGXDLMS::AppendData(
+    CGXDLMSSettings* settings,
     CGXDLMSObject* obj,
     unsigned char index,
     CGXByteBuffer& bb,
@@ -3878,7 +3883,7 @@ int CGXDLMS::AppendData(
             }
         }
     }
-    return GXHelpers::SetData(bb, tp, value);
+    return GXHelpers::SetData(settings, bb, tp, value);
 }
 
 int CGXDLMS::ParseSnrmUaResponse(
@@ -4059,6 +4064,54 @@ int CGXDLMS::HandleConfirmedServiceError(CGXReplyData& data)
             return ret;
         }
         return service << 16 | type << 8 | ch;
+    }
+    return 0;
+}
+
+int CGXDLMS::HandleExceptionResponse(CGXReplyData& data)
+{
+    int ret;
+    unsigned char ch;
+    DLMS_EXCEPTION_STATE_ERROR state;
+    DLMS_EXCEPTION_SERVICE_ERROR error;
+    if ((ret = data.GetData().GetUInt8(&ch)) != 0)
+    {
+        return ret;
+    }
+    state = (DLMS_EXCEPTION_STATE_ERROR) ch;
+    if ((ret = data.GetData().GetUInt8(&ch)) != 0)
+    {
+        return ret;
+    }
+    error = (DLMS_EXCEPTION_SERVICE_ERROR)ch;
+    unsigned long value = 0;
+    if (error == DLMS_EXCEPTION_SERVICE_ERROR_INVOCATION_COUNTER_ERROR && data.GetData().Available() > 3)
+    {
+        data.GetData().GetUInt32(&value);
+    }
+    if (data.GetXml() != NULL)
+    {
+        std::string str;
+        data.GetXml()->AppendStartTag(DLMS_COMMAND_EXCEPTION_RESPONSE);
+        if (data.GetXml()->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML)
+        {
+            str = CTranslatorStandardTags::StateErrorToString(state);
+            data.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_STATE_ERROR, "", str);
+            str = CTranslatorStandardTags::ExceptionServiceErrorToString(error);
+            data.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_SERVICE_ERROR, "", str);
+        }
+        else
+        {
+            str = CTranslatorSimpleTags::StateErrorToString(state);
+            data.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_STATE_ERROR, "", str);
+            str = CTranslatorSimpleTags::ExceptionServiceErrorToString(error);
+            data.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_SERVICE_ERROR, "", str);
+        }
+        data.GetXml()->AppendEndTag(DLMS_COMMAND_EXCEPTION_RESPONSE);
+    }
+    else
+    {
+        return state << 8 | error;
     }
     return 0;
 }

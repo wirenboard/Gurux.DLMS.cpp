@@ -216,7 +216,7 @@ int CGXDLMSCompactData::GetCaptureObjects(CGXDLMSSettings& settings, CGXDLMSValu
         data.SetUInt8(4); //Count
         tmp = it->first->GetObjectType();
         //ClassID
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, tmp)) != 0)
         {
             return ret;
         }
@@ -228,11 +228,11 @@ int CGXDLMSCompactData::GetCaptureObjects(CGXDLMSSettings& settings, CGXDLMSValu
         ai = (*it).second->GetAttributeIndex();
         di = (*it).second->GetDataIndex();
         //LN
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0 ||
+        if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0 ||
             //Attribute Index
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_INT8, ai)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_INT8, ai)) != 0 ||
             //Data Index
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, di)) != 0)
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, di)) != 0)
         {
             return ret;
         }

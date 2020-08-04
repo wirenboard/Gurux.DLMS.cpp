@@ -185,7 +185,7 @@ int CGXDLMSScriptTable::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
             data.SetUInt8(2);
             //Script_identifier:
             id = (*it)->GetID();
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, id)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, id)) != 0)
             {
                 return ret;
             }
@@ -201,11 +201,11 @@ int CGXDLMSScriptTable::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
                 oType = (*a)->GetObjectType();
                 index = (*a)->GetIndex();
                 CGXDLMSVariant param = (*a)->GetParameter();
-                if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_ENUM, type)) != 0 || //service_id
-                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, oType)) != 0 || //class_id
-                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0 || //logical_name
-                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_INT8, index)) != 0 || //index
-                    (ret = GXHelpers::SetData(data, (*a)->GetParameter().vt, param)) != 0) //parameter
+                if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_ENUM, type)) != 0 || //service_id
+                    (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, oType)) != 0 || //class_id
+                    (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0 || //logical_name
+                    (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_INT8, index)) != 0 || //index
+                    (ret = GXHelpers::SetData(&settings, data, (*a)->GetParameter().vt, param)) != 0) //parameter
                 {
                     return ret;
                 }

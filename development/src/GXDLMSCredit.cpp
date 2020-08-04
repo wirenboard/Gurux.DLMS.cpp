@@ -286,7 +286,7 @@ int CGXDLMSCredit::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
                 e.GetValue().GetBytes(bb);
                 CGXDataInfo info;
                 info.SetType(DLMS_DATA_TYPE_DATETIME);
-                if ((ret = GXHelpers::GetData(bb, info, tmp)) != 0)
+                if ((ret = GXHelpers::GetData(&settings, bb, info, tmp)) != 0)
                 {
                     return ret;
                 }

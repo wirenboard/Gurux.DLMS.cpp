@@ -204,8 +204,8 @@ int CGXDLMSActionSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
         CGXDLMSVariant ln;
         GXHelpers::SetLogicalName(m_ExecutedScriptLogicalName.c_str(), ln);
         CGXDLMSVariant ss = m_ExecutedScriptSelector;
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0 ||
-            (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, ss)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0 ||
+            (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, ss)) != 0)
         {
             return ret;
         }
@@ -233,8 +233,8 @@ int CGXDLMSActionSchedule::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
             CGXDate d(*it);
             val1 = t;
             val2 = d;
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, val1)) != 0 ||
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, val2)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, val1)) != 0 ||
+                (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, val2)) != 0)
             {
                 return ret;
             }

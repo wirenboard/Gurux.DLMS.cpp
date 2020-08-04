@@ -193,38 +193,38 @@ int CGXDLMSParameterMonitor::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
         {
             unsigned char ln[6] = { 0 };
             tmp = 0;
-            GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, tmp);
+            GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, tmp);
             tmp.Clear();
             tmp.Add(ln, 6);
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
             {
                 return ret;
             }
             tmp = 1;
-            GXHelpers::SetData(data, DLMS_DATA_TYPE_INT8, tmp);
+            GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_INT8, tmp);
             tmp.Clear();
-            GXHelpers::SetData(data, DLMS_DATA_TYPE_NONE, tmp);
+            GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_NONE, tmp);
         }
         else
         {
             tmp = m_ChangedParameter.GetTarget()->GetObjectType();
-            GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, tmp);
+            GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, tmp);
             tmp.Clear();
             if ((ret = GetLogicalName(m_ChangedParameter.GetTarget(), tmp)) != 0)
             {
                 return ret;
             }
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
             {
                 return ret;
             }
             tmp = m_ChangedParameter.GetAttributeIndex();
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_INT8, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_INT8, tmp)) != 0)
             {
                 return ret;
             }
             tmp = m_ChangedParameter.GetValue();
-            if ((ret = GXHelpers::SetData(data, tmp.vt, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, data, tmp.vt, tmp)) != 0)
             {
                 return ret;
             }
@@ -244,18 +244,18 @@ int CGXDLMSParameterMonitor::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
             data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
             data.SetUInt8(3);
             tmp = (*it)->GetTarget()->GetObjectType();
-            GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, tmp);
+            GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, tmp);
             tmp.Clear();
             if ((ret = GetLogicalName((*it)->GetTarget(), tmp)) != 0)
             {
                 return ret;
             }
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
             {
                 return ret;
             }
             tmp = (*it)->GetAttributeIndex();
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_INT8, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_INT8, tmp)) != 0)
             {
                 return ret;
             }
@@ -306,7 +306,7 @@ int CGXDLMSParameterMonitor::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
             e.GetValue().GetBytes(bb);
             CGXDataInfo info;
             info.SetType(DLMS_DATA_TYPE_DATETIME);
-            if ((ret = GXHelpers::GetData(bb, info, tmp)) != 0)
+            if ((ret = GXHelpers::GetData(&settings, bb, info, tmp)) != 0)
             {
                 return ret;
             }

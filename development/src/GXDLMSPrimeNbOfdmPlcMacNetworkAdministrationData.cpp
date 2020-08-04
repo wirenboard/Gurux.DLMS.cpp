@@ -286,8 +286,8 @@ int CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData::GetMulticastEntries(CGXDL
         CGXDLMSVariant a = (*it)->GetId(), b = (*it)->GetMembers();
         if ((ret = bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE)) != 0 ||
             (ret = bb.SetUInt8(2)) != 0 ||
-            (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_INT8, a)) != 0 ||
-            (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_INT16, b)) != 0)
+            (ret = GXHelpers::SetData(NULL, bb, DLMS_DATA_TYPE_INT8, a)) != 0 ||
+            (ret = GXHelpers::SetData(NULL, bb, DLMS_DATA_TYPE_INT16, b)) != 0)
         {
             break;
         }
@@ -307,7 +307,7 @@ int CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData::GetSwitchTable(CGXDLMSSet
     GXHelpers::SetObjectCount((unsigned long)m_SwitchTable.size(), bb);
     for (std::vector<short>::iterator it = m_SwitchTable.begin(); it != m_SwitchTable.end(); ++it)
     {
-        if ((ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT16, *it)) != 0)
+        if ((ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT16, *it)) != 0)
         {
             break;
         }
@@ -329,13 +329,13 @@ int CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData::GetDirectTable(CGXDLMSSet
     {
         if ((ret = bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE)) != 0 ||
             (ret = bb.SetUInt8(7)) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT16, (*it)->GetSourceSId())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT16, (*it)->GetSourceLnId())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT16, (*it)->GetSourceLcId())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT16, (*it)->GetDestinationSId())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT16, (*it)->GetDestinationLnId())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT16, (*it)->GetDestinationLcId())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_OCTET_STRING, (*it)->GetDid())) != 0)
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT16, (*it)->GetSourceSId())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT16, (*it)->GetSourceLnId())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT16, (*it)->GetSourceLcId())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT16, (*it)->GetDestinationSId())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT16, (*it)->GetDestinationLnId())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT16, (*it)->GetDestinationLcId())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_OCTET_STRING, (*it)->GetDid())) != 0)
         {
             break;
         }
@@ -357,11 +357,11 @@ int CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData::GetAvailableSwitches(CGXD
     {
         if ((ret = bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE)) != 0 ||
             (ret = bb.SetUInt8(5)) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_OCTET_STRING, (*it)->GetSna())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT16, (*it)->GetLsId())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT8, (*it)->GetLevel())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxLevel())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxSnr())) != 0)
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_OCTET_STRING, (*it)->GetSna())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT16, (*it)->GetLsId())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetLevel())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxLevel())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxSnr())) != 0)
         {
             break;
         }
@@ -383,15 +383,15 @@ int CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData::GetCommunications(CGXDLMS
     {
         if ((ret = bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE)) != 0 ||
             (ret = bb.SetUInt8(9)) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_OCTET_STRING, (*it)->GetEui())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxPower())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxCoding())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxCoding())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxLvl())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT8, (*it)->GetSnr())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxPowerModified())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxCodingModified())) != 0 ||
-            (ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxCodingModified())) != 0)
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_OCTET_STRING, (*it)->GetEui())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxPower())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxCoding())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxCoding())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxLvl())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetSnr())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxPowerModified())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxCodingModified())) != 0 ||
+            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxCodingModified())) != 0)
         {
             break;
         }

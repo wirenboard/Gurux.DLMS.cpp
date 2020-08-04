@@ -77,6 +77,9 @@ class CGXDLMSSettings
 
     CGXByteBuffer m_SourceSystemTitle;
 
+    // Pre-established system title.
+    CGXByteBuffer m_PreEstablishedSystemTitle;
+
     // Invoke ID.
     unsigned char m_InvokeID;
     bool m_AutoIncreaseInvokeID;
@@ -189,6 +192,8 @@ class CGXDLMSSettings
     // DLMS Standard says that Time zone is from normal time to UTC in minutes.
     // If meter is configured to use UTC time (UTC to normal time) set this to true.
     bool m_UseUtc2NormalTime;
+
+    DATETIME_SKIPS m_DateTimeSkips;
 
     /**
      * Last executed command.
@@ -386,6 +391,16 @@ public:
     int SetSourceSystemTitle(CGXByteBuffer& value);
 
     /**
+     * @return Pre-established system title.
+     */
+    CGXByteBuffer& GetPreEstablishedSystemTitle();
+
+    /**
+     * value: Pre-established system title..
+     */
+    int SetPreEstablishedSystemTitle(CGXByteBuffer& value);
+
+    /**
      * @return Key Encrypting Key, also known as Master key.
      */
     CGXByteBuffer& GetKek();
@@ -464,6 +479,11 @@ public:
     // DLMS Standard says that Time zone is from normal time to UTC in minutes.
     // If meter is configured to use UTC time (UTC to normal time) set this to true.
     void SetUseUtc2NormalTime(bool value);
+
+    /////////////////////////////////////////////////////////////////////////
+    // Skip selected date time fields.
+    DATETIME_SKIPS GetDateTimeSkips();
+    void SetDateTimeSkips(DATETIME_SKIPS value);
 
     // User ID.
     unsigned char GetUserID();

@@ -209,8 +209,8 @@ int CGXDLMSRegisterActivation::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
             data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
             data.SetUInt8(2);
             id = it->GetObjectType();
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, id)) != 0 ||
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, id)) != 0 ||
+                (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0)
             {
                 return ret;
             }
@@ -230,7 +230,7 @@ int CGXDLMSRegisterActivation::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
             data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
             data.SetUInt8(2);
             tmp = it->first;
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
             {
                 return ret;
             }

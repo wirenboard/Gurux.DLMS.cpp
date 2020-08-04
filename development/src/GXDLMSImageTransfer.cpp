@@ -155,8 +155,8 @@ int CGXDLMSImageTransfer::ImageTransferInitiate(CGXDLMSClient* client, unsigned 
     size = imageSize;
     data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
     data.SetUInt8(2);
-    if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, identifier)) == 0 &&
-        (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT32, size)) == 0)
+    if ((ret = GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_OCTET_STRING, identifier)) == 0 &&
+        (ret = GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_UINT32, size)) == 0)
     {
         CGXDLMSVariant tmp = data;
         ret = client->Method(this, 1, tmp, DLMS_DATA_TYPE_ARRAY, reply);
@@ -186,7 +186,7 @@ int CGXDLMSImageTransfer::GetImageBlocks(CGXByteBuffer& image, std::vector<CGXBy
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(2);
         tmp = pos;
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT32, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_UINT32, tmp)) != 0)
         {
             break;
         }
@@ -202,7 +202,7 @@ int CGXDLMSImageTransfer::GetImageBlocks(CGXByteBuffer& image, std::vector<CGXBy
             data.Set(&image, data.GetSize(), m_ImageBlockSize);
         }
         tmp = data;
-        if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
         {
             break;
         }
@@ -492,9 +492,9 @@ int CGXDLMSImageTransfer::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
                 size = (*it)->GetSize();
                 CGXDLMSVariant id((*it)->GetIdentification());
                 CGXDLMSVariant signature((*it)->GetSignature());
-                if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT32, size)) != 0 ||
-                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, id)) != 0 ||
-                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, signature)) != 0)
+                if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT32, size)) != 0 ||
+                    (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, id)) != 0 ||
+                    (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, signature)) != 0)
                 {
                     return ret;
                 }

@@ -167,8 +167,8 @@ int CGXDLMSSapAssignment::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
                 bb.Clear();
                 bb.AddString(it->second);
                 s = bb;
-                if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, f)) != 0 ||
-                    (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, s)) != 0)
+                if ((ret = GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_UINT16, f)) != 0 ||
+                    (ret = GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_OCTET_STRING, s)) != 0)
                 {
                     return ret;
                 }

@@ -212,18 +212,18 @@ int AddEntry(CGXDLMSSettings& settings, CGXDLMSScheduleEntry* it, CGXByteBuffer&
         (ret = data.SetUInt8(DLMS_DATA_TYPE_UINT16)) != 0 ||
         (ret = data.SetUInt16(it->GetScriptSelector())) != 0 ||
         //Add switch time.
-        (ret = GXHelpers::SetData2(data, DLMS_DATA_TYPE_OCTET_STRING, it->GetSwitchTime())) != 0 ||
+        (ret = GXHelpers::SetData2(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, it->GetSwitchTime())) != 0 ||
         //Add validity window.
         (ret = data.SetUInt8(DLMS_DATA_TYPE_UINT16)) != 0 ||
         (ret = data.SetUInt16(it->GetValidityWindow())) != 0 ||
         //Add exec week days.
-        (ret = GXHelpers::SetData2(data, DLMS_DATA_TYPE_BIT_STRING, CGXBitString::ToBitString((unsigned char)it->GetExecWeekdays(), 7))) != 0 ||
+        (ret = GXHelpers::SetData2(&settings, data, DLMS_DATA_TYPE_BIT_STRING, CGXBitString::ToBitString((unsigned char)it->GetExecWeekdays(), 7))) != 0 ||
         //Add exec spec days.
-        (ret = GXHelpers::SetData2(data, DLMS_DATA_TYPE_BIT_STRING, it->GetExecSpecDays())) != 0 ||
+        (ret = GXHelpers::SetData2(&settings, data, DLMS_DATA_TYPE_BIT_STRING, it->GetExecSpecDays())) != 0 ||
         //Add begin date.
-        (ret = GXHelpers::SetData2(data, DLMS_DATA_TYPE_OCTET_STRING, it->GetBeginDate())) != 0 ||
+        (ret = GXHelpers::SetData2(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, it->GetBeginDate())) != 0 ||
         //Add end date.
-        (ret = GXHelpers::SetData2(data, DLMS_DATA_TYPE_OCTET_STRING, it->GetEndDate())) != 0)
+        (ret = GXHelpers::SetData2(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, it->GetEndDate())) != 0)
     {
 
     }
@@ -250,9 +250,9 @@ int CGXDLMSSchedule::Delete(CGXDLMSClient* client, CGXDLMSScheduleEntry* entry, 
         //Add structure size.
         (ret = data.SetUInt8(2)) == 0 &&
         //firstIndex
-        (ret = GXHelpers::SetData2(data, DLMS_DATA_TYPE_UINT16, entry->GetIndex())) == 0 &&
+        (ret = GXHelpers::SetData2(NULL, data, DLMS_DATA_TYPE_UINT16, entry->GetIndex())) == 0 &&
         //lastIndex
-        (ret = GXHelpers::SetData2(data, DLMS_DATA_TYPE_UINT16, entry->GetIndex())) == 0)
+        (ret = GXHelpers::SetData2(NULL, data, DLMS_DATA_TYPE_UINT16, entry->GetIndex())) == 0)
     {
         CGXDLMSVariant tmp = data;
         ret = client->Method(this, 3, tmp, DLMS_DATA_TYPE_STRUCTURE, reply);
@@ -268,11 +268,11 @@ int CGXDLMSSchedule::Enable(CGXDLMSClient* client, CGXDLMSScheduleEntry* entry, 
         //Add structure size.
         (ret = data.SetUInt8(4)) == 0 &&
         //firstIndex
-        (ret = GXHelpers::SetData2(data, DLMS_DATA_TYPE_UINT16, entry->GetIndex())) == 0 &&
+        (ret = GXHelpers::SetData2(NULL, data, DLMS_DATA_TYPE_UINT16, entry->GetIndex())) == 0 &&
         //lastIndex
-        (ret = GXHelpers::SetData2(data, DLMS_DATA_TYPE_UINT16, entry->GetIndex())) == 0 &&
-        (ret = GXHelpers::SetData2(data, DLMS_DATA_TYPE_UINT16, 0)) == 0 &&
-        (ret = GXHelpers::SetData2(data, DLMS_DATA_TYPE_UINT16, 0)) == 0)
+        (ret = GXHelpers::SetData2(NULL, data, DLMS_DATA_TYPE_UINT16, entry->GetIndex())) == 0 &&
+        (ret = GXHelpers::SetData2(NULL, data, DLMS_DATA_TYPE_UINT16, 0)) == 0 &&
+        (ret = GXHelpers::SetData2(NULL, data, DLMS_DATA_TYPE_UINT16, 0)) == 0)
     {
         CGXDLMSVariant tmp = data;
         ret = client->Method(this, 1, tmp, DLMS_DATA_TYPE_STRUCTURE, reply);
@@ -288,11 +288,11 @@ int CGXDLMSSchedule::Disable(CGXDLMSClient* client, CGXDLMSScheduleEntry* entry,
         //Add structure size.
         (ret = data.SetUInt8(4)) == 0 &&
         //firstIndex
-        (ret = GXHelpers::SetData2(data, DLMS_DATA_TYPE_UINT16, 0)) == 0 &&
-        (ret = GXHelpers::SetData2(data, DLMS_DATA_TYPE_UINT16, 0)) == 0 &&
-        (ret = GXHelpers::SetData2(data, DLMS_DATA_TYPE_UINT16, entry->GetIndex())) == 0 &&
+        (ret = GXHelpers::SetData2(NULL, data, DLMS_DATA_TYPE_UINT16, 0)) == 0 &&
+        (ret = GXHelpers::SetData2(NULL, data, DLMS_DATA_TYPE_UINT16, 0)) == 0 &&
+        (ret = GXHelpers::SetData2(NULL, data, DLMS_DATA_TYPE_UINT16, entry->GetIndex())) == 0 &&
         //lastIndex
-        (ret = GXHelpers::SetData2(data, DLMS_DATA_TYPE_UINT16, entry->GetIndex())) == 0)
+        (ret = GXHelpers::SetData2(NULL, data, DLMS_DATA_TYPE_UINT16, entry->GetIndex())) == 0)
     {
         CGXDLMSVariant tmp = data;
         ret = client->Method(this, 1, tmp, DLMS_DATA_TYPE_STRUCTURE, reply);

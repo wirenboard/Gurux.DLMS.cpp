@@ -39,6 +39,8 @@
 #include "GXDLMSVariant.h"
 #include "GXDataInfo.h"
 
+class CGXDLMSSettings;
+
 class GXHelpers
 {
     /*
@@ -49,12 +51,14 @@ class GXHelpers
     static unsigned char GetValue(char c);
 
     static int GetCompactArrayItem(
+        CGXDLMSSettings* settings,
         CGXByteBuffer& buff,
         std::vector< CGXDLMSVariant>& dt,
         std::vector< CGXDLMSVariant>& list,
         int len);
 
     static int GetCompactArrayItem(
+        CGXDLMSSettings* settings,
         CGXByteBuffer& buff,
         DLMS_DATA_TYPE dt,
         std::vector< CGXDLMSVariant>& list,
@@ -79,6 +83,7 @@ class GXHelpers
      * @return parsed UInt16 value.
      */
     static int GetCompactArray(
+        CGXDLMSSettings* settings,
         CGXByteBuffer& buff,
         CGXDataInfo& info,
         CGXDLMSVariant& value);
@@ -91,7 +96,7 @@ public:
     * type : Data type.
     * value : Added Value.
     */
-    static int SetData2(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant value);
+    static int SetData2(CGXDLMSSettings* settings, CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant value);
 
     /**
     * Convert object to DLMS bytes.
@@ -100,18 +105,17 @@ public:
     * type : Data type.
     * value : Added Value.
     */
-    static int SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant& value);
+    static int SetData(CGXDLMSSettings* settings, CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant& value);
 
-    /**
-        * Get data from DLMS frame.
-        *
-        * @param data
-        *            received data.
-        * @param info
-        *            Data info.
-        * @return Received data.
-        */
-    static int GetData(CGXByteBuffer& data, CGXDataInfo& info, CGXDLMSVariant& value);
+    /*
+    * Get data from DLMS frame.
+    *
+    * data: received data.
+    * info: Data info.
+    * value: Received data.
+    @return Error code.
+    */
+    static int GetData(CGXDLMSSettings* settings, CGXByteBuffer& data, CGXDataInfo& info, CGXDLMSVariant& value);
 
     static void GetLogicalName(unsigned char* buff, std::string& ln);
 

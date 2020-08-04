@@ -402,7 +402,7 @@ int CGXDLMSAccount::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
                 return ret;
             }
             bb.Set(ln, 6);
-            if ((ret = GXHelpers::SetData2(bb, DLMS_DATA_TYPE_BIT_STRING, CGXBitString::ToBitString(it->GetCollectionConfiguration(), 3))) != 0)
+            if ((ret = GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_BIT_STRING, CGXBitString::ToBitString(it->GetCollectionConfiguration(), 3))) != 0)
             {
                 return ret;
             }
@@ -438,17 +438,17 @@ int CGXDLMSAccount::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         bb.SetUInt8(3);
         tmp = m_Currency.GetName();
-        if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_STRING_UTF8, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, bb, DLMS_DATA_TYPE_STRING_UTF8, tmp)) != 0)
         {
             return ret;
         }
         tmp = m_Currency.GetScale();
-        if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_INT8, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, bb, DLMS_DATA_TYPE_INT8, tmp)) != 0)
         {
             return ret;
         }
         tmp = m_Currency.GetUnit();
-        if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_ENUM, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(&settings, bb, DLMS_DATA_TYPE_ENUM, tmp)) != 0)
         {
             return ret;
         }
@@ -607,7 +607,7 @@ int CGXDLMSAccount::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
                 e.GetValue().GetBytes(bb);
                 CGXDataInfo info;
                 info.SetType(DLMS_DATA_TYPE_DATETIME);
-                if ((ret = GXHelpers::GetData(bb, info, tmp)) != 0)
+                if ((ret = GXHelpers::GetData(&settings, bb, info, tmp)) != 0)
                 {
                     return ret;
                 }
@@ -627,7 +627,7 @@ int CGXDLMSAccount::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
                 e.GetValue().GetBytes(bb);
                 CGXDataInfo info;
                 info.SetType(DLMS_DATA_TYPE_DATETIME);
-                if ((ret = GXHelpers::GetData(bb, info, tmp)) != 0)
+                if ((ret = GXHelpers::GetData(&settings, bb, info, tmp)) != 0)
                 {
                     return ret;
                 }

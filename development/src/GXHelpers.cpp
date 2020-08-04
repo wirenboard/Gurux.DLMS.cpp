@@ -49,7 +49,7 @@
     *            starting index.
     * Returns  CGXDLMSVariant array.
     */
-static int GetArray(CGXByteBuffer& buff, CGXDataInfo& info, int index, CGXDLMSVariant& value)
+static int GetArray(CGXDLMSSettings* settings, CGXByteBuffer& buff, CGXDataInfo& info, int index, CGXDLMSVariant& value)
 {
     int ret;
     unsigned long cnt = 0;
@@ -85,7 +85,7 @@ static int GetArray(CGXByteBuffer& buff, CGXDataInfo& info, int index, CGXDLMSVa
         info2.Clear();
         tmp.Clear();
         info2.SetXml(info.GetXml());
-        if ((ret = GXHelpers::GetData(buff, info2, tmp)) != 0)
+        if ((ret = GXHelpers::GetData(settings, buff, info2, tmp)) != 0)
         {
             return ret;
         }
@@ -1001,8 +1001,13 @@ int GetUtfString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMS
     {
         tmp = new char[len];
         buff.Get((unsigned char*)tmp, len);
+        value.vt = DLMS_DATA_TYPE_STRING_UTF8;
         value.strVal.append(tmp, len);
         delete tmp;
+        if (info.GetXml() != NULL)
+        {
+            info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", value.strVal);
+        }
     }
     else
     {
@@ -1337,6 +1342,7 @@ static int GetBool(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value
 
 
 int GXHelpers::GetCompactArrayItem(
+    CGXDLMSSettings* settings,
     CGXByteBuffer& buff,
     std::vector< CGXDLMSVariant>& dt,
     std::vector< CGXDLMSVariant>& list,
@@ -1349,14 +1355,14 @@ int GXHelpers::GetCompactArrayItem(
     {
         if (it->vt == DLMS_DATA_TYPE_ARRAY || it->vt == DLMS_DATA_TYPE_STRUCTURE)
         {
-            if ((ret = GetCompactArrayItem(buff, it->Arr, tmp.Arr, 1)) != 0)
+            if ((ret = GetCompactArrayItem(settings, buff, it->Arr, tmp.Arr, 1)) != 0)
             {
                 return ret;
             }
         }
         else
         {
-            if ((ret = GetCompactArrayItem(buff, (DLMS_DATA_TYPE)it->bVal, tmp.Arr, 1)) != 0)
+            if ((ret = GetCompactArrayItem(settings, buff, (DLMS_DATA_TYPE)it->bVal, tmp.Arr, 1)) != 0)
             {
                 return ret;
             }
@@ -1367,6 +1373,7 @@ int GXHelpers::GetCompactArrayItem(
 }
 
 int GXHelpers::GetCompactArrayItem(
+    CGXDLMSSettings* settings,
     CGXByteBuffer& buff,
     DLMS_DATA_TYPE dt,
     std::vector< CGXDLMSVariant>& list,
@@ -1420,7 +1427,7 @@ int GXHelpers::GetCompactArrayItem(
             tmp.Clear();
             tmp.SetType(dt);
             CGXDLMSVariant value;
-            if ((ret = GetData(buff, tmp, value)) != 0)
+            if ((ret = GetData(settings, buff, tmp, value)) != 0)
             {
                 return ret;
             }
@@ -1512,6 +1519,7 @@ int GXHelpers::AppendDataTypeAsXml(
 }
 
 int GXHelpers::GetCompactArray(
+    CGXDLMSSettings* settings,
     CGXByteBuffer& buff,
     CGXDataInfo& info,
     CGXDLMSVariant& value)
@@ -1583,7 +1591,7 @@ int GXHelpers::GetCompactArray(
                 CGXDLMSVariant& tmp = cols.at(pos);
                 if (tmp.vt == DLMS_DATA_TYPE_STRUCTURE)
                 {
-                    if ((ret = GetCompactArrayItem(buff, tmp.Arr, row.Arr, 1)) != 0)
+                    if ((ret = GetCompactArrayItem(settings, buff, tmp.Arr, row.Arr, 1)) != 0)
                     {
                         return ret;
                     }
@@ -1591,7 +1599,7 @@ int GXHelpers::GetCompactArray(
                 else if (tmp.vt == DLMS_DATA_TYPE_ARRAY)
                 {
                     std::vector<CGXDLMSVariant> tmp2;
-                    if ((ret = GetCompactArrayItem(buff, tmp.Arr, tmp2, 1)) != 0)
+                    if ((ret = GetCompactArrayItem(settings, buff, tmp.Arr, tmp2, 1)) != 0)
                     {
                         return ret;
                     }
@@ -1599,7 +1607,7 @@ int GXHelpers::GetCompactArray(
                 }
                 else
                 {
-                    if ((ret = GetCompactArrayItem(buff, (DLMS_DATA_TYPE)tmp.cVal, row.Arr, 1)) != 0)
+                    if ((ret = GetCompactArrayItem(settings, buff, (DLMS_DATA_TYPE)tmp.cVal, row.Arr, 1)) != 0)
                     {
                         return ret;
                     }
@@ -1687,7 +1695,7 @@ int GXHelpers::GetCompactArray(
                 info.GetXml()->AppendEndTag(str);
             }
         }
-        GetCompactArrayItem(buff, dt, value.Arr, len);
+        GetCompactArrayItem(settings, buff, dt, value.Arr, len);
         if (info.GetXml() != NULL && info.GetXml()->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
         {
             std::string separator = ";";
@@ -1710,6 +1718,7 @@ int GXHelpers::GetCompactArray(
 }
 
 int GXHelpers::GetData(
+    CGXDLMSSettings* settings,
     CGXByteBuffer& data,
     CGXDataInfo& info,
     CGXDLMSVariant& value)
@@ -1751,7 +1760,7 @@ int GXHelpers::GetData(
     {
     case DLMS_DATA_TYPE_ARRAY:
     case DLMS_DATA_TYPE_STRUCTURE:
-        ret = GetArray(data, info, startIndex, value);
+        ret = GetArray(settings, data, info, startIndex, value);
         value.vt = info.GetType();
         break;
     case DLMS_DATA_TYPE_BOOLEAN:
@@ -1791,7 +1800,7 @@ int GXHelpers::GetData(
         ret = GetUInt16(data, info, value);
         break;
     case DLMS_DATA_TYPE_COMPACT_ARRAY:
-        ret = GetCompactArray(data, info, value);
+        ret = GetCompactArray(settings, data, info, value);
         break;
     case DLMS_DATA_TYPE_INT64:
         ret = GetInt64(data, info, value);
@@ -1832,10 +1841,14 @@ int GXHelpers::GetData(
     * value
     *            Added value.
     */
-static int SetTime(CGXByteBuffer& buff, CGXDLMSVariant& value)
+static int SetTime(CGXDLMSSettings* settings, CGXByteBuffer& buff, CGXDLMSVariant& value)
 {
     DATETIME_SKIPS skip = value.dateTime.GetSkip();
     struct tm dt = value.dateTime.GetValue();
+    if (settings->GetDateTimeSkips() != DATETIME_SKIPS_NONE)
+    {
+        skip = (DATETIME_SKIPS)(skip | settings->GetDateTimeSkips());
+    }
     // Add time.
     if ((skip & DATETIME_SKIPS_HOUR) != 0)
     {
@@ -1881,10 +1894,14 @@ static int SetTime(CGXByteBuffer& buff, CGXDLMSVariant& value)
 * value
 *            Added value.
 */
-static int SetDate(CGXByteBuffer& buff, CGXDLMSVariant& value)
+static int SetDate(CGXDLMSSettings* settings, CGXByteBuffer& buff, CGXDLMSVariant& value)
 {
     struct tm dt = value.dateTime.GetValue();
     DATETIME_SKIPS skip = value.dateTime.GetSkip();
+    if (settings->GetDateTimeSkips() != DATETIME_SKIPS_NONE)
+    {
+        skip = (DATETIME_SKIPS)(skip | settings->GetDateTimeSkips());
+    }
     // Add year.
     if ((skip & DATETIME_SKIPS_YEAR) != 0)
     {
@@ -1954,12 +1971,16 @@ static int SetDate(CGXByteBuffer& buff, CGXDLMSVariant& value)
 * value
 *            Added value.
 */
-static int SetDateTime(CGXByteBuffer& buff, CGXDLMSVariant& value)
+static int SetDateTime(CGXDLMSSettings* settings, CGXByteBuffer& buff, CGXDLMSVariant& value)
 {
     //Add year.
     unsigned short year = 0xFFFF;
     struct tm dt = value.dateTime.GetValue();
     DATETIME_SKIPS skip = value.dateTime.GetSkip();
+    if (settings->GetDateTimeSkips() != DATETIME_SKIPS_NONE)
+    {
+        skip = (DATETIME_SKIPS) (skip | settings->GetDateTimeSkips());
+    }
     if (dt.tm_year != -1 && (skip & DATETIME_SKIPS_YEAR) == 0)
     {
         year = 1900 + dt.tm_year;
@@ -2101,13 +2122,13 @@ static int SetBcd(CGXByteBuffer& buff, CGXDLMSVariant& value)
     * value
     *            Added value.
     */
-static int SetArray(CGXByteBuffer& buff, CGXDLMSVariant& value)
+static int SetArray(CGXDLMSSettings* settings, CGXByteBuffer& buff, CGXDLMSVariant& value)
 {
     int ret;
     GXHelpers::SetObjectCount((unsigned long)value.Arr.size(), buff);
     for (std::vector<CGXDLMSVariant>::iterator it = value.Arr.begin(); it != value.Arr.end(); ++it)
     {
-        if ((ret = GXHelpers::SetData(buff, it->vt, *it)) != 0)
+        if ((ret = GXHelpers::SetData(settings, buff, it->vt, *it)) != 0)
         {
             return ret;
         }
@@ -2320,12 +2341,12 @@ int GXHelpers::SetBitString(CGXByteBuffer& buff, CGXDLMSVariant& value, bool add
     return DLMS_ERROR_CODE_OK;
 }
 
-int GXHelpers::SetData2(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant value)
+int GXHelpers::SetData2(CGXDLMSSettings* settings, CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant value)
 {
-    return SetData(buff, type, value);
+    return SetData(settings, buff, type, value);
 }
 
-int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant& value)
+int GXHelpers::SetData(CGXDLMSSettings* settings, CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant& value)
 {
     if ((type == DLMS_DATA_TYPE_ARRAY || type == DLMS_DATA_TYPE_STRUCTURE)
         && value.vt == DLMS_DATA_TYPE_OCTET_STRING)
@@ -2384,19 +2405,19 @@ int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant&
         {
             // Add size
             buff.SetUInt8(5);
-            SetDate(buff, value);
+            SetDate(settings, buff, value);
         }
         else if (value.vt == DLMS_DATA_TYPE_TIME)
         {
             // Add size
             buff.SetUInt8(4);
-            SetTime(buff, value);
+            SetTime(settings, buff, value);
         }
         else if (value.vt == DLMS_DATA_TYPE_DATETIME)
         {
             // Date an calendar are always written as date time.
             buff.SetUInt8(12);
-            SetDateTime(buff, value);
+            SetDateTime(settings, buff, value);
         }
         else
         {
@@ -2405,7 +2426,7 @@ int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant&
         break;
     case DLMS_DATA_TYPE_ARRAY:
     case DLMS_DATA_TYPE_STRUCTURE:
-        return SetArray(buff, value);
+        return SetArray(settings, buff, value);
         break;
     case DLMS_DATA_TYPE_BINARY_CODED_DESIMAL:
         return SetBcd(buff, value);
@@ -2415,13 +2436,13 @@ int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant&
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
         break;
     case DLMS_DATA_TYPE_DATETIME:
-        return SetDateTime(buff, value);
+        return SetDateTime(settings, buff, value);
         break;
     case DLMS_DATA_TYPE_DATE:
-        return SetDate(buff, value);
+        return SetDate(settings, buff, value);
         break;
     case DLMS_DATA_TYPE_TIME:
-        return SetTime(buff, value);
+        return SetTime(settings, buff, value);
         break;
     default:
         return DLMS_ERROR_CODE_INVALID_PARAMETER;

@@ -166,9 +166,9 @@ int CGXDLMSSpecialDaysTable::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
             index = (*it)->GetIndex();
             date = (*it)->GetDate();
             id = (*it)->GetDayId();
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, index)) != DLMS_ERROR_CODE_OK ||
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, date)) != DLMS_ERROR_CODE_OK ||
-                (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT8, id)) != DLMS_ERROR_CODE_OK)
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT16, index)) != DLMS_ERROR_CODE_OK ||
+                (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, date)) != DLMS_ERROR_CODE_OK ||
+                (ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT8, id)) != DLMS_ERROR_CODE_OK)
             {
                 return ret;
             }

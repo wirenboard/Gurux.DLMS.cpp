@@ -420,6 +420,7 @@ public:
 
 
     static int AppendData(
+        CGXDLMSSettings* settings,
         CGXDLMSObject* obj,
         unsigned char index,
         CGXByteBuffer& bb,
@@ -433,5 +434,7 @@ public:
     static void AppendHdlcParameter(CGXByteBuffer& data, unsigned short value);
 
     static int HandleConfirmedServiceError(CGXReplyData& data);
+
+    static int HandleExceptionResponse(CGXReplyData& data);
 };
 #endif //GXDLMS_H

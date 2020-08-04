@@ -449,7 +449,7 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         for (std::vector<unsigned int>::iterator it = m_MulticastIPAddress.begin(); it != m_MulticastIPAddress.end(); ++it)
         {
             tmp = *it;
-            if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT32, tmp)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_UINT32, tmp)) != 0)
             {
                 return ret;
             }
@@ -471,9 +471,9 @@ int CGXDLMSIp4Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
             type = it->GetType();
             len = it->GetLength();
             data = it->GetData();
-            if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT8, type)) != 0 ||
-                (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT8, len)) != 0 ||
-                (ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_OCTET_STRING, data)) != 0)
+            if ((ret = GXHelpers::SetData(&settings, bb, DLMS_DATA_TYPE_UINT8, type)) != 0 ||
+                (ret = GXHelpers::SetData(&settings, bb, DLMS_DATA_TYPE_UINT8, len)) != 0 ||
+                (ret = GXHelpers::SetData(&settings, bb, DLMS_DATA_TYPE_OCTET_STRING, data)) != 0)
             {
                 return ret;
             }

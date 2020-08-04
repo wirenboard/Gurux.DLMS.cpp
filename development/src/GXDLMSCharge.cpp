@@ -227,19 +227,19 @@ int CGXDLMSCharge::GetUnitCharge(CGXUnitCharge& charge, CGXByteBuffer& bb)
     bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
     bb.SetUInt8(2);
     tmp = charge.GetChargePerUnitScaling().GetCommodityScale();
-    if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_INT8, tmp)) != 0)
+    if ((ret = GXHelpers::SetData(NULL, bb, DLMS_DATA_TYPE_INT8, tmp)) != 0)
     {
         return ret;
     }
     tmp = charge.GetChargePerUnitScaling().GetPriceScale();
-    if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_INT8, tmp)) != 0)
+    if ((ret = GXHelpers::SetData(NULL, bb, DLMS_DATA_TYPE_INT8, tmp)) != 0)
     {
         return ret;
     }
     bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
     bb.SetUInt8(3);
     tmp = charge.GetCommodity().GetType();
-    if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_UINT16, tmp)) != 0)
+    if ((ret = GXHelpers::SetData(NULL, bb, DLMS_DATA_TYPE_UINT16, tmp)) != 0)
     {
         return ret;
     }
@@ -247,7 +247,7 @@ int CGXDLMSCharge::GetUnitCharge(CGXUnitCharge& charge, CGXByteBuffer& bb)
     bb.SetUInt8(6);
     bb.Set(charge.GetCommodity().GetLogicalName(), 6);
     tmp = charge.GetCommodity().GetIndex();
-    if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_INT8, tmp)) != 0)
+    if ((ret = GXHelpers::SetData(NULL, bb, DLMS_DATA_TYPE_INT8, tmp)) != 0)
     {
         return ret;
     }
@@ -258,12 +258,12 @@ int CGXDLMSCharge::GetUnitCharge(CGXUnitCharge& charge, CGXByteBuffer& bb)
         bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         bb.SetUInt8(2);
         tmp = it->GetIndex();
-        if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(NULL, bb, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
         {
             return ret;
         }
         tmp = it->GetChargePerUnit();
-        if ((ret = GXHelpers::SetData(bb, DLMS_DATA_TYPE_INT16, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(NULL, bb, DLMS_DATA_TYPE_INT16, tmp)) != 0)
         {
             return ret;
         }
@@ -386,7 +386,7 @@ int CGXDLMSCharge::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         {
             e.GetValue().GetBytes(bb);
             CGXDataInfo info;
-            if ((ret = GXHelpers::GetData(bb, info, tmp)) != 0)
+            if ((ret = GXHelpers::GetData(&settings, bb, info, tmp)) != 0)
             {
                 return ret;
             }
@@ -415,7 +415,7 @@ int CGXDLMSCharge::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         {
             e.GetValue().GetBytes(bb);
             CGXDataInfo info;
-            if ((ret = GXHelpers::GetData(bb, info, tmp)) != 0)
+            if ((ret = GXHelpers::GetData(&settings, bb, info, tmp)) != 0)
             {
                 return ret;
             }

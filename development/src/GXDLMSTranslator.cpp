@@ -675,6 +675,11 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
         xml->AppendEndTag(cmd);
     }
     break;
+    case DLMS_COMMAND_EXCEPTION_RESPONSE:
+        data.SetXml(xml);
+        data.SetData(value);
+        CGXDLMS::HandleExceptionResponse(data);
+        break;
     default:
         if (!allowUnknownCommand)
         {
@@ -757,7 +762,7 @@ int CGXDLMSTranslator::DataToXml(CGXByteBuffer& data, std::string& xml)
     CGXDLMSSettings settings(false);
     CGXDLMSTranslatorStructure tmp(m_OutputType, m_OmitXmlNameSpace, m_Hex, m_ShowStringAsHex, m_Comments, m_Tags);
     di.SetXml(&tmp);
-    ret = GXHelpers::GetData(data, di, value);
+    ret = GXHelpers::GetData(&settings, data, di, value);
     xml = di.GetXml()->ToString();
     return ret;
 }

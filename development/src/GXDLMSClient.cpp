@@ -98,6 +98,16 @@ void CGXDLMSClient::SetUseUtc2NormalTime(bool value)
     m_Settings.SetUseUtc2NormalTime(value);
 }
 
+DATETIME_SKIPS CGXDLMSClient::GetDateTimeSkips()
+{
+    return m_Settings.GetDateTimeSkips();
+}
+
+void CGXDLMSClient::SetDateTimeSkips(DATETIME_SKIPS value)
+{
+    m_Settings.SetDateTimeSkips(value);
+}
+
 unsigned char CGXDLMSClient::GetUserID()
 {
     return m_Settings.GetUserID();
@@ -394,7 +404,7 @@ int CGXDLMSClient::ParseSNObjects(
     for (unsigned long objPos = 0; objPos != cnt; ++objPos)
     {
         info.Clear();
-        if ((ret = GXHelpers::GetData(buff, info, value)) != 0 ||
+        if ((ret = GXHelpers::GetData(&m_Settings, buff, info, value)) != 0 ||
             (ret = ParseSNObjectItem(value, ignoreInactiveObjects)) != 0)
         {
             return ret;
@@ -564,7 +574,7 @@ int CGXDLMSClient::ParseLNObjects(CGXByteBuffer& buff, bool onlyKnownObjects, bo
         info.SetType(DLMS_DATA_TYPE_NONE);
         info.SetIndex(0);
         info.SetCount(0);
-        if ((ret = GXHelpers::GetData(buff, info, value)) != 0 ||
+        if ((ret = GXHelpers::GetData(&m_Settings, buff, info, value)) != 0 ||
             (ret = ParseLNObjectItem(value, ignoreInactiveObjects)) != 0)
         {
             return ret;
@@ -669,7 +679,7 @@ int CGXDLMSClient::UpdateValue(CGXDLMSObject& target, int attributeIndex, CGXDLM
 int CGXDLMSClient::GetValue(CGXByteBuffer& data, CGXDLMSVariant& value)
 {
     CGXDataInfo info;
-    return GXHelpers::GetData(data, info, value);
+    return GXHelpers::GetData(&m_Settings, data, info, value);
 }
 
 
@@ -712,7 +722,9 @@ int CGXDLMSClient::ChangeType(CGXByteBuffer& value, DLMS_DATA_TYPE type, bool us
         return 0;
     }
     info.SetType(type);
-    if ((ret = GXHelpers::GetData(value, info, newValue)) != 0)
+    CGXDLMSSettings settings(false);
+    settings.SetUseUtc2NormalTime(useUtc);
+    if ((ret = GXHelpers::GetData(&settings, value, info, newValue)) != 0)
     {
         return ret;
     }
@@ -907,7 +919,7 @@ int CGXDLMSClient::ParseApplicationAssociationResponse(
     int ret;
     unsigned long ic = 0;
     CGXDLMSVariant value;
-    if ((ret = GXHelpers::GetData(reply, info, value)) != 0)
+    if ((ret = GXHelpers::GetData(&m_Settings, reply, info, value)) != 0)
     {
         return ret;
     }
@@ -1423,7 +1435,7 @@ int CGXDLMSClient::WriteList(
                 {
                     break;
                 }
-                if ((ret = GXHelpers::SetData(bb, type, value)) != 0)
+                if ((ret = GXHelpers::SetData(&m_Settings, bb, type, value)) != 0)
                 {
                     break;
                 }
@@ -1470,7 +1482,7 @@ int CGXDLMSClient::WriteList(
                 {
                     break;
                 }
-                if ((ret = GXHelpers::SetData(bb, type, value)) != 0)
+                if ((ret = GXHelpers::SetData(&m_Settings, bb, type, value)) != 0)
                 {
                     break;
                 }
@@ -1542,7 +1554,7 @@ int CGXDLMSClient::Write(
             {
                 return ret;
             }
-            if ((ret = GXHelpers::SetData(data, type, value)) != 0)
+            if ((ret = GXHelpers::SetData(&m_Settings, data, type, value)) != 0)
             {
                 return ret;
             }
@@ -1604,7 +1616,7 @@ int CGXDLMSClient::Write(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType,
     int ret;
     m_Settings.ResetBlockIndex();
     CGXByteBuffer bb, data;
-    if ((ret = GXHelpers::SetData(data, value.vt, value)) != 0)
+    if ((ret = GXHelpers::SetData(&m_Settings, data, value.vt, value)) != 0)
     {
         return ret;
     }
@@ -1710,7 +1722,7 @@ int CGXDLMSClient::Method(
 
     CGXByteBuffer bb, data;
     m_Settings.ResetBlockIndex();
-    if ((ret = GXHelpers::SetData(data, dataType, value)) != 0)
+    if ((ret = GXHelpers::SetData(&m_Settings, data, dataType, value)) != 0)
     {
         return ret;
     }
@@ -1817,7 +1829,7 @@ int CGXDLMSClient::ReadRowsByEntry(
     buff.SetUInt8(0x04);
     // Add start index
     CGXDLMSVariant tmp = index;
-    GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT32, tmp);
+    GXHelpers::SetData(&m_Settings, buff, DLMS_DATA_TYPE_UINT32, tmp);
     // Add Count
     if (count == 0)
     {
@@ -1827,12 +1839,12 @@ int CGXDLMSClient::ReadRowsByEntry(
     {
         tmp = index + count - 1;
     }
-    GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT32, tmp);
+    GXHelpers::SetData(&m_Settings, buff, DLMS_DATA_TYPE_UINT32, tmp);
     tmp = 1;
     // Read all columns.
-    GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT16, tmp);
+    GXHelpers::SetData(&m_Settings, buff, DLMS_DATA_TYPE_UINT16, tmp);
     tmp = 0;
-    GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT16, tmp);
+    GXHelpers::SetData(&m_Settings, buff, DLMS_DATA_TYPE_UINT16, tmp);
     CGXDLMSVariant name = pg->GetName();
     return Read(name, DLMS_OBJECT_TYPE_PROFILE_GENERIC, 2, &buff, reply);
 }
@@ -1843,6 +1855,10 @@ int CGXDLMSClient::ReadRowsByRange(
     CGXDateTime& end,
     std::vector<CGXByteBuffer>& reply)
 {
+    if (pg == NULL)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
     int ret;
     bool unixTime = false;
     unsigned char LN[] = { 0, 0, 1, 0, 0, 255 };
@@ -1850,10 +1866,6 @@ int CGXDLMSClient::ReadRowsByRange(
     unsigned char* pLn = LN;
     CGXByteBuffer buff(51);
     CGXDLMSVariant name = pg->GetName();
-    if (pg == NULL)
-    {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
     if (pg->GetCaptureObjects().size() != 0)
     {
         std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> kv = pg->GetCaptureObjects()[0];
@@ -1875,16 +1887,16 @@ int CGXDLMSClient::ReadRowsByRange(
     buff.SetUInt8(0x04);
     // CI
     CGXDLMSVariant tmp = DLMS_OBJECT_TYPE_CLOCK;
-    GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT16, tmp);
+    GXHelpers::SetData(&m_Settings, buff, DLMS_DATA_TYPE_UINT16, tmp);
     // LN
     CGXDLMSVariant ln(pLn, 6, DLMS_DATA_TYPE_OCTET_STRING);
-    GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, ln);
+    GXHelpers::SetData(&m_Settings, buff, DLMS_DATA_TYPE_OCTET_STRING, ln);
     // Add attribute index.
     tmp = 2;
-    GXHelpers::SetData(buff, DLMS_DATA_TYPE_INT8, tmp);
+    GXHelpers::SetData(&m_Settings, buff, DLMS_DATA_TYPE_INT8, tmp);
     // Add version
     tmp = 0;
-    if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT16, tmp)) != 0)
+    if ((ret = GXHelpers::SetData(&m_Settings, buff, DLMS_DATA_TYPE_UINT16, tmp)) != 0)
     {
         return ret;
     }
@@ -1892,7 +1904,7 @@ int CGXDLMSClient::ReadRowsByRange(
     if (unixTime)
     {
         tmp = start.ToUnixTime();
-        if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT32, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(&m_Settings, buff, DLMS_DATA_TYPE_UINT32, tmp)) != 0)
         {
             return ret;
         }
@@ -1900,7 +1912,7 @@ int CGXDLMSClient::ReadRowsByRange(
     else
     {
         tmp = start;
-        if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(&m_Settings, buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
         {
             return ret;
         }
@@ -1909,7 +1921,7 @@ int CGXDLMSClient::ReadRowsByRange(
     if (unixTime)
     {
         tmp = end.ToUnixTime();
-        if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_UINT32, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(&m_Settings, buff, DLMS_DATA_TYPE_UINT32, tmp)) != 0)
         {
             return ret;
         }
@@ -1917,7 +1929,7 @@ int CGXDLMSClient::ReadRowsByRange(
     else
     {
         tmp = end;
-        if ((ret = GXHelpers::SetData(buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
+        if ((ret = GXHelpers::SetData(&m_Settings, buff, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
         {
             return ret;
         }
