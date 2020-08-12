@@ -82,7 +82,7 @@ class CGXCommunication
 #else
     int             m_hComPort;
 #endif
-    int m_WaitTime;
+    uint16_t m_WaitTime;
     int Read(unsigned char eop, CGXByteBuffer& reply);
     /// Read Invocation counter (frame counter) from the meter and update it.
     int UpdateFrameCounter();
@@ -90,7 +90,7 @@ public:
     void WriteValue(GX_TRACE_LEVEL trace, std::string line);
 public:
 
-    CGXCommunication(CGXDLMSSecureClient* pCosem, int wt, GX_TRACE_LEVEL trace, char* invocationCounter);
+    CGXCommunication(CGXDLMSSecureClient* pCosem, uint16_t wt, GX_TRACE_LEVEL trace, char* invocationCounter);
     ~CGXCommunication(void);
 
     //Disconnect from the meter.
@@ -131,6 +131,11 @@ public:
 #endif
         str.append(tmp, ret);
     }
+
+    //Send data to the media.
+    int SendData(CGXByteBuffer& data);
+    //Read data from the media.
+    int ReadData(CGXByteBuffer& reply, std::string& str);
 
     int ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply);
     int ReadDataBlock(CGXByteBuffer& data, CGXReplyData& reply);

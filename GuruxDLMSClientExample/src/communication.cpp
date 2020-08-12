@@ -49,7 +49,7 @@ void CGXCommunication::WriteValue(GX_TRACE_LEVEL trace, std::string line)
 }
 
 
-CGXCommunication::CGXCommunication(CGXDLMSSecureClient* pParser, int wt, GX_TRACE_LEVEL trace, char* invocationCounter) :
+CGXCommunication::CGXCommunication(CGXDLMSSecureClient* pParser, uint16_t wt, GX_TRACE_LEVEL trace, char* invocationCounter) :
     m_WaitTime(wt), m_Parser(pParser),
     m_socket(-1), m_Trace(trace), m_InvocationCounter(invocationCounter)
 {
@@ -179,6 +179,8 @@ int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
         addIP4.sin_port = htons(Port);
         addIP4.sin_family = AF_INET;
         addIP4.sin_addr.s_addr = inet_addr(pAddress);
+        addSize = sizeof(sockaddr_in);
+        add = (sockaddr*)&addIP4;
         //If address is give as name
         if (addIP4.sin_addr.s_addr == INADDR_NONE)
         {
@@ -194,8 +196,6 @@ int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
                 return err;
             };
             addIP4.sin_addr = *(in_addr*)(void*)Hostent->h_addr_list[0];
-            add = (sockaddr*)&addIP4;
-            addSize = sizeof(sockaddr_in);
         };
     }
     else
@@ -212,6 +212,16 @@ int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
         addSize = sizeof(sockaddr_in6);
     }
 
+    //Set timeout.
+#if defined(_WIN32) || defined(_WIN64)//If Windows
+    DWORD timeout = m_WaitTime;
+    setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof timeout);
+#else
+    struct timeval tv;
+    tv.tv_sec = m_WaitTime / 1000;
+    tv.tv_usec = 0;
+    setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
+#endif //
     //Connect to the meter.
     ret = connect(m_socket, add, addSize);
     if (ret == -1)
@@ -923,8 +933,8 @@ int CGXCommunication::InitializeConnection()
     {
         if (ret == DLMS_ERROR_CODE_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED)
         {
-            printf("Use Logical Name referencing is wrong. Change it!\r\n");
-            return ret;
+printf("Use Logical Name referencing is wrong. Change it!\r\n");
+return ret;
         }
         printf("AARQRequest failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
         return ret;
@@ -944,26 +954,10 @@ int CGXCommunication::InitializeConnection()
     return DLMS_ERROR_CODE_OK;
 }
 
-// Read DLMS Data frame from the device.
-int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
+int CGXCommunication::SendData(CGXByteBuffer& data)
 {
-    int ret;
-    CGXByteBuffer bb;
-    std::string tmp;
-    CGXReplyData notify;
-    if (data.GetSize() == 0)
-    {
-        return DLMS_ERROR_CODE_OK;
-    }
-    Now(tmp);
-    tmp = "TX:\t" + tmp;
-    tmp += "\t" + data.ToHexString();
-    if (m_Trace > GX_TRACE_LEVEL_INFO)
-    {
-        printf("%s\r\n", tmp.c_str());
-    }
-    GXHelpers::Write("trace.txt", tmp + "\r\n");
-    int len = data.GetSize();
+    int ret = 0;
+    uint16_t len = (uint16_t)data.GetSize();
     if (m_hComPort != INVALID_HANDLE_VALUE)
     {
 #if defined(_WIN32) || defined(_WIN64)//If Windows
@@ -1001,7 +995,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
         }
 #endif
     }
-    else if ((ret = send(m_socket, (const char*)data.GetData(), len, 0)) == -1)
+    else if (send(m_socket, (const char*)data.GetData(), len, 0) == -1)
     {
         //If error has occured
 #if defined(_WIN32) || defined(_WIN64)//If Windows
@@ -1011,8 +1005,88 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
 #endif
         return DLMS_ERROR_CODE_SEND_FAILED;
     }
+    return ret;
+}
+
+int CGXCommunication::ReadData(CGXByteBuffer& reply, std::string& str)
+{
+    int ret;
+    if (m_hComPort != INVALID_HANDLE_VALUE)
+    {
+        unsigned short pos = (unsigned short)reply.GetSize();
+        if (ret = Read(0x7E, reply) != 0)
+        {
+            str += reply.ToHexString(pos, reply.GetSize() - pos, true);
+            printf("Read failed.\r\n%s", str.c_str());
+            return DLMS_ERROR_CODE_RECEIVE_FAILED;
+        }
+        if (str.size() == 0)
+        {
+            Now(str);
+            str = "RX:\t" + str + "\t";
+        }
+        else
+        {
+            str += " ";
+        }
+        str += reply.ToHexString(pos, reply.GetSize() - pos, true);
+    }
+    else
+    {
+        int len = RECEIVE_BUFFER_SIZE;
+        if ((ret = recv(m_socket, (char*)m_Receivebuff, len, 0)) == -1)
+        {
+            if (ret != 10060)
+            {
+#if defined(_WIN32) || defined(_WIN64)//If Windows
+                printf("recv failed %d\n", WSAGetLastError());
+#else
+                printf("recv failed %d\n", errno);
+#endif
+            }
+            return DLMS_ERROR_CODE_RECEIVE_FAILED;
+        }
+        reply.Set(m_Receivebuff, ret);
+        if (str.size() == 0)
+        {
+            Now(str);
+            str = "RX:\t" + str + "\t";
+        }
+        else
+        {
+            str += " ";
+        }
+        str += GXHelpers::BytesToHex(m_Receivebuff, ret);
+    }
+    return 0;
+}
+
+// Read DLMS Data frame from the device.
+int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
+{
+    int ret;
+    CGXByteBuffer bb;
+    std::string tmp;
+    CGXReplyData notify;
+    if (data.GetSize() == 0)
+    {
+        return DLMS_ERROR_CODE_OK;
+    }
+    Now(tmp);
+    tmp = "TX:\t" + tmp;
+    tmp += "\t" + data.ToHexString();
+    if (m_Trace > GX_TRACE_LEVEL_INFO)
+    {
+        printf("%s\r\n", tmp.c_str());
+    }
+    GXHelpers::Write("trace.txt", tmp + "\r\n");
+    if ((ret = SendData(data)) != 0)
+    {
+        return ret;
+    }
     // Loop until whole DLMS packet is received.
     tmp = "";
+    unsigned char pos = 0;
     do
     {
         if (notify.GetData().GetSize() != 0)
@@ -1035,50 +1109,18 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             }
             continue;
         }
-
-        if (m_hComPort != INVALID_HANDLE_VALUE)
+        if ((ret = ReadData(bb, tmp)) != 0)
         {
-            unsigned short pos = (unsigned short)bb.GetSize();
-            if (Read(0x7E, bb) != 0)
+            if (ret != DLMS_ERROR_CODE_RECEIVE_FAILED || pos == 3)
             {
-                tmp += bb.ToHexString(pos, bb.GetSize() - pos, true);
-                printf("Read failed.\r\n%s", tmp.c_str());
-                return DLMS_ERROR_CODE_SEND_FAILED;
+                break;
             }
-            if (tmp.size() == 0)
+            ++pos;
+            printf("Data send failed. Try to resend %d/3\n", pos);
+            if ((ret = SendData(data)) != 0)
             {
-                Now(tmp);
-                tmp = "RX:\t" + tmp + "\t";
+                break;
             }
-            else
-            {
-                tmp += " ";
-            }
-            tmp += bb.ToHexString(pos, bb.GetSize() - pos, true);
-        }
-        else
-        {
-            len = RECEIVE_BUFFER_SIZE;
-            if ((ret = recv(m_socket, (char*)m_Receivebuff, len, 0)) == -1)
-            {
-#if defined(_WIN32) || defined(_WIN64)//If Windows
-                printf("recv failed %d\n", WSAGetLastError());
-#else
-                printf("recv failed %d\n", errno);
-#endif
-                return DLMS_ERROR_CODE_RECEIVE_FAILED;
-            }
-            bb.Set(m_Receivebuff, ret);
-            if (tmp.size() == 0)
-            {
-                Now(tmp);
-                tmp = "RX:\t" + tmp + "\t";
-            }
-            else
-            {
-                tmp += " ";
-            }
-            tmp += GXHelpers::BytesToHex(m_Receivebuff, ret);
         }
     } while ((ret = m_Parser->GetData(bb, reply, notify)) == DLMS_ERROR_CODE_FALSE);
     tmp += "\r\n";
