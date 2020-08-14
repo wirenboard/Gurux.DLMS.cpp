@@ -31,8 +31,9 @@
 // This code is licensed under the GNU General Public License v2.
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
-#ifndef ERRORCODES_H
-#define ERRORCODES_H
+
+#ifndef DLMS_ERROR_CODE_H
+#define DLMS_ERROR_CODE_H
 
 typedef enum
 {
@@ -64,7 +65,7 @@ typedef enum
     // Access Error : Device reports a undefined object
     DLMS_ERROR_CODE_UNDEFINED_OBJECT = 4,
     // Access Error : Device reports a inconsistent Class or Object
-    DLMS_ERROR_CODE_INCONSISTENT_CLASS = 9,
+    DLMS_ERROR_CODE_INCONSISTENT_CLASS_OR_OBJECT = 9,
     // Access Error : Device reports a unavailable object
     DLMS_ERROR_CODE_UNAVAILABLE_OBJECT = 11,
     // Access Error : Device reports a unmatched type
@@ -139,6 +140,8 @@ typedef enum
     DLMS_ERROR_CODE_AUTHENTICATION_MECHANISM_NAME_REQUIRED,
     DLMS_ERROR_CODE_AUTHENTICATION_FAILURE,
     DLMS_ERROR_CODE_AUTHENTICATION_REQUIRED,
+    //Invalid frame number.
+    DLMS_ERROR_CODE_INVALID_FRAME_NUMBER,
     DLMS_ERROR_CODE_INVALID_DATE_TIME,
     DLMS_ERROR_CODE_INVALID_INVOKE_ID,
     //Invocation counter value is too small.
@@ -149,4 +152,4 @@ typedef enum
     DLMS_ERROR_CODE_INVALID_SECURITY_SUITE
 }DLMS_ERROR_CODE;
 
-#endif //ERRORCODES_H
+#endif //DLMS_ERROR_CODE_H

@@ -323,7 +323,7 @@ public:
         case DLMS_ERROR_CODE_HARDWARE_FAULT:
             str = "hardware-fault";
             break;
-        case DLMS_ERROR_CODE_INCONSISTENT_CLASS:
+        case DLMS_ERROR_CODE_INCONSISTENT_CLASS_OR_OBJECT:
             str = "object-class-inconsistent";
             break;
         case DLMS_ERROR_CODE_LONG_GET_OR_READ_ABORTED:
@@ -386,7 +386,7 @@ public:
         }
         else if (value.compare("object-class-inconsistent") == 0)
         {
-            v = DLMS_ERROR_CODE_INCONSISTENT_CLASS;
+            v = DLMS_ERROR_CODE_INCONSISTENT_CLASS_OR_OBJECT;
         }
         else if (value.compare("long-Get-aborted") == 0)
         {

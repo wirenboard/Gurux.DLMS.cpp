@@ -174,7 +174,7 @@ const char* CGXDLMSConverter::GetErrorMessage(int error)
         case DLMS_ERROR_CODE_UNDEFINED_OBJECT:
             str = "Access Error : Device reports a undefined object.";
             break;
-        case DLMS_ERROR_CODE_INCONSISTENT_CLASS:
+        case DLMS_ERROR_CODE_INCONSISTENT_CLASS_OR_OBJECT:
             str = "Access Error : Device reports a inconsistent Class or Object.";
             break;
         case DLMS_ERROR_CODE_UNAVAILABLE_OBJECT:
