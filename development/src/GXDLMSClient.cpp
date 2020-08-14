@@ -98,6 +98,16 @@ void CGXDLMSClient::SetUseUtc2NormalTime(bool value)
     m_Settings.SetUseUtc2NormalTime(value);
 }
 
+uint64_t CGXDLMSClient::GetExpectedInvocationCounter()
+{
+    return m_Settings.GetExpectedInvocationCounter();
+}
+
+void CGXDLMSClient::SetExpectedInvocationCounter(uint64_t value)
+{
+    m_Settings.SetExpectedInvocationCounter(value);
+}
+
 DATETIME_SKIPS CGXDLMSClient::GetDateTimeSkips()
 {
     return m_Settings.GetDateTimeSkips();

@@ -655,9 +655,12 @@ typedef enum
     /*
      AES-GCM-128 for authenticated encryption and AES-128 for key wrapping.
     */
-    DLMS_SECURITY_SUITE_AES_GCM_128
+    DLMS_SECURITY_SUITE_V0 = 0,
+    /*
+     AES-GCM-128 authenticated encryption, ECDSA P-256 digital signature, ECDH P-256 key agreement, SHA-256 hash, V.44 compression and AES-128 key wrap,
+    */
+    DLMS_SECURITY_SUITE_V1 = 1
 } DLMS_SECURITY_SUITE;
-
 
 typedef enum
 {

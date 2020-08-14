@@ -34,6 +34,13 @@
 #ifndef ERRORCODES_H
 #define ERRORCODES_H
 
+typedef enum
+{
+    DLMS_ERROR_TYPE_EXCEPTION_RESPONSE = 0x80000000,
+    DLMS_ERROR_TYPE_CONFIRMED_SERVICE_ERROR = 0x40000000,
+    DLMS_ERROR_TYPE_COMMUNICATION_ERROR = 0x20000000
+}DLMS_ERROR_TYPE;
+
 /////////////////////////////////////////////////////////////////////////////
 // Enumerates all DLMS error codes.
 // https://www.gurux.fi/Gurux.DLMS.ErrorCodes
@@ -133,7 +140,13 @@ typedef enum
     DLMS_ERROR_CODE_AUTHENTICATION_FAILURE,
     DLMS_ERROR_CODE_AUTHENTICATION_REQUIRED,
     DLMS_ERROR_CODE_INVALID_DATE_TIME,
-    DLMS_ERROR_CODE_INVALID_INVOKE_ID
+    DLMS_ERROR_CODE_INVALID_INVOKE_ID,
+    //Invocation counter value is too small.
+    DLMS_ERROR_CODE_INVOCATION_COUNTER_TOO_SMALL,
+    //Client try to connect with wrong security.
+    DLMS_ERROR_CODE_INVALID_DECIPHERING_ERROR,
+    //Client try to connect with wrong security suite.
+    DLMS_ERROR_CODE_INVALID_SECURITY_SUITE
 }DLMS_ERROR_CODE;
 
 #endif //ERRORCODES_H

@@ -541,9 +541,10 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
             {
                 DLMS_SECURITY security = DLMS_SECURITY_NONE;
                 DLMS_SECURITY_SUITE suite;
+                uint64_t InvocationCounter;
                 if ((ret = settings.GetCipher()->Decrypt(*st, value,
                     settings.GetCipher()->GetBlockCipherKey(),
-                    security, suite)) != 0)
+                    security, suite, InvocationCounter)) != 0)
                 {
                     // It's OK if this fails. Ciphering settings are not correct.
                     xml->SetXmlLength(len2);
@@ -579,6 +580,7 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
         {
             DLMS_SECURITY security;
             DLMS_SECURITY_SUITE suite;
+            uint64_t invocationCounter;
             int len2 = xml->GetXmlLength();
             int originalPosition = value.GetPosition();
             value.SetPosition(value.GetPosition() - 1);
@@ -589,7 +591,7 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
                 data.GetData().SetPosition(data.GetData().GetPosition() - 1);
                 if (settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(), data.GetData(),
                     settings.GetCipher()->GetBlockCipherKey(),
-                    security, suite) == 0)
+                    security, suite, invocationCounter) == 0)
                 {
                     xml->StartComment("Decrypt data: " + data.GetData().ToHexString());
                     CGXByteBuffer& bb = data.GetData();
@@ -608,7 +610,7 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
                 {
                     if (settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(), data.GetData(),
                         settings.GetCipher()->GetBlockCipherKey(),
-                        security, suite) == 0)
+                        security, suite, invocationCounter) == 0)
                     {
                         xml->StartComment("Decrypt data: " + data.GetData().ToHexString());
                         ret = PduToXml(xml, data.GetData(), omitDeclaration, omitNameSpace, false, output);

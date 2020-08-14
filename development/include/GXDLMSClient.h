@@ -195,6 +195,12 @@ public:
     void SetUseUtc2NormalTime(bool value);
 
     /////////////////////////////////////////////////////////////////////////
+    // Expected Invocation(Frame) counter value.
+    // Expected Invocation counter is not check if value is zero.
+    uint64_t GetExpectedInvocationCounter();
+    void SetExpectedInvocationCounter(uint64_t value);
+
+    /////////////////////////////////////////////////////////////////////////
     // Skip selected date time fields.
     DATETIME_SKIPS GetDateTimeSkips();
     void SetDateTimeSkips(DATETIME_SKIPS value);

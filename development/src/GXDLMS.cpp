@@ -2402,12 +2402,13 @@ int CGXDLMS::HandleGloDedRequest(CGXDLMSSettings& settings,
         {
             int ret;
             unsigned char ch;
+            uint64_t InvocationCounter;
             data.GetData().SetPosition(data.GetData().GetPosition() - 1);
             if (settings.GetCipher()->GetDedicatedKey().GetSize() != 0 &&
                 (settings.GetConnected() & DLMS_CONNECTION_STATE_DLMS) != 0)
             {
                 if ((ret = settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(),
-                    settings.GetCipher()->GetDedicatedKey(), data.GetData(), security, suite)) != 0)
+                    settings.GetCipher()->GetDedicatedKey(), data.GetData(), security, suite, InvocationCounter)) != 0)
                 {
                     return ret;
                 }
@@ -2420,7 +2421,7 @@ int CGXDLMS::HandleGloDedRequest(CGXDLMSSettings& settings,
             else
             {
                 if ((ret = settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(),
-                    settings.GetCipher()->GetBlockCipherKey(), data.GetData(), security, suite)) != 0)
+                    settings.GetCipher()->GetBlockCipherKey(), data.GetData(), security, suite, InvocationCounter)) != 0)
                 {
                     return ret;
                 }
@@ -2472,6 +2473,7 @@ int CGXDLMS::HandleGloDedResponse(
             CGXByteBuffer bb;
             CGXByteBuffer& tmp = data.GetData();
             CGXByteBuffer* key;
+            uint64_t invocationCounter;
             bb.Set(&tmp, data.GetData().GetPosition(), data.GetData().GetSize() - data.GetData().GetPosition());
             data.GetData().SetPosition(index);
             data.GetData().SetSize(index);
@@ -2484,9 +2486,30 @@ int CGXDLMS::HandleGloDedResponse(
                 key = &settings.GetCipher()->GetBlockCipherKey();
             }
             if ((ret = settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(),
-                *key, bb, security, suite)) != 0)
+                *key, bb, security, suite, invocationCounter)) != 0)
             {
                 return ret;
+            }
+            //If target is sending data ciphered using different security policy.
+            if (settings.GetCipher()->GetSecurity() != security)
+            {
+                return DLMS_ERROR_CODE_INVALID_DECIPHERING_ERROR;
+            }
+            /*TODO:
+            //If target is sending data ciphered using different security policy.
+            if (settings.Cipher.Security1 != p.Security1)
+            {
+                return DLMS_ERROR_CODE_INVALID_DECIPHERING_ERROR;
+            }
+            */
+            if (settings.GetExpectedInvocationCounter() != 0)
+            {
+                //If data is ciphered using invalid invocation counter value.
+                if (invocationCounter < settings.GetExpectedInvocationCounter())
+                {
+                    return DLMS_ERROR_CODE_INVOCATION_COUNTER_TOO_SMALL;
+                }
+                settings.SetExpectedInvocationCounter(invocationCounter);
             }
             data.GetData().Set(&bb, bb.GetPosition());
             data.SetCipheredCommand(data.GetCommand());
@@ -2523,8 +2546,9 @@ int CGXDLMS::HandleGeneralCiphering(
         data.GetData().SetPosition(data.GetData().GetPosition() - 1);
         DLMS_SECURITY security;
         DLMS_SECURITY_SUITE suite;
+        uint64_t invocationCounter;
         if ((ret = settings.GetCipher()->Decrypt(settings.GetSourceSystemTitle(),
-            settings.GetCipher()->GetBlockCipherKey(), data.GetData(), security, suite)) != 0)
+            settings.GetCipher()->GetBlockCipherKey(), data.GetData(), security, suite, invocationCounter)) != 0)
         {
             return ret;
         }
@@ -4063,7 +4087,7 @@ int CGXDLMS::HandleConfirmedServiceError(CGXReplyData& data)
         {
             return ret;
         }
-        return service << 16 | type << 8 | ch;
+        return DLMS_ERROR_TYPE_CONFIRMED_SERVICE_ERROR | service << 16 | type << 8 | ch;
     }
     return 0;
 }
@@ -4111,7 +4135,7 @@ int CGXDLMS::HandleExceptionResponse(CGXReplyData& data)
     }
     else
     {
-        return state << 8 | error;
+        return DLMS_ERROR_TYPE_EXCEPTION_RESPONSE | value << 8 | error;
     }
     return 0;
 }

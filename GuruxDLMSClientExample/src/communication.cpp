@@ -167,8 +167,12 @@ int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
     m_socket = socket(family, SOCK_STREAM, IPPROTO_IP);
     if (m_socket == -1)
     {
-        assert(0);
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+#if defined(_WIN32) || defined(_WIN64)//If Windows
+        ret = WSAGetLastError();
+#else
+        ret = errno;
+#endif
+        return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
     }
     sockaddr* add;
     int addSize;
@@ -188,12 +192,12 @@ int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
             if (Hostent == NULL)
             {
 #if defined(_WIN32) || defined(_WIN64)//If Windows
-                int err = WSAGetLastError();
+                ret = WSAGetLastError();
 #else
-                int err = errno;
+                ret = errno;
 #endif
                 Close();
-                return err;
+                return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
             };
             addIP4.sin_addr = *(in_addr*)(void*)Hostent->h_addr_list[0];
         };
@@ -206,7 +210,13 @@ int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
         ret = inet_pton(family, pAddress, &(addrIP6.sin6_addr));
         if (ret == -1)
         {
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+#if defined(_WIN32) || defined(_WIN64)//If Windows
+            ret = WSAGetLastError();
+#else
+            ret = errno;
+#endif
+            Close();
+            return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
         };
         add = (sockaddr*)&addrIP6;
         addSize = sizeof(sockaddr_in6);
@@ -214,8 +224,7 @@ int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
 
     //Set timeout.
 #if defined(_WIN32) || defined(_WIN64)//If Windows
-    DWORD timeout = m_WaitTime;
-    setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof timeout);
+    setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&m_WaitTime, sizeof(m_WaitTime));
 #else
     struct timeval tv;
     tv.tv_sec = m_WaitTime / 1000;
@@ -226,7 +235,13 @@ int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
     ret = connect(m_socket, add, addSize);
     if (ret == -1)
     {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+#if defined(_WIN32) || defined(_WIN64)//If Windows
+        ret = WSAGetLastError();
+#else
+        ret = errno;
+#endif
+        Close();
+        return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
     };
     return DLMS_ERROR_CODE_OK;
 }
@@ -316,7 +331,7 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
         //We do not want to read byte at the time.
         if (!ClearCommError(m_hComPort, &RecieveErrors, &comstat))
         {
-            return DLMS_ERROR_CODE_SEND_FAILED;
+            return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | WSAGetLastError();
         }
         bytesRead = 0;
         cnt = 1;
@@ -335,7 +350,7 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             DWORD nErr = GetLastError();
             if (nErr != ERROR_IO_PENDING)
             {
-                return DLMS_ERROR_CODE_RECEIVE_FAILED;
+                return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | WSAGetLastError();
             }
             //Wait until data is actually read
             if (::WaitForSingleObject(m_osReader.hEvent, m_WaitTime) != WAIT_OBJECT_0)
@@ -344,7 +359,7 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             }
             if (!GetOverlappedResult(m_hComPort, &m_osReader, &bytesRead, TRUE))
             {
-                return DLMS_ERROR_CODE_RECEIVE_FAILED;
+                return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | WSAGetLastError();
             }
         }
 #else
@@ -383,12 +398,12 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             else if (errno == EBADF)
             {
                 printf("Read failed. Connection closed.\r\n");
-                return DLMS_ERROR_CODE_RECEIVE_FAILED;
+                return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | errno;
             }
             else
             {
                 printf("Read failed. %d.\r\n", errno);
-                return DLMS_ERROR_CODE_RECEIVE_FAILED;
+                return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | errno;
             }
         }
 #endif
@@ -523,13 +538,14 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
     if (m_hComPort == INVALID_HANDLE_VALUE)
     {
+        ret = WSAGetLastError();
         printf("Failed to open serial port: \"%s\"\r\n", port.c_str());
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
     }
     dcb.DCBlength = sizeof(DCB);
     if ((ret = GXGetCommState(m_hComPort, &dcb)) != 0)
     {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
     }
     dcb.fBinary = 1;
     dcb.fOutX = dcb.fInX = 0;
@@ -551,7 +567,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
     }
     if ((ret = GXSetCommState(m_hComPort, &dcb)) != 0)
     {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
     }
 #else //#if defined(__LINUX__)
     struct termios options;
@@ -559,15 +575,17 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
     m_hComPort = open(port.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (m_hComPort == -1) // if open is unsuccessful.
     {
+        ret = errno;
         printf("Failed to open serial port: \"%s\"\r\n", port.c_str());
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
     }
     else
     {
         if (!isatty(m_hComPort))
         {
+            ret = errno;
             printf("Failed to Open port. This is not a serial port.\r\n");
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+            return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
         }
         memset(&options, 0, sizeof(options));
         options.c_iflag = 0;
@@ -606,8 +624,9 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         //options.c_cflag |= CRTSCTS;
         if (tcsetattr(m_hComPort, TCSAFLUSH, &options) != 0)
         {
+            ret = errno;
             printf("Failed to Open port. tcsetattr failed.\r\n");
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+            return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
         }
     }
 #endif
@@ -632,11 +651,11 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         ret = WriteFile(m_hComPort, buff, len, &sendSize, &m_osWrite);
         if (ret == 0)
         {
-            DWORD err = GetLastError();
+            ret = GetLastError();
             //If error occurs...
-            if (err != ERROR_IO_PENDING)
+            if (ret != ERROR_IO_PENDING)
             {
-                return DLMS_ERROR_CODE_SEND_FAILED;
+                return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
             }
             //Wait until data is actually sent
             WaitForSingleObject(m_osWrite.hEvent, INFINITE);
@@ -645,8 +664,9 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         ret = write(m_hComPort, buff, len);
         if (ret != len)
         {
-            printf("write failed %d\r\n", errno);
-            return DLMS_ERROR_CODE_SEND_FAILED;
+            ret = errno;
+            printf("write failed %d\r\n", ret);
+            return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
         }
 #endif
         //Read reply data.
@@ -933,8 +953,8 @@ int CGXCommunication::InitializeConnection()
     {
         if (ret == DLMS_ERROR_CODE_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED)
         {
-printf("Use Logical Name referencing is wrong. Change it!\r\n");
-return ret;
+            printf("Use Logical Name referencing is wrong. Change it!\r\n");
+            return ret;
         }
         printf("AARQRequest failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
         return ret;
@@ -971,39 +991,40 @@ int CGXCommunication::SendData(CGXByteBuffer& data)
             //If error occurs...
             if (err != ERROR_IO_PENDING)
             {
-                return DLMS_ERROR_CODE_SEND_FAILED;
+                ret = WSAGetLastError();
+                return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
             }
             //Wait until data is actually sent
             ret = WaitForSingleObject(m_osWrite.hEvent, m_WaitTime);
             if (ret != 0)
             {
-                DWORD err = GetLastError();
-                return DLMS_ERROR_CODE_SEND_FAILED;
+                ret = WSAGetLastError();
+                return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
             }
             //Read bytes in output buffer. Some USB converts require this.
             if (!ClearCommError(m_hComPort, &RecieveErrors, &comstat))
             {
-                return DLMS_ERROR_CODE_SEND_FAILED;
+                ret = WSAGetLastError();
+                return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
             }
         }
 #else //If Linux
         ret = write(m_hComPort, data.GetData(), len);
         if (ret != len)
         {
-            printf("write failed %d\n", errno);
-            return DLMS_ERROR_CODE_SEND_FAILED;
+            ret = errno;
+            return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
         }
 #endif
     }
     else if (send(m_socket, (const char*)data.GetData(), len, 0) == -1)
     {
-        //If error has occured
 #if defined(_WIN32) || defined(_WIN64)//If Windows
-        printf("send failed %d\n", WSAGetLastError());
+        ret = WSAGetLastError();
 #else
-        printf("send failed %d\n", errno);
+        ret = errno;
 #endif
-        return DLMS_ERROR_CODE_SEND_FAILED;
+        return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
     }
     return ret;
 }

@@ -55,7 +55,7 @@ void CGXCipher::Init(
     m_SystemTitle.Set(systemTitle, count);
     m_BlockCipherKey.Set(BLOCKCIPHERKEY, sizeof(BLOCKCIPHERKEY));
     m_AuthenticationKey.Set(AUTHENTICATIONKEY, sizeof(AUTHENTICATIONKEY));
-    m_SecuritySuite = DLMS_SECURITY_SUITE_AES_GCM_128;
+    m_SecuritySuite = DLMS_SECURITY_SUITE_V1;
 }
 
 CGXCipher::CGXCipher(CGXByteBuffer& systemTitle)
@@ -703,7 +703,8 @@ int CGXCipher::Decrypt(
     CGXByteBuffer& key,
     CGXByteBuffer& data,
     DLMS_SECURITY& security,
-    DLMS_SECURITY_SUITE& suite)
+    DLMS_SECURITY_SUITE& suite,
+    uint64_t& InvocationCounter)
 {
     unsigned long length;
     int ret;
@@ -777,6 +778,7 @@ int CGXCipher::Decrypt(
     {
         return ret;
     }
+    InvocationCounter = frameCounter;
     if ((ret = Encrypt(
         security,
         DLMS_COUNT_TYPE_DATA,

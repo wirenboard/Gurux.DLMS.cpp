@@ -416,6 +416,27 @@ int CGXDLMSServer::HandleAarqRequest(
         Reset(true);
     }
     ret = CGXAPDU::ParsePDU(m_Settings, m_Settings.GetCipher(), data, result, diagnostic, NULL);
+    if (ret == DLMS_ERROR_CODE_INVOCATION_COUNTER_TOO_SMALL ||
+        ret == DLMS_ERROR_CODE_INVALID_DECIPHERING_ERROR ||
+        ret == DLMS_ERROR_CODE_INVALID_SECURITY_SUITE)
+    {
+        if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC)
+        {
+            m_ReplyData.Set(LLC_REPLY_BYTES, 3);
+        }
+        m_ReplyData.SetUInt8(DLMS_COMMAND_EXCEPTION_RESPONSE);
+        m_ReplyData.SetUInt8(DLMS_EXCEPTION_STATE_ERROR_SERVICE_UNKNOWN);
+        if (ret == DLMS_ERROR_CODE_INVOCATION_COUNTER_TOO_SMALL)
+        {
+            m_ReplyData.SetUInt8(DLMS_EXCEPTION_SERVICE_ERROR_INVOCATION_COUNTER_ERROR);
+            m_ReplyData.SetUInt32((uint32_t)m_Settings.GetExpectedInvocationCounter());
+        }
+        else
+        {
+            m_ReplyData.SetUInt8(DLMS_EXCEPTION_SERVICE_ERROR_DECIPHERING_ERROR);
+        }
+        return 0;
+    }
     if (ret != 0)
     {
         return ret;
@@ -1234,4 +1255,55 @@ int CGXDLMSServer::GeneratePushSetupMessages(
         AddData(it->first, it->second.GetAttributeIndex(), buff);
     }
     return GenerateDataNotificationMessages(date, buff, reply);
+}
+
+
+bool CGXDLMSServer::GetUseUtc2NormalTime()
+{
+    return m_Settings.GetUseUtc2NormalTime();
+}
+
+void CGXDLMSServer::SetUseUtc2NormalTime(bool value)
+{
+    m_Settings.SetUseUtc2NormalTime(value);
+}
+
+uint64_t CGXDLMSServer::GetExpectedInvocationCounter()
+{
+    return m_Settings.GetExpectedInvocationCounter();
+}
+
+void CGXDLMSServer::SetExpectedInvocationCounter(uint64_t value)
+{
+    m_Settings.SetExpectedInvocationCounter(value);
+}
+
+unsigned char CGXDLMSServer::GetExpectedSecurityPolicy()
+{
+    return m_Settings.GetExpectedSecurityPolicy();
+}
+
+void CGXDLMSServer::SetExpectedSecurityPolicy(unsigned char value)
+{
+    m_Settings.SetExpectedSecurityPolicy(value);
+}
+
+void CGXDLMSServer::SetExpectedSecuritySuite(unsigned char value)
+{
+    m_Settings.SetExpectedSecuritySuite(value);
+}
+
+unsigned char CGXDLMSServer::GetExpectedSecuritySuite()
+{
+    return m_Settings.GetExpectedSecuritySuite();
+}
+
+void CGXDLMSServer::SetDateTimeSkips(DATETIME_SKIPS value)
+{
+    m_Settings.SetDateTimeSkips(value);
+}
+
+DATETIME_SKIPS CGXDLMSServer::GetDateTimeSkips()
+{
+    return m_Settings.GetDateTimeSkips();
 }

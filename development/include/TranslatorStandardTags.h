@@ -1127,6 +1127,12 @@ public:
             return "service-not-supported";
         case DLMS_EXCEPTION_SERVICE_ERROR_OTHER_REASON:
             return "other-reason";
+        case DLMS_EXCEPTION_SERVICE_ERROR_PDU_TOO_LONG:
+            return "pdu-too-long";
+        case DLMS_EXCEPTION_SERVICE_ERROR_DECIPHERING_ERROR:
+            return "deciphering-error";
+        case DLMS_EXCEPTION_SERVICE_ERROR_INVOCATION_COUNTER_ERROR:
+            return "invocation-counter-error";
         default:
             return "";
         }
@@ -1134,11 +1140,11 @@ public:
 
     static DLMS_EXCEPTION_STATE_ERROR ValueofStateError(std::string& value)
     {
-        if ("service-not-allowed" == value)
+        if (value.compare("service-not-allowed") == 0)
         {
             return DLMS_EXCEPTION_STATE_ERROR_SERVICE_NOT_ALLOWED;
         }
-        if ("service-unknown" == value)
+        if (value.compare("service-unknown") == 0)
         {
             return DLMS_EXCEPTION_STATE_ERROR_SERVICE_UNKNOWN;
         }
@@ -1147,20 +1153,31 @@ public:
 
     static DLMS_EXCEPTION_SERVICE_ERROR ValueOfExceptionServiceError(std::string& value)
     {
-        if ("operation-not-possible" == value)
+        if (value.compare("operation-not-possible") == 0)
         {
             return DLMS_EXCEPTION_SERVICE_ERROR_OPERATION_NOT_POSSIBLE;
         }
-        if ("service-not-supported" == value)
+        if (value.compare("service-not-supported") == 0)
         {
             return DLMS_EXCEPTION_SERVICE_ERROR_SERVICE_NOT_SUPPORTED;
         }
-        if ("other-reason" == value)
+        if (value.compare("other-reason") == 0)
         {
             return DLMS_EXCEPTION_SERVICE_ERROR_OTHER_REASON;
         }
+        if (value.compare("pdu-too-long") == 0)
+        {
+            return DLMS_EXCEPTION_SERVICE_ERROR_PDU_TOO_LONG;
+        }
+        if (value.compare("deciphering-error") == 0)
+        {
+            return DLMS_EXCEPTION_SERVICE_ERROR_DECIPHERING_ERROR;
+        }
+        if (value.compare("invocation-counter-error") == 0)
+        {
+            return DLMS_EXCEPTION_SERVICE_ERROR_INVOCATION_COUNTER_ERROR;
+        }
         return DLMS_EXCEPTION_SERVICE_ERROR_INVALID;
     }
-
 };
 #endif //TRANSLATOR_STANDARD_TAGS_H

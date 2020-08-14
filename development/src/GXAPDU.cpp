@@ -760,6 +760,8 @@ int CGXAPDU::ParseInitiate(
     }
     if (tag == DLMS_COMMAND_GLO_INITIATE_RESPONSE ||
         tag == DLMS_COMMAND_GLO_INITIATE_REQUEST ||
+        tag == DLMS_COMMAND_DED_INITIATE_RESPONSE ||
+        tag == DLMS_COMMAND_DED_INITIATE_REQUEST ||
         tag == DLMS_COMMAND_GENERAL_GLO_CIPHERING ||
         tag == DLMS_COMMAND_GENERAL_DED_CIPHERING)
     {
@@ -792,9 +794,10 @@ int CGXAPDU::ParseInitiate(
                 data.SetPosition(originalPos - 1);
                 DLMS_SECURITY security = DLMS_SECURITY_NONE;
                 DLMS_SECURITY_SUITE suite;
+                uint64_t invocationCounter;
                 if ((ret = cipher->Decrypt(st,
                     settings.GetCipher()->GetBlockCipherKey(),
-                    data, security, suite)) != 0)
+                    data, security, suite, invocationCounter)) != 0)
                 {
                     return ret;
                 }
@@ -824,10 +827,27 @@ int CGXAPDU::ParseInitiate(
         data.SetPosition(data.GetPosition() - 1);
         DLMS_SECURITY security = DLMS_SECURITY_NONE;
         DLMS_SECURITY_SUITE suite;
+        uint64_t invocationCounter;
         if ((ret = cipher->Decrypt(settings.GetSourceSystemTitle(),
-            settings.GetCipher()->GetBlockCipherKey(), data, security, suite)) != 0)
+            settings.GetCipher()->GetBlockCipherKey(), data, security, suite, invocationCounter)) != 0)
         {
             return ret;
+        }
+        if (settings.GetExpectedSecurityPolicy() != 0xFF && security < settings.GetExpectedSecurityPolicy())
+        {
+            return DLMS_ERROR_CODE_INVALID_DECIPHERING_ERROR;
+        }
+        if (settings.GetExpectedSecuritySuite() != 0xFF && security != settings.GetExpectedSecuritySuite())
+        {
+            return DLMS_ERROR_CODE_INVALID_SECURITY_SUITE;
+        }
+        if (settings.GetExpectedInvocationCounter() != 0)
+        {
+            if (invocationCounter != settings.GetExpectedInvocationCounter())
+            {
+                return DLMS_ERROR_CODE_INVOCATION_COUNTER_TOO_SMALL;
+            }
+            settings.SetExpectedInvocationCounter(1 + invocationCounter);
         }
         cipher->SetSecurity(security);
         cipher->SetSecuritySuite(suite);
@@ -1878,6 +1898,12 @@ int CGXAPDU::ParsePDU2(
             }
             if ((ret = ParseUserInformation(settings, cipher, buff, xml)) != 0)
             {
+                if (ret == DLMS_ERROR_CODE_INVOCATION_COUNTER_TOO_SMALL ||
+                    ret == DLMS_ERROR_CODE_INVALID_DECIPHERING_ERROR ||
+                    ret == DLMS_ERROR_CODE_INVALID_SECURITY_SUITE)
+                {
+                    return ret;
+                }
                 result = DLMS_ASSOCIATION_RESULT_PERMANENT_REJECTED;
                 diagnostic = DLMS_SOURCE_DIAGNOSTIC_NO_REASON_GIVEN;
                 return 0;

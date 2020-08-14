@@ -65,6 +65,9 @@ CGXDLMSSettings::CGXDLMSSettings(bool isServer)
     m_BlockNumberAck = 0;
     m_WindowSize = 1;
     m_AutoIncreaseInvokeID = false;
+    m_ExpectedInvocationCounter = 0;
+    m_ExpectedSecurityPolicy = 0xFF;
+    m_ExpectedSecuritySuite = 0xFF;
 }
 
 //Destructor.
@@ -587,6 +590,36 @@ bool CGXDLMSSettings::GetUseUtc2NormalTime()
 void CGXDLMSSettings::SetUseUtc2NormalTime(bool value)
 {
     m_UseUtc2NormalTime = value;
+}
+
+uint64_t CGXDLMSSettings::GetExpectedInvocationCounter()
+{
+    return m_ExpectedInvocationCounter;
+}
+
+void CGXDLMSSettings::SetExpectedInvocationCounter(uint64_t value)
+{
+    m_ExpectedInvocationCounter = value;
+}
+
+unsigned char CGXDLMSSettings::GetExpectedSecurityPolicy()
+{
+    return m_ExpectedSecurityPolicy;
+}
+
+void CGXDLMSSettings::SetExpectedSecurityPolicy(unsigned char value)
+{
+    m_ExpectedSecurityPolicy = value;
+}
+
+void CGXDLMSSettings::SetExpectedSecuritySuite(unsigned char value)
+{
+    m_ExpectedSecuritySuite = value;
+}
+
+unsigned char CGXDLMSSettings::GetExpectedSecuritySuite()
+{
+    return m_ExpectedSecuritySuite;
 }
 
 DATETIME_SKIPS CGXDLMSSettings::GetDateTimeSkips()

@@ -390,6 +390,37 @@ public:
     */
     void SetWrapper(CGXDLMSTcpUdpSetup* value);
 
+    /////////////////////////////////////////////////////////////////////////////
+    // Standard says that Time zone is from normal time to UTC in minutes.
+    // If meter is configured to use UTC time (UTC to normal time) set this to true.
+    bool GetUseUtc2NormalTime();
+    void SetUseUtc2NormalTime(bool value);
+
+    /////////////////////////////////////////////////////////////////////////
+    // Client Invocation (Frame) counter value.
+    // Client  Invocation counter is not check if value is zero.
+    uint64_t GetExpectedInvocationCounter();
+    void SetExpectedInvocationCounter(uint64_t value);
+
+    /////////////////////////////////////////////////////////////////////////
+    // Expected security policy.
+    // If Expected security policy is set client can't connect with other security policies.
+    unsigned char GetExpectedSecurityPolicy();
+    void SetExpectedSecurityPolicy(unsigned char value);
+
+    /////////////////////////////////////////////////////////////////////////
+    // Expected security suite.
+    // If Expected security suite is set client can't connect with other security suite.
+    //Default value is 0xFF;
+    unsigned char GetExpectedSecuritySuite();
+    void SetExpectedSecuritySuite(unsigned char value);
+
+    /////////////////////////////////////////////////////////////////////////
+    // Skip selected date time fields.
+    DATETIME_SKIPS GetDateTimeSkips();
+    void SetDateTimeSkips(DATETIME_SKIPS value);
+
+
     /**
      * @return Server to client challenge.
      */

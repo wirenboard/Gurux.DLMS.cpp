@@ -196,13 +196,15 @@ public:
       * data: Decrypted data.
       * security: Used security level.
       * suite: Used security suite.
+      * InvocationCounter: Invocation counter value.
       */
     int Decrypt(
         CGXByteBuffer& title,
         CGXByteBuffer& key,
         CGXByteBuffer& data,
         DLMS_SECURITY& security,
-        DLMS_SECURITY_SUITE& suite);
+        DLMS_SECURITY_SUITE& suite,
+        uint64_t& InvocationCounter);
 
     /*
      * Encrypt data using AES.

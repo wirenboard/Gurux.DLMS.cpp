@@ -189,9 +189,25 @@ class CGXDLMSSettings
 
     unsigned char m_QualityOfService;
 
+    /////////////////////////////////////////////////////////////////////////
     // DLMS Standard says that Time zone is from normal time to UTC in minutes.
     // If meter is configured to use UTC time (UTC to normal time) set this to true.
     bool m_UseUtc2NormalTime;
+
+    /////////////////////////////////////////////////////////////////////////
+    // Expected Invocation(Frame) counter value.
+    // Expected Invocation counter is not check if value is zero.
+    uint64_t m_ExpectedInvocationCounter;
+
+    /////////////////////////////////////////////////////////////////////////
+    // Expected security policy.
+    // If Expected security policy is set client can't connect with other security policies.
+    unsigned char m_ExpectedSecurityPolicy;
+
+    /////////////////////////////////////////////////////////////////////////
+    // Expected security suite.
+    // If Expected security suite is set client can't connect with other security suite.
+    unsigned char m_ExpectedSecuritySuite;
 
     DATETIME_SKIPS m_DateTimeSkips;
 
@@ -461,24 +477,35 @@ public:
     */
     void SetProposedConformance(DLMS_CONFORMANCE value);
 
-    /**
-    * @return Protocol version.
-    */
+    /////////////////////////////////////////////////////////////////////////
+    // Protocol version.
     char* GetProtocolVersion();
-
-    /**
-    * @param value
-    *            Protocol version.
-    */
     void SetProtocolVersion(const char* value);
 
+    /////////////////////////////////////////////////////////////////////////
     // DLMS Standard says that Time zone is from normal time to UTC in minutes.
     // If meter is configured to use UTC time (UTC to normal time) set this to true.
     bool GetUseUtc2NormalTime();
-
-    // DLMS Standard says that Time zone is from normal time to UTC in minutes.
-    // If meter is configured to use UTC time (UTC to normal time) set this to true.
     void SetUseUtc2NormalTime(bool value);
+
+    /////////////////////////////////////////////////////////////////////////
+    // Expected Invocation(Frame) counter value.
+    // Expected Invocation counter is not check if value is zero.
+    uint64_t GetExpectedInvocationCounter();
+    void SetExpectedInvocationCounter(uint64_t uint32_t);
+
+    /////////////////////////////////////////////////////////////////////////
+    // Expected security policy.
+    // If Expected security policy is set client can't connect with other security policies.
+    unsigned char GetExpectedSecurityPolicy();
+    void SetExpectedSecurityPolicy(unsigned char value);
+
+    /////////////////////////////////////////////////////////////////////////
+    // Expected security suite.
+    // If Expected security suite is set client can't connect with other security suite.
+    //Default value is -1.
+    void SetExpectedSecuritySuite(unsigned char value);
+    unsigned char GetExpectedSecuritySuite();
 
     /////////////////////////////////////////////////////////////////////////
     // Skip selected date time fields.
