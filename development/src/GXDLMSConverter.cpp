@@ -67,7 +67,7 @@ const char* CGXDLMSConverter::GetErrorMessage(int error)
     }
     else if ((error & DLMS_ERROR_TYPE_COMMUNICATION_ERROR) != 0)
     {
-        str = "Connection error.";
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 #if defined(_WIN32) || defined(_WIN64)
         wchar_t* s = NULL;
         FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -76,8 +76,11 @@ const char* CGXDLMSConverter::GetErrorMessage(int error)
             (LPWSTR)&s, 0, NULL);
         fprintf(stderr, "%S\n", s);
         LocalFree(s);
+        str = "Connection error.";
 #else
         str = strerror(error & ~DLMS_ERROR_TYPE_COMMUNICATION_ERROR);
+#endif
+        str = "Connection error.";
 #endif
     }
     else
@@ -221,6 +224,12 @@ const char* CGXDLMSConverter::GetErrorMessage(int error)
             break;
         case DLMS_ERROR_CODE_INVOCATION_COUNTER_TOO_SMALL:
             str = "Invocation counter value is too small.";
+            break;
+        case DLMS_ERROR_CODE_INVALID_DECIPHERING_ERROR:
+            str = "Deciphering error.";
+            break;
+        case DLMS_ERROR_CODE_INVALID_SECURITY_SUITE:
+            str = "Client try to connect with wrong security suite.";
             break;
         default:
             str = "Unknown error.";
