@@ -68,6 +68,15 @@ public:
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
 
+    // Inserts a new entry in the table.
+    // If a special day with the same index or with the same date as an already
+    // defined day is inserted, the old entry will be overwritten.
+    int Insert(CGXDLMSClient* client, CGXDLMSSpecialDay* entry, std::vector<CGXByteBuffer>& reply);
+
+    // Deletes an entry from the table.
+    int Delete(CGXDLMSClient* client, CGXDLMSSpecialDay* entry, std::vector<CGXByteBuffer>& reply);
+
+
     /////////////////////////////////////////////////////////////////////////
     // Returns collection of attributes to read.
     //

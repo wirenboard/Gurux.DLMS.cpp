@@ -833,11 +833,11 @@ int CGXAPDU::ParseInitiate(
         {
             return ret;
         }
-        if (settings.GetExpectedSecurityPolicy() != 0xFF && security < settings.GetExpectedSecurityPolicy())
+        if (settings.GetExpectedSecurityPolicy() != 0xFF && security != settings.GetExpectedSecurityPolicy())
         {
             return DLMS_ERROR_CODE_INVALID_DECIPHERING_ERROR;
         }
-        if (settings.GetExpectedSecuritySuite() != 0xFF && security != settings.GetExpectedSecuritySuite())
+        if (settings.GetExpectedSecuritySuite() != 0xFF && suite != settings.GetExpectedSecuritySuite())
         {
             return DLMS_ERROR_CODE_INVALID_SECURITY_SUITE;
         }

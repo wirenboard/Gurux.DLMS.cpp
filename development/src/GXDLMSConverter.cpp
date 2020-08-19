@@ -70,7 +70,7 @@ const char* CGXDLMSConverter::GetErrorMessage(int error)
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 #if defined(_WIN32) || defined(_WIN64)
         wchar_t* s = NULL;
-        FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
             NULL, error & ~DLMS_ERROR_TYPE_COMMUNICATION_ERROR,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
             (LPWSTR)&s, 0, NULL);

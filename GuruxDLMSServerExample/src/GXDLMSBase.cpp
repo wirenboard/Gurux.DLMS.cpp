@@ -943,7 +943,7 @@ void CGXDLMSBase::PreRead(std::vector<CGXDLMSValueEventArg*>& args)
                         (*it)->SetRowBeginIndex(begin);
                         (*it)->SetRowEndIndex((*it)->GetParameters().Arr[1].ulVal);
                         // If client wants to read more data what we have.
-                        int cnt = GetProfileGenericDataCount();
+                        unsigned int cnt = GetProfileGenericDataCount();
                         if ((*it)->GetRowEndIndex() > cnt)
                         {
                             (*it)->SetRowEndIndex(cnt);

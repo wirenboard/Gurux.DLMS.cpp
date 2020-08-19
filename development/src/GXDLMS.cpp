@@ -2505,11 +2505,11 @@ int CGXDLMS::HandleGloDedResponse(
             if (settings.GetExpectedInvocationCounter() != 0)
             {
                 //If data is ciphered using invalid invocation counter value.
-                if (invocationCounter < settings.GetExpectedInvocationCounter())
+                if (invocationCounter != settings.GetExpectedInvocationCounter())
                 {
                     return DLMS_ERROR_CODE_INVOCATION_COUNTER_TOO_SMALL;
                 }
-                settings.SetExpectedInvocationCounter(invocationCounter);
+                settings.SetExpectedInvocationCounter(1 + invocationCounter);
             }
             data.GetData().Set(&bb, bb.GetPosition());
             data.SetCipheredCommand(data.GetCommand());

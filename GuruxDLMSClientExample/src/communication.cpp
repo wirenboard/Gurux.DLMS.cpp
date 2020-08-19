@@ -290,11 +290,11 @@ int CGXCommunication::GXSetCommState(HANDLE hWnd, LPDCB DCB)
             unsigned long RecieveErrors;
             if (!ClearCommError(hWnd, &RecieveErrors, &comstat))
             {
-                return GetLastError();
+                return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | GetLastError();
             }
             if (!SetCommState(hWnd, DCB))
             {
-                return GetLastError();
+                return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | GetLastError();
             }
         }
         else
@@ -302,7 +302,7 @@ int CGXCommunication::GXSetCommState(HANDLE hWnd, LPDCB DCB)
             //If USB to serial port converters do not implement this.
             if (err != ERROR_INVALID_FUNCTION)
             {
-                return err;
+                return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | err;
             }
         }
     }
@@ -976,7 +976,7 @@ int CGXCommunication::InitializeConnection()
 
 int CGXCommunication::SendData(CGXByteBuffer& data)
 {
-    int ret = 0;
+    int ret;
     uint16_t len = (uint16_t)data.GetSize();
     if (m_hComPort != INVALID_HANDLE_VALUE)
     {
@@ -1026,7 +1026,7 @@ int CGXCommunication::SendData(CGXByteBuffer& data)
 #endif
         return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
     }
-    return ret;
+    return 0;
 }
 
 int CGXCommunication::ReadData(CGXByteBuffer& reply, std::string& str)

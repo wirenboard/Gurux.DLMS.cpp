@@ -83,6 +83,27 @@ int CGXDLMSSpecialDaysTable::GetMethodCount()
     return 2;
 }
 
+int CGXDLMSSpecialDaysTable::Insert(CGXDLMSClient* client, CGXDLMSSpecialDay* entry, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data;
+    CGXByteBuffer bb;
+    bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+    bb.SetUInt8(3);
+    GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_UINT16, entry->GetIndex());
+    GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_OCTET_STRING, entry->GetDate());
+    GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_UINT8, entry->GetDayId());
+    data = bb;
+    return client->Method(this, 1, data, DLMS_DATA_TYPE_ARRAY, reply);
+}
+
+int CGXDLMSSpecialDaysTable::Delete(CGXDLMSClient* client, CGXDLMSSpecialDay* entry, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data = entry->GetIndex();
+    data.vt = DLMS_DATA_TYPE_UINT16;
+    return client->Method(this, 2, data, reply);
+}
+
+
 void CGXDLMSSpecialDaysTable::GetValues(std::vector<std::string>& values)
 {
     values.clear();
