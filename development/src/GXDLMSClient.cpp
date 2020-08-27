@@ -858,7 +858,10 @@ int CGXDLMSClient::ParseAAREResponse(CGXByteBuffer& reply)
         //Invalid DLMS version number.
         return DLMS_ERROR_CODE_INVALID_VERSION_NUMBER;
     }
-    m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() | DLMS_CONNECTION_STATE_DLMS));
+    if (m_Settings.GetAuthentication() < DLMS_AUTHENTICATION_HIGH)
+    {
+        m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() | DLMS_CONNECTION_STATE_DLMS));
+    }
     return 0;
 }
 

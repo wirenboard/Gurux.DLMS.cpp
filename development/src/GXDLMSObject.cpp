@@ -341,5 +341,5 @@ bool CGXDLMSObject::IsRead(int index)
 
 bool CGXDLMSObject::CanRead(int index)
 {
-    return GetAccess(index) != DLMS_ACCESS_MODE_NONE;
+    return (GetAccess(index) & DLMS_ACCESS_MODE_READ) != 0;
 }

@@ -79,7 +79,7 @@ int CGXCommunication::Disconnect()
             (ret = ReadDataBlock(data, reply)) != 0)
         {
             //Show error but continue close.
-            printf("DisconnectRequest failed (%d) %s.\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+            printf("DisconnectRequest failed (%d) %s.\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
         }
     }
     return 0;
@@ -97,7 +97,7 @@ int CGXCommunication::Release()
             (ret = ReadDataBlock(data, reply)) != 0)
         {
             //Show error but continue close.
-            printf("DisconnectRequest failed (%d) %s.\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+            printf("DisconnectRequest failed (%d) %s.\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
         }
     }
     return 0;
@@ -117,7 +117,7 @@ int CGXCommunication::Close()
             (ret = ReadDataBlock(data, reply)) != 0)
         {
             //Show error but continue close.
-            printf("ReleaseRequest failed (%d) %s.\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+            printf("ReleaseRequest failed (%d) %s.\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
         }
     }
     if (m_hComPort != INVALID_HANDLE_VALUE || m_socket != -1)
@@ -126,7 +126,7 @@ int CGXCommunication::Close()
             (ret = ReadDataBlock(data, reply)) != 0)
         {
             //Show error but continue close.
-            printf("DisconnectRequest failed (%d) %s.\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+            printf("DisconnectRequest failed (%d) %s.\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
         }
     }
     if (m_hComPort != INVALID_HANDLE_VALUE)
@@ -388,7 +388,7 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             {
                 if (readTime > m_WaitTime)
                 {
-                    printf("Read failed. Timeout occurred.\r\n");
+                    printf("Read failed. Timeout occurred.\n");
                     return DLMS_ERROR_CODE_RECEIVE_FAILED;
                 }
                 readTime += 100;
@@ -397,12 +397,12 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             //If connection is closed.
             else if (errno == EBADF)
             {
-                printf("Read failed. Connection closed.\r\n");
+                printf("Read failed. Connection closed.\n");
                 return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | errno;
             }
             else
             {
-                printf("Read failed. %d.\r\n", errno);
+                printf("Read failed. %d.\n", errno);
                 return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | errno;
             }
         }
@@ -500,7 +500,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         }
         else
         {
-            printf("Invalid parity :\"%s\"\r\n", tmp2.c_str());
+            printf("Invalid parity :\"%s\"\n", tmp2.c_str());
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         stopBits = atoi(tmp[2].substr(tmp[2].size() - 1, 1).c_str());
@@ -539,7 +539,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
     if (m_hComPort == INVALID_HANDLE_VALUE)
     {
         ret = WSAGetLastError();
-        printf("Failed to open serial port: \"%s\"\r\n", port.c_str());
+        printf("Failed to open serial port: \"%s\"\n", port.c_str());
         return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
     }
     dcb.DCBlength = sizeof(DCB);
@@ -576,7 +576,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
     if (m_hComPort == -1) // if open is unsuccessful.
     {
         ret = errno;
-        printf("Failed to open serial port: \"%s\"\r\n", port.c_str());
+        printf("Failed to open serial port: \"%s\"\n", port.c_str());
         return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
     }
     else
@@ -584,7 +584,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         if (!isatty(m_hComPort))
         {
             ret = errno;
-            printf("Failed to Open port. This is not a serial port.\r\n");
+            printf("Failed to Open port. This is not a serial port.\n");
             return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
         }
         memset(&options, 0, sizeof(options));
@@ -625,7 +625,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         if (tcsetattr(m_hComPort, TCSAFLUSH, &options) != 0)
         {
             ret = errno;
-            printf("Failed to Open port. tcsetattr failed.\r\n");
+            printf("Failed to Open port. tcsetattr failed.\n");
             return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
         }
     }
@@ -640,12 +640,12 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         len = (int)strlen(buff);
         if (m_Trace > GX_TRACE_LEVEL_WARNING)
         {
-            printf("\r\nTX:\t");
+            printf("\nTX:\t");
             for (pos = 0; pos != len; ++pos)
             {
                 printf("%.2X ", buff[pos]);
             }
-            printf("\r\n");
+            printf("\n");
         }
 #if defined(_WIN32) || defined(_WIN64)
         ret = WriteFile(m_hComPort, buff, len, &sendSize, &m_osWrite);
@@ -665,7 +665,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         if (ret != len)
         {
             ret = errno;
-            printf("write failed %d\r\n", ret);
+            printf("write failed %d\n", ret);
             return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
         }
 #endif
@@ -685,7 +685,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
 
         if (m_Trace > GX_TRACE_LEVEL_WARNING)
         {
-            printf("RX:\t%s\r\n", reply.ToHexString().c_str());
+            printf("RX:\t%s\n", reply.ToHexString().c_str());
         }
         if (reply.GetUInt8(&ch) != 0 || ch != '/')
         {
@@ -714,7 +714,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
             ret = write(m_hComPort, buff, len);
             if (ret != len)
             {
-                printf("write failed %d\r\n", errno);
+                printf("write failed %d\n", errno);
                 return DLMS_ERROR_CODE_SEND_FAILED;
             }
 #endif
@@ -795,12 +795,12 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         reply.Clear();
         if (m_Trace > GX_TRACE_LEVEL_WARNING)
         {
-            printf("\r\nTX: ");
+            printf("\nTX: ");
             for (pos = 0; pos != len; ++pos)
             {
                 printf("%.2X ", buff[pos]);
             }
-            printf("\r\n");
+            printf("\n");
         }
 #if defined(_WIN32) || defined(_WIN64)//Windows
         ret = WriteFile(m_hComPort, buff, len, &sendSize, &m_osWrite);
@@ -810,7 +810,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
             //If error occurs...
             if (err != ERROR_IO_PENDING)
             {
-                printf("WriteFile %d\r\n", err);
+                printf("WriteFile %d\n", err);
                 return DLMS_ERROR_CODE_SEND_FAILED;
             }
             //Wait until data is actually sent
@@ -828,7 +828,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         //Some meters need this sleep. Do not remove.
         Sleep(200);
         dcb.BaudRate = baudRate;
-        printf("New baudrate %d\r\n", (int)dcb.BaudRate);
+        printf("New baudrate %d\n", (int)dcb.BaudRate);
         dcb.ByteSize = 8;
         dcb.StopBits = ONESTOPBIT;
         dcb.Parity = NOPARITY;
@@ -849,7 +849,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         cfsetispeed(&options, baudRate);
         if (tcsetattr(m_hComPort, TCSAFLUSH, &options) != 0)
         {
-            printf("Failed to Open port. tcsetattr failed %d.\r\n", errno);
+            printf("Failed to Open port. tcsetattr failed %d.\n", errno);
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         //Some meters need this sleep. Do not remove.
@@ -870,7 +870,7 @@ int CGXCommunication::UpdateFrameCounter()
     {
         if (m_Trace > GX_TRACE_LEVEL_WARNING)
         {
-            printf("UpdateFrameCounter\r\n");
+            printf("UpdateFrameCounter\n");
         }
         m_Parser->SetProposedConformance((DLMS_CONFORMANCE)(m_Parser->GetProposedConformance() | DLMS_CONFORMANCE_GENERAL_PROTECTION));
         unsigned long add = m_Parser->GetClientAddress();
@@ -887,7 +887,7 @@ int CGXCommunication::UpdateFrameCounter()
             (ret = ReadDataBlock(data, reply)) != 0 ||
             (ret = m_Parser->ParseUAResponse(reply.GetData())) != 0)
         {
-            printf("SNRMRequest failed %d.\r\n", ret);
+            printf("SNRMRequest failed %d.\n", ret);
             return ret;
         }
         reply.Clear();
@@ -897,10 +897,10 @@ int CGXCommunication::UpdateFrameCounter()
         {
             if (ret == DLMS_ERROR_CODE_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED)
             {
-                printf("Use Logical Name referencing is wrong. Change it!\r\n");
+                printf("Use Logical Name referencing is wrong. Change it!\n");
                 return ret;
             }
-            printf("AARQRequest failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+            printf("AARQRequest failed %s\n", CGXDLMSConverter::GetErrorMessage(ret));
             return ret;
         }
         reply.Clear();
@@ -912,7 +912,7 @@ int CGXCommunication::UpdateFrameCounter()
         {
             m_Parser->GetCiphering()->SetInvocationCounter(1 + d.GetValue().ToInteger());
         }
-        printf("Invocation counter: %d\r\n", m_Parser->GetCiphering()->GetInvocationCounter());
+        printf("Invocation counter: %d\n", m_Parser->GetCiphering()->GetInvocationCounter());
         reply.Clear();
         Disconnect();
         m_Parser->SetClientAddress(add);
@@ -934,7 +934,7 @@ int CGXCommunication::InitializeConnection()
     }
     if (m_Trace > GX_TRACE_LEVEL_WARNING)
     {
-        printf("InitializeConnection\r\n");
+        printf("InitializeConnection\n");
     }
     std::vector<CGXByteBuffer> data;
     CGXReplyData reply;
@@ -943,7 +943,7 @@ int CGXCommunication::InitializeConnection()
         (ret = ReadDataBlock(data, reply)) != 0 ||
         (ret = m_Parser->ParseUAResponse(reply.GetData())) != 0)
     {
-        printf("SNRMRequest failed %d.\r\n", ret);
+        printf("SNRMRequest failed %d.\n", ret);
         return ret;
     }
     reply.Clear();
@@ -953,10 +953,10 @@ int CGXCommunication::InitializeConnection()
     {
         if (ret == DLMS_ERROR_CODE_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED)
         {
-            printf("Use Logical Name referencing is wrong. Change it!\r\n");
+            printf("Use Logical Name referencing is wrong. Change it!\n");
             return ret;
         }
-        printf("AARQRequest failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+        printf("AARQRequest failed (%d) %s\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
         return ret;
     }
     reply.Clear();
@@ -967,7 +967,7 @@ int CGXCommunication::InitializeConnection()
             (ret = ReadDataBlock(data, reply)) != 0 ||
             (ret = m_Parser->ParseApplicationAssociationResponse(reply.GetData())) != 0)
         {
-            printf("Authentication failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+            printf("Authentication failed (%d) %s\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
             return ret;
         }
     }
@@ -1038,7 +1038,7 @@ int CGXCommunication::ReadData(CGXByteBuffer& reply, std::string& str)
         if (ret = Read(0x7E, reply) != 0)
         {
             str += reply.ToHexString(pos, reply.GetSize() - pos, true);
-            printf("Read failed.\r\n%s", str.c_str());
+            printf("Read failed.\n%s", str.c_str());
             return DLMS_ERROR_CODE_RECEIVE_FAILED;
         }
         if (str.size() == 0)
@@ -1098,9 +1098,9 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
     tmp += "\t" + data.ToHexString();
     if (m_Trace > GX_TRACE_LEVEL_INFO)
     {
-        printf("%s\r\n", tmp.c_str());
+        printf("%s\n", tmp.c_str());
     }
-    GXHelpers::Write("trace.txt", tmp + "\r\n");
+    GXHelpers::Write("trace.txt", tmp + "\n");
     if ((ret = SendData(data)) != 0)
     {
         return ret;
@@ -1124,7 +1124,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
                 }
                 else
                 {
-                    printf("%s\r\n", xml.c_str());
+                    printf("%s\n", xml.c_str());
                 }
                 notify.Clear();
             }
@@ -1144,7 +1144,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             }
         }
     } while ((ret = m_Parser->GetData(bb, reply, notify)) == DLMS_ERROR_CODE_FALSE);
-    tmp += "\r\n";
+    tmp += "\n";
     if (m_Trace > GX_TRACE_LEVEL_INFO)
     {
         printf("%s", tmp.c_str());
@@ -1230,7 +1230,7 @@ int CGXCommunication::GetAssociationView()
 {
     if (m_Trace > GX_TRACE_LEVEL_WARNING)
     {
-        printf("GetAssociationView\r\n");
+        printf("GetAssociationView\n");
     }
     int ret;
     std::vector<CGXByteBuffer> data;
@@ -1239,7 +1239,7 @@ int CGXCommunication::GetAssociationView()
         (ret = ReadDataBlock(data, reply)) != 0 ||
         (ret = m_Parser->ParseObjects(reply.GetData(), true)) != 0)
     {
-        printf("GetObjects failed %d.\r\n", ret);
+        printf("GetObjects failed %d.\n", ret);
         return ret;
     }
     return DLMS_ERROR_CODE_OK;
@@ -1555,7 +1555,7 @@ int CGXCommunication::GetProfileGenericColumns()
                 }
             }
         }
-        WriteValue(m_Trace, "Profile Generic " + (*it)->GetName().ToString() + " Columns:\r\n");
+        WriteValue(m_Trace, "Profile Generic " + (*it)->GetName().ToString() + " Columns:\n");
         std::string str;
         for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it2 = pg->GetCaptureObjects().begin(); it2 != pg->GetCaptureObjects().end(); ++it2)
         {
@@ -1567,7 +1567,7 @@ int CGXCommunication::GetProfileGenericColumns()
             str.append(" ");
             str.append((*it2).first->GetDescription());
         }
-        str.append("\r\n");
+        str.append("\n");
         WriteValue(m_Trace, str);
     }
     return ret;
@@ -1591,13 +1591,13 @@ int CGXCommunication::GetReadOut()
         {
             //If interface is not implemented.
             //Example manufacturer specific interface.
-            printf("Unknown Interface: %d\r\n", (*it)->GetObjectType());
+            printf("Unknown Interface: %d\n", (*it)->GetObjectType());
             continue;
         }
 #if _MSC_VER > 1000
-        sprintf_s(buff, 200, "-------- Reading %s %s %s\r\n", CGXDLMSClient::ObjectTypeToString((*it)->GetObjectType()).c_str(), (*it)->GetName().ToString().c_str(), (*it)->GetDescription().c_str());
+        sprintf_s(buff, 200, "-------- Reading %s %s %s\n", CGXDLMSClient::ObjectTypeToString((*it)->GetObjectType()).c_str(), (*it)->GetName().ToString().c_str(), (*it)->GetDescription().c_str());
 #else
-        sprintf(buff, "-------- Reading %s %s %s\r\n", CGXDLMSClient::ObjectTypeToString((*it)->GetObjectType()).c_str(), (*it)->GetName().ToString().c_str(), (*it)->GetDescription().c_str());
+        sprintf(buff, "-------- Reading %s %s %s\n", CGXDLMSClient::ObjectTypeToString((*it)->GetObjectType()).c_str(), (*it)->GetName().ToString().c_str(), (*it)->GetDescription().c_str());
 #endif
 
         WriteValue(m_Trace, buff);
@@ -1606,26 +1606,33 @@ int CGXCommunication::GetReadOut()
         for (std::vector<int>::iterator pos = attributes.begin(); pos != attributes.end(); ++pos)
         {
             value.clear();
-            if ((ret = Read(*it, *pos, value)) != DLMS_ERROR_CODE_OK)
+            if (((*it)->GetAccess(*pos) & DLMS_ACCESS_MODE_READ) != 0)
             {
+                if ((ret = Read(*it, *pos, value)) != DLMS_ERROR_CODE_OK)
+                {
 #if _MSC_VER > 1000
-                sprintf_s(buff, 100, "Error! Index: %d %s\r\n", *pos, CGXDLMSConverter::GetErrorMessage(ret));
+                    sprintf_s(buff, 100, "Error! Index: %d %s\n", *pos, CGXDLMSConverter::GetErrorMessage(ret));
 #else
-                sprintf(buff, "Error! Index: %d read failed: %s\r\n", *pos, CGXDLMSConverter::GetErrorMessage(ret));
+                    sprintf(buff, "Error! Index: %d read failed: %s\n", *pos, CGXDLMSConverter::GetErrorMessage(ret));
 #endif
-                WriteValue(GX_TRACE_LEVEL_ERROR, buff);
-                //Continue reading.
+                    WriteValue(GX_TRACE_LEVEL_ERROR, buff);
+                    //Continue reading.
+                }
+                else
+                {
+#if _MSC_VER > 1000
+                    sprintf_s(buff, 100, "Index: %d Value: ", *pos);
+#else
+                    sprintf(buff, "Index: %d Value: ", *pos);
+#endif
+                    WriteValue(m_Trace, buff);
+                    WriteValue(m_Trace, value.c_str());
+                    WriteValue(m_Trace, "\n");
+                }
             }
             else
             {
-#if _MSC_VER > 1000
-                sprintf_s(buff, 100, "Index: %d Value: ", *pos);
-#else
-                sprintf(buff, "Index: %d Value: ", *pos);
-#endif
-                WriteValue(m_Trace, buff);
-                WriteValue(m_Trace, value.c_str());
-                WriteValue(m_Trace, "\r\n");
+                WriteValue(GX_TRACE_LEVEL_INFO, "Attribute" + GXHelpers::IntToString(*pos) + " is not readable.");
             }
         }
     }
@@ -1644,9 +1651,9 @@ int CGXCommunication::GetProfileGenerics()
     for (std::vector<CGXDLMSObject*>::iterator it = pgs.begin(); it != pgs.end(); ++it)
     {
 #if _MSC_VER > 1000
-        sprintf_s(buff, 200, "-------- Reading %s %s %s\r\n", CGXDLMSClient::ObjectTypeToString((*it)->GetObjectType()).c_str(), (*it)->GetName().ToString().c_str(), (*it)->GetDescription().c_str());
+        sprintf_s(buff, 200, "-------- Reading %s %s %s\n", CGXDLMSClient::ObjectTypeToString((*it)->GetObjectType()).c_str(), (*it)->GetName().ToString().c_str(), (*it)->GetDescription().c_str());
 #else
-        sprintf(buff, "-------- Reading %s %s %s\r\n", CGXDLMSClient::ObjectTypeToString((*it)->GetObjectType()).c_str(), (*it)->GetName().ToString().c_str(), (*it)->GetDescription().c_str());
+        sprintf(buff, "-------- Reading %s %s %s\n", CGXDLMSClient::ObjectTypeToString((*it)->GetObjectType()).c_str(), (*it)->GetName().ToString().c_str(), (*it)->GetDescription().c_str());
 #endif
 
         WriteValue(m_Trace, buff);
@@ -1654,9 +1661,9 @@ int CGXCommunication::GetProfileGenerics()
         if ((ret = Read(*it, 7, value)) != DLMS_ERROR_CODE_OK)
         {
 #if _MSC_VER > 1000
-            sprintf_s(buff, 100, "Error! Index: %d: %s\r\n", 7, CGXDLMSConverter::GetErrorMessage(ret));
+            sprintf_s(buff, 100, "Error! Index: %d: %s\n", 7, CGXDLMSConverter::GetErrorMessage(ret));
 #else
-            sprintf(buff, "Error! Index: %d: %s\r\n", 7, CGXDLMSConverter::GetErrorMessage(ret));
+            sprintf(buff, "Error! Index: %d: %s\n", 7, CGXDLMSConverter::GetErrorMessage(ret));
 #endif
             WriteValue(GX_TRACE_LEVEL_ERROR, buff);
             //Continue reading.
@@ -1666,9 +1673,9 @@ int CGXCommunication::GetProfileGenerics()
         if ((ret = Read(*it, 8, value)) != DLMS_ERROR_CODE_OK)
         {
 #if _MSC_VER > 1000
-            sprintf_s(buff, 100, "Error! Index: %d: %s\r\n", 8, CGXDLMSConverter::GetErrorMessage(ret));
+            sprintf_s(buff, 100, "Error! Index: %d: %s\n", 8, CGXDLMSConverter::GetErrorMessage(ret));
 #else
-            sprintf(buff, "Error! Index: %d: %s\r\n", 8, CGXDLMSConverter::GetErrorMessage(ret));
+            sprintf(buff, "Error! Index: %d: %s\n", 8, CGXDLMSConverter::GetErrorMessage(ret));
 #endif
             WriteValue(GX_TRACE_LEVEL_ERROR, buff);
             //Continue reading.
@@ -1678,7 +1685,7 @@ int CGXCommunication::GetProfileGenerics()
         str += entriesInUse;
         str += "/";
         str += entries;
-        str += "\r\n";
+        str += "\n";
         WriteValue(m_Trace, str);
         //If there are no columns or rows.
         if (((CGXDLMSProfileGeneric*)*it)->GetEntriesInUse() == 0 || ((CGXDLMSProfileGeneric*)*it)->GetCaptureObjects().size() == 0)
@@ -1694,7 +1701,7 @@ int CGXCommunication::GetProfileGenerics()
             {
                 str = "Error! Failed to read first row:";
                 str += CGXDLMSConverter::GetErrorMessage(ret);
-                str += "\r\n";
+                str += "\n";
                 WriteValue(GX_TRACE_LEVEL_ERROR, str);
                 //Continue reading.
             }
@@ -1716,7 +1723,7 @@ int CGXCommunication::GetProfileGenerics()
             {
                 str = "Error! Failed to read last day:";
                 str += CGXDLMSConverter::GetErrorMessage(ret);
-                str += "\r\n";
+                str += "\n";
                 WriteValue(GX_TRACE_LEVEL_ERROR, str);
                 //Continue reading.
             }
@@ -1749,27 +1756,27 @@ int CGXCommunication::ReadAll(char* outputFile)
             // Get list of objects that meter supports.
             if ((ret = GetAssociationView()) != 0)
             {
-                printf("GetAssociationView failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+                printf("GetAssociationView failed (%d) %s\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
             }
             // Read Scalers and units from the register objects.
             if (ret == 0 && (ret = ReadScalerAndUnits()) != 0)
             {
-                printf("ReadScalerAndUnits failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+                printf("ReadScalerAndUnits failed (%d) %s\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
             }
             // Read Profile Generic columns.
             if (ret == 0 && (ret = GetProfileGenericColumns()) != 0)
             {
-                printf("GetProfileGenericColumns failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+                printf("GetProfileGenericColumns failed (%d) %s\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
             }
         }
         if (ret == 0 && (ret = GetReadOut()) != 0)
         {
-            printf("GetReadOut failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+            printf("GetReadOut failed (%d) %s\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
         }
         // Read historical data.
         if (ret == 0 && (ret = GetProfileGenerics()) != 0)
         {
-            printf("GetProfileGenerics failed (%d) %s\r\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
+            printf("GetProfileGenerics failed (%d) %s\n", ret, CGXDLMSConverter::GetErrorMessage(ret));
         }
     }
     Close();

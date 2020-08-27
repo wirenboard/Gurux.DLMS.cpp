@@ -521,6 +521,8 @@ int CGXDLMSTranslator::PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& 
     case DLMS_COMMAND_DED_SET_RESPONSE:
     case DLMS_COMMAND_DED_METHOD_REQUEST:
     case DLMS_COMMAND_DED_METHOD_RESPONSE:
+    case DLMS_COMMAND_GLO_CONFIRMED_SERVICE_ERROR:
+    case DLMS_COMMAND_DED_CONFIRMED_SERVICE_ERROR:
         if (settings.GetCipher() != NULL && m_Comments)
         {
             int originalPosition = value.GetPosition();

@@ -677,8 +677,9 @@ int Cipher0(CGXDLMSLNParameters& p,
     unsigned char cmd;
     // If client.
     if (p.GetCipheredCommand() == DLMS_COMMAND_NONE) {
-        if ((p.GetSettings()->GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_PROTECTION) == 0 &&
-            (p.GetSettings()->GetPreEstablishedSystemTitle().GetSize() == 0 ||  p.GetSettings()->GetProposedConformance() & DLMS_CONFORMANCE_GENERAL_PROTECTION) == 0)
+        if (((p.GetSettings()->GetConnected() & DLMS_CONNECTION_STATE_DLMS) == 0 ||
+            (p.GetSettings()->GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_PROTECTION) == 0) &&
+            (p.GetSettings()->GetPreEstablishedSystemTitle().GetSize() == 0 || (p.GetSettings()->GetProposedConformance() & DLMS_CONFORMANCE_GENERAL_PROTECTION) == 0))
         {
             if (p.GetSettings()->GetCipher()->GetDedicatedKey().GetSize() != 0 &&
                 (p.GetSettings()->GetConnected() & DLMS_CONNECTION_STATE_DLMS) != 0)
@@ -4102,7 +4103,7 @@ int CGXDLMS::HandleExceptionResponse(CGXReplyData& data)
     {
         return ret;
     }
-    state = (DLMS_EXCEPTION_STATE_ERROR) ch;
+    state = (DLMS_EXCEPTION_STATE_ERROR)ch;
     if ((ret = data.GetData().GetUInt8(&ch)) != 0)
     {
         return ret;

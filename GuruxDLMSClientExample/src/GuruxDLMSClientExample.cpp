@@ -35,6 +35,10 @@
 // GuruxDLMSClientExample.cpp : Defines the entry point for the Gurux DLMS Client example.
 #if defined(_WIN32) || defined(_WIN64)//Windows
 #include "../include/getopt.h"
+//Windows doesn't implement strcasecmp. It uses strcmpi.
+#define strcasecmp _strcmpi
+#else
+#include <strings.h>
 #endif
 #include "../include/communication.h"
 
@@ -123,11 +127,11 @@ int main(int argc, char* argv[])
                 interfaceType = DLMS_INTERFACE_TYPE_WRAPPER;
                 break;
             case 'r':
-                if (strcmp("sn", optarg) == 0)
+                if (strcasecmp("sn", optarg) == 0)
                 {
                     useLogicalNameReferencing = false;
                 }
-                else if (strcmp("ln", optarg) == 0)
+                else if (strcasecmp("ln", optarg) == 0)
                 {
                     useLogicalNameReferencing = 1;
                 }
@@ -143,15 +147,15 @@ int main(int argc, char* argv[])
                 break;
             case 't':
                 //Trace.
-                if (strcmp("Error", optarg) == 0)
+                if (strcasecmp("Error", optarg) == 0)
                     trace = GX_TRACE_LEVEL_ERROR;
-                else  if (strcmp("Warning", optarg) == 0)
+                else  if (strcasecmp("Warning", optarg) == 0)
                     trace = GX_TRACE_LEVEL_WARNING;
-                else  if (strcmp("Info", optarg) == 0)
+                else  if (strcasecmp("Info", optarg) == 0)
                     trace = GX_TRACE_LEVEL_INFO;
-                else  if (strcmp("Verbose", optarg) == 0)
+                else  if (strcasecmp("Verbose", optarg) == 0)
                     trace = GX_TRACE_LEVEL_VERBOSE;
-                else  if (strcmp("Off", optarg) == 0)
+                else  if (strcasecmp("Off", optarg) == 0)
                     trace = GX_TRACE_LEVEL_OFF;
                 else
                 {
@@ -175,19 +179,19 @@ int main(int argc, char* argv[])
                 autoIncreaseInvokeID = true;
                 break;
             case 'C':
-                if (strcmp("None", optarg) == 0)
+                if (strcasecmp("None", optarg) == 0)
                 {
                     security = DLMS_SECURITY_NONE;
                 }
-                else if (strcmp("Authentication", optarg) == 0)
+                else if (strcasecmp("Authentication", optarg) == 0)
                 {
                     security = DLMS_SECURITY_AUTHENTICATION;
                 }
-                else if (strcmp("Encryption", optarg) == 0)
+                else if (strcasecmp("Encryption", optarg) == 0)
                 {
                     security = DLMS_SECURITY_ENCRYPTION;
                 }
-                else if (strcmp("AuthenticationEncryption", optarg) == 0)
+                else if (strcasecmp("AuthenticationEncryption", optarg) == 0)
                 {
                     security = DLMS_SECURITY_AUTHENTICATION_ENCRYPTION;
                 }
@@ -249,31 +253,31 @@ int main(int argc, char* argv[])
                 serialPort = optarg;
                 break;
             case 'a':
-                if (strcmp("None", optarg) == 0)
+                if (strcasecmp("None", optarg) == 0)
                 {
                     authentication = DLMS_AUTHENTICATION_NONE;
                 }
-                else if (strcmp("Low", optarg) == 0)
+                else if (strcasecmp("Low", optarg) == 0)
                 {
                     authentication = DLMS_AUTHENTICATION_LOW;
                 }
-                else if (strcmp("High", optarg) == 0)
+                else if (strcasecmp("High", optarg) == 0)
                 {
                     authentication = DLMS_AUTHENTICATION_HIGH;
                 }
-                else if (strcmp("HighMd5", optarg) == 0)
+                else if (strcasecmp("HighMd5", optarg) == 0)
                 {
                     authentication = DLMS_AUTHENTICATION_HIGH_MD5;
                 }
-                else if (strcmp("HighSha1", optarg) == 0)
+                else if (strcasecmp("HighSha1", optarg) == 0)
                 {
                     authentication = DLMS_AUTHENTICATION_HIGH_SHA1;
                 }
-                else if (strcmp("HighGmac", optarg) == 0)
+                else if (strcasecmp("HighGmac", optarg) == 0)
                 {
                     authentication = DLMS_AUTHENTICATION_HIGH_GMAC;
                 }
-                else if (strcmp("HighSha256", optarg) == 0)
+                else if (strcasecmp("HighSha256", optarg) == 0)
                 {
                     authentication = DLMS_AUTHENTICATION_HIGH_SHA256;
                 }

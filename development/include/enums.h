@@ -1105,6 +1105,12 @@ typedef enum
      * Glo write response.
      */
     DLMS_COMMAND_GLO_WRITE_RESPONSE = 45,
+
+    /*
+    * GLO confirmed service error.
+    */
+    DLMS_COMMAND_GLO_CONFIRMED_SERVICE_ERROR = 46,
+
     /*
     * General GLO ciphering.
     */
@@ -1180,6 +1186,11 @@ typedef enum
     * Ded write response.
     */
     DLMS_COMMAND_DED_WRITE_RESPONSE = 77,
+
+    /*
+    * Ded confirmed service error.
+    */
+    DLMS_COMMAND_DED_CONFIRMED_SERVICE_ERROR = 78,
 
     /*
     * Request message from client to gateway.
