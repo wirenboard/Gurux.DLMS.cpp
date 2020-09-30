@@ -1884,7 +1884,8 @@ int CGXDLMSClient::ReadRowsByRange(
         std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> kv = pg->GetCaptureObjects()[0];
         type = kv.first->GetObjectType();
         pLn = kv.first->m_LN;
-        unixTime = type == DLMS_OBJECT_TYPE_DATA;
+        unsigned char UNIX_LN[] = { 0, 0, 1, 1, 0, 255 };
+        unixTime = type == DLMS_OBJECT_TYPE_DATA && memcmp(pLn, UNIX_LN, 6) == 0;
     }
     pg->Reset();
     m_Settings.ResetBlockIndex();

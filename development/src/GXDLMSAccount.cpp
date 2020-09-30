@@ -328,9 +328,9 @@ int CGXDLMSAccount::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         bb.SetUInt8(2);
         bb.SetUInt8(DLMS_DATA_TYPE_ENUM);
-        bb.SetUInt8(m_AccountStatus);
-        bb.SetUInt8(DLMS_DATA_TYPE_ENUM);
         bb.SetUInt8(m_PaymentMode);
+        bb.SetUInt8(DLMS_DATA_TYPE_ENUM);
+        bb.SetUInt8(m_AccountStatus);
         e.SetValue(bb);
         break;
     case 3:
@@ -531,8 +531,8 @@ int CGXDLMSAccount::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
         return SetLogicalName(this, e.GetValue());
         break;
     case 2:
-        m_AccountStatus = (DLMS_ACCOUNT_STATUS)e.GetValue().Arr[0].ToInteger();
-        m_PaymentMode = (DLMS_ACCOUNT_PAYMENT_MODE)e.GetValue().Arr[1].ToInteger();
+        m_PaymentMode = (DLMS_ACCOUNT_PAYMENT_MODE)e.GetValue().Arr[0].ToInteger();
+        m_AccountStatus = (DLMS_ACCOUNT_STATUS)e.GetValue().Arr[1].ToInteger();
         break;
     case 3:
         m_CurrentCreditInUse = e.GetValue().ToInteger();
