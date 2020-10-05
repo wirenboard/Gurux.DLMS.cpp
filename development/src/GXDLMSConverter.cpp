@@ -34,9 +34,21 @@
 
 #include "../include/GXDLMSConverter.h"
 #include "../include/errorcodes.h"
+#include "../include/OBiscodes.h"
+#include "../include/GXStandardObisCodeCollection.h"
+
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
 #endif //defined(_WIN32) || defined(_WIN64)
+
+CGXDLMSConverter::~CGXDLMSConverter()
+{
+    for (std::vector<CGXStandardObisCode*>::iterator it = m_Codes.begin(); it != m_Codes.end(); ++it)
+    {
+        delete* it;
+    }
+    m_Codes.clear();
+}
 
 const char* CGXDLMSConverter::GetErrorMessage(int error)
 {
@@ -1390,4 +1402,159 @@ DLMS_OBJECT_TYPE CGXDLMSConverter::ValueOfObjectType(const char* value)
     else
         type = DLMS_OBJECT_TYPE_NONE;
     return type;
+}
+
+void CGXDLMSConverter::UpdateObisCodes()
+{
+    if (m_Codes.empty())
+    {
+        std::stringstream sb;
+        sb << OBIS_CODES1;
+        sb << OBIS_CODES2;
+        sb << OBIS_CODES3;
+        sb << OBIS_CODES4;
+        sb << OBIS_CODES5;
+        sb << OBIS_CODES6;
+        sb << OBIS_CODES7;
+        sb << OBIS_CODES8;
+        sb << OBIS_CODES9;
+        sb << OBIS_CODES10;
+        sb << OBIS_CODES11;
+        std::string str = sb.str();
+        std::vector< std::string > rows = GXHelpers::Split(str, "\r\n", true);
+        int row = 0;
+        std::string last;
+        for (std::vector< std::string >::iterator it = rows.begin(); it != rows.end(); ++it)
+        {
+            std::vector< std::string > items = GXHelpers::Split(*it, ";\r\n", false);
+            if (items.size() != 8)
+            {
+                items = GXHelpers::Split(*it, ";\r\n", false);
+            }
+            assert(items.size() == 8);
+            std::vector< std::string > obis = GXHelpers::Split(items[0], ".\r\n", false);
+            if (obis.size() != 6)
+            {
+                obis = GXHelpers::Split(items[0], ".\r\n", false);
+            }
+            std::string str = items[3] + "; " + items[4] + "; " + items[5] + "; " + items[6] + "; " + items[7];
+            m_Codes.push_back(new CGXStandardObisCode(obis, str, items[1], items[2]));
+            ++row;
+            last = *it;
+        }
+    }
+}
+
+void CGXDLMSConverter::GetDescription(std::string& logicalName, DLMS_OBJECT_TYPE type, std::vector< std::string >& descriptions)
+{
+    UpdateObisCodes();
+    std::vector<CGXStandardObisCode*> list;
+    m_Codes.Find(logicalName, type, list);
+    for (std::vector<CGXStandardObisCode*>::iterator it = list.begin(); it != list.end(); ++it)
+    {
+        descriptions.push_back((*it)->GetDescription());
+        delete* it;
+    }
+    list.clear();
+}
+
+void CGXDLMSConverter::UpdateOBISCodeInformation(CGXDLMSObjectCollection& objects)
+{
+    UpdateObisCodes();
+    for (std::vector<CGXDLMSObject*>::iterator it = objects.begin(); it != objects.end(); ++it)
+    {
+        std::string ln;
+        (*it)->GetLogicalName(ln);
+        std::vector<CGXStandardObisCode*> list;
+        m_Codes.Find(ln, (*it)->GetObjectType(), list);
+        CGXStandardObisCode* code = list.at(0);
+        (*it)->SetDescription(code->GetDescription());
+        //If std::string is used
+        if (code->GetDataType().find("10") != std::string::npos)
+        {
+            code->SetUIDataType("10");
+        }
+        //If date time is used.
+        else if (code->GetDataType().find("25") != std::string::npos ||
+            code->GetDataType().find("26") != std::string::npos)
+        {
+            code->SetUIDataType("25");
+        }
+        else if (code->GetDataType().find("9"))
+        {
+            //Time stamps of the billing periods objects (first scheme if there are two)
+            if ((CGXStandardObisCodeCollection::EqualsMask("0.0-64.96.7.10-14.255", ln) ||
+                //Time stamps of the billing periods objects (second scheme)
+                CGXStandardObisCodeCollection::EqualsMask("0.0-64.0.1.5.0-99,255", ln) ||
+                //Time of power failure
+                CGXStandardObisCodeCollection::EqualsMask("0.0-64.0.1.2.0-99,255", ln) ||
+                //Time stamps of the billing periods objects (first scheme if there are two)
+                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.1.2.0-99,255", ln) ||
+                //Time stamps of the billing periods objects (second scheme)
+                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.1.5.0-99,255", ln) ||
+                //Time expired since last end of billing period
+                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.0.255", ln) ||
+                //Time of last reset
+                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.6.255", ln) ||
+                //Date of last reset
+                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.7.255", ln) ||
+                //Time expired since last end of billing period (Second billing period scheme)
+                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.13.255", ln) ||
+                //Time of last reset (Second billing period scheme)
+                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.14.255", ln) ||
+                //Date of last reset (Second billing period scheme)
+                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.15.255", ln)))
+            {
+                code->SetUIDataType("25");
+            }
+            //Local time
+            else if (CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.1.255", ln))
+            {
+                code->SetUIDataType("27");
+            }
+            //Local date
+            else if (CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.2.255", ln))
+            {
+                code->SetUIDataType("26");
+            }
+            //Active firmware identifier
+            else if (CGXStandardObisCodeCollection::EqualsMask("1.0.0.2.0.255", ln))
+            {
+                code->SetUIDataType("10");
+            }
+        }
+        //Unix time
+        else if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_DATA && CGXStandardObisCodeCollection::EqualsMask("0.0.1.1.0.255", ln))
+        {
+            code->SetUIDataType("25");
+        }
+        if (code->GetDataType() != "*" &&
+            code->GetDataType() != "" &&
+            code->GetDataType().find(",") == std::string::npos)
+        {
+            int value;
+#if _MSC_VER > 1000
+            sscanf_s(code->GetDataType().c_str(), "%d", &value);
+#else
+            sscanf(code->GetDataType().c_str(), "%d", &value);
+#endif
+            DLMS_DATA_TYPE type = (DLMS_DATA_TYPE)value;
+            switch ((*it)->GetObjectType())
+            {
+            case DLMS_OBJECT_TYPE_DATA:
+            case DLMS_OBJECT_TYPE_REGISTER:
+            case DLMS_OBJECT_TYPE_REGISTER_ACTIVATION:
+            case DLMS_OBJECT_TYPE_EXTENDED_REGISTER:
+                (*it)->SetUIDataType(2, type);
+                break;
+            default:
+                break;
+            }
+        }
+        for (std::vector<CGXStandardObisCode*>::iterator it = list.begin(); it != list.end(); ++it)
+        {
+            delete* it;
+        }
+        list.clear();
+    }
 }

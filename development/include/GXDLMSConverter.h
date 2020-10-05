@@ -36,11 +36,16 @@
 #define GXDLMSCONVERTER_H
 
 #include "enums.h"
+#include "GXStandardObisCodeCollection.h"
+#include "GXDLMSObjectCollection.h"
 
 //This class is used to convert enum and error values to std::string.
 class CGXDLMSConverter
 {
+    CGXStandardObisCodeCollection m_Codes;
+    void UpdateObisCodes();
 public:
+    ~CGXDLMSConverter();
     //Get Unit as String.
     static const char* GetUnitAsString(int unit);
     //Get baudrate enum balue as std::string.
@@ -114,5 +119,11 @@ public:
     static const char* ToString(DLMS_OBJECT_TYPE type);
 
     static DLMS_OBJECT_TYPE ValueOfObjectType(const char* value);
+
+    // Get OBIS code description.
+    void GetDescription(std::string& logicalName, DLMS_OBJECT_TYPE type, std::vector< std::string >& descriptions);
+
+    // Update standard OBIS codes descriptions and type if defined.
+    void UpdateOBISCodeInformation(CGXDLMSObjectCollection& objects);
 };
 #endif //GXDLMSCONVERTER_H

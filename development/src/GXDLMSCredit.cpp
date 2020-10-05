@@ -34,6 +34,7 @@
 
 #include "../include/GXDLMSCredit.h"
 #include "../include/GXBitString.h"
+#include "../include/GXDLMSClient.h"
 
 //Constructor.
 CGXDLMSCredit::CGXDLMSCredit() :
@@ -83,6 +84,48 @@ void CGXDLMSCredit::GetValues(std::vector<std::string>& values)
     values.push_back(GXHelpers::IntToString(m_PresetCreditAmount));
     values.push_back(GXHelpers::IntToString(m_CreditAvailableThreshold));
     values.push_back(m_Period.ToString());
+}
+
+int CGXDLMSCredit::UpdateAmount(CGXDLMSClient* client, uint32_t value, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data(value);
+    return client->Method(this, 1, data, reply);
+}
+
+int CGXDLMSCredit::SetAmountToValue(CGXDLMSClient* client, uint32_t value, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data(value);
+    return client->Method(this, 2, data, reply);
+}
+
+int CGXDLMSCredit::InvokeCredit(CGXDLMSClient* client, DLMS_CREDIT_STATUS value, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data(value);
+    return client->Method(this, 3, data, reply);
+}
+
+int CGXDLMSCredit::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
+{
+    if (e.GetIndex() == 1)
+    {
+        m_CurrentCreditAmount += e.GetValue().ToInteger();
+    }
+    else if (e.GetIndex() == 2)
+    {
+        m_CurrentCreditAmount = e.GetValue().ToInteger();
+    }
+    else if (e.GetIndex() == 3)
+    {
+        if ((m_CreditConfiguration & DLMS_CREDIT_CONFIGURATION_CONFIRMATION) != 0 && m_Status == DLMS_CREDIT_STATUS_SELECTABLE)
+        {
+            m_Status = DLMS_CREDIT_STATUS_INVOKED;
+        }
+    }
+    else
+    {
+        e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+    }
+    return DLMS_ERROR_CODE_OK;
 }
 
 void CGXDLMSCredit::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)

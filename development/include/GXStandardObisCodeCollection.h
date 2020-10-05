@@ -42,10 +42,10 @@
 /////////////////////////////////////////////////////////////////////////////
 // Obis Code Collection is used to save all default OBIS Codes.
 /////////////////////////////////////////////////////////////////////////////
-class CGXStandardObisCodeCollection : public std::vector<CGXStandardObisCode>
+class CGXStandardObisCodeCollection : public std::vector<CGXStandardObisCode*>
 {
     //Convert logican name std::string to bytes.
-    static int GetUInt8(std::string ln, unsigned char* bytes);
+    static int GetBytes(std::string ln, unsigned char* bytes);
 
     // Check is interface included to standard.
     bool EqualsInterface(CGXStandardObisCode item, int ic);
@@ -60,11 +60,11 @@ class CGXStandardObisCodeCollection : public std::vector<CGXStandardObisCode>
     std::string GetDescription(std::string& str);
 
 public:
-    bool Find(std::string ln, DLMS_OBJECT_TYPE objectType, CGXStandardObisCode& item);
+    int Find(std::string ln, DLMS_OBJECT_TYPE objectType, std::vector<CGXStandardObisCode*>& list);
 
     static bool EqualsMask(std::string obisMask, std::string ln);
 
     // Find Standard OBIS Code description.
-    bool Find(unsigned char* pObisCode, int IC, CGXStandardObisCode& tmp);
+    void Find(unsigned char* pObisCode, int IC, std::vector<CGXStandardObisCode*>& list);
 };
 #endif //GXSTANDARDOBISCODECOLLECTION_H

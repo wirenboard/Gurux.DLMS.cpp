@@ -36,7 +36,6 @@
 #define GXDLMSCLIENT_H
 
 #include "GXDLMS.h"
-#include "GXStandardObisCodeCollection.h"
 #include "GXDLMSProfileGeneric.h"
 #include "GXSecure.h"
 #include "GXDateTime.h"
@@ -50,7 +49,6 @@ private:
     // If protected release is used release is including a ciphered xDLMS Initiate request.
     bool m_UseProtectedRelease;
     bool m_IsAuthenticationRequired;
-    static void UpdateOBISCodes(CGXDLMSObjectCollection& objects);
     // SN referencing
     int ParseSNObjects(
         CGXByteBuffer& buff,

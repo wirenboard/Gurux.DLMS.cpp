@@ -33,7 +33,7 @@
 //---------------------------------------------------------------------------
 #include "../include/GXStandardObisCodeCollection.h"
 
-int CGXStandardObisCodeCollection::GetUInt8(std::string ln, unsigned char* bytes)
+int CGXStandardObisCodeCollection::GetBytes(std::string ln, unsigned char* bytes)
 {
     std::vector< std::string > tmp = GXHelpers::Split(ln, '.');
     if (tmp.size() != 6)
@@ -399,20 +399,22 @@ std::string CGXStandardObisCodeCollection::GetDescription(std::string& str)
 }
 
 
-bool CGXStandardObisCodeCollection::Find(std::string ln, DLMS_OBJECT_TYPE objectType, CGXStandardObisCode& item)
+int CGXStandardObisCodeCollection::Find(std::string ln, DLMS_OBJECT_TYPE objectType, std::vector<CGXStandardObisCode*>& list)
 {
+    int ret;
     unsigned char bytes[6];
-    if (GetUInt8(ln, bytes) != DLMS_ERROR_CODE_OK)
+    if ((ret = GetBytes(ln, bytes)) != DLMS_ERROR_CODE_OK)
     {
-        return NULL;
+        return ret;
     }
-    return Find(bytes, objectType, item);
+    Find(bytes, objectType, list);
+    return 0;
 }
 
 bool CGXStandardObisCodeCollection::EqualsMask(std::string obisMask, std::string ln)
 {
     unsigned char bytes[6];
-    if (GetUInt8(ln, bytes) != DLMS_ERROR_CODE_OK)
+    if (GetBytes(ln, bytes) != DLMS_ERROR_CODE_OK)
     {
         return NULL;
     }
@@ -421,19 +423,21 @@ bool CGXStandardObisCodeCollection::EqualsMask(std::string obisMask, std::string
 }
 
 // Find Standard OBIS Code description.
-bool CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, CGXStandardObisCode& tmp)
+void CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, std::vector<CGXStandardObisCode*>& list)
 {
     char buff[6];
-    for (std::vector<CGXStandardObisCode>::iterator it = this->begin(); it != this->end(); ++it)
+    for (std::vector<CGXStandardObisCode*>::iterator it = this->begin(); it != this->end(); ++it)
     {
         //Interface is tested first because it's faster.
-        if (EqualsInterface(*it, IC) && EqualsObisCode((*it).GetOBIS(), pObisCode))
+        if (EqualsInterface(*(*it), IC) && EqualsObisCode((*it)->GetOBIS(), pObisCode))
         {
-            tmp.SetOBIS((*it).GetOBIS());
-            tmp.SetDescription((*it).GetDescription());
-            tmp.SetInterfaces((*it).GetInterfaces());
-            tmp.SetDataType((*it).GetDataType());
-            std::vector< std::string > tmp2 = GXHelpers::Split((*it).GetDescription(), ';');
+            CGXStandardObisCode* obj = new CGXStandardObisCode();
+            obj->SetOBIS((*it)->GetOBIS());
+            obj->SetDescription((*it)->GetDescription());
+            obj->SetInterfaces((*it)->GetInterfaces());
+            obj->SetDataType((*it)->GetDataType());
+            obj->SetUIDataType((*it)->GetUIDataType());
+            std::vector< std::string > tmp2 = GXHelpers::Split((*it)->GetDescription(), ';');
             if (tmp2.size() > 1)
             {
                 std::string desc = GetDescription(tmp2[1]);
@@ -449,10 +453,10 @@ bool CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, CGXSt
                         }
                         builder.append(*s);
                     }
-                    tmp.SetDescription(builder);
+                    obj->SetDescription(builder);
                 }
             }
-            std::vector< std::string > obis = tmp.GetOBIS();
+            std::vector< std::string > obis = obj->GetOBIS();
 #if _MSC_VER > 1000
             sprintf_s(buff, 6, "%d", pObisCode[0]);
 #else
@@ -494,8 +498,8 @@ bool CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, CGXSt
 #endif
 
             obis[5] = buff;
-            tmp.SetOBIS(obis);
-            std::string desc = tmp.GetDescription();
+            obj->SetOBIS(obis);
+            std::string desc = obj->GetDescription();
 #if _MSC_VER > 1000
             sprintf_s(buff, 6, "%d", pObisCode[0]);
 #else
@@ -589,59 +593,61 @@ bool CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, CGXSt
             GXHelpers::Replace(desc, ";", " ");
             GXHelpers::Replace(desc, "  ", " ");
             GXHelpers::rtrim(desc);
-            tmp.SetDescription(desc);
-            return true;
+            obj->SetDescription(desc);
+            list.push_back(obj);
         }
     }
-    tmp.SetDescription("Manufacturer specific");
+    //If invalid OBIS code.
+    if (list.size() == 0)
+    {
+        CGXStandardObisCode* obj = new CGXStandardObisCode();
+        std::string desc = "Invalid";
+        obj->SetDescription(desc);
 #if _MSC_VER > 1000
-    sprintf_s(buff, 6, "%d", IC);
+        sprintf_s(buff, 6, "%d", IC);
 #else
-    sprintf(buff, "%d", IC);
+        sprintf(buff, "%d", IC);
 #endif
-    tmp.SetInterfaces(buff);
-    tmp.SetDataType("");
-    std::vector <std::string > obis;
-    //Pois
+        std::string str = buff;
+        obj->SetInterfaces(str);
+        std::vector <std::string > obis;
 #if _MSC_VER > 1000
-    sprintf_s(buff, 6, "%d", pObisCode[0]);
+        sprintf_s(buff, 6, "%d", pObisCode[0]);
 #else
-    sprintf(buff, "%d", pObisCode[0]);
+        sprintf(buff, "%d", pObisCode[0]);
 #endif
-    obis.push_back(buff);
+        obis.push_back(buff);
 #if _MSC_VER > 1000
-    sprintf_s(buff, 6, "%d", pObisCode[1]);
+        sprintf_s(buff, 6, "%d", pObisCode[1]);
 #else
-    sprintf(buff, "%d", pObisCode[1]);
+        sprintf(buff, "%d", pObisCode[1]);
 #endif
-    obis.push_back(buff);
+        obis.push_back(buff);
 #if _MSC_VER > 1000
-    sprintf_s(buff, 6, "%d", pObisCode[2]);
+        sprintf_s(buff, 6, "%d", pObisCode[2]);
 #else
-    sprintf(buff, "%d", pObisCode[2]);
+        sprintf(buff, "%d", pObisCode[2]);
 #endif
-
-    obis.push_back(buff);
+        obis.push_back(buff);
 #if _MSC_VER > 1000
-    sprintf_s(buff, 6, "%d", pObisCode[3]);
+        sprintf_s(buff, 6, "%d", pObisCode[3]);
 #else
-    sprintf(buff, "%d", pObisCode[3]);
+        sprintf(buff, "%d", pObisCode[3]);
 #endif
-    obis.push_back(buff);
+        obis.push_back(buff);
 #if _MSC_VER > 1000
-    sprintf_s(buff, 6, "%d", pObisCode[4]);
+        sprintf_s(buff, 6, "%d", pObisCode[4]);
 #else
-    sprintf(buff, "%d", pObisCode[4]);
+        sprintf(buff, "%d", pObisCode[4]);
 #endif
-
-    obis.push_back(buff);
+        obis.push_back(buff);
 #if _MSC_VER > 1000
-    sprintf_s(buff, 6, "%d", pObisCode[5]);
+        sprintf_s(buff, 6, "%d", pObisCode[5]);
 #else
-    sprintf(buff, "%d", pObisCode[5]);
+        sprintf(buff, "%d", pObisCode[5]);
 #endif
-
-    obis.push_back(buff);
-    tmp.SetOBIS(obis);
-    return true;
+        obis.push_back(buff);
+        obj->SetOBIS(obis);
+        list.push_back(obj);
+    }
 }

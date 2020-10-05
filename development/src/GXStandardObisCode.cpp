@@ -63,7 +63,7 @@ std::string& CGXStandardObisCode::GetDescription()
 {
     return m_Description;
 }
-void CGXStandardObisCode::SetDescription(std::string value)
+void CGXStandardObisCode::SetDescription(std::string& value)
 {
     m_Description = value;
 }
@@ -75,14 +75,11 @@ std::string& CGXStandardObisCode::GetInterfaces()
 {
     return m_Interfaces;
 }
-void CGXStandardObisCode::SetInterfaces(std::string value)
+void CGXStandardObisCode::SetInterfaces(std::string& value)
 {
     m_Interfaces = value;
 }
 
-/**
- Standard data types.
-*/
 std::string& CGXStandardObisCode::GetDataType()
 {
     return m_DataType;
@@ -91,4 +88,14 @@ std::string& CGXStandardObisCode::GetDataType()
 void CGXStandardObisCode::SetDataType(std::string value)
 {
     m_DataType = value;
+}
+
+std::string& CGXStandardObisCode::GetUIDataType()
+{
+    return m_UIDataType;
+}
+
+void CGXStandardObisCode::SetUIDataType(std::string value)
+{
+    m_UIDataType = value;
 }

@@ -239,6 +239,16 @@ public:
         m_Period = value;
     }
 
+    //Adjusts the value of the current credit amount attribute.
+    int UpdateAmount(CGXDLMSClient* client, uint32_t value, std::vector<CGXByteBuffer>& reply);
+
+    //Sets the value of the current credit amount attribute.
+    int SetAmountToValue(CGXDLMSClient* client, uint32_t value, std::vector<CGXByteBuffer>& reply);
+
+    //Sets the value of the current credit amount attribute.
+    int InvokeCredit(CGXDLMSClient* client, DLMS_CREDIT_STATUS value, std::vector<CGXByteBuffer>& reply);
+
+    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 
     // Returns amount of attributes.
     int GetAttributeCount();
