@@ -84,7 +84,7 @@ int CGXStandardObisCodeCollection::GetBytes(std::string ln, unsigned char* bytes
 bool CGXStandardObisCodeCollection::EqualsInterface(CGXStandardObisCode item, int ic)
 {
     //If all interfaces are allowed.
-    if (item.GetInterfaces() == "*")
+    if (ic == 0 || item.GetInterfaces() == "*")
     {
         return true;
     }
@@ -106,7 +106,7 @@ bool CGXStandardObisCodeCollection::EqualsInterface(CGXStandardObisCode item, in
 }
 
 // Check OBIS codes.
-bool CGXStandardObisCodeCollection::EqualsMask(std::string obis, int ic)
+bool CGXStandardObisCodeCollection::EqualsMask(std::string& obis, int ic)
 {
     bool number = true;
     int value;
@@ -212,190 +212,284 @@ std::string CGXStandardObisCodeCollection::GetDescription(std::string& str)
 #else
     sscanf(str.substr(1).c_str(), "%d", &value);
 #endif
+    const char* tmp;
     switch (value)
     {
     case 1:
-        return "Sum Li Active power+ (QI+QIV)";
+        tmp = "Sum Li Active power+ (QI+QIV)";
+        break;
     case 2:
-        return "Sum Li Active power- (QII+QIII)";
+        tmp = "Sum Li Active power- (QII+QIII)";
+        break;
     case 3:
-        return "Sum Li Reactive power+ (QI+QII)";
+        tmp = "Sum Li Reactive power+ (QI+QII)";
+        break;
     case 4:
-        return "Sum Li Reactive power- (QIII+QIV)";
+        tmp = "Sum Li Reactive power- (QIII+QIV)";
+        break;
     case 5:
-        return "Sum Li Reactive power QI";
+        tmp = "Sum Li Reactive power QI";
+        break;
     case 6:
-        return "Sum Li Reactive power QII";
+        tmp = "Sum Li Reactive power QII";
+        break;
     case 7:
-        return "Sum Li Reactive power QIII";
+        tmp = "Sum Li Reactive power QIII";
+        break;
     case 8:
-        return "Sum Li Reactive power QIV";
+        tmp = "Sum Li Reactive power QIV";
+        break;
     case 9:
-        return "Sum Li Apparent power+ (QI+QIV)";
+        tmp = "Sum Li Apparent power+ (QI+QIV)";
+        break;
     case 10:
-        return "Sum Li Apparent power- (QII+QIII)";
+        tmp = "Sum Li Apparent power- (QII+QIII)";
+        break;
     case 11:
-        return "Current: any phase";
+        tmp = "Current: any phase";
+        break;
     case 12:
-        return "Voltage: any phase";
+        tmp = "Voltage: any phase";
+        break;
     case 13:
-        return "Sum Li Power factor";
+        tmp = "Sum Li Power factor";
+        break;
     case 14:
-        return "Supply frequency";
+        tmp = "Supply frequency";
+        break;
     case 15:
-        return "Sum LI Active power (abs(QI+QIV)+abs(QII+QIII))";
+        tmp = "Sum Li Active power (abs(QI+QIV)+abs(QII+QIII))";
+        break;
     case 16:
-        return "Sum LI Active power        (abs(QI+QIV)-abs(QII+QIII))";
+        tmp = "Sum Li Active power (abs(QI+QIV)-abs(QII+QIII))";
+        break;
     case 17:
-        return "Sum Li Active power QI";
+        tmp = "Sum Li Active power QI";
+        break;
     case 18:
-        return "Sum Li Active power QII";
+        tmp = "Sum Li Active power QII";
+        break;
     case 19:
-        return "Sum Li Active power QIII";
+        tmp = "Sum Li Active power QIII";
+        break;
     case 20:
-        return "Sum Li Active power QIV";
+        tmp = "Sum Li Active power QIV";
+        break;
     case 21:
-        return "L1 Active power+ (QI+QIV)";
+        tmp = "L1 Active power+ (QI+QIV)";
+        break;
     case 22:
-        return "L1 Active power- (QII+QIII)";
+        tmp = "L1 Active power- (QII+QIII)";
+        break;
     case 23:
-        return "L1 Reactive power+ (QI+QII)";
+        tmp = "L1 Reactive power+ (QI+QII)";
+        break;
     case 24:
-        return "L1 Reactive power- (QIII+QIV)";
+        tmp = "L1 Reactive power- (QIII+QIV)";
+        break;
     case 25:
-        return "L1 Reactive power QI";
+        tmp = "L1 Reactive power QI";
+        break;
     case 26:
-        return "L1 Reactive power QII";
+        tmp = "L1 Reactive power QII";
+        break;
     case 27:
-        return "L1 Reactive power QIII";
+        tmp = "L1 Reactive power QIII";
+        break;
     case 28:
-        return "L1 Reactive power QIV";
+        tmp = "L1 Reactive power QIV";
+        break;
     case 29:
-        return "L1 Apparent power+ (QI+QIV)";
+        tmp = "L1 Apparent power+ (QI+QIV)";
+        break;
     case 30:
-        return "L1 Apparent power- (QII+QIII)";
+        tmp = "L1 Apparent power- (QII+QIII)";
+        break;
     case 31:
-        return "L1 Current";
+        tmp = "L1 Current";
+        break;
     case 32:
-        return "L1 Voltage";
+        tmp = "L1 Voltage";
+        break;
     case 33:
-        return "L1 Power factor";
+        tmp = "L1 Power factor";
+        break;
     case 34:
-        return "L1 Supply frequency";
+        tmp = "L1 Supply frequency";
+        break;
     case 35:
-        return "L1 Active power (abs(QI+QIV)+abs(QII+QIII))";
+        tmp = "L1 Active power (abs(QI+QIV)+abs(QII+QIII))";
+        break;
     case 36:
-        return "L1 Active power (abs(QI+QIV)-abs(QII+QIII))";
+        tmp = "L1 Active power (abs(QI+QIV)-abs(QII+QIII))";
+        break;
     case 37:
-        return "L1 Active power QI";
+        tmp = "L1 Active power QI";
+        break;
     case 38:
-        return "L1 Active power QII";
+        tmp = "L1 Active power QII";
+        break;
     case 39:
-        return "L1 Active power QIII";
+        tmp = "L1 Active power QIII";
+        break;
     case 40:
-        return "L1 Active power QIV";
+        tmp = "L1 Active power QIV";
+        break;
     case 41:
-        return "L2 Active power+ (QI+QIV)";
+        tmp = "L2 Active power+ (QI+QIV)";
+        break;
     case 42:
-        return "L2 Active power- (QII+QIII)";
+        tmp = "L2 Active power- (QII+QIII)";
+        break;
     case 43:
-        return "L2 Reactive power+ (QI+QII)";
+        tmp = "L2 Reactive power+ (QI+QII)";
+        break;
     case 44:
-        return "L2 Reactive power- (QIII+QIV)";
+        tmp = "L2 Reactive power- (QIII+QIV)";
+        break;
     case 45:
-        return "L2 Reactive power QI";
+        tmp = "L2 Reactive power QI";
+        break;
     case 46:
-        return "L2 Reactive power QII";
+        tmp = "L2 Reactive power QII";
+        break;
     case 47:
-        return "L2 Reactive power QIII";
+        tmp = "L2 Reactive power QIII";
+        break;
     case 48:
-        return "L2 Reactive power QIV";
+        tmp = "L2 Reactive power QIV";
+        break;
     case 49:
-        return "L2 Apparent power+ (QI+QIV)";
+        tmp = "L2 Apparent power+ (QI+QIV)";
+        break;
     case 50:
-        return "L2 Apparent power- (QII+QIII)";
+        tmp = "L2 Apparent power- (QII+QIII)";
+        break;
     case 51:
-        return "L2 Current";
+        tmp = "L2 Current";
+        break;
     case 52:
-        return "L2 Voltage";
+        tmp = "L2 Voltage";
+        break;
     case 53:
-        return "L2 Power factor";
+        tmp = "L2 Power factor";
+        break;
     case 54:
-        return "L2 Supply frequency";
+        tmp = "L2 Supply frequency";
+        break;
     case 55:
-        return "L2 Active power (abs(QI+QIV)+abs(QII+QIII))";
+        tmp = "L2 Active power (abs(QI+QIV)+abs(QII+QIII))";
+        break;
     case 56:
-        return "L2 Active power (abs(QI+QIV)-abs(QI+QIII))";
+        tmp = "L2 Active power (abs(QI+QIV)-abs(QI+QIII))";
+        break;
     case 57:
-        return "L2 Active power QI";
+        tmp = "L2 Active power QI";
+        break;
     case 58:
-        return "L2 Active power QII";
+        tmp = "L2 Active power QII";
+        break;
     case 59:
-        return "L2 Active power QIII";
+        tmp = "L2 Active power QIII";
+        break;
     case 60:
-        return "L2 Active power QIV";
+        tmp = "L2 Active power QIV";
+        break;
     case 61:
-        return "L3 Active power+ (QI+QIV)";
+        tmp = "L3 Active power+ (QI+QIV)";
+        break;
     case 62:
-        return "L3 Active power- (QII+QIII)";
+        tmp = "L3 Active power- (QII+QIII)";
+        break;
     case 63:
-        return "L3 Reactive power+ (QI+QII)";
+        tmp = "L3 Reactive power+ (QI+QII)";
+        break;
     case 64:
-        return "L3 Reactive power- (QIII+QIV)";
+        tmp = "L3 Reactive power- (QIII+QIV)";
+        break;
     case 65:
-        return "L3 Reactive power QI";
+        tmp = "L3 Reactive power QI";
+        break;
     case 66:
-        return "L3 Reactive power QII";
+        tmp = "L3 Reactive power QII";
+        break;
     case 67:
-        return "L3 Reactive power QIII";
+        tmp = "L3 Reactive power QIII";
+        break;
     case 68:
-        return "L3 Reactive power QIV";
+        tmp = "L3 Reactive power QIV";
+        break;
     case 69:
-        return "L3 Apparent power+ (QI+QIV)";
+        tmp = "L3 Apparent power+ (QI+QIV)";
+        break;
     case 70:
-        return "L3 Apparent power- (QII+QIII)";
+        tmp = "L3 Apparent power- (QII+QIII)";
+        break;
     case 71:
-        return "L3 Current";
+        tmp = "L3 Current";
+        break;
     case 72:
-        return "L3 Voltage";
+        tmp = "L3 Voltage";
+        break;
     case 73:
-        return "L3 Power factor";
+        tmp = "L3 Power factor";
+        break;
     case 74:
-        return "L3 Supply frequency";
+        tmp = "L3 Supply frequency";
+        break;
     case 75:
-        return "L3 Active power (abs(QI+QIV)+abs(QII+QIII))";
+        tmp = "L3 Active power (abs(QI+QIV)+abs(QII+QIII))";
+        break;
     case 76:
-        return "L3 Active power (abs(QI+QIV)-abs(QI+QIII))";
+        tmp = "L3 Active power (abs(QI+QIV)-abs(QI+QIII))";
+        break;
     case 77:
-        return "L3 Active power QI";
+        tmp = "L3 Active power QI";
+        break;
     case 78:
-        return "L3 Active power QII";
+        tmp = "L3 Active power QII";
+        break;
     case 79:
-        return "L3 Active power QIII";
+        tmp = "L3 Active power QIII";
+        break;
     case 80:
-        return "L3 Active power QIV";
+        tmp = "L3 Active power QIV";
+        break;
     case 82:
-        return "Unitless quantities (pulses or pieces)";
+        tmp = "Unitless quantities (pulses or pieces)";
+        break;
     case 84:
-        return "Sum Li Power factor-";
+        tmp = "Sum Li Power factor-";
+        break;
     case 85:
-        return "L1 Power factor-";
+        tmp = "L1 Power factor-";
+        break;
     case 86:
-        return "L2 Power factor-";
+        tmp = "L2 Power factor-";
+        break;
     case 87:
-        return "L3 Power factor-";
+        tmp = "L3 Power factor-";
+        break;
     case 88:
-        return "Sum Li A2h QI+QII+QIII+QIV";
+        tmp = "Sum Li A2h QI+QII+QIII+QIV";
+        break;
     case 89:
-        return "Sum Li V2h QI+QII+QIII+QIV";
+        tmp = "Sum Li V2h QI+QII+QIII+QIV";
+        break;
     case 90:
-        return "SLi current (algebraic sum of the - unsigned - value of the currents in all phases)";
+        tmp = "SLi current (algebraic sum of the - unsigned - value of the currents in all phases)";
+        break;
     case 91:
-        return "Lo Current (neutral)";
+        tmp = "Lo Current (neutral)";
+        break;
     case 92:
-        return "Lo Voltage (neutral)";
+        tmp = "Lo Voltage (neutral)";
+        break;
+    default:
+        tmp = "";
+        break;
     }
-    return "";
+    return tmp;
 }
 
 
@@ -411,7 +505,7 @@ int CGXStandardObisCodeCollection::Find(std::string ln, DLMS_OBJECT_TYPE objectT
     return 0;
 }
 
-bool CGXStandardObisCodeCollection::EqualsMask(std::string obisMask, std::string ln)
+bool CGXStandardObisCodeCollection::EqualsMask(std::string& obisMask, std::string& ln)
 {
     unsigned char bytes[6];
     if (GetBytes(ln, bytes) != DLMS_ERROR_CODE_OK)
@@ -422,10 +516,63 @@ bool CGXStandardObisCodeCollection::EqualsMask(std::string obisMask, std::string
     return EqualsObisCode(tmp, bytes);
 }
 
+bool CGXStandardObisCodeCollection::EqualsMask2(std::string obisMask, std::string& ln)
+{
+    return EqualsMask(obisMask, ln);
+}
+
+// Get N1C description.
+static const char* GetN1CDescription(std::string& str)
+{
+    if (str.empty() || str[0] != '$')
+    {
+        return "";
+    }
+    int value;
+#if _MSC_VER > 1000
+    if (sscanf_s(str.c_str(), "%d", &value) == -1)
+#else
+    if (sscanf(str.c_str(), "%d", &value) == -1)
+#endif
+    {
+        return "";;
+    }
+    const char* tmp;
+    switch (value)
+    {
+    case 41:
+        tmp = "Absolute temperature";
+        break;
+    case 42:
+        tmp = "Absolute pressure";
+        break;
+    case 44:
+        tmp = "Velocity of sound";
+        break;
+    case 45:
+        tmp = "Density(of gas)";
+        break;
+    case 46:
+        tmp = "Relative density";
+        break;
+    case 47:
+        tmp = "Gauge pressure";
+        break;
+    case 48:
+        tmp = "Differential pressure";
+        break;
+    case 49:
+        tmp = "Density of air";
+        break;
+    }
+    return tmp;
+}
+
 // Find Standard OBIS Code description.
 void CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, std::vector<CGXStandardObisCode*>& list)
 {
     char buff[6];
+    std::string desc;
     for (std::vector<CGXStandardObisCode*>::iterator it = this->begin(); it != this->end(); ++it)
     {
         //Interface is tested first because it's faster.
@@ -440,20 +587,32 @@ void CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, std::
             std::vector< std::string > tmp2 = GXHelpers::Split((*it)->GetDescription(), ';');
             if (tmp2.size() > 1)
             {
-                std::string desc = GetDescription(tmp2[1]);
-                if (desc != "")
+                if (pObisCode != NULL && GXHelpers::trim(tmp2[1]).compare("$1") == 0)
                 {
-                    tmp2[1] = desc;
-                    std::string builder;
-                    for (std::vector< std::string >::iterator s = tmp2.begin(); s != tmp2.end(); ++s)
+                    desc = "$";
+                    desc += GXHelpers::IntToString(pObisCode[2]);
+                    if (pObisCode[0] == 7)
                     {
-                        if (builder.size() != 0)
-                        {
-                            builder.append(";");
-                        }
-                        builder.append(*s);
+                        desc = GetN1CDescription(desc);
                     }
-                    obj->SetDescription(builder);
+                    else
+                    {
+                        desc = GetDescription(desc);
+                    }
+                    if (desc != "")
+                    {
+                        tmp2[1] = desc;
+                        std::string builder;
+                        for (std::vector< std::string >::iterator s = tmp2.begin(); s != tmp2.end(); ++s)
+                        {
+                            if (builder.size() != 0)
+                            {
+                                builder.append(";");
+                            }
+                            builder.append(*s);
+                        }
+                        obj->SetDescription(builder);
+                    }
                 }
             }
             std::vector< std::string > obis = obj->GetOBIS();
@@ -499,7 +658,7 @@ void CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, std::
 
             obis[5] = buff;
             obj->SetOBIS(obis);
-            std::string desc = obj->GetDescription();
+            desc = obj->GetDescription();
 #if _MSC_VER > 1000
             sprintf_s(buff, 6, "%d", pObisCode[0]);
 #else

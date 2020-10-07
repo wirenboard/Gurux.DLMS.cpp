@@ -51,7 +51,7 @@ class CGXStandardObisCodeCollection : public std::vector<CGXStandardObisCode*>
     bool EqualsInterface(CGXStandardObisCode item, int ic);
 
     // Check OBIS codes.
-    static bool EqualsMask(std::string obis, int ic);
+    static bool EqualsMask(std::string& obis, int ic);
 
     // Check OBIS code.
     static bool EqualsObisCode(std::vector< std::string >& obisMask, unsigned char* ic);
@@ -62,7 +62,8 @@ class CGXStandardObisCodeCollection : public std::vector<CGXStandardObisCode*>
 public:
     int Find(std::string ln, DLMS_OBJECT_TYPE objectType, std::vector<CGXStandardObisCode*>& list);
 
-    static bool EqualsMask(std::string obisMask, std::string ln);
+    static bool EqualsMask(std::string& obisMask, std::string& ln);
+    static bool EqualsMask2(std::string obisMask, std::string& ln);
 
     // Find Standard OBIS Code description.
     void Find(unsigned char* pObisCode, int IC, std::vector<CGXStandardObisCode*>& list);

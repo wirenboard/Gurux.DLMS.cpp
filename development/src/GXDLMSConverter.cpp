@@ -1483,48 +1483,48 @@ void CGXDLMSConverter::UpdateOBISCodeInformation(CGXDLMSObjectCollection& object
         else if (code->GetDataType().find("9"))
         {
             //Time stamps of the billing periods objects (first scheme if there are two)
-            if ((CGXStandardObisCodeCollection::EqualsMask("0.0-64.96.7.10-14.255", ln) ||
+            if ((CGXStandardObisCodeCollection::EqualsMask2("0.0-64.96.7.10-14.255", ln) ||
                 //Time stamps of the billing periods objects (second scheme)
-                CGXStandardObisCodeCollection::EqualsMask("0.0-64.0.1.5.0-99,255", ln) ||
+                CGXStandardObisCodeCollection::EqualsMask2("0.0-64.0.1.5.0-99,255", ln) ||
                 //Time of power failure
-                CGXStandardObisCodeCollection::EqualsMask("0.0-64.0.1.2.0-99,255", ln) ||
+                CGXStandardObisCodeCollection::EqualsMask2("0.0-64.0.1.2.0-99,255", ln) ||
                 //Time stamps of the billing periods objects (first scheme if there are two)
-                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.1.2.0-99,255", ln) ||
+                CGXStandardObisCodeCollection::EqualsMask2("1.0-64.0.1.2.0-99,255", ln) ||
                 //Time stamps of the billing periods objects (second scheme)
-                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.1.5.0-99,255", ln) ||
+                CGXStandardObisCodeCollection::EqualsMask2("1.0-64.0.1.5.0-99,255", ln) ||
                 //Time expired since last end of billing period
-                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.0.255", ln) ||
+                CGXStandardObisCodeCollection::EqualsMask2("1.0-64.0.9.0.255", ln) ||
                 //Time of last reset
-                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.6.255", ln) ||
+                CGXStandardObisCodeCollection::EqualsMask2("1.0-64.0.9.6.255", ln) ||
                 //Date of last reset
-                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.7.255", ln) ||
+                CGXStandardObisCodeCollection::EqualsMask2("1.0-64.0.9.7.255", ln) ||
                 //Time expired since last end of billing period (Second billing period scheme)
-                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.13.255", ln) ||
+                CGXStandardObisCodeCollection::EqualsMask2("1.0-64.0.9.13.255", ln) ||
                 //Time of last reset (Second billing period scheme)
-                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.14.255", ln) ||
+                CGXStandardObisCodeCollection::EqualsMask2("1.0-64.0.9.14.255", ln) ||
                 //Date of last reset (Second billing period scheme)
-                CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.15.255", ln)))
+                CGXStandardObisCodeCollection::EqualsMask2("1.0-64.0.9.15.255", ln)))
             {
                 code->SetUIDataType("25");
             }
             //Local time
-            else if (CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.1.255", ln))
+            else if (CGXStandardObisCodeCollection::EqualsMask2("1.0-64.0.9.1.255", ln))
             {
                 code->SetUIDataType("27");
             }
             //Local date
-            else if (CGXStandardObisCodeCollection::EqualsMask("1.0-64.0.9.2.255", ln))
+            else if (CGXStandardObisCodeCollection::EqualsMask2("1.0-64.0.9.2.255", ln))
             {
                 code->SetUIDataType("26");
             }
             //Active firmware identifier
-            else if (CGXStandardObisCodeCollection::EqualsMask("1.0.0.2.0.255", ln))
+            else if (CGXStandardObisCodeCollection::EqualsMask2("1.0.0.2.0.255", ln))
             {
                 code->SetUIDataType("10");
             }
         }
         //Unix time
-        else if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_DATA && CGXStandardObisCodeCollection::EqualsMask("0.0.1.1.0.255", ln))
+        else if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_DATA && CGXStandardObisCodeCollection::EqualsMask2("0.0.1.1.0.255", ln))
         {
             code->SetUIDataType("25");
         }
