@@ -89,7 +89,7 @@ public:
      *
      * @return Charge tables.
      */
-    std::vector<CGXChargeTable> GetChargeTables();
+    std::vector<CGXChargeTable>& GetChargeTables();
 
     std::string ToString();
 

@@ -66,15 +66,19 @@ void CGXDLMSPppSetup::SetAuthentication(PPP_AUTHENTICATION_TYPE value)
     m_Authentication = value;
 }
 
-/**
-PPP authentication procedure user name.
-*/
-CGXByteBuffer CGXDLMSPppSetup::GetUserName()
+#ifdef UNICODE
+CGXByteBuffer& CGXDLMSPppSetup::GetUserNameW()
+{
+    return m_UserName;
+}
+#endif //UNICODE
+
+CGXByteBuffer& CGXDLMSPppSetup::GetUserName()
 {
     return m_UserName;
 }
 
-void CGXDLMSPppSetup::SetUserName(CGXByteBuffer value)
+void CGXDLMSPppSetup::SetUserName(CGXByteBuffer& value)
 {
     m_UserName = value;
 }

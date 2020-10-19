@@ -86,6 +86,7 @@
 #include "../include/GXDLMSPrimeNbOfdmPlcMacCounters.h"
 #include "../include/GXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData.h"
 #include "../include/GXDLMSPrimeNbOfdmPlcApplicationsIdentification.h"
+#include "../include/GXDLMSIp6Setup.h"
 
 // Reserved for internal use.
 CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
@@ -126,8 +127,8 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
         return new CGXDLMSCustomObject(type);
     case DLMS_OBJECT_TYPE_IP4_SETUP:
         return new CGXDLMSIp4Setup();
-//    case DLMS_OBJECT_TYPE_IP6_SETUP:
-//        return new CGXDLMSIp6Setup();
+    case DLMS_OBJECT_TYPE_IP6_SETUP:
+        return new CGXDLMSIp6Setup();
     case DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP:
         return new CGXDLMSMBusSlavePortSetup();
     case DLMS_OBJECT_TYPE_IMAGE_TRANSFER:

@@ -46,7 +46,7 @@ CGXCommodity& CGXUnitCharge::GetCommodity() {
     return m_Commodity;
 }
 
-std::vector<CGXChargeTable> CGXUnitCharge::GetChargeTables()
+std::vector<CGXChargeTable>& CGXUnitCharge::GetChargeTables()
 {
     return m_ChargeTables;
 }

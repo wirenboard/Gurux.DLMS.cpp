@@ -79,8 +79,8 @@ public:
     std::string& GetDestination();
     void SetDestination(std::string& value);
 
-    DLMS_MESSAGE_TYPE GetMessage();
-    void SetMessage(DLMS_MESSAGE_TYPE value);
+    DLMS_MESSAGE_TYPE GetMessageType();
+    void SetMessageType(DLMS_MESSAGE_TYPE value);
 
     /**
      Contains the start and end date/time

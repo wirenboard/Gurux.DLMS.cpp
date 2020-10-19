@@ -195,6 +195,7 @@
     <ClCompile Include="..\src\GXDLMSImageTransfer.cpp" />
     <ClCompile Include="..\src\GXDLMSIp4Setup.cpp" />
     <ClCompile Include="..\src\GXDLMSIp4SetupIpOption.cpp" />
+    <ClCompile Include="..\src\GXDLMSIp6Setup.cpp" />
     <ClCompile Include="..\src\GXDLMSLimiter.cpp" />
     <ClCompile Include="..\src\GXDLMSLimits.cpp" />
     <ClCompile Include="..\src\GXDLMSLlcSscsSetup.cpp" />

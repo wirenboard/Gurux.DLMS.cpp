@@ -82,11 +82,18 @@ public:
     PPP_AUTHENTICATION_TYPE GetAuthentication();
     void SetAuthentication(PPP_AUTHENTICATION_TYPE value);
 
+#ifdef UNICODE
+    //This fixes UNICODE for Windows.
     /**
     PPP authentication procedure user name.
     */
-    CGXByteBuffer GetUserName();
-    void SetUserName(CGXByteBuffer value);
+    CGXByteBuffer& GetUserNameW();
+#endif
+    /**
+    PPP authentication procedure user name.
+    */
+    CGXByteBuffer& GetUserName();
+    void SetUserName(CGXByteBuffer& value);
 
     /**
      PPP authentication procedure password.

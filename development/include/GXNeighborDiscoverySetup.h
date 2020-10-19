@@ -47,54 +47,60 @@ class CGXNeighborDiscoverySetup
      * Gives the maximum number of router solicitation retries to be performed
      * by a node if the expected router advertisement has not been received.
      */
-    private int maxRetry;
+    int m_MaxRetry;
     /**
      * Gives the waiting time in milliseconds between two successive router
      * solicitation retries.
      */
-    private int retryWaitTime;
+    int m_RetryWaitTime;
     /**
      * Gives the router advertisement transmission period in seconds.
      */
-    private long sendPeriod;
+    long m_SendPeriod;
 
+public:
     /**
      * Constructor.
      */
-    public GXNeighborDiscoverySetup() {
-        setMaxRetry(3);
-        setRetryWaitTime(10000);
+    CGXNeighborDiscoverySetup()
+    {
+        m_MaxRetry = 3;
+        m_RetryWaitTime = 10000;
     }
 
-    public final int getMaxRetry() {
-        return maxRetry;
+    int GetMaxRetry()
+    {
+        return m_MaxRetry;
     }
 
-    public final void setMaxRetry(final int value) {
-        maxRetry = value;
+    void SetMaxRetry(int value)
+    {
+        m_MaxRetry = value;
     }
 
-    public final int getRetryWaitTime() {
-        return retryWaitTime;
+    int GetRetryWaitTime()
+    {
+        return m_RetryWaitTime;
     }
 
-    public final void setRetryWaitTime(final int value) {
-        retryWaitTime = value;
+    void SetRetryWaitTime(int value)
+    {
+        m_RetryWaitTime = value;
     }
 
     /**
      * @return Gives the router advertisement transmission period in seconds.
      */
-    public final long getSendPeriod() {
-        return sendPeriod;
+    long GetSendPeriod() {
+        return m_SendPeriod;
     }
 
     /**
      * @param value
      *            Router advertisement transmission period in seconds.
      */
-    public final void setSendPeriod(final long value) {
-        sendPeriod = value;
+    void SetSendPeriod(long value) {
+        m_SendPeriod = value;
     }
 };
 

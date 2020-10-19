@@ -63,6 +63,7 @@
 #include "../include/GXDLMSHdlcSetup.h"
 #include "../include/GXDLMSIECOpticalPortSetup.h"
 #include "../include/GXDLMSIp4Setup.h"
+#include "../include/GXDLMSIp6Setup.h"
 #include "../include/GXDLMSRegisterActivation.h"
 #include "../include/GXDLMSSchedule.h"
 #include "../include/GXDLMSModemConfiguration.h"
@@ -832,6 +833,65 @@ int SaveIp4Setup(CGXXmlWriter* writer, CGXDLMSIp4Setup* obj)
     return ret;
 }
 
+int SaveIPAddress(CGXXmlWriter* writer, std::vector<IN6_ADDR>& list, const char* name)
+{
+    char tmp[33];
+    if (!list.empty())
+    {
+        writer->WriteStartElement(name);
+        for (std::vector<IN6_ADDR>::iterator it = list.begin(); it != list.end(); ++it)
+        {
+            inet_ntop(AF_INET6, &(*it), tmp, sizeof(tmp));
+            writer->WriteElementString("Value", tmp);
+        }
+        writer->WriteEndElement();
+    }
+    return 0;
+}
+
+int SaveNeighborDiscoverySetup(CGXXmlWriter* writer, std::vector<CGXNeighborDiscoverySetup*>& list, const char* name)
+{
+    if (!list.empty())
+    {
+        writer->WriteStartElement(name);
+        for (std::vector<CGXNeighborDiscoverySetup*>::iterator it = list.begin(); it != list.end(); ++it)
+        {
+            writer->WriteStartElement("Item");
+            writer->WriteElementString("MaxRetry", (*it)->GetMaxRetry());
+            writer->WriteElementString("RetryWaitTime", (*it)->GetRetryWaitTime());
+            writer->WriteElementString("SendPeriod", (*it)->GetSendPeriod());
+            writer->WriteEndElement();
+        }
+        writer->WriteEndElement();
+    }
+    return 0;
+}
+
+int SaveIp6Setup(CGXXmlWriter* writer, CGXDLMSIp6Setup* obj)
+{
+    int ret;
+    char tmp[64];
+    std::string str;
+    if ((ret = writer->WriteElementString("DataLinkLayerReference", obj->GetDataLinkLayerReference())) == 0 &&
+        (ret = writer->WriteElementString("AddressConfigMode", obj->GetAddressConfigMode())) == 0 &&
+        (ret = SaveIPAddress(writer, obj->GetUnicastIPAddress(), "UnicastIPAddress")) == 0 &&
+        (ret = SaveIPAddress(writer, obj->GetMulticastIPAddress(), "MulticastIPAddress")) == 0 &&
+        (ret = SaveIPAddress(writer, obj->GetGatewayIPAddress(), "GatewayIPAddress")) == 0)
+    {
+        inet_ntop(AF_INET6, &obj->GetPrimaryDNSAddress(), tmp, sizeof(tmp));
+        if ((ret = writer->WriteElementString("PrimaryDNSAddress", tmp)) == 0)
+        {
+            inet_ntop(AF_INET6, &obj->GetSecondaryDNSAddress(), tmp, sizeof(tmp));
+            if ((ret = writer->WriteElementString("SecondaryDNSAddress", tmp)) == 0 &&
+                (ret = writer->WriteElementString("TrafficClass", obj->GetTrafficClass())) == 0 &&
+                (ret = SaveNeighborDiscoverySetup(writer, obj->GetNeighborDiscoverySetup(), "NeighborDiscoverySetup")) == 0)
+            {
+            }
+        }
+    }
+    return ret;
+}
+
 int SaveGSMDiagnostic(CGXXmlWriter* writer, CGXDLMSGSMDiagnostic* obj)
 {
     int ret;
@@ -952,9 +1012,9 @@ int SavePushSetup(CGXXmlWriter* writer, CGXDLMSPushSetup* obj)
         if (ret == 0)
         {
             if ((ret = writer->WriteEndElement()) == 0 &&
-                (ret = writer->WriteElementString("Service", obj->GetService())) == 0 &&
+                (ret = writer->WriteElementString("Service", (int)obj->GetService())) == 0 &&
                 (ret = writer->WriteElementString("Destination", obj->GetDestination())) == 0 &&
-                (ret = writer->WriteElementString("Message", obj->GetMessage())) == 0 &&
+                (ret = writer->WriteElementString("Message", obj->GetMessageType())) == 0 &&
                 (ret = writer->WriteStartElement("CommunicationWindow")) == 0)
             {
                 for (std::vector<std::pair<CGXDateTime, CGXDateTime> >::iterator it = obj->GetCommunicationWindow().begin(); it != obj->GetCommunicationWindow().end(); ++it)
@@ -2132,6 +2192,8 @@ int CGXXmlWriter::Save(CGXDLMSObject* obj)
         */
     case DLMS_OBJECT_TYPE_IP4_SETUP:
         return SaveIp4Setup(this, (CGXDLMSIp4Setup*)obj);
+    case DLMS_OBJECT_TYPE_IP6_SETUP:
+        return SaveIp6Setup(this, (CGXDLMSIp6Setup*)obj);
     case DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP:
         return SaveMBusSlavePortSetup(this, (CGXDLMSMBusSlavePortSetup*)obj);
     case DLMS_OBJECT_TYPE_IMAGE_TRANSFER:

@@ -77,11 +77,12 @@ void CGXDLMSPushSetup::SetDestination(std::string& value)
     m_Destination = value;
 }
 
-DLMS_MESSAGE_TYPE CGXDLMSPushSetup::GetMessage()
+DLMS_MESSAGE_TYPE CGXDLMSPushSetup::GetMessageType()
 {
     return m_Message;
 }
-void CGXDLMSPushSetup::SetMessage(DLMS_MESSAGE_TYPE value)
+
+void CGXDLMSPushSetup::SetMessageType(DLMS_MESSAGE_TYPE value)
 {
     m_Message = value;
 }
@@ -126,7 +127,7 @@ void CGXDLMSPushSetup::GetValues(std::vector<std::string>& values)
     sb << " ";
     sb << GetDestination().c_str();
     sb << " ";
-    sb << GetMessage();
+    sb << GetMessageType();
     values.push_back(sb.str());
 
     sb.str(std::string());
@@ -303,7 +304,7 @@ int CGXDLMSPushSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
             return ret;
         }
 
-        tmp = GetMessage();
+        tmp = GetMessageType();
         if ((ret = GXHelpers::SetData(&settings, buff, DLMS_DATA_TYPE_ENUM, tmp)) != 0)
         {
             return ret;
@@ -396,7 +397,7 @@ int CGXDLMSPushSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
             std::string str;
             str.append(reinterpret_cast<char const*>(e.GetValue().Arr[1].byteArr), e.GetValue().Arr[1].size);
             SetDestination(str);
-            SetMessage((DLMS_MESSAGE_TYPE)e.GetValue().Arr[2].ToInteger());
+            SetMessageType((DLMS_MESSAGE_TYPE)e.GetValue().Arr[2].ToInteger());
         }
     }
     else if (e.GetIndex() == 4)

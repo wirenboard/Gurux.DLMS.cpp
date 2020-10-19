@@ -1150,6 +1150,9 @@ const char* CGXDLMSConverter::ToString(DLMS_OBJECT_TYPE type)
     case DLMS_OBJECT_TYPE_IP4_SETUP:
         str = "GXDLMSIp4Setup";
         break;
+    case DLMS_OBJECT_TYPE_IP6_SETUP:
+        str = "GXDLMSIp6Setup";
+        break;
     case DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP:
         str = "GXDLMSMBusSlavePortSetup";
         break;
@@ -1317,6 +1320,8 @@ DLMS_OBJECT_TYPE CGXDLMSConverter::ValueOfObjectType(const char* value)
         type = DLMS_OBJECT_TYPE_IEC_TWISTED_PAIR_SETUP;
     else if (strcmp(value, "GXDLMSIp4Setup") == 0)
         type = DLMS_OBJECT_TYPE_IP4_SETUP;
+    else if (strcmp(value, "GXDLMSIp6Setup") == 0)
+        type = DLMS_OBJECT_TYPE_IP6_SETUP;
     else if (strcmp(value, "GXDLMSMBusSlavePortSetup") == 0)
         type = DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP;
     else if (strcmp(value, "GXDLMSImageTransfer") == 0)
