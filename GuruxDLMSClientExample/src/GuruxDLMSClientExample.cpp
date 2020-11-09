@@ -418,6 +418,8 @@ int main(int argc, char* argv[])
         else
         {
             printf("Missing mandatory connection information for TCP/IP or serial port connection.\n");
+            printf("-----------------------------------------------------------------------------.\n");
+            ShowHelp();
             return 1;
         }
 
