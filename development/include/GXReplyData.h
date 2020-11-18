@@ -105,7 +105,9 @@ private:
      */
     struct tm* m_Time;
 
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     CGXDLMSTranslatorStructure* m_pXml;
+#endif //DLMS_IGNORE_XML_TRANSLATOR
 
     /*
     * Invoke ID.
@@ -298,6 +300,7 @@ public:
      */
     void SetTime(struct tm* value);
 
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     /*
      * @return Data notification date time.
      */
@@ -309,6 +312,7 @@ public:
      *            Data notification date time.
      */
     void SetXml(CGXDLMSTranslatorStructure* value);
+#endif //DLMS_IGNORE_XML_TRANSLATOR
 
     /**
     * Invoke ID.

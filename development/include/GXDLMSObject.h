@@ -35,6 +35,10 @@
 #ifndef GXDLMSOBJECT_H
 #define GXDLMSOBJECT_H
 
+#include <string.h>
+#include <vector>
+#include <map>
+#include <assert.h>
 #include "GXAttributeCollection.h"
 #include "GXDLMSVariant.h"
 #include "IGXDLMSBase.h"

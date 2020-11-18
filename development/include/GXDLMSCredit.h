@@ -35,6 +35,9 @@
 #ifndef GXCREDIT_H
 #define GXCREDIT_H
 
+#include "GXIgnore.h"
+
+#ifndef DLMS_IGNORE_CREDIT
 #include "GXDLMSObject.h"
 
 /**
@@ -277,4 +280,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_CREDIT
 #endif //GXCREDIT_H

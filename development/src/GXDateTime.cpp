@@ -32,14 +32,15 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#include "../include/GXDateTime.h"
-#include "../include/GXHelpers.h"
-
 #include <string.h>
+#include <string>
 #include <locale>
 #include <vector>
 #include <assert.h>
 #include <time.h>
+
+#include "../include/GXDateTime.h"
+#include "../include/GXHelpers.h"
 
 #if defined(_WIN32) || defined(_WIN64)//Windows
 #include <windows.h>
@@ -387,7 +388,11 @@ void Remove(std::string& value, const char* tag, const char sep)
     if (sep != 0)
     {
         char tmp[6];
+#if _MSC_VER > 1000
+        strcpy_s(tmp, tag);
+#else
         strcpy(tmp, tag);
+#endif
         size_t len = strlen(tag);
         tmp[len] = sep;
         tmp[len + 1] = '\0';
@@ -579,7 +584,11 @@ int CGXDateTime::FromString(const char* datetime)
         g[0] = 0;
         if (dynamic_cast<CGXDate*>(this) != NULL)
         {
+#if _MSC_VER > 1000
+            ret = sscanf_s(v.c_str(), format.c_str(), &a, &b, &c);
+#else
             ret = sscanf(v.c_str(), format.c_str(), &a, &b, &c);
+#endif
             if (ret != 3)
             {
                 ret = DLMS_ERROR_CODE_INVALID_DATE_TIME;

@@ -35,6 +35,7 @@
 #ifndef GXBYTEBUFFER_H
 #define GXBYTEBUFFER_H
 
+#include <string>
 #include "errorcodes.h"
 #include "enums.h"
 
@@ -90,7 +91,9 @@ public:
     int SetUInt8(unsigned char item);
 
     int SetUInt8(unsigned long index, unsigned char item);
+
     int SetUInt16(unsigned short item);
+    int SetUInt16(unsigned long index, unsigned short item);
 
     int SetUInt32(unsigned long item);
 
@@ -128,6 +131,9 @@ public:
     int GetUInt8(unsigned long index, unsigned char* value);
 
     int GetUInt16(unsigned short* value);
+
+    int GetUInt24(unsigned long index, unsigned int* value);
+    int GetUInt24(unsigned int* value);
 
     int GetUInt32(unsigned long* value);
 

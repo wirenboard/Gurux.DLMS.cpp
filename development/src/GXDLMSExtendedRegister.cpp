@@ -36,6 +36,7 @@
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSExtendedRegister.h"
 
+#ifndef DLMS_IGNORE_EXTENDED_REGISTER
 bool CGXDLMSExtendedRegister::IsRead(int index)
 {
     if (index == 3)
@@ -227,4 +228,4 @@ int CGXDLMSExtendedRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     }
     return DLMS_ERROR_CODE_OK;
 }
-
+#endif //DLMS_IGNORE_EXTENDED_REGISTER

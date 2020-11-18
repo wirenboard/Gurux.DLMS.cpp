@@ -35,6 +35,8 @@
 #ifndef GXDLMSIP4SETUP_H
 #define GXDLMSIP4SETUP_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_IP4_SETUP
 #include "GXDLMSObject.h"
 #include "GXDLMSIp4SetupIpOption.h"
 
@@ -140,4 +142,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_IP4_SETUP
 #endif //GXDLMSIP4SETUP_H

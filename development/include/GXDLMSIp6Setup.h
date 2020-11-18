@@ -35,6 +35,8 @@
 #ifndef GXDLMSIP6SETUP_H
 #define GXDLMSIP6SETUP_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_IP6_SETUP
 #include "GXDLMSObject.h"
 #include "GXNeighborDiscoverySetup.h"
 
@@ -196,4 +198,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_IP6_SETUP
 #endif //GXDLMSIP6SETUP_H

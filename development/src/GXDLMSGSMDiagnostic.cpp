@@ -33,6 +33,7 @@
 //---------------------------------------------------------------------------
 
 #include "../include/GXDLMSGSMDiagnostic.h"
+#ifndef DLMS_IGNORE_GSM_DIAGNOSTIC
 #include "../include/GXDLMSClient.h"
 
 //Constructor.
@@ -402,3 +403,5 @@ int CGXDLMSGSMDiagnostic::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     }
     return DLMS_ERROR_CODE_OK;
 }
+
+#endif //DLMS_IGNORE_GSM_DIAGNOSTIC

@@ -36,7 +36,7 @@
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSAutoConnect.h"
 #include <sstream>
-
+#ifndef DLMS_IGNORE_AUTO_CONNECT
 //Constructor.
 CGXDLMSAutoConnect::CGXDLMSAutoConnect() :
     CGXDLMSAutoConnect("0.0.2.1.0.255", 0)
@@ -368,3 +368,4 @@ int CGXDLMSAutoConnect::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
+#endif //DLMS_IGNORE_AUTO_CONNECT

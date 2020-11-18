@@ -35,6 +35,9 @@
 #ifndef GXDLMSTRANSLATOR_H
 #define GXDLMSTRANSLATOR_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+#include <algorithm>
 #include "enums.h"
 #include "GXBytebuffer.h"
 #include "TranslatorSimpleTags.h"
@@ -288,4 +291,5 @@ public:
     int DataToXml(CGXByteBuffer& data, std::string& xml);
 
 };
-#endif //GXDATE_H
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+#endif //GXDLMSTRANSLATOR_H

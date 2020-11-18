@@ -35,6 +35,7 @@
 #ifndef GXDLMSMONITOREDVALUE_H
 #define GXDLMSMONITOREDVALUE_H
 
+#include "GXIgnore.h"
 #include "GXDLMSObject.h"
 
 class CGXDLMSMonitoredValue

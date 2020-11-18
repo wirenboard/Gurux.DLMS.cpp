@@ -36,6 +36,7 @@
 #include "../include/GXDLMSClient.h"
 #include <sstream>
 
+#ifndef DLMS_IGNORE_IMAGE_TRANSFER
 //Constructor.
 CGXDLMSImageTransfer::CGXDLMSImageTransfer() : CGXDLMSImageTransfer("0.0.44.0.0.255", 0)
 {
@@ -563,3 +564,4 @@ int CGXDLMSImageTransfer::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_IMAGE_TRANSFER

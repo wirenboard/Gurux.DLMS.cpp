@@ -35,8 +35,10 @@
 #ifndef GXDLMSCLOCK_H
 #define GXDLMSCLOCK_H
 
+#include "GXIgnore.h"
 #include "GXDLMSObject.h"
 
+#ifndef DLMS_IGNORE_CLOCK
 /**
 Online help:
 http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSClock
@@ -140,4 +142,5 @@ public:
      */
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_CLOCK
 #endif //GXDLMSCLOCK_H

@@ -35,6 +35,8 @@
 #ifndef GXDLMSREGISTERMONITOR_H
 #define GXDLMSREGISTERMONITOR_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_REGISTER_MONITOR
 #include "GXDLMSMonitoredValue.h"
 #include "GXDLMSActionSet.h"
 
@@ -116,5 +118,6 @@ public:
      */
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_REGISTER_MONITOR
 
 #endif //GXDLMSREGISTERMONITOR_H

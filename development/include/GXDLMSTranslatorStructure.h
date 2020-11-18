@@ -35,6 +35,9 @@
 #ifndef GXDLMSTRANSLATOR_STRUCTURE_H
 #define GXDLMSTRANSLATOR_STRUCTURE_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+#include <sstream>
 #include "enums.h"
 #include "GXBytebuffer.h"
 #include "TranslatorSimpleTags.h"
@@ -206,4 +209,5 @@ public:
     // returns: Integer value as a string.
     int IntegerToHex(unsigned long long value, std::string& result);
 };
+#endif //DLMS_IGNORE_XML_TRANSLATOR
 #endif //GXDLMSTRANSLATOR_STRUCTURE_H

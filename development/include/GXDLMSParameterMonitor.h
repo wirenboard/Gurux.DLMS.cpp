@@ -35,6 +35,9 @@
 #ifndef GXPARAMETER_MONITOR_H
 #define GXPARAMETER_MONITOR_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_PARAMETER_MONITOR
+
 #include "GXDLMSObject.h"
 #include "GXDLMSTarget.h"
 
@@ -115,4 +118,5 @@ public:
     std::vector<CGXDLMSTarget*>& GetParameters();
     void SetParameters(std::vector<CGXDLMSTarget*>& value);
 };
+#endif //DLMS_IGNORE_PARAMETER_MONITOR
 #endif //GXPARAMETER_MONITOR_H

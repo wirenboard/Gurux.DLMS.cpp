@@ -43,6 +43,7 @@ CGXDLMSSecureServer::CGXDLMSSecureServer(bool UseLogicalNameReferencing,
     m_Settings.SetCipher(&m_Cipher);
 }
 
+#ifndef DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
 CGXDLMSSecureServer::CGXDLMSSecureServer(
     CGXDLMSAssociationLogicalName* ln,
     CGXDLMSIecHdlcSetup* hdlc) :
@@ -62,7 +63,9 @@ CGXDLMSSecureServer::CGXDLMSSecureServer(
 {
     m_Settings.SetCipher(&m_Cipher);
 }
+#endif //DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
 
+#ifndef DLMS_IGNORE_ASSOCIATION_SHORT_NAME
 CGXDLMSSecureServer::CGXDLMSSecureServer(
     CGXDLMSAssociationShortName* sn,
     CGXDLMSIecHdlcSetup* hdlc) :
@@ -82,6 +85,8 @@ CGXDLMSSecureServer::CGXDLMSSecureServer(
 {
     m_Settings.SetCipher(&m_Cipher);
 }
+
+#endif //DLMS_IGNORE_ASSOCIATION_SHORT_NAME
 
 CGXDLMSSecureServer::~CGXDLMSSecureServer()
 {

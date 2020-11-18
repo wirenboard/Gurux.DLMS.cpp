@@ -35,6 +35,8 @@
 #ifndef GXDLMSPRIMENBOFDMPLCMACSETUP_H
 #define GXDLMSPRIMENBOFDMPLCMACSETUP_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_SETUP
 #include "GXDLMSObject.h"
 
 /**
@@ -187,4 +189,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_SETUP
 #endif //GXDLMSPRIMENBOFDMPLCMACSETUP_H

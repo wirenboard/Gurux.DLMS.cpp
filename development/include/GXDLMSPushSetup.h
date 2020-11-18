@@ -35,6 +35,8 @@
 #ifndef GXDLMSPUSHSETUP_H
 #define GXDLMSPUSHSETUP_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_PUSH_SETUP
 #include "GXDLMSObject.h"
 #include "GXDLMSPushObject.h"
 #include "GXDLMSCaptureObject.h"
@@ -156,4 +158,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_PUSH_SETUP
 #endif //GXDLMSPUSHSETUP_H

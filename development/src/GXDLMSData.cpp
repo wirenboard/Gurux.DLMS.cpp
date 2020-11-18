@@ -34,6 +34,8 @@
 
 #include "../include/GXDLMSData.h"
 
+#ifndef DLMS_IGNORE_DATA
+
 //Constructor.
 CGXDLMSData::CGXDLMSData() :
     CGXDLMSData("", 0)
@@ -154,3 +156,4 @@ int CGXDLMSData::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_DATA

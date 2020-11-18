@@ -34,6 +34,7 @@
 
 #include "../include/GXDLMSTokenGateway.h"
 
+#ifndef DLMS_IGNORE_TOKEN_GATEWAY
 //Constructor.
 CGXDLMSTokenGateway::CGXDLMSTokenGateway() :
     CGXDLMSTokenGateway("", 0)
@@ -251,3 +252,5 @@ int CGXDLMSTokenGateway::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventAr
     }
     return DLMS_ERROR_CODE_OK;
 }
+
+#endif //DLMS_IGNORE_TOKEN_GATEWAY

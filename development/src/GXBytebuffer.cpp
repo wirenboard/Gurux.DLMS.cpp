@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <assert.h>
 #include "../include/errorcodes.h"
 #include "../include/GXBytebuffer.h"
 #include "../include/GXHelpers.h"
@@ -198,8 +199,17 @@ int CGXByteBuffer::SetUInt8(unsigned long index, unsigned char item)
 
 int CGXByteBuffer::SetUInt16(unsigned short item)
 {
+    int ret = SetUInt16(m_Size, item);
+    if (ret == 0)
+    {
+        m_Size += 2;
+    }
+    return ret;
+}
 
-    if (m_Capacity == 0 || m_Size + 2 > m_Capacity)
+int CGXByteBuffer::SetUInt16(unsigned long index, unsigned short item)
+{
+    if (m_Capacity == 0 || index + 2 > m_Capacity)
     {
         m_Capacity += VECTOR_CAPACITY;
         unsigned char* tmp = (unsigned char*)realloc(m_Data, m_Capacity);
@@ -210,9 +220,8 @@ int CGXByteBuffer::SetUInt16(unsigned short item)
         }
         m_Data = tmp;
     }
-    m_Data[m_Size] = (item >> 8) & 0xFF;
-    m_Data[m_Size + 1] = item & 0xFF;
-    m_Size += 2;
+    m_Data[index] = (item >> 8) & 0xFF;
+    m_Data[index + 1] = item & 0xFF;
     return 0;
 }
 
@@ -461,6 +470,28 @@ int CGXByteBuffer::GetUInt16(unsigned short* value)
     *value = (((m_Data[m_Position] & 0xFF) << 8) | (m_Data[m_Position + 1] & 0xFF));
     m_Position += 2;
     return 0;
+}
+
+int CGXByteBuffer::GetUInt24(unsigned long index, unsigned int* value)
+{
+    if (index + 3 > m_Size)
+    {
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
+    }
+    *value = m_Data[index] << 16 |
+        m_Data[index + 1] << 8 |
+        m_Data[index + 2];
+    return 0;
+}
+
+int CGXByteBuffer::GetUInt24(unsigned int* value)
+{
+    int ret = GetUInt24(m_Position, value);
+    if (ret == 0)
+    {
+        m_Position += 3;
+    }
+    return ret;
 }
 
 int CGXByteBuffer::GetUInt32(unsigned long* value)

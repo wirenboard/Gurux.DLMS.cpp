@@ -35,6 +35,8 @@
 #ifndef GXDLMSIECHDLCSETUP_H
 #define GXDLMSIECHDLCSETUP_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_IEC_HDLC_SETUP
 #include "GXDLMSObject.h"
 
 /**
@@ -112,4 +114,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_IEC_HDLC_SETUP
 #endif //GXDLMSIECHDLCSETUP_H

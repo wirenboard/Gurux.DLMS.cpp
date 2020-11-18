@@ -36,6 +36,7 @@
 #include "../include/GXDLMSClient.h"
 #include "../include/GXBitString.h"
 
+#ifndef DLMS_IGNORE_ACCOUNT
 //Constructor.
 CGXDLMSAccount::CGXDLMSAccount() :
     CGXDLMSAccount("", 0)
@@ -661,3 +662,5 @@ int CGXDLMSAccount::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
     }
     return ret;
 }
+
+#endif //DLMS_IGNORE_ACCOUNT

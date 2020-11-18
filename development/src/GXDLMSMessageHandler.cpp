@@ -36,6 +36,7 @@
 #include "../include/GXDLMSClient.h"
 #include <sstream>
 
+#ifndef DLMS_IGNORE_MESSAGE_HANDLER
 //Constructor.
 CGXDLMSMessageHandler::CGXDLMSMessageHandler() :
     CGXDLMSMessageHandler("", 0)
@@ -283,3 +284,4 @@ int CGXDLMSMessageHandler::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_MESSAGE_HANDLER

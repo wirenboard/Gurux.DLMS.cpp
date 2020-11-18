@@ -32,6 +32,7 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
+#include <string.h>
 #include "../include/GXDLMSSha256.h"
 
 const unsigned int sha256_k[64] =

@@ -36,7 +36,7 @@
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSAutoAnswer.h"
 #include <sstream>
-
+#ifndef DLMS_IGNORE_AUTO_ANSWER
 CGXDLMSAutoAnswer::CGXDLMSAutoAnswer() :
     CGXDLMSAutoAnswer("0.0.2.2.0.255", 0)
 {
@@ -352,3 +352,4 @@ int CGXDLMSAutoAnswer::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg&
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
+#endif //DLMS_IGNORE_AUTO_ANSWER

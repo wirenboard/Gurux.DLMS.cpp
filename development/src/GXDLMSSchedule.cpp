@@ -37,6 +37,7 @@
 #include "../include/GXDLMSSchedule.h"
 #include "../include/GXBitString.h"
 
+#ifndef DLMS_IGNORE_SCHEDULE
 //Constructor.
 CGXDLMSSchedule::CGXDLMSSchedule() :
     CGXDLMSSchedule("0.0.12.0.0.255", 0)
@@ -467,3 +468,4 @@ int CGXDLMSSchedule::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     return ret;
 }
+#endif //DLMS_IGNORE_SCHEDULE

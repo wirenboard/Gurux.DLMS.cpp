@@ -32,9 +32,9 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#include "../include/GXDLMSLimits.h"
+#include "../include/GXHdlcSettings.h"
 
-CGXDLMSLimits::CGXDLMSLimits()
+CGXHdlcSettings::CGXHdlcSettings()
 {
     m_MaxInfoTX = DEFAULT_MAX_INFO_TX;
     m_MaxInfoRX = DEFAULT_MAX_INFO_RX;
@@ -42,42 +42,42 @@ CGXDLMSLimits::CGXDLMSLimits()
     m_WindowSizeRX = DEFAULT_WINDOWS_SIZE_RX;
 }
 
-unsigned short CGXDLMSLimits::GetMaxInfoTX()
+unsigned short CGXHdlcSettings::GetMaxInfoTX()
 {
     return m_MaxInfoTX;
 }
 
-void CGXDLMSLimits::SetMaxInfoTX(unsigned short value)
+void CGXHdlcSettings::SetMaxInfoTX(unsigned short value)
 {
     m_MaxInfoTX = value;
 }
 
-unsigned short CGXDLMSLimits::GetMaxInfoRX()
+unsigned short CGXHdlcSettings::GetMaxInfoRX()
 {
     return m_MaxInfoRX;
 }
 
-void CGXDLMSLimits::SetMaxInfoRX(unsigned short value)
+void CGXHdlcSettings::SetMaxInfoRX(unsigned short value)
 {
     m_MaxInfoRX = value;
 }
 
-unsigned char CGXDLMSLimits::GetWindowSizeTX()
+unsigned char CGXHdlcSettings::GetWindowSizeTX()
 {
     return m_WindowSizeRX;
 }
 
-void CGXDLMSLimits::SetWindowSizeTX(unsigned char value)
+void CGXHdlcSettings::SetWindowSizeTX(unsigned char value)
 {
     m_WindowSizeRX = value;
 }
 
-unsigned char CGXDLMSLimits::GetWindowSizeRX()
+unsigned char CGXHdlcSettings::GetWindowSizeRX()
 {
     return m_WindowSizeTX;
 }
 
-void CGXDLMSLimits::SetWindowSizeRX(unsigned char value)
+void CGXHdlcSettings::SetWindowSizeRX(unsigned char value)
 {
     m_WindowSizeTX = value;
 }

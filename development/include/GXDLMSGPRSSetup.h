@@ -35,6 +35,8 @@
 #ifndef GXDLMSGPRSSETUP_H
 #define GXDLMSGPRSSETUP_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_GPRS_SETUP
 #include "GXDLMSObject.h"
 #include "GXDLMSQualityOfService.h"
 
@@ -97,5 +99,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
-
+#endif //DLMS_IGNORE_GPRS_SETUP
 #endif //GXDLMSGPRSSETUP_H

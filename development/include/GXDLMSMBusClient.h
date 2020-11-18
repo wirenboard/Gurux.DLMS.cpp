@@ -35,6 +35,8 @@
 #ifndef GXDLMSMBUSCLIENT_H
 #define GXDLMSMBUSCLIENT_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_MBUS_CLIENT
 #include "GXDLMSObject.h"
 
 typedef enum
@@ -149,4 +151,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_MBUS_CLIENT
 #endif //GXDLMSMBUSCLIENT_H

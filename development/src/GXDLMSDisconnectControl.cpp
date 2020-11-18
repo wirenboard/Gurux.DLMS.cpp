@@ -37,6 +37,7 @@
 #include "../include/GXDLMSDisconnectControl.h"
 #include "../include/GXDLMSConverter.h"
 
+#ifndef DLMS_IGNORE_DISCONNECT_CONTROL
 //Constructor.
 CGXDLMSDisconnectControl::CGXDLMSDisconnectControl() :
     CGXDLMSDisconnectControl("", 0)
@@ -234,3 +235,5 @@ int CGXDLMSDisconnectControl::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEv
     }
     return DLMS_ERROR_CODE_OK;
 }
+
+#endif //DLMS_IGNORE_DISCONNECT_CONTROL

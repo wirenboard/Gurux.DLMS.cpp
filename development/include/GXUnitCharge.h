@@ -35,6 +35,7 @@
 #ifndef CGXUNIT_CHARGE_H
 #define CGXUNIT_CHARGE_H
 
+#include <vector>
 #include "GXChargePerUnitScaling.h"
 #include "GXCommodity.h"
 #include "GXChargeTable.h"

@@ -34,6 +34,7 @@
 
 #include "../include/GXDLMSPrimeNbOfdmPlcMacSetup.h"
 
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_SETUP
 //Constructor.
 CGXDLMSPrimeNbOfdmPlcMacSetup::CGXDLMSPrimeNbOfdmPlcMacSetup() :
     CGXDLMSPrimeNbOfdmPlcMacSetup("0.0.28.2.0.255", 0)
@@ -304,3 +305,5 @@ int CGXDLMSPrimeNbOfdmPlcMacSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSVa
     }
     return ret;
 }
+
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_SETUP

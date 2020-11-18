@@ -35,6 +35,7 @@
 #include "../include/GXDLMSRegisterMonitor.h"
 #include "../include/GXDLMSClient.h"
 
+#ifndef DLMS_IGNORE_REGISTER_MONITOR
 CGXDLMSRegisterMonitor::CGXDLMSRegisterMonitor() :
     CGXDLMSRegisterMonitor("", 0)
 {
@@ -326,3 +327,4 @@ int CGXDLMSRegisterMonitor::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEven
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
+#endif //DLMS_IGNORE_REGISTER_MONITOR

@@ -37,6 +37,7 @@
 #include "../include/GXDLMSSapAssignment.h"
 #include <sstream>
 
+#ifndef DLMS_IGNORE_SAP_ASSIGNMENT
 CGXDLMSSapAssignment::CGXDLMSSapAssignment() :
     CGXDLMSSapAssignment("0.0.41.0.0.255", 0)
 {
@@ -212,3 +213,4 @@ int CGXDLMSSapAssignment::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
+#endif //DLMS_IGNORE_SAP_ASSIGNMENT

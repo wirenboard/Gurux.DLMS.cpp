@@ -34,6 +34,7 @@
 
 #include "../include/GXDLMSPrimeNbOfdmPlcMacFunctionalParameters.h"
 
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS
 //Constructor.
 CGXDLMSPrimeNbOfdmPlcMacFunctionalParameters::CGXDLMSPrimeNbOfdmPlcMacFunctionalParameters() :
     CGXDLMSPrimeNbOfdmPlcMacFunctionalParameters("0.0.28.3.0.255", 0)
@@ -473,3 +474,5 @@ int CGXDLMSPrimeNbOfdmPlcMacFunctionalParameters::SetValue(CGXDLMSSettings& sett
     }
     return ret;
 }
+
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS

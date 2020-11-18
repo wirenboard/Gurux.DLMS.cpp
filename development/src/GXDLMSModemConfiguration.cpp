@@ -38,6 +38,7 @@
 #include "../include/GXDLMSConverter.h"
 #include <sstream>
 
+#ifndef DLMS_IGNORE_MODEM_CONFIGURATION
 CGXDLMSModemConfiguration::CGXDLMSModemConfiguration() :
     CGXDLMSModemConfiguration("0.0.2.0.0.255", 0)
 {
@@ -320,3 +321,4 @@ int CGXDLMSModemConfiguration::SetValue(CGXDLMSSettings& settings, CGXDLMSValueE
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
+#endif //DLMS_IGNORE_MODEM_CONFIGURATION

@@ -35,6 +35,9 @@
 #ifndef GXDLMSSCRIPTTABLE_H
 #define GXDLMSSCRIPTTABLE_H
 
+#include "GXIgnore.h"
+
+#ifndef DLMS_IGNORE_SCRIPT_TABLE
 #include "GXDLMSObject.h"
 #include "GXDLMSScript.h"
 
@@ -94,4 +97,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_SCRIPT_TABLE
 #endif //GXDLMSSCRIPTTABLE_H

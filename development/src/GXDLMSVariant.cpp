@@ -31,6 +31,8 @@
 // This code is licensed under the GNU General Public License v2.
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
+#include <assert.h>
+#include <string.h>
 #include "../include/GXDLMSVariant.h"
 #include "../include/errorcodes.h"
 #include "../include/GXHelpers.h"
@@ -225,21 +227,9 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
         }
         if (tmp.vt == DLMS_DATA_TYPE_OCTET_STRING)
         {
-            unsigned char ch;
-            char buff[4];
             for (int pos = 0; pos != tmp.size; ++pos)
             {
-                if (pos != 0)
-                {
-                    item->strVal.append(".");
-                }
-                ch = tmp.byteArr[pos];
-#if _MSC_VER > 1000
-                sprintf_s(buff, 4, "%d", ch);
-#else
-                sprintf(buff, "%d", ch);
-#endif
-                item->strVal.append(buff);
+                item->strVal.push_back((char) tmp.byteArr[pos]);
             }
             item->vt = type;
             return DLMS_ERROR_CODE_OK;

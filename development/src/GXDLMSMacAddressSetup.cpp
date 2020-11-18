@@ -35,6 +35,7 @@
 #include "../include/GXDLMSMacAddressSetup.h"
 #include "../include/GXDLMSClient.h"
 
+#ifndef DLMS_IGNORE_MAC_ADDRESS_SETUP
 CGXDLMSMacAddressSetup::CGXDLMSMacAddressSetup() :
     CGXDLMSMacAddressSetup("0.0.25.2.0.255", 0)
 {
@@ -150,7 +151,7 @@ int CGXDLMSMacAddressSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEven
         return SetLogicalName(this, e.GetValue());
     }
     else if (e.GetIndex() == 2)
-    {        
+    {
         std::string add = GXHelpers::BytesToHex(e.GetValue().byteArr, e.GetValue().GetSize());
         GXHelpers::Replace(add, " ", ":");
         SetMacAddress(add);
@@ -158,3 +159,4 @@ int CGXDLMSMacAddressSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEven
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
+#endif //DLMS_IGNORE_MAC_ADDRESS_SETUP

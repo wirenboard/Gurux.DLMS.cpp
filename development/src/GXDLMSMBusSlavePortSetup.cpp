@@ -35,6 +35,7 @@
 #include "../include/GXDLMSMBusSlavePortSetup.h"
 #include "../include/GXDLMSConverter.h"
 
+#ifndef DLMS_IGNORE_MBUS_SLAVE_PORT_SETUP
 //Constructor.
 CGXDLMSMBusSlavePortSetup::CGXDLMSMBusSlavePortSetup() :
     CGXDLMSMBusSlavePortSetup("", 0)
@@ -252,3 +253,5 @@ int CGXDLMSMBusSlavePortSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueE
     }
     return DLMS_ERROR_CODE_OK;
 }
+
+#endif //DLMS_IGNORE_MBUS_SLAVE_PORT_SETUP

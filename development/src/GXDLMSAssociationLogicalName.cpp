@@ -38,6 +38,8 @@
 #include "../include/GXDLMSServer.h"
 #include "../include/GXBitString.h"
 
+#ifndef DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
+
 void CGXDLMSAssociationLogicalName::UpdateAccessRights(CGXDLMSObject* pObj, CGXDLMSVariant data)
 {
     for (std::vector<CGXDLMSVariant >::iterator it = data.Arr[0].Arr.begin(); it != data.Arr[0].Arr.end(); ++it)
@@ -1284,3 +1286,4 @@ int CGXDLMSAssociationLogicalName::SetValue(CGXDLMSSettings& settings, CGXDLMSVa
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME

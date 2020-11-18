@@ -35,6 +35,8 @@
 #ifndef GXDLMSDLMS_SECURITYSETUP_H
 #define GXDLMSDLMS_SECURITYSETUP_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_SECURITY_SETUP
 #include "GXDLMSObject.h"
 #include "GXDLMSCertificateInfo.h"
 
@@ -158,4 +160,5 @@ public:
         std::vector<std::pair<DLMS_GLOBAL_KEY_TYPE, CGXByteBuffer&> >& list,
         std::vector<CGXByteBuffer>& reply);
 };
+#endif //DLMS_IGNORE_SECURITY_SETUP
 #endif //GXDLMSDLMS_SECURITYSETUP_H

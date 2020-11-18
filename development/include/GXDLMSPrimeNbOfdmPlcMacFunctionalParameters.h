@@ -35,6 +35,8 @@
 #ifndef GXDLMSPrimeNbOfdmPlcMacFunctionalParameters_H
 #define GXDLMSPrimeNbOfdmPlcMacFunctionalParameters_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS
 #include "GXDLMSObject.h"
 
 
@@ -365,4 +367,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS
 #endif //GXDLMSPrimeNbOfdmPlcMacFunctionalParameters_H

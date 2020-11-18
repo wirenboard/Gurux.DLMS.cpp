@@ -35,6 +35,8 @@
 #ifndef TRANSLATOR_STANDARD_TAGS_H
 #define TRANSLATOR_STANDARD_TAGS_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
 #include "enums.h"
 #include "errorcodes.h"
 #include "TranslatorTags.h"
@@ -1180,4 +1182,5 @@ public:
         return DLMS_EXCEPTION_SERVICE_ERROR_INVALID;
     }
 };
+#endif //DLMS_IGNORE_XML_TRANSLATOR
 #endif //TRANSLATOR_STANDARD_TAGS_H

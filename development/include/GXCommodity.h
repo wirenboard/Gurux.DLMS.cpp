@@ -35,6 +35,7 @@
 #ifndef CGXCOMMODITY_H
 #define CGXCOMMODITY_H
 
+#include <string>
 #include "enums.h"
 
 /**

@@ -89,10 +89,10 @@ public:
      */
     CGXDLMSObjectCollection& GetObjects();
 
-    /**
-     * @return Information from the connection size that server can handle.
-     */
+    //HDLC connection settings. GetLimits is obsolete. Use GetHdlcSettings instead.
     CGXDLMSLimits& GetLimits();
+    //HDLC connection settings.
+    CGXHdlcSettings& GetHdlcSettings();
 
     /**
      * Retrieves the maximum size of received PDU. PDU size tells maximum size
@@ -220,6 +220,7 @@ public:
         std::vector<std::pair<CGXDLMSObject*, unsigned char> >& objects,
         std::vector<CGXByteBuffer>& reply);
 
+#ifndef DLMS_IGNORE_PUSH_SETUP
     /**
      * Generates push setup message.
      *
@@ -233,6 +234,7 @@ public:
         struct tm* date,
         CGXDLMSPushSetup* push,
         std::vector<CGXByteBuffer>& reply);
+#endif //DLMS_IGNORE_PUSH_SETUP
 
     /**
     * Returns collection of push objects. If this method is used Push object

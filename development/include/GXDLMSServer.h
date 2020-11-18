@@ -62,8 +62,12 @@ class CGXDLMSServer
     friend class CGXDLMSSNCommandHandler;
 private:
     long m_DataReceived;
+#ifndef DLMS_IGNORE_IEC_HDLC_SETUP
     CGXDLMSIecHdlcSetup* m_Hdlc;
+#endif //DLMS_IGNORE_IEC_HDLC_SETUP
+#ifndef DLMS_IGNORE_TCP_UDP_SETUP
     CGXDLMSTcpUdpSetup* m_Wrapper;
+#endif //DLMS_IGNORE_TCP_UDP_SETUP
     CGXReplyData m_Info;
     /**
      * Received data.
@@ -368,6 +372,7 @@ protected:
 
     int HandleRequest(CGXServerReply& sr);
 public:
+#ifndef DLMS_IGNORE_IEC_HDLC_SETUP
     /**
     * @return HDLC settings.
     */
@@ -378,7 +383,8 @@ public:
     *            HDLC settings.
     */
     void SetHdlc(CGXDLMSIecHdlcSetup* value);
-
+#endif //DLMS_IGNORE_IEC_HDLC_SETUP
+#ifndef DLMS_IGNORE_TCP_UDP_SETUP
     /**
     * @return Wrapper settings.
     */
@@ -389,6 +395,7 @@ public:
     *            Wrapper settings.
     */
     void SetWrapper(CGXDLMSTcpUdpSetup* value);
+#endif //DLMS_IGNORE_TCP_UDP_SETUP
 
     /////////////////////////////////////////////////////////////////////////////
     // Standard says that Time zone is from normal time to UTC in minutes.
@@ -467,6 +474,7 @@ public:
         bool logicalNameReferencing,
         DLMS_INTERFACE_TYPE type);
 
+#ifndef DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
     /**
     * Constructor.
     *
@@ -489,6 +497,9 @@ public:
     CGXDLMSServer(
         CGXDLMSAssociationLogicalName* ln, CGXDLMSTcpUdpSetup* wrapper);
 
+#endif //DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
+
+#ifndef DLMS_IGNORE_ASSOCIATION_SHORT_NAME
     /**
     * Constructor.
     *
@@ -511,6 +522,7 @@ public:
     CGXDLMSServer(
         CGXDLMSAssociationShortName* sn, CGXDLMSTcpUdpSetup* wrapper);
 
+#endif //DLMS_IGNORE_ASSOCIATION_SHORT_NAME
 
     /**
     * Destructor.
@@ -527,10 +539,10 @@ public:
      */
     CGXDLMSObjectCollection& GetItems();
 
-    /**
-     * @return Information from the connection size that server can handle.
-     */
-    CGXDLMSLimits GetLimits();
+    //HDLC connection settings. GetLimits is obsolete. Use GetHdlcSettings instead.
+    CGXDLMSLimits& GetLimits();
+    //HDLC connection settings.
+    CGXHdlcSettings& GetHdlcSettings();
 
     /**
      * Retrieves the maximum size of received PDU. PDU size tells maximum size
@@ -654,9 +666,11 @@ public:
         std::vector<std::pair<CGXDLMSObject*, unsigned char> >& objects,
         std::vector<CGXByteBuffer>& reply);
 
+#ifndef DLMS_IGNORE_PUSH_SETUP
     int GeneratePushSetupMessages(
         struct tm* date,
         CGXDLMSPushSetup* push,
         std::vector<CGXByteBuffer>& reply);
+#endif //DLMS_IGNORE_PUSH_SETUP
 };
 #endif //GXDLMSSERVER_H

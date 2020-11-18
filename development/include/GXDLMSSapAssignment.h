@@ -35,6 +35,8 @@
 #ifndef GXDLMSSAPASSIGNMENT_H
 #define GXDLMSSAPASSIGNMENT_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_SAP_ASSIGNMENT
 #include "GXDLMSObject.h"
 
 /**
@@ -96,4 +98,5 @@ public:
      */
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_SAP_ASSIGNMENT
 #endif //GXDLMSSAPASSIGNMENT_H

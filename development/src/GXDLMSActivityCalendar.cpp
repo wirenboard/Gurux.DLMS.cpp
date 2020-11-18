@@ -37,6 +37,8 @@
 #include "../include/GXDLMSActivityCalendar.h"
 #include <sstream>
 
+#ifndef DLMS_IGNORE_ACTIVITY_CALENDAR
+
 CGXDLMSActivityCalendar::CGXDLMSActivityCalendar() :
     CGXDLMSActivityCalendar("0.0.13.0.0.255", 0)
 {
@@ -703,3 +705,4 @@ int CGXDLMSActivityCalendar::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_ACTIVITY_CALENDAR

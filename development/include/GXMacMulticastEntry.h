@@ -35,6 +35,7 @@
 #ifndef GXMACMULTICASTENTRY_H
 #define GXMACMULTICASTENTRY_H
 
+#include <sstream>
 class CGXMacMulticastEntry
 {
     /*

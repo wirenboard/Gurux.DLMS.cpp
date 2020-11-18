@@ -37,6 +37,8 @@
 #include "../include/GXDLMSActionSet.h"
 #include <sstream>
 
+#ifndef DLMS_IGNORE_LIMITER
+
 //Constructor.
 CGXDLMSLimiter::CGXDLMSLimiter() :
     CGXDLMSLimiter("", 0)
@@ -571,3 +573,4 @@ int CGXDLMSLimiter::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_LIMITER

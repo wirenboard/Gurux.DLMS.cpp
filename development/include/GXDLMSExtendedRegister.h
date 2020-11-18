@@ -36,6 +36,7 @@
 
 #include <math.h>
 #include "GXDLMSRegister.h"
+#ifndef DLMS_IGNORE_EXTENDED_REGISTER
 
 class CGXDLMSExtendedRegister : public CGXDLMSRegister
 {
@@ -104,4 +105,5 @@ public:
 
     int GetUIDataType(int index, DLMS_DATA_TYPE& type);
 };
+#endif //DLMS_IGNORE_EXTENDED_REGISTER
 #endif //GXDLMSEXTENDEDREGISTER_H

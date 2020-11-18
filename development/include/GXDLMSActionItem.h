@@ -34,6 +34,7 @@
 #ifndef GXDLMSACTIONITEM_H
 #define GXDLMSACTIONITEM_H
 
+#include <string>
 #include "enums.h"
 
 class CGXDLMSActionItem

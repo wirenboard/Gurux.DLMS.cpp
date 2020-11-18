@@ -38,6 +38,7 @@
 #include "enums.h"
 #include "GXBytebuffer.h"
 #include "GXDLMSLimits.h"
+#include "GXPlcSettings.h"
 #include "GXDLMSObjectCollection.h"
 #include "GXCipher.h"
 
@@ -146,8 +147,10 @@ class CGXDLMSSettings
     // Is this server or client.
     bool m_Server;
 
-    // Information from the connection size that server can handle.
-    CGXDLMSLimits m_Limits;
+    // HDLC connection settings.
+    CGXDLMSLimits m_HdlcSettings;
+    // PLC connection settings.
+    CGXPlcSettings m_PlcSettings;
 
     // Block packet index.
     unsigned long m_BlockIndex;
@@ -286,8 +289,11 @@ public:
     //Is acting as server or client.
     bool IsServer();
 
-    // Information from the frame size that server can handle.
-    CGXDLMSLimits& GetLimits();
+    //HDLC connection settings.
+    CGXDLMSLimits& GetHdlcSettings();
+
+    //PLC connection settings.
+    CGXPlcSettings& GetPlcSettings();
 
     // Used interface.
     DLMS_INTERFACE_TYPE GetInterfaceType();

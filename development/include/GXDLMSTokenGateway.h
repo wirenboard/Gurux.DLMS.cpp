@@ -35,6 +35,10 @@
 #ifndef GXTOKEN_GATEWAY_H
 #define GXTOKEN_GATEWAY_H
 
+#include "GXIgnore.h"
+
+#ifndef DLMS_IGNORE_TOKEN_GATEWAY
+
 #include "GXDLMSObject.h"
 
 /**
@@ -247,4 +251,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_TOKEN_GATEWAY
 #endif //GXTOKEN_GATEWAY_H

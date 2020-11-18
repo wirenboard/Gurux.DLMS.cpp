@@ -33,7 +33,7 @@
 //---------------------------------------------------------------------------
 
 #include "../include/GXDLMSIp6Setup.h"
-
+#ifndef DLMS_IGNORE_IP6_SETUP
 //Constructor.
 CGXDLMSIp6Setup::CGXDLMSIp6Setup() :
     CGXDLMSIp6Setup("0.0.25.7.0.255", 0)
@@ -351,7 +351,7 @@ int CGXDLMSIp6Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         CGXDLMSVariant tmp;
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
-        GXHelpers::SetObjectCount(m_NeighborDiscoverySetup.size(), data);
+        GXHelpers::SetObjectCount((unsigned long)m_NeighborDiscoverySetup.size(), data);
         for (std::vector<CGXNeighborDiscoverySetup*>::iterator it = m_NeighborDiscoverySetup.begin();
             it != m_NeighborDiscoverySetup.end(); ++it)
         {
@@ -479,3 +479,5 @@ int CGXDLMSIp6Setup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     return DLMS_ERROR_CODE_OK;
 }
+
+#endif //DLMS_IGNORE_IP6_SETUP

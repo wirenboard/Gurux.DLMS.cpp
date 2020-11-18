@@ -36,6 +36,7 @@
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSConverter.h"
 
+#ifndef DLMS_IGNORE_IEC_LOCAL_PORT_SETUP
 //Constructor.
 CGXDLMSIECLocalPortSetup::CGXDLMSIECLocalPortSetup() :
     CGXDLMSIECLocalPortSetup("0.0.20.0.0.255", 0)
@@ -366,3 +367,5 @@ int CGXDLMSIECLocalPortSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEv
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
+
+#endif //DLMS_IGNORE_IEC_LOCAL_PORT_SETUP

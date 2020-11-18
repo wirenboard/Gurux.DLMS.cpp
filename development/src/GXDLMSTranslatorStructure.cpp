@@ -32,7 +32,9 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
+#include <assert.h>
 #include "../include/GXDLMSTranslatorStructure.h"
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
 #include "../include/GXHelpers.h"
 
 std::string CGXDLMSTranslatorStructure::GetTag(unsigned long tag)
@@ -562,3 +564,4 @@ int CGXDLMSTranslatorStructure::IntegerToHex(unsigned long long value, std::stri
     result = tmp;
     return 0;
 }
+#endif //DLMS_IGNORE_XML_TRANSLATOR

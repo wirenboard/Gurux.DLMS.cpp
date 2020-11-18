@@ -32,60 +32,195 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#include <string.h>
+#include <string>
+#include "../include/GXIgnore.h"
 #include "../include/GXXmlWriter.h"
+#ifndef DLMS_IGNORE_ACTION_SCHEDULE
 #include "../include/GXDLMSActionSchedule.h"
+#endif //DLMS_IGNORE_ACTION_SCHEDULE
+#ifndef DLMS_IGNORE_ACTIVITY_CALENDAR
 #include "../include/GXDLMSActivityCalendar.h"
+#endif //DLMS_IGNORE_ACTIVITY_CALENDAR
+#ifndef DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
 #include "../include/GXDLMSAssociationLogicalName.h"
+#endif //DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
+#ifndef DLMS_IGNORE_ASSOCIATION_SHORT_NAME
 #include "../include/GXDLMSAssociationShortName.h"
+#endif //DLMS_IGNORE_ASSOCIATION_SHORT_NAME
+#ifndef DLMS_IGNORE_AUTO_ANSWER
 #include "../include/GXDLMSAutoAnswer.h"
+#endif //DLMS_IGNORE_AUTO_ANSWER
+#ifndef DLMS_IGNORE_AUTO_CONNECT
 #include "../include/GXDLMSAutoConnect.h"
+#endif //DLMS_IGNORE_AUTO_CONNECT
+#ifndef DLMS_IGNORE_CLOCK
 #include "../include/GXDLMSClock.h"
+#endif //DLMS_IGNORE_CLOCK
+#ifndef DLMS_IGNORE_DATA
 #include "../include/GXDLMSData.h"
+#endif //DLMS_IGNORE_DATA
+#ifndef DLMS_IGNORE_REGISTER
 #include "../include/GXDLMSRegister.h"
+#endif //DLMS_IGNORE_REGISTER
+#ifndef DLMS_IGNORE_EXTENDED_REGISTER
 #include "../include/GXDLMSExtendedRegister.h"
+#endif //DLMS_IGNORE_EXTENDED_REGISTER
+#ifndef DLMS_IGNORE_DEMAND_REGISTER
 #include "../include/GXDLMSDemandRegister.h"
+#endif //DLMS_IGNORE_DEMAND_REGISTER
+#ifndef DLMS_IGNORE_REGISTER_MONITOR
 #include "../include/GXDLMSRegisterMonitor.h"
+#endif //DLMS_IGNORE_REGISTER_MONITOR
+#ifndef DLMS_IGNORE_PROFILE_GENERIC
 #include "../include/GXDLMSProfileGeneric.h"
+#endif //DLMS_IGNORE_PROFILE_GENERIC
+#ifndef DLMS_IGNORE_TCP_UDP_SETUP
 #include "../include/GXDLMSTcpUdpSetup.h"
+#endif //DLMS_IGNORE_TCP_UDP_SETUP
+#ifndef DLMS_IGNORE_GPRS_SETUP
 #include "../include/GXDLMSGPRSSetup.h"
+#endif //DLMS_IGNORE_GPRS_SETUP
+#ifndef DLMS_IGNORE_ACTION_SCHEDULE
 #include "../include/GXDLMSActionSchedule.h"
+#endif //DLMS_IGNORE_ACTION_SCHEDULE
+#ifndef DLMS_IGNORE_SPECIAL_DAYS_TABLE
 #include "../include/GXDLMSSpecialDaysTable.h"
+#endif //DLMS_IGNORE_SPECIAL_DAYS_TABLE
+#ifndef DLMS_IGNORE_IMAGE_TRANSFER
 #include "../include/GXDLMSImageTransfer.h"
+#endif //DLMS_IGNORE_IMAGE_TRANSFER
+#ifndef DLMS_IGNORE_DISCONNECT_CONTROL
 #include "../include/GXDLMSDisconnectControl.h"
+#endif //DLMS_IGNORE_DISCONNECT_CONTROL
+#ifndef DLMS_IGNORE_LIMITER
 #include "../include/GXDLMSLimiter.h"
+#endif //DLMS_IGNORE_LIMITER
+#ifndef DLMS_IGNORE_MBUS_CLIENT
 #include "../include/GXDLMSMBusClient.h"
+#endif //DLMS_IGNORE_MBUS_CLIENT
+#ifndef DLMS_IGNORE_SCRIPT_TABLE
 #include "../include/GXDLMSScriptTable.h"
+#endif //DLMS_IGNORE_SCRIPT_TABLE
+#ifndef DLMS_IGNORE_MBUS_SLAVE_PORT_SETUP
 #include "../include/GXDLMSMBusSlavePortSetup.h"
+#endif //DLMS_IGNORE_MBUS_SLAVE_PORT_SETUP
+#ifndef DLMS_IGNORE_SECURITY_SETUP
 #include "../include/GXDLMSSecuritySetup.h"
+#endif //DLMS_IGNORE_SECURITY_SETUP
+#ifndef DLMS_IGNORE_PPP_SETUP
 #include "../include/GXDLMSPppSetup.h"
+#endif //DLMS_IGNORE_PPP_SETUP
+#ifndef DLMS_IGNORE_MAC_ADDRESS_SETUP
 #include "../include/GXDLMSMacAddressSetup.h"
+#endif //DLMS_IGNORE_MAC_ADDRESS_SETUP
+#ifndef DLMS_IGNORE_IEC_HDLC_SETUP
 #include "../include/GXDLMSHdlcSetup.h"
+#endif //DLMS_IGNORE_IEC_HDLC_SETUP
+#ifndef DLMS_IGNORE_IEC_LOCAL_PORT_SETUP
 #include "../include/GXDLMSIECOpticalPortSetup.h"
+#endif //DLMS_IGNORE_IEC_LOCAL_PORT_SETUP
+#ifndef DLMS_IGNORE_IP4_SETUP
 #include "../include/GXDLMSIp4Setup.h"
+#endif //DLMS_IGNORE_IP4_SETUP
+#ifndef DLMS_IGNORE_IP6_SETUP
 #include "../include/GXDLMSIp6Setup.h"
+#endif //DLMS_IGNORE_IP6_SETUP
+#ifndef DLMS_IGNORE_REGISTER_ACTIVATION
 #include "../include/GXDLMSRegisterActivation.h"
+#endif //DLMS_IGNORE_REGISTER_ACTIVATION
+#ifndef DLMS_IGNORE_SCHEDULE
 #include "../include/GXDLMSSchedule.h"
+#endif //DLMS_IGNORE_SCHEDULE
+#ifndef DLMS_IGNORE_MODEM_CONFIGURATION
 #include "../include/GXDLMSModemConfiguration.h"
+#endif //DLMS_IGNORE_MODEM_CONFIGURATION
+#ifndef DLMS_IGNORE_SAP_ASSIGNMENT
 #include "../include/GXDLMSSapAssignment.h"
+#endif //DLMS_IGNORE_SAP_ASSIGNMENT
+#ifndef DLMS_IGNORE_MBUS_MASTER_PORT_SETUP
 #include "../include/GXDLMSMBusMasterPortSetup.h"
+#endif //DLMS_IGNORE_MBUS_MASTER_PORT_SETUP
+#ifndef DLMS_IGNORE_MESSAGE_HANDLER
 #include "../include/GXDLMSMessageHandler.h"
+#endif //DLMS_IGNORE_MESSAGE_HANDLER
+#ifndef DLMS_IGNORE_PUSH_SETUP
 #include "../include/GXDLMSPushSetup.h"
+#endif //DLMS_IGNORE_PUSH_SETUP
+#ifndef DLMS_IGNORE_GSM_DIAGNOSTIC
 #include "../include/GXDLMSGSMDiagnostic.h"
+#endif //DLMS_IGNORE_GSM_DIAGNOSTIC
+#ifndef DLMS_IGNORE_ACCOUNT
 #include "../include/GXDLMSAccount.h"
+#endif //DLMS_IGNORE_ACCOUNT
+#ifndef DLMS_IGNORE_CREDIT
 #include "../include/GXDLMSCredit.h"
+#endif //DLMS_IGNORE_CREDIT
+#ifndef DLMS_IGNORE_CHARGE
 #include "../include/GXDLMSCharge.h"
+#endif //DLMS_IGNORE_CHARGE
+#ifndef DLMS_IGNORE_PARAMETER_MONITOR
 #include "../include/GXDLMSParameterMonitor.h"
+#endif //DLMS_IGNORE_PARAMETER_MONITOR
+#ifndef DLMS_IGNORE_TOKEN_GATEWAY
 #include "../include/GXDLMSTokenGateway.h"
+#endif //DLMS_IGNORE_TOKEN_GATEWAY
+#ifndef DLMS_IGNORE_COMPACT_DATA
 #include "../include/GXDLMSCompactData.h"
+#endif //DLMS_IGNORE_COMPACT_DATA
+#ifndef DLMS_IGNORE_UTILITY_TABLES
 #include "../include/GXDLMSUtilityTables.h"
+#endif //DLMS_IGNORE_UTILITY_TABLES
+#ifndef DLMS_IGNORE_LLC_SSCS_SETUP
 #include "../include/GXDLMSLlcSscsSetup.h"
+#endif //DLMS_IGNORE_LLC_SSCS_SETUP
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS
 #include "../include/GXDLMSPrimeNbOfdmPlcPhysicalLayerCounters.h"
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_SETUP
 #include "../include/GXDLMSPrimeNbOfdmPlcMacSetup.h"
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_SETUP
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS
 #include "../include/GXDLMSPrimeNbOfdmPlcMacFunctionalParameters.h"
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_COUNTERS
 #include "../include/GXDLMSPrimeNbOfdmPlcMacCounters.h"
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_COUNTERS
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA
 #include "../include/GXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData.h"
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION
 #include "../include/GXDLMSPrimeNbOfdmPlcApplicationsIdentification.h"
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION
+#ifndef DLMS_IGNORE_IEC_8802_LLC_TYPE1_SETUP
+#include "../include/GXDLMSIec8802LlcType1Setup.h"
+#endif //DLMS_IGNORE_IEC_8802_LLC_TYPE1_SETUP
+#ifndef DLMS_IGNORE_IEC_8802_LLC_TYPE2_SETUP
+#include "../include/GXDLMSIec8802LlcType2Setup.h"
+#endif //DLMS_IGNORE_IEC_8802_LLC_TYPE2_SETUP
+#ifndef DLMS_IGNORE_IEC_8802_LLC_TYPE3_SETUP
+#include "../include/GXDLMSIec8802LlcType3Setup.h"
+#endif //DLMS_IGNORE_IEC_8802_LLC_TYPE3_SETUP
+#ifndef DLMS_IGNORE_SFSK_REPORTING_SYSTEM_LIST
+#include "../include/GXDLMSSFSKReportingSystemList.h"
+#endif //DLMS_IGNORE_SFSK_REPORTING_SYSTEM_LIST
+#ifndef DLMS_IGNORE_ARBITRATOR
+#include "../include/GXDLMSArbitrator.h"
+#endif //DLMS_IGNORE_ARBITRATOR
+#ifndef DLMS_IGNORE_SFSK_MAC_COUNTERS
+#include "../include/GXDLMSSFSKMacCounters.h"
+#endif //DLMS_IGNORE_SFSK_MAC_COUNTERS
+#ifndef DLMS_IGNORE_SFSK_MAC_SYNCHRONIZATION_TIMEOUTS
+#include "../include/GXDLMSSFSKMacSynchronizationTimeouts.h"
+#endif //DLMS_IGNORE_SFSK_MAC_SYNCHRONIZATION_TIMEOUTS
+#ifndef DLMS_IGNORE_SFSK_ACTIVE_INITIATOR
+#include "../include/GXDLMSSFSKActiveInitiator.h"
+#endif //DLMS_IGNORE_SFSK_ACTIVE_INITIATOR
+#ifndef DLMS_IGNORE_SFSK_PHY_MAC_SETUP
+#include "../include/GXDLMSSFSKPhyMacSetUp.h"
+#endif //DLMS_IGNORE_SFSK_PHY_MAC_SETUP
+#ifndef DLMS_IGNORE_IEC_TWISTED_PAIR_SETUP
+#include "../include/GXDLMSIecTwistedPairSetup.h"
+#endif //DLMS_IGNORE_IEC_TWISTED_PAIR_SETUP
 
 CGXXmlWriter::CGXXmlWriter(FILE* f, bool skipDefaults)
 {
@@ -379,6 +514,7 @@ int CGXXmlWriter::WriteElementObject(const char* name, CGXDLMSVariant& value, DL
     return ret;
 }
 
+#ifndef DLMS_IGNORE_ACTION_SCHEDULE
 int SaveActionSchedule(CGXXmlWriter* writer, CGXDLMSActionSchedule* obj)
 {
     int ret;
@@ -401,7 +537,9 @@ int SaveActionSchedule(CGXXmlWriter* writer, CGXDLMSActionSchedule* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_ACTION_SCHEDULE
 
+#ifndef DLMS_IGNORE_ACTIVITY_CALENDAR
 int SaveSeasonProfile(CGXXmlWriter* writer, std::vector<CGXDLMSSeasonProfile*>& list, const char* name)
 {
     int ret;
@@ -512,6 +650,10 @@ int SaveActivityCalendar(CGXXmlWriter* writer, CGXDLMSActivityCalendar* obj)
     }
     return ret;
 }
+
+#endif //DLMS_IGNORE_ACTIVITY_CALENDAR
+
+#ifndef DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
 int SaveAssociationLogicalName(CGXXmlWriter* writer, CGXDLMSAssociationLogicalName* obj)
 {
     int ret;
@@ -560,6 +702,9 @@ int SaveAssociationLogicalName(CGXXmlWriter* writer, CGXDLMSAssociationLogicalNa
     return ret;
 }
 
+#endif //DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
+
+#ifndef DLMS_IGNORE_ASSOCIATION_SHORT_NAME
 int SaveAssociationShortName(CGXXmlWriter* writer, CGXDLMSAssociationShortName* obj)
 {
     int ret;
@@ -569,7 +714,9 @@ int SaveAssociationShortName(CGXXmlWriter* writer, CGXDLMSAssociationShortName* 
     }
     return ret;
 }
+#endif //DLMS_IGNORE_ASSOCIATION_SHORT_NAME
 
+#ifndef DLMS_IGNORE_AUTO_ANSWER
 int SaveAutoAnswer(CGXXmlWriter* writer, CGXDLMSAutoAnswer* obj)
 {
     int ret;
@@ -600,6 +747,9 @@ int SaveAutoAnswer(CGXXmlWriter* writer, CGXDLMSAutoAnswer* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_AUTO_ANSWER
+
+#ifndef DLMS_IGNORE_AUTO_CONNECT
 int SaveAutoConnect(CGXXmlWriter* writer, CGXDLMSAutoConnect* obj)
 {
     int ret;
@@ -630,7 +780,9 @@ int SaveAutoConnect(CGXXmlWriter* writer, CGXDLMSAutoConnect* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_AUTO_CONNECT
 
+#ifndef DLMS_IGNORE_CLOCK
 int SaveClock(CGXXmlWriter* writer, CGXDLMSClock* obj)
 {
     int ret;
@@ -647,7 +799,9 @@ int SaveClock(CGXXmlWriter* writer, CGXDLMSClock* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_CLOCK
 
+#ifndef DLMS_IGNORE_DATA
 int SaveData(CGXXmlWriter* writer, CGXDLMSData* obj)
 {
     int ret;
@@ -660,7 +814,9 @@ int SaveData(CGXXmlWriter* writer, CGXDLMSData* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_DATA
 
+#ifndef DLMS_IGNORE_DEMAND_REGISTER
 int SaveDemandRegister(CGXXmlWriter* writer, CGXDLMSDemandRegister* obj)
 {
     int ret;
@@ -678,12 +834,16 @@ int SaveDemandRegister(CGXXmlWriter* writer, CGXDLMSDemandRegister* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_DEMAND_REGISTER
 
+#ifndef DLMS_IGNORE_MAC_ADDRESS_SETUP
 int SaveMacAddressSetup(CGXXmlWriter* writer, CGXDLMSMacAddressSetup* obj)
 {
     return writer->WriteElementString("MacAddress", obj->GetMacAddress());
 }
+#endif //DLMS_IGNORE_MAC_ADDRESS_SETUP
 
+#ifndef DLMS_IGNORE_EXTENDED_REGISTER
 int SaveExtendedRegister(CGXXmlWriter* writer, CGXDLMSExtendedRegister* obj)
 {
     int ret;
@@ -701,7 +861,9 @@ int SaveExtendedRegister(CGXXmlWriter* writer, CGXDLMSExtendedRegister* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_EXTENDED_REGISTER
 
+#ifndef DLMS_IGNORE_GPRS_SETUP
 int SaveGprsSetup(CGXXmlWriter* writer, CGXDLMSGPRSSetup* obj)
 {
     int ret;
@@ -726,7 +888,9 @@ int SaveGprsSetup(CGXXmlWriter* writer, CGXDLMSGPRSSetup* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_GPRS_SETUP
 
+#ifndef DLMS_IGNORE_IEC_HDLC_SETUP
 int SaveIecHdlcSetup(CGXXmlWriter* writer, CGXDLMSIecHdlcSetup* obj)
 {
     int ret;
@@ -743,7 +907,9 @@ int SaveIecHdlcSetup(CGXXmlWriter* writer, CGXDLMSIecHdlcSetup* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_IEC_HDLC_SETUP
 
+#ifndef DLMS_IGNORE_IEC_LOCAL_PORT_SETUP
 int SaveIecLocalPortSetup(CGXXmlWriter* writer, CGXDLMSIECLocalPortSetup* obj)
 {
     int ret;
@@ -760,22 +926,35 @@ int SaveIecLocalPortSetup(CGXXmlWriter* writer, CGXDLMSIECLocalPortSetup* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_IEC_LOCAL_PORT_SETUP
 
-/*
 int SaveIecTwistedPairSetup(CGXXmlWriter* writer, CGXDLMSIecTwistedPairSetup* obj)
 {
     int ret;
-    writer->WriteElementString("Mode", (int)Mode);
-            writer->WriteElementString("Speed", (int)Speed);
-            writer->WriteElementString("LN", GXDLMSTranslator.ToHex(PrimaryAddresses));
-            if (Tabis != null)
+    if ((ret = writer->WriteElementString("Mode", (int)obj->GetMode())) == 0 &&
+        (ret = writer->WriteElementString("Speed", (int)obj->GetSpeed())) == 0)
+    {
+        CGXByteBuffer bb;
+        for (std::vector<unsigned char>::iterator it = obj->GetPrimaryAddresses().begin();
+            it != obj->GetPrimaryAddresses().end(); ++it)
+        {
+            bb.SetUInt8(*it);
+        }
+        if ((ret = writer->WriteElementString("PrimaryAddresses", bb.ToHexString(true))) == 0)
+        {
+            bb.Clear();
+            for (std::vector<char>::iterator it = obj->GetTabis().begin();
+                it != obj->GetTabis().end(); ++it)
             {
-                byte[] tmp = new byte[Tabis.Length];
-                Buffer.BlockCopy(Tabis, 0, tmp, 0, Tabis.Length);
-                writer->WriteElementString("LN", GXDLMSTranslator.ToHex(tmp));
+                bb.SetUInt8(*it);
             }
+            ret = writer->WriteElementString("LN", bb.ToHexString(true));
+        }
+    }
+    return ret;
 }
-*/
+
+#ifndef DLMS_IGNORE_IP4_SETUP
 int SaveIp4Setup(CGXXmlWriter* writer, CGXDLMSIp4Setup* obj)
 {
     int ret;
@@ -833,6 +1012,9 @@ int SaveIp4Setup(CGXXmlWriter* writer, CGXDLMSIp4Setup* obj)
     return ret;
 }
 
+#endif //DLMS_IGNORE_IP4_SETUP
+
+#ifndef DLMS_IGNORE_IP6_SETUP
 int SaveIPAddress(CGXXmlWriter* writer, std::vector<IN6_ADDR>& list, const char* name)
 {
     char tmp[33];
@@ -891,7 +1073,9 @@ int SaveIp6Setup(CGXXmlWriter* writer, CGXDLMSIp6Setup* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_IP6_SETUP
 
+#ifndef DLMS_IGNORE_GSM_DIAGNOSTIC
 int SaveGSMDiagnostic(CGXXmlWriter* writer, CGXDLMSGSMDiagnostic* obj)
 {
     int ret;
@@ -927,26 +1111,9 @@ int SaveGSMDiagnostic(CGXXmlWriter* writer, CGXDLMSGSMDiagnostic* obj)
     }
     return ret;
 }
-/*
-int SaveIp6Setup(CGXXmlWriter* writer, CGXDLMSIp6Setup* obj)
-{
- writer->WriteElementString("DataLinkLayerReference", DataLinkLayerReference);
-            writer->WriteElementString("AddressConfigMode", (int)AddressConfigMode);
-            SaveIPAddress(writer, UnicastIPAddress, "UnicastIPAddress");
-            SaveIPAddress(writer, MulticastIPAddress, "MulticastIPAddress");
-            SaveIPAddress(writer, GatewayIPAddress, "GatewayIPAddress");
-            if (PrimaryDNSAddress != null)
-            {
-                writer->WriteElementString("PrimaryDNSAddress", PrimaryDNSAddress.ToString());
-            }
-            if (SecondaryDNSAddress != null)
-            {
-                writer->WriteElementString("SecondaryDNSAddress", SecondaryDNSAddress.ToString());
-            }
-            writer->WriteElementString("TrafficClass", TrafficClass);
-            SaveNeighborDiscoverySetup(writer, NeighborDiscoverySetup, "NeighborDiscoverySetup");
-}
-*/
+#endif //DLMS_IGNORE_GSM_DIAGNOSTIC
+
+#ifndef DLMS_IGNORE_MBUS_SLAVE_PORT_SETUP
 int SaveMBusSlavePortSetup(CGXXmlWriter* writer, CGXDLMSMBusSlavePortSetup* obj)
 {
     int ret;
@@ -959,7 +1126,9 @@ int SaveMBusSlavePortSetup(CGXXmlWriter* writer, CGXDLMSMBusSlavePortSetup* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_MBUS_SLAVE_PORT_SETUP
 
+#ifndef DLMS_IGNORE_MODEM_CONFIGURATION
 int SaveModemConfiguration(CGXXmlWriter* writer, CGXDLMSModemConfiguration* obj)
 {
     int ret;
@@ -989,7 +1158,9 @@ int SaveModemConfiguration(CGXXmlWriter* writer, CGXDLMSModemConfiguration* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_MODEM_CONFIGURATION
 
+#ifndef DLMS_IGNORE_PUSH_SETUP
 int SavePushSetup(CGXXmlWriter* writer, CGXDLMSPushSetup* obj)
 {
     int ret;
@@ -1041,7 +1212,9 @@ int SavePushSetup(CGXXmlWriter* writer, CGXDLMSPushSetup* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_PUSH_SETUP
 
+#ifndef DLMS_IGNORE_PPP_SETUP
 int SavePppSetup(CGXXmlWriter* writer, CGXDLMSPppSetup* obj)
 {
     int ret;
@@ -1089,7 +1262,9 @@ int SavePppSetup(CGXXmlWriter* writer, CGXDLMSPppSetup* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_PPP_SETUP
 
+#ifndef DLMS_IGNORE_PROFILE_GENERIC
 int SaveProfileGeneric(CGXXmlWriter* writer, CGXDLMSProfileGeneric* obj)
 {
     int ret;
@@ -1203,7 +1378,9 @@ int SaveProfileGeneric(CGXXmlWriter* writer, CGXDLMSProfileGeneric* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_PROFILE_GENERIC
 
+#ifndef DLMS_IGNORE_REGISTER
 int SaveRegister(CGXXmlWriter* writer, CGXDLMSRegister* obj)
 {
     DLMS_DATA_TYPE dt, uiDt;
@@ -1218,7 +1395,9 @@ int SaveRegister(CGXXmlWriter* writer, CGXDLMSRegister* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_REGISTER
 
+#ifndef DLMS_IGNORE_REGISTER_ACTIVATION
 int SaveRegisterActivation(CGXXmlWriter* writer, CGXDLMSRegisterActivation* obj)
 {
     int ret;
@@ -1264,7 +1443,9 @@ int SaveRegisterActivation(CGXXmlWriter* writer, CGXDLMSRegisterActivation* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_REGISTER_ACTIVATION
 
+#ifndef DLMS_IGNORE_REGISTER_MONITOR
 int SaveRegisterMonitor(CGXXmlWriter* writer, CGXDLMSRegisterMonitor* obj)
 {
     int ret;
@@ -1312,6 +1493,9 @@ int SaveRegisterMonitor(CGXXmlWriter* writer, CGXDLMSRegisterMonitor* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_REGISTER_MONITOR
+
+#ifndef DLMS_IGNORE_DISCONNECT_CONTROL
 int SaveDisconnectControl(CGXXmlWriter* writer, CGXDLMSDisconnectControl* obj)
 {
     int ret;
@@ -1323,7 +1507,9 @@ int SaveDisconnectControl(CGXXmlWriter* writer, CGXDLMSDisconnectControl* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_DISCONNECT_CONTROL
 
+#ifndef DLMS_IGNORE_LIMITER
 int SaveLimiter(CGXXmlWriter* writer, CGXDLMSLimiter* obj)
 {
     int ret;
@@ -1376,7 +1562,9 @@ int SaveLimiter(CGXXmlWriter* writer, CGXDLMSLimiter* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_LIMITER
 
+#ifndef DLMS_IGNORE_MBUS_CLIENT
 int SaveMBusClient(CGXXmlWriter* writer, CGXDLMSMBusClient* obj)
 {
     int ret;
@@ -1418,12 +1606,16 @@ int SaveMBusClient(CGXXmlWriter* writer, CGXDLMSMBusClient* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_MBUS_CLIENT
 
+#ifndef DLMS_IGNORE_COMPACT_DATA
 int SaveCompactData(CGXXmlWriter* writer, CGXDLMSCompactData* obj)
 {
     return 0;
 }
+#endif //DLMS_IGNORE_COMPACT_DATA
 
+#ifndef DLMS_IGNORE_LLC_SSCS_SETUP
 int SaveLlcSscsSetup(CGXXmlWriter* writer, CGXDLMSLlcSscsSetup* obj)
 {
     int ret;
@@ -1433,6 +1625,9 @@ int SaveLlcSscsSetup(CGXXmlWriter* writer, CGXDLMSLlcSscsSetup* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_LLC_SSCS_SETUP
+
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS
 
 int SavePrimeNbOfdmPlcPhysicalLayerCounters(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcPhysicalLayerCounters* obj)
 {
@@ -1446,7 +1641,9 @@ int SavePrimeNbOfdmPlcPhysicalLayerCounters(CGXXmlWriter* writer, CGXDLMSPrimeNb
     }
     return ret;
 }
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS
 
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_SETUP
 int SavePrimeNbOfdmPlcMacSetup(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacSetup* obj)
 {
     int ret;
@@ -1462,7 +1659,9 @@ int SavePrimeNbOfdmPlcMacSetup(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacSet
     }
     return ret;
 }
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_SETUP
 
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS
 int SavePrimeNbOfdmPlcMacFunctionalParameters(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacFunctionalParameters* obj)
 {
     int ret;
@@ -1484,7 +1683,9 @@ int SavePrimeNbOfdmPlcMacFunctionalParameters(CGXXmlWriter* writer, CGXDLMSPrime
     }
     return ret;
 }
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS
 
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_COUNTERS
 int SavePrimeNbOfdmPlcMacCounters(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacCounters* obj)
 {
     int ret;
@@ -1498,8 +1699,10 @@ int SavePrimeNbOfdmPlcMacCounters(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMac
 
     }
     return ret;
-    return 0;
 }
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_COUNTERS
+
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA
 
 int SaveMulticastEntries(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData* obj)
 {
@@ -1642,6 +1845,9 @@ int SavePrimeNbOfdmPlcMacNetworkAdministrationData(CGXXmlWriter* writer, CGXDLMS
     return ret;
 }
 
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA
+
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION
 int SavePrimeNbOfdmPlcApplicationsIdentification(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcApplicationsIdentification* obj)
 {
     int ret;
@@ -1653,8 +1859,9 @@ int SavePrimeNbOfdmPlcApplicationsIdentification(CGXXmlWriter* writer, CGXDLMSPr
     }
     return ret;
 }
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION
 
-
+#ifndef DLMS_IGNORE_PARAMETER_MONITOR
 int SaveParameterMonitor(CGXXmlWriter* writer, CGXDLMSParameterMonitor* obj)
 {
     int ret = 0;
@@ -1697,37 +1904,319 @@ int SaveParameterMonitor(CGXXmlWriter* writer, CGXDLMSParameterMonitor* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_PARAMETER_MONITOR
+
 /*
 int SaveWirelessModeQchannel(CGXXmlWriter* writer, CGXDLMSWirelessModeQchannel* obj)
 {
     return writer->WriteElementString("AddressState", obj->GetAddressState());
 }
 */
+
+#ifndef DLMS_IGNORE_MBUS_MASTER_PORT_SETUP
 int SaveMBusMasterPortSetup(CGXXmlWriter* writer, CGXDLMSMBusMasterPortSetup* obj)
 {
     return writer->WriteElementString("CommSpeed", obj->GetCommSpeed(), DLMS_BAUD_RATE_2400);
 }
+#endif //DLMS_IGNORE_MBUS_MASTER_PORT_SETUP
 
 /*
+#ifndef DLMS_IGNORE_REGISTER_TABLE
 int SaveRegisterTable(CGXXmlWriter* writer, CGXDLMSRegisterTable* obj)
 {
+    return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
 }
+#endif //DLMS_IGNORE_REGISTER_TABLE
+
+#ifndef DLMS_IGNORE_ZIG_BEE_SAS_STARTUP
 int SaveZigBeeSasStartup(CGXXmlWriter* writer, CGXDLMSZigBeeSasStartup* obj)
 {
+    return DLMS_ERROR_CODE_NOT_IMPLEMENTED;
 }
+#endif //DLMS_IGNORE_ZIG_BEE_SAS_STARTUP
+
+#ifndef DLMS_IGNORE_ZIG_BEE_SAS_JOIN
 int SaveZigBeeSasJoin(CGXXmlWriter* writer, CGXDLMSZigBeeSasJoin* obj)
 {
 }
+#endif //DLMS_IGNORE_ZIG_BEE_SAS_JOIN
+#ifndef DLMS_IGNORE_ZIG_BEE_SAS_APS_FRAGMENTATION
 int SaveZigBeeSasApsFragmentation(CGXXmlWriter* writer, CGXDLMSZigBeeSasApsFragmentation* obj)
 {
 }
+#endif //DLMS_IGNORE_ZIG_BEE_SAS_APS_FRAGMENTATION
+
+#ifndef DLMS_IGNORE_ZIG_BEE_NETWORK_CONTROL
 int SaveZigBeeNetworkControl(CGXXmlWriter* writer, CGXDLMSZigBeeNetworkControl* obj)
 {
 }
+#endif //DLMS_IGNORE_ZIG_BEE_NETWORK_CONTROL
+
 int SaveDataProtection(CGXXmlWriter* writer, CGXDLMSDataProtection* obj)
 {
 }
 */
+
+#ifndef DLMS_IGNORE_IEC_8802_LLC_TYPE1_SETUP
+int SaveIec8802LlcType1Setup(CGXXmlWriter* writer, CGXDLMSIec8802LlcType1Setup* obj)
+{
+    return writer->WriteElementString("MaximumOctetsUiPdu", obj->GetMaximumOctetsUiPdu());
+}
+#endif //DLMS_IGNORE_IEC_8802_LLC_TYPE1_SETUP
+
+#ifndef DLMS_IGNORE_IEC_8802_LLC_TYPE2_SETUP
+int SaveIec8802LlcType2Setup(CGXXmlWriter* writer, CGXDLMSIec8802LlcType2Setup* obj)
+{
+    int ret;
+    if ((ret = writer->WriteElementString("TransmitWindowSizeK", obj->GetTransmitWindowSizeK())) != 0 ||
+        (ret = writer->WriteElementString("TransmitWindowSizeRW", obj->GetTransmitWindowSizeRW())) != 0 ||
+        (ret = writer->WriteElementString("MaximumOctetsPdu", obj->GetMaximumOctetsPdu())) != 0 ||
+        (ret = writer->WriteElementString("MaximumNumberTransmissions", obj->GetMaximumNumberTransmissions())) != 0 ||
+        (ret = writer->WriteElementString("AcknowledgementTimer", obj->GetAcknowledgementTimer())) != 0 ||
+        (ret = writer->WriteElementString("BitTimer", obj->GetBitTimer())) != 0 ||
+        (ret = writer->WriteElementString("RejectTimer", obj->GetRejectTimer())) != 0 ||
+        (ret = writer->WriteElementString("BusyStateTimer", obj->GetBusyStateTimer())) != 0)
+    {
+
+    }
+    return 0;
+}
+#endif //DLMS_IGNORE_IEC_8802_LLC_TYPE2_SETUP
+
+#ifndef DLMS_IGNORE_IEC_8802_LLC_TYPE3_SETUP
+int SaveIec8802LlcType3Setup(CGXXmlWriter* writer, CGXDLMSIec8802LlcType3Setup* obj)
+{
+    int ret;
+    if ((ret = writer->WriteElementString("MaximumOctetsACnPdu", obj->GetMaximumOctetsACnPdu())) != 0 ||
+        (ret = writer->WriteElementString("MaximumTransmissions", obj->GetMaximumTransmissions())) != 0 ||
+        (ret = writer->WriteElementString("AcknowledgementTime", obj->GetAcknowledgementTime())) != 0 ||
+        (ret = writer->WriteElementString("ReceiveLifetime", obj->GetReceiveLifetime())) != 0 ||
+        (ret = writer->WriteElementString("TransmitLifetime", obj->GetTransmitLifetime())) != 0)
+    {
+
+    }
+    return ret;
+}
+#endif //DLMS_IGNORE_IEC_8802_LLC_TYPE3_SETUP
+
+#ifndef DLMS_IGNORE_SFSK_REPORTING_SYSTEM_LIST
+int SaveSFSKReportingSystemList(CGXXmlWriter* writer, CGXDLMSSFSKReportingSystemList* obj)
+{
+    int ret = 0;
+    if ((ret = writer->WriteStartElement("ReportingSystems")) == 0)
+    {
+        for (std::vector<CGXByteBuffer>::iterator it = obj->GetReportingSystemList().begin(); it != obj->GetReportingSystemList().end(); ++it)
+        {
+            if ((ret = writer->WriteElementString("Item", it->ToHexString(false))) != 0)
+            {
+                break;
+            }
+        }
+        ret = writer->WriteEndElement();
+    }
+    return ret;
+}
+#endif //DLMS_IGNORE_SFSK_REPORTING_SYSTEM_LIST
+
+#ifndef DLMS_IGNORE_ARBITRATOR
+int SaveArbitrator(CGXXmlWriter* writer, CGXDLMSArbitrator* obj)
+{
+    int ret = 0;
+    if ((ret = writer->WriteStartElement("Actions")) == 0)
+    {
+        for (std::vector<CGXDLMSActionItem>::iterator it = obj->GetActions().begin();
+            it != obj->GetActions().end(); ++it)
+        {
+            if ((ret = writer->WriteStartElement("Item")) != 0 ||
+                (ret = writer->WriteElementString("LN", it->GetLogicalName())) != 0 ||
+                (ret = writer->WriteElementString("ScriptSelector", it->GetScriptSelector())) != 0 ||
+                (ret = writer->WriteEndElement()) != 0)
+            {
+                break;
+            }
+        }
+        ret = writer->WriteEndElement();//Actions
+    }
+    if (ret == 0)
+    {
+        ret = writer->WriteStartElement("PermissionTable");
+        if (ret == 0)
+        {
+            for (std::vector<std::string>::iterator it = obj->GetPermissionsTable().begin();
+                it != obj->GetPermissionsTable().end(); ++it)
+            {
+                if ((ret = writer->WriteElementString("Item", *it)) != 0)
+                {
+                    break;
+                }
+            }
+        }
+        if (ret == 0)
+        {
+            if ((ret = writer->WriteEndElement()) == 0 &&//PermissionTable
+                (ret = writer->WriteStartElement("WeightingTable")) == 0)
+            {
+                for (std::vector< std::vector<uint16_t> >::iterator it = obj->GetWeightingsTable().begin();
+                    it != obj->GetWeightingsTable().end(); ++it)
+                {
+                    ret = writer->WriteStartElement("Weightings");
+                    for (std::vector<uint16_t>::iterator it2 = it->begin(); it2 != it->end(); ++it2)
+                    {
+                        if ((ret = writer->WriteElementString("Item", *it2)) != 0)
+                        {
+                            break;
+                        }
+                    }
+                    ret = writer->WriteEndElement();//Weightings
+                }
+            }
+            if (ret == 0)
+            {
+                if ((ret = writer->WriteEndElement()) == 0 &&//WeightingTable
+                    (ret = writer->WriteStartElement("MostRecentRequestsTable")) == 0)
+                {
+                    for (std::vector<std::string>::iterator it = obj->GetMostRecentRequestsTable().begin();
+                        it != obj->GetMostRecentRequestsTable().end(); ++it)
+                    {
+                        if ((ret = writer->WriteElementString("Item", *it)) != 0)
+                        {
+                            break;
+                        }
+                    }
+                    if ((ret = writer->WriteEndElement()) == 0)//MostRecentRequestsTable
+                    {
+                        ret = writer->WriteElementString("LastOutcome", obj->GetLastOutcome());
+                    }
+                }
+            }
+        }
+    }
+    return ret;
+}
+#endif //DLMS_IGNORE_ARBITRATOR
+
+#ifndef DLMS_IGNORE_SFSK_MAC_COUNTERS
+int SaveSFSKMacCounters(CGXXmlWriter* writer, CGXDLMSSFSKMacCounters* obj)
+{
+    int ret;
+    if ((ret = writer->WriteStartElement("SynchronizationRegisters")) == 0)
+    {
+        for (std::vector< std::pair<uint16_t, uint32_t> >::iterator it = obj->GetSynchronizationRegister().begin();
+            it != obj->GetSynchronizationRegister().end(); ++it)
+        {
+            if ((ret = writer->WriteStartElement("Item")) != 0 ||
+                (ret = writer->WriteElementString("Key", it->first)) != 0 ||
+                (ret = writer->WriteElementString("Value", it->second)) != 0 ||
+                (ret = writer->WriteEndElement()) != 0)
+            {
+                break;
+            }
+        }
+        if (ret == 0)
+        {
+            if ((ret = writer->WriteEndElement()) == 0)
+            {
+                if ((ret = writer->WriteElementString("PhysicalLayerDesynchronization", obj->GetPhysicalLayerDesynchronization())) == 0 &&
+                    (ret = writer->WriteElementString("TimeOutNotAddressedDesynchronization", obj->GetTimeOutNotAddressedDesynchronization())) == 0 &&
+                    (ret = writer->WriteElementString("TimeOutFrameNotOkDesynchronization", obj->GetTimeOutFrameNotOkDesynchronization())) == 0 &&
+                    (ret = writer->WriteElementString("WriteRequestDesynchronization", obj->GetWriteRequestDesynchronization())) == 0 &&
+                    (ret = writer->WriteElementString("WrongInitiatorDesynchronization", obj->GetWrongInitiatorDesynchronization())) == 0 &&
+                    (ret = writer->WriteStartElement("BroadcastFramesCounters")) == 0)
+                {
+                    for (std::vector< std::pair<uint16_t, uint32_t> >::iterator it = obj->GetBroadcastFramesCounter().begin();
+                        it != obj->GetBroadcastFramesCounter().end(); ++it)
+                    {
+                        if ((ret = writer->WriteStartElement("Item")) != 0 ||
+                            (ret = writer->WriteElementString("Key", it->first)) != 0 ||
+                            (ret = writer->WriteElementString("Value", it->second)) != 0 ||
+                            (ret = writer->WriteEndElement()) != 0)
+                        {
+                            break;
+                        }
+                    }
+                    if (ret == 0)
+                    {
+                        if ((ret = writer->WriteEndElement()) != 0 ||
+                            (ret = writer->WriteElementString("RepetitionsCounter", obj->GetRepetitionsCounter())) != 0 ||
+                            (ret = writer->WriteElementString("TransmissionsCounter", obj->GetTransmissionsCounter())) != 0 ||
+                            (ret = writer->WriteElementString("CrcOkFramesCounter", obj->GetCrcOkFramesCounter())) != 0 ||
+                            (ret = writer->WriteElementString("CrcNOkFramesCounter", obj->GetCrcNOkFramesCounter())) != 0)
+                        {
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return ret;
+}
+#endif //DLMS_IGNORE_SFSK_MAC_COUNTERS
+
+#ifndef DLMS_IGNORE_SFSK_MAC_SYNCHRONIZATION_TIMEOUTS
+int SaveSFSKMacSynchronizationTimeouts(CGXXmlWriter* writer, CGXDLMSSFSKMacSynchronizationTimeouts* obj)
+{
+    int ret;
+    if ((ret = writer->WriteElementString("SearchInitiatorTimeout", obj->GetSearchInitiatorTimeout())) != 0 ||
+        (ret = writer->WriteElementString("SynchronizationConfirmationTimeout", obj->GetSynchronizationConfirmationTimeout())) != 0 ||
+        (ret = writer->WriteElementString("TimeOutNotAddressed", obj->GetTimeOutNotAddressed())) != 0 ||
+        (ret = writer->WriteElementString("TimeOutFrameNotOK", obj->GetTimeOutFrameNotOK())) != 0)
+    {
+    }
+    return ret;
+}
+#endif //DLMS_IGNORE_SFSK_MAC_SYNCHRONIZATION_TIMEOUTS
+
+#ifndef DLMS_IGNORE_SFSK_ACTIVE_INITIATOR
+int SaveSFSKActiveInitiator(CGXXmlWriter* writer, CGXDLMSSFSKActiveInitiator* obj)
+{
+    int ret;
+    if ((ret = writer->WriteElementString("SystemTitle", obj->GetSystemTitle().ToHexString(false))) != 0 ||
+        (ret = writer->WriteElementString("MacAddress", obj->GetMacAddress())) != 0 ||
+        (ret = writer->WriteElementString("LSapSelector", obj->GetLSapSelector())) != 0)
+    {
+    }
+    return ret;
+}
+#endif //DLMS_IGNORE_SFSK_ACTIVE_INITIATOR
+
+#ifndef DLMS_IGNORE_SFSK_PHY_MAC_SETUP
+int SaveSFSKPhyMacSetUp(CGXXmlWriter* writer, CGXDLMSSFSKPhyMacSetUp* obj)
+{
+    int ret;
+    if ((ret = writer->WriteElementString("InitiatorElectricalPhase", obj->GetInitiatorElectricalPhase())) == 0 &&
+        (ret = writer->WriteElementString("DeltaElectricalPhase", obj->GetDeltaElectricalPhase())) == 0 &&
+        (ret = writer->WriteElementString("MaxReceivingGain", obj->GetMaxReceivingGain())) == 0 &&
+        (ret = writer->WriteElementString("MaxTransmittingGain", obj->GetMaxTransmittingGain())) == 0 &&
+        (ret = writer->WriteElementString("SearchInitiatorThreshold", obj->GetSearchInitiatorThreshold())) == 0 &&
+        (ret = writer->WriteElementString("MarkFrequency", obj->GetMarkFrequency())) == 0 &&
+        (ret = writer->WriteElementString("SpaceFrequency", obj->GetSpaceFrequency())) == 0 &&
+        (ret = writer->WriteElementString("MacAddress", obj->GetMacAddress())) == 0 &&
+        (ret = writer->WriteStartElement("MacGroupAddresses")) == 0)
+    {
+        for (std::vector<uint16_t>::iterator it = obj->GetMacGroupAddresses().begin();
+            it != obj->GetMacGroupAddresses().end(); ++it)
+        {
+            if ((ret = writer->WriteElementString("Value", *it)) != 0)
+            {
+                break;
+            }
+        }
+        if (ret == 0 &&
+            (ret = writer->WriteEndElement()) == 0 &&
+            (ret = writer->WriteElementString("Repeater", obj->GetRepeater())) == 0 &&
+            (ret = writer->WriteElementString("RepeaterStatus", obj->GetRepeaterStatus())) == 0 &&
+            (ret = writer->WriteElementString("MinDeltaCredit", obj->GetMinDeltaCredit())) == 0 &&
+            (ret = writer->WriteElementString("InitiatorMacAddress", obj->GetInitiatorMacAddress())) == 0 &&
+            (ret = writer->WriteElementString("SynchronizationLocked", obj->GetSynchronizationLocked())) == 0 &&
+            (ret = writer->WriteElementString("TransmissionSpeed", obj->GetTransmissionSpeed())) == 0)
+        {
+
+        }
+    }
+    return ret;
+}
+#endif //DLMS_IGNORE_SFSK_PHY_MAC_SETUP
 
 int SaveReferences(CGXXmlWriter* writer, std::vector<std::string>& list, const char* name)
 {
@@ -1751,6 +2240,7 @@ int SaveReferences(CGXXmlWriter* writer, std::vector<std::string>& list, const c
     return ret;
 }
 
+#ifndef DLMS_IGNORE_TOKEN_GATEWAY
 int SaveCreditChargeConfigurations(CGXXmlWriter* writer, std::vector<CGXCreditChargeConfiguration>& list)
 {
     int ret;
@@ -1798,6 +2288,9 @@ int SaveTokenGatewayConfigurations(CGXXmlWriter* writer, std::vector<CGXTokenGat
     return ret;
 }
 
+#endif //DLMS_IGNORE_TOKEN_GATEWAY
+
+#ifndef DLMS_IGNORE_ACCOUNT
 int SaveAccount(CGXXmlWriter* writer, CGXDLMSAccount* obj)
 {
     int ret;
@@ -1826,7 +2319,9 @@ int SaveAccount(CGXXmlWriter* writer, CGXDLMSAccount* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_ACCOUNT
 
+#ifndef DLMS_IGNORE_CREDIT
 int SaveCredit(CGXXmlWriter* writer, CGXDLMSCredit* obj)
 {
     int ret;
@@ -1844,7 +2339,9 @@ int SaveCredit(CGXXmlWriter* writer, CGXDLMSCredit* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_CREDIT
 
+#ifndef DLMS_IGNORE_CHARGE
 int SaveUnitChargeActive(CGXXmlWriter* writer, const char* name, CGXUnitCharge& charge)
 {
     return 0;
@@ -1869,7 +2366,9 @@ int SaveCharge(CGXXmlWriter* writer, CGXDLMSCharge* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_CHARGE
 
+#ifndef DLMS_IGNORE_TOKEN_GATEWAY
 int SaveTokenGateway(CGXXmlWriter* writer, CGXDLMSTokenGateway* obj)
 {
     int ret;
@@ -1899,7 +2398,9 @@ int SaveTokenGateway(CGXXmlWriter* writer, CGXDLMSTokenGateway* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_TOKEN_GATEWAY
 
+#ifndef DLMS_IGNORE_SAP_ASSIGNMENT
 int SaveSapAssignment(CGXXmlWriter* writer, CGXDLMSSapAssignment* obj)
 {
     int ret;
@@ -1922,7 +2423,9 @@ int SaveSapAssignment(CGXXmlWriter* writer, CGXDLMSSapAssignment* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_SAP_ASSIGNMENT
 
+#ifndef DLMS_IGNORE_IMAGE_TRANSFER
 int SaveImageTransfer(CGXXmlWriter* writer, CGXDLMSImageTransfer* obj)
 {
     int ret;
@@ -1951,7 +2454,9 @@ int SaveImageTransfer(CGXXmlWriter* writer, CGXDLMSImageTransfer* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_IMAGE_TRANSFER
 
+#ifndef DLMS_IGNORE_SCHEDULE
 int SaveSchedule(CGXXmlWriter* writer, CGXDLMSSchedule* obj)
 {
     int ret;
@@ -1982,7 +2487,9 @@ int SaveSchedule(CGXXmlWriter* writer, CGXDLMSSchedule* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_SCHEDULE
 
+#ifndef DLMS_IGNORE_SCRIPT_TABLE
 int SaveScriptTable(CGXXmlWriter* writer, CGXDLMSScriptTable* obj)
 {
     int ret;
@@ -2022,11 +2529,16 @@ int SaveScriptTable(CGXXmlWriter* writer, CGXDLMSScriptTable* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_SCRIPT_TABLE
+
 /*
 int SaveSmtpSetup(CGXXmlWriter* writer, CGXDLMSSmtpSetup* obj)
 {
 }
 */
+
+#ifndef DLMS_IGNORE_SPECIAL_DAYS_TABLE
+
 int SaveSpecialDaysTable(CGXXmlWriter* writer, CGXDLMSSpecialDaysTable* obj)
 {
     int ret;
@@ -2051,11 +2563,15 @@ int SaveSpecialDaysTable(CGXXmlWriter* writer, CGXDLMSSpecialDaysTable* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_SPECIAL_DAYS_TABLE
+
 /*
 int SaveStatusMapping(CGXXmlWriter* writer, CGXDLMSStatusMapping* obj)
 {
 }
 */
+
+#ifndef DLMS_IGNORE_SECURITY_SETUP
 int SaveSecuritySetup(CGXXmlWriter* writer, CGXDLMSSecuritySetup* obj)
 {
     int ret;
@@ -2087,6 +2603,9 @@ int SaveSecuritySetup(CGXXmlWriter* writer, CGXDLMSSecuritySetup* obj)
     return ret;
 }
 
+#endif //DLMS_IGNORE_SECURITY_SETUP
+
+#ifndef DLMS_IGNORE_TCP_UDP_SETUP
 int SaveTcpUdpSetup(CGXXmlWriter* writer, CGXDLMSTcpUdpSetup* obj)
 {
     int ret;
@@ -2100,7 +2619,9 @@ int SaveTcpUdpSetup(CGXXmlWriter* writer, CGXDLMSTcpUdpSetup* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_TCP_UDP_SETUP
 
+#ifndef DLMS_IGNORE_UTILITY_TABLES
 int SaveUtilityTables(CGXXmlWriter* writer, CGXDLMSUtilityTables* obj)
 {
     int ret;
@@ -2110,6 +2631,8 @@ int SaveUtilityTables(CGXXmlWriter* writer, CGXDLMSUtilityTables* obj)
     }
     return ret;
 }
+#endif //DLMS_IGNORE_UTILITY_TABLES
+
 /*
 int SaveSFSKPhyMacSetUp(CGXXmlWriter* writer, CGXDLMSSFSKPhyMacSetUp* obj)
 {
@@ -2156,134 +2679,286 @@ int CGXXmlWriter::Save(CGXDLMSObject* obj)
 {
     switch (obj->GetObjectType())
     {
+#ifndef DLMS_IGNORE_ACTION_SCHEDULE
     case DLMS_OBJECT_TYPE_ACTION_SCHEDULE:
         return SaveActionSchedule(this, (CGXDLMSActionSchedule*)obj);
+#endif //DLMS_IGNORE_ACTION_SCHEDULE
+#ifndef DLMS_IGNORE_ACTIVITY_CALENDAR
     case DLMS_OBJECT_TYPE_ACTIVITY_CALENDAR:
         return SaveActivityCalendar(this, (CGXDLMSActivityCalendar*)obj);
+#endif //DLMS_IGNORE_ACTIVITY_CALENDAR
+#ifndef DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
     case DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME:
         return SaveAssociationLogicalName(this, (CGXDLMSAssociationLogicalName*)obj);
+#endif //DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
+#ifndef DLMS_IGNORE_ASSOCIATION_SHORT_NAME
     case DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME:
         return SaveAssociationShortName(this, (CGXDLMSAssociationShortName*)obj);
+#endif //DLMS_IGNORE_ASSOCIATION_SHORT_NAME
+#ifndef DLMS_IGNORE_AUTO_ANSWER
     case DLMS_OBJECT_TYPE_AUTO_ANSWER:
         return SaveAutoAnswer(this, (CGXDLMSAutoAnswer*)obj);
+#endif //DLMS_IGNORE_AUTO_ANSWER
+#ifndef DLMS_IGNORE_AUTO_CONNECT
     case DLMS_OBJECT_TYPE_AUTO_CONNECT:
         return SaveAutoConnect(this, (CGXDLMSAutoConnect*)obj);
+#endif //DLMS_IGNORE_AUTO_CONNECT
+#ifndef DLMS_IGNORE_CLOCK
     case DLMS_OBJECT_TYPE_CLOCK:
         return SaveClock(this, (CGXDLMSClock*)obj);
+#endif //DLMS_IGNORE_CLOCK
+#ifndef DLMS_IGNORE_DATA
     case DLMS_OBJECT_TYPE_DATA:
         return SaveData(this, (CGXDLMSData*)obj);
+#endif //DLMS_IGNORE_DATA
+#ifndef DLMS_IGNORE_DEMAND_REGISTER
     case DLMS_OBJECT_TYPE_DEMAND_REGISTER:
         return SaveDemandRegister(this, (CGXDLMSDemandRegister*)obj);
+#endif //DLMS_IGNORE_DEMAND_REGISTER
+#ifndef DLMS_IGNORE_MAC_ADDRESS_SETUP
     case DLMS_OBJECT_TYPE_MAC_ADDRESS_SETUP:
         return SaveMacAddressSetup(this, (CGXDLMSMacAddressSetup*)obj);
+#endif //DLMS_IGNORE_MAC_ADDRESS_SETUP
+#ifndef DLMS_IGNORE_EXTENDED_REGISTER
     case DLMS_OBJECT_TYPE_EXTENDED_REGISTER:
         return SaveExtendedRegister(this, (CGXDLMSExtendedRegister*)obj);
+#endif //DLMS_IGNORE_EXTENDED_REGISTER
+#ifndef DLMS_IGNORE_GPRS_SETUP
     case DLMS_OBJECT_TYPE_GPRS_SETUP:
         return SaveGprsSetup(this, (CGXDLMSGPRSSetup*)obj);
+#endif //DLMS_IGNORE_GPRS_SETUP
+#ifndef DLMS_IGNORE_SECURITY_SETUP
     case DLMS_OBJECT_TYPE_SECURITY_SETUP:
         return SaveSecuritySetup(this, (CGXDLMSSecuritySetup*)obj);
+#endif //DLMS_IGNORE_SECURITY_SETUP
+#ifndef DLMS_IGNORE_IEC_HDLC_SETUP
     case DLMS_OBJECT_TYPE_IEC_HDLC_SETUP:
         return SaveIecHdlcSetup(this, (CGXDLMSIecHdlcSetup*)obj);
+#endif //DLMS_IGNORE_IEC_HDLC_SETUP
+#ifndef DLMS_IGNORE_IEC_LOCAL_PORT_SETUP
     case DLMS_OBJECT_TYPE_IEC_LOCAL_PORT_SETUP:
         return SaveIecLocalPortSetup(this, (CGXDLMSIECLocalPortSetup*)obj);
-        /*
+#endif //DLMS_IGNORE_IEC_LOCAL_PORT_SETUP
+#ifndef DLMS_IGNORE_IEC_TWISTED_PAIR_SETUP
     case DLMS_OBJECT_TYPE_IEC_TWISTED_PAIR_SETUP:
-        return SaveIEC_TWISTED_PAIR_SETUP(this, (CGXDLMSIecTw*)obj);
-        */
+        return SaveIecTwistedPairSetup(this, (CGXDLMSIecTwistedPairSetup*)obj);
+#endif //DLMS_IGNORE_IEC_TWISTED_PAIR_SETUP
+#ifndef DLMS_IGNORE_IP4_SETUP
     case DLMS_OBJECT_TYPE_IP4_SETUP:
         return SaveIp4Setup(this, (CGXDLMSIp4Setup*)obj);
+#endif //DLMS_IGNORE_IP4_SETUP
+#ifndef DLMS_IGNORE_IP6_SETUP
     case DLMS_OBJECT_TYPE_IP6_SETUP:
         return SaveIp6Setup(this, (CGXDLMSIp6Setup*)obj);
+#endif //DLMS_IGNORE_IP6_SETUP
+#ifndef DLMS_IGNORE_MBUS_SLAVE_PORT_SETUP
     case DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP:
         return SaveMBusSlavePortSetup(this, (CGXDLMSMBusSlavePortSetup*)obj);
+#endif //DLMS_IGNORE_MBUS_SLAVE_PORT_SETUP
+#ifndef DLMS_IGNORE_IMAGE_TRANSFER
     case DLMS_OBJECT_TYPE_IMAGE_TRANSFER:
         return SaveImageTransfer(this, (CGXDLMSImageTransfer*)obj);
+#endif //DLMS_IGNORE_IMAGE_TRANSFER
+#ifndef DLMS_IGNORE_DISCONNECT_CONTROL
     case DLMS_OBJECT_TYPE_DISCONNECT_CONTROL:
         return SaveDisconnectControl(this, (CGXDLMSDisconnectControl*)obj);
+#endif //DLMS_IGNORE_DISCONNECT_CONTROL
+#ifndef DLMS_IGNORE_LIMITER
     case DLMS_OBJECT_TYPE_LIMITER:
         return SaveLimiter(this, (CGXDLMSLimiter*)obj);
+#endif //DLMS_IGNORE_LIMITER
+#ifndef DLMS_IGNORE_MBUS_CLIENT
     case DLMS_OBJECT_TYPE_MBUS_CLIENT:
         return SaveMBusClient(this, (CGXDLMSMBusClient*)obj);
+#endif //DLMS_IGNORE_MBUS_CLIENT
+#ifndef DLMS_IGNORE_MODEM_CONFIGURATION
     case DLMS_OBJECT_TYPE_MODEM_CONFIGURATION:
         return SaveModemConfiguration(this, (CGXDLMSModemConfiguration*)obj);
+#endif //DLMS_IGNORE_MODEM_CONFIGURATION
+#ifndef DLMS_IGNORE_PPP_SETUP
     case DLMS_OBJECT_TYPE_PPP_SETUP:
         return SavePppSetup(this, (CGXDLMSPppSetup*)obj);
+#endif //DLMS_IGNORE_PPP_SETUP
+#ifndef DLMS_IGNORE_PROFILE_GENERIC
     case DLMS_OBJECT_TYPE_PROFILE_GENERIC:
         return SaveProfileGeneric(this, (CGXDLMSProfileGeneric*)obj);
+#endif //DLMS_IGNORE_PROFILE_GENERIC
+#ifndef DLMS_IGNORE_REGISTER
     case DLMS_OBJECT_TYPE_REGISTER:
         return SaveRegister(this, (CGXDLMSRegister*)obj);
+#endif //DLMS_IGNORE_REGISTER
+#ifndef DLMS_IGNORE_REGISTER_ACTIVATION
     case DLMS_OBJECT_TYPE_REGISTER_ACTIVATION:
         return SaveRegisterActivation(this, (CGXDLMSRegisterActivation*)obj);
+#endif //DLMS_IGNORE_REGISTER_ACTIVATION
+#ifndef DLMS_IGNORE_REGISTER_MONITOR
     case DLMS_OBJECT_TYPE_REGISTER_MONITOR:
         return SaveRegisterMonitor(this, (CGXDLMSRegisterMonitor*)obj);
+#endif //DLMS_IGNORE_REGISTER_MONITOR
         /*
-    case DLMS_OBJECT_TYPE_REGISTER_TABLE:
-        return SaveRegisterTable(this, (CGXDLMSRegisterTable*)obj);
-    case DLMS_OBJECT_TYPE_ZIG_BEE_SAS_STARTUP:
-        return SaveZigBeeSasStartup(this, (CGXDLMSZigBeeSasStartup*)obj);
-    case DLMS_OBJECT_TYPE_ZIG_BEE_SAS_JOIN:
-        return SaveZigBeeSasJoin(this, (CGXDLMSZigBeeSasJoin*)obj);
-    case DLMS_OBJECT_TYPE_ZIG_BEE_SAS_APS_FRAGMENTATION:
-        return SaveZigBeeSasApsFragmentation(this, (CGXDLMSZigBeeSasApsFragmentation*)obj);
-    case DLMS_OBJECT_TYPE_ZIG_BEE_NETWORK_CONTROL:
-        return SaveZigBeeNetworkControl(this, (CGXDLMSZigBeeNetworkControl*)obj);
+        #ifndef DLMS_IGNORE_REGISTER_TABLE
+            case DLMS_OBJECT_TYPE_REGISTER_TABLE:
+                return SaveRegisterTable(this, (CGXDLMSRegisterTable*)obj);
+        #endif //DLMS_IGNORE_REGISTER_TABLE
+        #ifndef DLMS_IGNORE_ZIG_BEE_SAS_STARTUP
+            case DLMS_OBJECT_TYPE_ZIG_BEE_SAS_STARTUP:
+                return SaveZigBeeSasStartup(this, (CGXDLMSZigBeeSasStartup*)obj);
+        #endif //DLMS_IGNORE_ZIG_BEE_SAS_STARTUP
+        #ifndef DLMS_IGNORE_ZIG_BEE_SAS_JOIN
+            case DLMS_OBJECT_TYPE_ZIG_BEE_SAS_JOIN:
+                return SaveZigBeeSasJoin(this, (CGXDLMSZigBeeSasJoin*)obj);
+        #endif //DLMS_IGNORE_ZIG_BEE_SAS_JOIN
+        #ifndef DLMS_IGNORE_ZIG_BEE_SAS_APS_FRAGMENTATION
+            case DLMS_OBJECT_TYPE_ZIG_BEE_SAS_APS_FRAGMENTATION:
+                return SaveZigBeeSasApsFragmentation(this, (CGXDLMSZigBeeSasApsFragmentation*)obj);
+        #endif //DLMS_IGNORE_ZIG_BEE_SAS_APS_FRAGMENTATION
+        #ifndef DLMS_IGNORE_ZIG_BEE_NETWORK_CONTROL
+            case DLMS_OBJECT_TYPE_ZIG_BEE_NETWORK_CONTROL:
+                return SaveZigBeeNetworkControl(this, (CGXDLMSZigBeeNetworkControl*)obj);
+        #endif //DLMS_IGNORE_ZIG_BEE_NETWORK_CONTROL
         */
+#ifndef DLMS_IGNORE_SAP_ASSIGNMENT
     case DLMS_OBJECT_TYPE_SAP_ASSIGNMENT:
         return SaveSapAssignment(this, (CGXDLMSSapAssignment*)obj);
+#endif //DLMS_IGNORE_SAP_ASSIGNMENT
+#ifndef DLMS_IGNORE_SCHEDULE
     case DLMS_OBJECT_TYPE_SCHEDULE:
         return SaveSchedule(this, (CGXDLMSSchedule*)obj);
+#endif //DLMS_IGNORE_SCHEDULE
+#ifndef DLMS_IGNORE_SCRIPT_TABLE
     case DLMS_OBJECT_TYPE_SCRIPT_TABLE:
         return SaveScriptTable(this, (CGXDLMSScriptTable*)obj);
+#endif //DLMS_IGNORE_SCRIPT_TABLE
         /*
+#ifndef DLMS_IGNORE_SMTP_SETUP
     case DLMS_OBJECT_TYPE_SMTP_SETUP:
         return SaveSMTPSetup(this, (CGXDLMSSMTPSetup*)obj);
-        */
+#endif //DLMS_IGNORE_SMTP_SETUP
+*/
+#ifndef DLMS_IGNORE_SPECIAL_DAYS_TABLE
     case DLMS_OBJECT_TYPE_SPECIAL_DAYS_TABLE:
         return SaveSpecialDaysTable(this, (CGXDLMSSpecialDaysTable*)obj);
+#endif //DLMS_IGNORE_SPECIAL_DAYS_TABLE
         /*
+#ifndef DLMS_IGNORE_STATUS_MAPPING
     case DLMS_OBJECT_TYPE_STATUS_MAPPING:
         return SaveStatusMapping(this, (CGXDLMSStatusMapping*)obj);
-        */
+#endif //DLMS_IGNORE_STATUS_MAPPING
+*/
+#ifndef DLMS_IGNORE_TCP_UDP_SETUP
     case DLMS_OBJECT_TYPE_TCP_UDP_SETUP:
         return SaveTcpUdpSetup(this, (CGXDLMSTcpUdpSetup*)obj);
+#endif //DLMS_IGNORE_TCP_UDP_SETUP
+#ifndef DLMS_IGNORE_UTILITY_TABLES
     case DLMS_OBJECT_TYPE_UTILITY_TABLES:
         return SaveUtilityTables(this, (CGXDLMSUtilityTables*)obj);
+#endif //DLMS_IGNORE_UTILITY_TABLES
+#ifndef DLMS_IGNORE_MBUS_MASTER_PORT_SETUP
     case DLMS_OBJECT_TYPE_MBUS_MASTER_PORT_SETUP:
         return SaveMBusMasterPortSetup(this, (CGXDLMSMBusMasterPortSetup*)obj);
+#endif //DLMS_IGNORE_MBUS_MASTER_PORT_SETUP
         /*
+#ifndef DLMS_IGNORE_MESSAGE_HANDLER
     case DLMS_OBJECT_TYPE_MESSAGE_HANDLER:
         return SaveMessageHandler(this, (CGXDLMSMessageHandler*)obj);
-        */
+#endif //DLMS_IGNORE_MESSAGE_HANDLER
+*/
+#ifndef DLMS_IGNORE_PUSH_SETUP
     case DLMS_OBJECT_TYPE_PUSH_SETUP:
         return SavePushSetup(this, (CGXDLMSPushSetup*)obj);
+#endif //DLMS_IGNORE_PUSH_SETUP
+#ifndef DLMS_IGNORE_ACCOUNT
     case DLMS_OBJECT_TYPE_ACCOUNT:
         return SaveAccount(this, (CGXDLMSAccount*)obj);
+#endif //DLMS_IGNORE_ACCOUNT
+#ifndef DLMS_IGNORE_CREDIT
     case DLMS_OBJECT_TYPE_CREDIT:
         return SaveCredit(this, (CGXDLMSCredit*)obj);
+#endif //DLMS_IGNORE_CREDIT
+#ifndef DLMS_IGNORE_CHARGE
     case DLMS_OBJECT_TYPE_CHARGE:
         return SaveCharge(this, (CGXDLMSCharge*)obj);
+#endif //DLMS_IGNORE_CHARGE
+#ifndef DLMS_IGNORE_PARAMETER_MONITOR
     case DLMS_OBJECT_TYPE_PARAMETER_MONITOR:
         return SaveParameterMonitor(this, (CGXDLMSParameterMonitor*)obj);
+#endif //DLMS_IGNORE_PARAMETER_MONITOR
+#ifndef DLMS_IGNORE_TOKEN_GATEWAY
     case DLMS_OBJECT_TYPE_TOKEN_GATEWAY:
         return SaveTokenGateway(this, (CGXDLMSTokenGateway*)obj);
+#endif //DLMS_IGNORE_TOKEN_GATEWAY
+#ifndef DLMS_IGNORE_GSM_DIAGNOSTIC
     case DLMS_OBJECT_TYPE_GSM_DIAGNOSTIC:
         return SaveGSMDiagnostic(this, (CGXDLMSGSMDiagnostic*)obj);
+#endif //DLMS_IGNORE_GSM_DIAGNOSTIC
+#ifndef DLMS_IGNORE_COMPACT_DATA
     case DLMS_OBJECT_TYPE_COMPACT_DATA:
         return SaveCompactData(this, (CGXDLMSCompactData*)obj);
+#endif //DLMS_IGNORE_COMPACT_DATA
+#ifndef DLMS_IGNORE_LLC_SSCS_SETUP
     case DLMS_OBJECT_TYPE_LLC_SSCS_SETUP:
         return SaveLlcSscsSetup(this, (CGXDLMSLlcSscsSetup*)obj);
+#endif //DLMS_IGNORE_LLC_SSCS_SETUP
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS:
         return SavePrimeNbOfdmPlcPhysicalLayerCounters(this, (CGXDLMSPrimeNbOfdmPlcPhysicalLayerCounters*)obj);
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_SETUP
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_SETUP:
         return SavePrimeNbOfdmPlcMacSetup(this, (CGXDLMSPrimeNbOfdmPlcMacSetup*)obj);
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_SETUP
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS:
         return SavePrimeNbOfdmPlcMacFunctionalParameters(this, (CGXDLMSPrimeNbOfdmPlcMacFunctionalParameters*)obj);
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_COUNTERS
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_COUNTERS:
         return SavePrimeNbOfdmPlcMacCounters(this, (CGXDLMSPrimeNbOfdmPlcMacCounters*)obj);
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_COUNTERS
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA:
         return SavePrimeNbOfdmPlcMacNetworkAdministrationData(this, (CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData*)obj);
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION:
         return SavePrimeNbOfdmPlcApplicationsIdentification(this, (CGXDLMSPrimeNbOfdmPlcApplicationsIdentification*)obj);
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION
+#ifndef DLMS_IGNORE_IEC_8802_LLC_TYPE1_SETUP
+    case DLMS_OBJECT_TYPE_IEC_8802_LLC_TYPE1_SETUP:
+        return SaveIec8802LlcType1Setup(this, (CGXDLMSIec8802LlcType1Setup*)obj);
+#endif //DLMS_IGNORE_IEC_8802_LLC_TYPE1_SETUP
+#ifndef DLMS_IGNORE_IEC_8802_LLC_TYPE2_SETUP
+    case DLMS_OBJECT_TYPE_IEC_8802_LLC_TYPE2_SETUP:
+        return SaveIec8802LlcType2Setup(this, (CGXDLMSIec8802LlcType2Setup*)obj);
+#endif //DLMS_IGNORE_IEC_8802_LLC_TYPE2_SETUP
+#ifndef DLMS_IGNORE_IEC_8802_LLC_TYPE3_SETUP
+    case DLMS_OBJECT_TYPE_IEC_8802_LLC_TYPE3_SETUP:
+        return SaveIec8802LlcType3Setup(this, (CGXDLMSIec8802LlcType3Setup*)obj);
+#endif //DLMS_IGNORE_IEC_8802_LLC_TYPE3_SETUP
+#ifndef DLMS_IGNORE_SFSK_REPORTING_SYSTEM_LIST
+    case DLMS_OBJECT_TYPE_SFSK_REPORTING_SYSTEM_LIST:
+        return SaveSFSKReportingSystemList(this, (CGXDLMSSFSKReportingSystemList*)obj);
+#endif //DLMS_IGNORE_SFSK_REPORTING_SYSTEM_LIST
+#ifndef DLMS_IGNORE_ARBITRATOR
+    case DLMS_OBJECT_TYPE_ARBITRATOR:
+        return SaveArbitrator(this, (CGXDLMSArbitrator*)obj);
+#endif //DLMS_IGNORE_ARBITRATOR
+#ifndef DLMS_IGNORE_SFSK_MAC_COUNTERS
+    case DLMS_OBJECT_TYPE_SFSK_MAC_COUNTERS:
+        return SaveSFSKMacCounters(this, (CGXDLMSSFSKMacCounters*)obj);
+#endif //DLMS_IGNORE_SFSK_MAC_COUNTERS
+#ifndef DLMS_IGNORE_SFSK_MAC_SYNCHRONIZATION_TIMEOUTS
+    case DLMS_OBJECT_TYPE_SFSK_MAC_SYNCHRONIZATION_TIMEOUTS:
+        return SaveSFSKMacSynchronizationTimeouts(this, (CGXDLMSSFSKMacSynchronizationTimeouts*)obj);
+#endif //DLMS_IGNORE_SFSK_MAC_SYNCHRONIZATION_TIMEOUTS
+#ifndef DLMS_IGNORE_SFSK_ACTIVE_INITIATOR
+    case DLMS_OBJECT_TYPE_SFSK_ACTIVE_INITIATOR:
+        return SaveSFSKActiveInitiator(this, (CGXDLMSSFSKActiveInitiator*)obj);
+#endif //DLMS_IGNORE_SFSK_ACTIVE_INITIATOR
+#ifndef DLMS_IGNORE_SFSK_PHY_MAC_SETUP
+    case DLMS_OBJECT_TYPE_SFSK_PHY_MAC_SETUP:
+        return SaveSFSKPhyMacSetUp(this, (CGXDLMSSFSKPhyMacSetUp*)obj);
+#endif //DLMS_IGNORE_SFSK_PHY_MAC_SETUP
     default:
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }

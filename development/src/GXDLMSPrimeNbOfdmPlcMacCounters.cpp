@@ -35,6 +35,7 @@
 #include "../include/GXDLMSPrimeNbOfdmPlcMacCounters.h"
 #include "../include/GXDLMSClient.h"
 
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_COUNTERS
 //Constructor.
 CGXDLMSPrimeNbOfdmPlcMacCounters::CGXDLMSPrimeNbOfdmPlcMacCounters() :
     CGXDLMSPrimeNbOfdmPlcMacCounters("0.0.28.4.0.255", 0)
@@ -296,3 +297,5 @@ int CGXDLMSPrimeNbOfdmPlcMacCounters::SetValue(CGXDLMSSettings& settings, CGXDLM
     }
     return ret;
 }
+
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_COUNTERS

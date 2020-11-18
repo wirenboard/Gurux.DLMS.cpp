@@ -35,6 +35,8 @@
 #ifndef GXDLMSMODEMCONFIGURATION_H
 #define GXDLMSMODEMCONFIGURATION_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_MODEM_CONFIGURATION
 #include "GXDLMSObject.h"
 #include "GXDLMSModemInitialisation.h"
 
@@ -104,4 +106,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_MODEM_CONFIGURATION
 #endif //GXDLMSMODEMCONFIGURATION_H

@@ -35,6 +35,7 @@
 #include "../include/GXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData.h"
 #include "../include/GXDLMSClient.h"
 
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA
 //Constructor.
 CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData::CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData() :
     CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData("0.0.28.5.0.255", 0)
@@ -383,15 +384,15 @@ int CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData::GetCommunications(CGXDLMS
     {
         if ((ret = bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE)) != 0 ||
             (ret = bb.SetUInt8(9)) != 0 ||
-            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_OCTET_STRING, (*it)->GetEui())) != 0 ||
-            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxPower())) != 0 ||
-            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxCoding())) != 0 ||
-            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxCoding())) != 0 ||
-            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxLvl())) != 0 ||
-            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetSnr())) != 0 ||
-            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxPowerModified())) != 0 ||
-            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxCodingModified())) != 0 ||
-            (ret = GXHelpers::SetData2(NULL, bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxCodingModified())) != 0)
+            (ret = GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_OCTET_STRING, (*it)->GetEui())) != 0 ||
+            (ret = GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxPower())) != 0 ||
+            (ret = GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxCoding())) != 0 ||
+            (ret = GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxCoding())) != 0 ||
+            (ret = GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxLvl())) != 0 ||
+            (ret = GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_INT8, (*it)->GetSnr())) != 0 ||
+            (ret = GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxPowerModified())) != 0 ||
+            (ret = GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_INT8, (*it)->GetTxCodingModified())) != 0 ||
+            (ret = GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_INT8, (*it)->GetRxCodingModified())) != 0)
         {
             break;
         }
@@ -549,13 +550,13 @@ int CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData::SetCommunications(std::ve
         CGXMacPhyCommunication* v = new CGXMacPhyCommunication();
         v->SetEui(tmp);
         v->SetTxPower(it->Arr.at(1).ToInteger());
-        v->SetTxCoding(it->Arr.at(1).ToInteger());
-        v->SetRxCoding(it->Arr.at(1).ToInteger());
-        v->SetRxLvl(it->Arr.at(1).ToInteger());
-        v->SetSnr(it->Arr.at(1).ToInteger());
-        v->SetTxPowerModified(it->Arr.at(1).ToInteger());
-        v->SetTxCodingModified(it->Arr.at(1).ToInteger());
-        v->SetRxCodingModified(it->Arr.at(1).ToInteger());
+        v->SetTxCoding(it->Arr.at(2).ToInteger());
+        v->SetRxCoding(it->Arr.at(3).ToInteger());
+        v->SetRxLvl(it->Arr.at(4).ToInteger());
+        v->SetSnr(it->Arr.at(5).ToInteger());
+        v->SetTxPowerModified(it->Arr.at(6).ToInteger());
+        v->SetTxCodingModified(it->Arr.at(7).ToInteger());
+        v->SetRxCodingModified(it->Arr.at(8).ToInteger());
         m_Communications.push_back(v);
     }
     return 0;
@@ -591,3 +592,5 @@ int CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData::SetValue(CGXDLMSSettings&
     }
     return ret;
 }
+
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA

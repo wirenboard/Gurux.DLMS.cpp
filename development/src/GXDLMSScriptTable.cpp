@@ -35,7 +35,7 @@
 #include "../include/GXDLMSScriptTable.h"
 #include "../include/GXDLMSClient.h"
 #include <sstream>
-
+#ifndef DLMS_IGNORE_SCRIPT_TABLE
 //Constructor.
 CGXDLMSScriptTable::CGXDLMSScriptTable() : CGXDLMSScriptTable("0.0.10.0.100.255", 0)
 {
@@ -284,3 +284,4 @@ int CGXDLMSScriptTable::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_SCRIPT_TABLE

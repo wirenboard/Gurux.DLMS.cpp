@@ -34,6 +34,8 @@
 #ifndef GXDLMSAUTOANSWER_H
 #define GXDLMSAUTOANSWER_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_AUTO_ANSWER
 #include "GXDLMSObject.h"
 
 typedef enum
@@ -138,4 +140,5 @@ public:
      */
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_AUTO_ANSWER
 #endif //GXDLMSAUTOANSWER_H

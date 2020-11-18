@@ -38,6 +38,8 @@
 #include "../include/GXDLMSConverter.h"
 #include "../include/GXDLMSSecureClient.h"
 
+#ifndef DLMS_IGNORE_SECURITY_SETUP
+
 //Constructor.
 CGXDLMSSecuritySetup::CGXDLMSSecuritySetup() : CGXDLMSSecuritySetup("0.0.43.0.0.255", 0)
 {
@@ -484,3 +486,4 @@ std::vector<CGXDLMSCertificateInfo*>& CGXDLMSSecuritySetup::GetCertificates()
 {
     return m_Certificates;
 }
+#endif //DLMS_IGNORE_SECURITY_SETUP

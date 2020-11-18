@@ -35,6 +35,7 @@
 #ifndef GXDLMSIP4SETUPIPOPTION_H
 #define GXDLMSIP4SETUPIPOPTION_H
 
+#include "GXIgnore.h"
 #include "GXDLMSObject.h"
 
 class CGXDLMSIp4SetupIpOption

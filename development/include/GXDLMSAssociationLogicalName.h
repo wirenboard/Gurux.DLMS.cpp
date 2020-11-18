@@ -34,6 +34,8 @@
 #ifndef GXDLMSASSOCIATIONLOGICALNAME_H
 #define GXDLMSASSOCIATIONLOGICALNAME_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
 #include "GXDLMSObject.h"
 #include "GXApplicationContextName.h"
 #include "GXDLMSContextType.h"
@@ -188,4 +190,5 @@ public:
     int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
 #endif //GXDLMSASSOCIATIONLOGICALNAME_H

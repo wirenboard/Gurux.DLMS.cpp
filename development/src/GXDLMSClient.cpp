@@ -76,6 +76,7 @@ CGXDLMSClient::CGXDLMSClient(bool UseLogicalNameReferencing,
             DLMS_CONFORMANCE_WRITE | DLMS_CONFORMANCE_PARAMETERIZED_ACCESS |
             DLMS_CONFORMANCE_MULTIPLE_REFERENCES));
     }
+    m_Settings.GetPlcSettings().Reset();
 }
 
 CGXDLMSClient::~CGXDLMSClient()
@@ -278,7 +279,18 @@ void CGXDLMSClient::SetAutoIncreaseInvokeID(bool value) {
 
 CGXDLMSLimits& CGXDLMSClient::GetLimits()
 {
-    return m_Settings.GetLimits();
+    return m_Settings.GetHdlcSettings();
+}
+
+CGXHdlcSettings& CGXDLMSClient::GetHdlcSettings()
+{
+    return m_Settings.GetHdlcSettings();
+}
+
+
+CGXPlcSettings& CGXDLMSClient::GetPlcSettings()
+{
+    return m_Settings.GetPlcSettings();
 }
 
 // Collection of the objects.
@@ -293,7 +305,22 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
     m_Settings.SetConnected(DLMS_CONNECTION_STATE_NONE);
     packets.clear();
     m_IsAuthenticationRequired = false;
-    // SNRM request is not used in network connections.
+    // SNRM request is not used for all communication channels.
+    if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_PLC_HDLC)
+    {
+        CGXByteBuffer tmp;
+        ret = CGXDLMS::GetMacHdlcFrame(m_Settings, DLMS_COMMAND_SNRM, 0, NULL, tmp);
+        if (ret == 0)
+        {
+            packets.push_back(tmp);
+        }
+        return ret;
+    }
+    if (m_Settings.GetInterfaceType() != DLMS_INTERFACE_TYPE_HDLC && m_Settings.GetInterfaceType() != DLMS_INTERFACE_TYPE_HDLC_WITH_MODE_E)
+    {
+        return 0;
+    }
+
     if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER)
     {
         return 0;
@@ -306,23 +333,23 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
     // Length is updated later.
     data.SetUInt8(0);
     // If custom HDLC parameters are used.
-    if (CGXDLMSLimits::DEFAULT_MAX_INFO_TX != GetLimits().GetMaxInfoTX())
+    if (CGXHdlcSettings::DEFAULT_MAX_INFO_TX != GetLimits().GetMaxInfoTX())
     {
         data.SetUInt8(HDLC_INFO_MAX_INFO_TX);
         CGXDLMS::AppendHdlcParameter(data, GetLimits().GetMaxInfoTX());
     }
-    if (CGXDLMSLimits::DEFAULT_MAX_INFO_RX != GetLimits().GetMaxInfoRX())
+    if (CGXHdlcSettings::DEFAULT_MAX_INFO_RX != GetLimits().GetMaxInfoRX())
     {
         data.SetUInt8(HDLC_INFO_MAX_INFO_RX);
         CGXDLMS::AppendHdlcParameter(data, GetLimits().GetMaxInfoRX());
     }
-    if (CGXDLMSLimits::DEFAULT_WINDOWS_SIZE_TX != GetLimits().GetWindowSizeTX())
+    if (CGXHdlcSettings::DEFAULT_WINDOWS_SIZE_TX != GetLimits().GetWindowSizeTX())
     {
         data.SetUInt8(HDLC_INFO_WINDOW_SIZE_TX);
         data.SetUInt8(4);
         data.SetUInt32(GetLimits().GetWindowSizeTX());
     }
-    if (CGXDLMSLimits::DEFAULT_WINDOWS_SIZE_RX != GetLimits().GetWindowSizeRX())
+    if (CGXHdlcSettings::DEFAULT_WINDOWS_SIZE_RX != GetLimits().GetWindowSizeRX())
     {
         data.SetUInt8(HDLC_INFO_WINDOW_SIZE_RX);
         data.SetUInt8(4);
@@ -772,7 +799,7 @@ int CGXDLMSClient::ChangeType(CGXByteBuffer& value, DLMS_DATA_TYPE type, bool us
 
 int CGXDLMSClient::ParseUAResponse(CGXByteBuffer& data)
 {
-    int ret = CGXDLMS::ParseSnrmUaResponse(data, &m_Settings.GetLimits());
+    int ret = CGXDLMS::ParseSnrmUaResponse(data, &m_Settings.GetHdlcSettings());
     if (ret == 0)
     {
         m_Settings.SetConnected(DLMS_CONNECTION_STATE_HDLC);
@@ -839,11 +866,19 @@ int CGXDLMSClient::ParseAAREResponse(CGXByteBuffer& reply)
     int ret;
     DLMS_SOURCE_DIAGNOSTIC sd;
     DLMS_ASSOCIATION_RESULT result;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if ((ret = CGXAPDU::ParsePDU(m_Settings, m_Settings.GetCipher(),
         reply, result, sd, NULL)) != 0)
     {
         return ret;
     }
+#else
+    if ((ret = CGXAPDU::ParsePDU(m_Settings, m_Settings.GetCipher(),
+        reply, result, sd)) != 0)
+    {
+        return ret;
+    }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     if (result != DLMS_ASSOCIATION_RESULT_ACCEPTED)
     {
         if (result == DLMS_ASSOCIATION_RESULT_TRANSIENT_REJECTED)
@@ -1053,10 +1088,16 @@ int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets)
     int ret;
     CGXByteBuffer reply;
     packets.clear();
-    m_Settings.SetMaxReceivePDUSize(0xFFFF);
-    if (GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC && (m_Settings.GetConnected() & DLMS_CONNECTION_STATE_HDLC) != 0)
+    if (CGXDLMS::UseHdlc(GetInterfaceType())&& (m_Settings.GetConnected() & DLMS_CONNECTION_STATE_HDLC) != 0)
     {
-        ret = CGXDLMS::GetHdlcFrame(m_Settings, DLMS_COMMAND_DISCONNECT_REQUEST, NULL, reply);
+        if (GetInterfaceType() == DLMS_INTERFACE_TYPE_PLC_HDLC)
+        {
+            ret = CGXDLMS::GetMacHdlcFrame(m_Settings, DLMS_COMMAND_DISCONNECT_REQUEST, 0, NULL, reply);
+        }
+        else
+        {
+            ret = CGXDLMS::GetHdlcFrame(m_Settings, DLMS_COMMAND_DISCONNECT_REQUEST, NULL, reply);
+        }
         packets.push_back(reply);
         m_Settings.SetConnected(DLMS_CONNECTION_STATE_NONE);
         return ret;
@@ -1065,6 +1106,7 @@ int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets)
     {
         ret = ReleaseRequest(packets);
     }
+    m_Settings.SetMaxReceivePDUSize(0xFFFF);
     return ret;
 }
 

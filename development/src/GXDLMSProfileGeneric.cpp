@@ -32,12 +32,29 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
+#include <algorithm>
+#include <functional>
+#include <cctype>
+#include <locale>
+#include <stdio.h>
+#include <string.h>
+#include <sstream>
+#include <vector>
+#include <time.h>
+#include <map>
+#include <fstream>
+#include <assert.h>
+#include <iostream>
+#include <math.h>
+#include <cmath>
+
 #include "../include/GXDLMSProfileGeneric.h"
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSObjectFactory.h"
 #include "../include/GXDLMSDemandRegister.h"
 #include "../include/GXDLMSServer.h"
 
+#ifndef DLMS_IGNORE_PROFILE_GENERIC
 CGXDLMSProfileGeneric::~CGXDLMSProfileGeneric()
 {
     for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >::iterator it = m_CaptureObjects.begin();
@@ -864,6 +881,7 @@ int CGXDLMSProfileGeneric::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
                             row->Arr[pos] = row->Arr[pos].ToDouble() * scaler;
                         }
                     }
+#ifndef DLMS_IGNORE_DEMAND_REGISTER
                     else if (item.first->GetObjectType() == DLMS_OBJECT_TYPE_DEMAND_REGISTER &&
                         (item.second->GetAttributeIndex() == 2 || item.second->GetAttributeIndex() == 3))
                     {
@@ -873,6 +891,7 @@ int CGXDLMSProfileGeneric::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
                             row->Arr[pos] = row->Arr[pos].ToDouble() * scaler;
                         }
                     }
+#endif //DLMS_IGNORE_DEMAND_REGISTER
                 }
                 m_Buffer.push_back(row->Arr);
             }
@@ -953,4 +972,5 @@ int CGXDLMSProfileGeneric::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     return DLMS_ERROR_CODE_OK;
-}
+                }
+#endif //DLMS_IGNORE_PROFILE_GENERIC

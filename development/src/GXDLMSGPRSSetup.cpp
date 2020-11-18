@@ -36,6 +36,7 @@
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSGPRSSetup.h"
 
+#ifndef DLMS_IGNORE_GPRS_SETUP
 //Constructor.
 CGXDLMSGPRSSetup::CGXDLMSGPRSSetup() :
     CGXDLMSGPRSSetup("", 0)
@@ -268,4 +269,4 @@ int CGXDLMSGPRSSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
     }
     return DLMS_ERROR_CODE_OK;
 }
-
+#endif //DLMS_IGNORE_GPRS_SETUP

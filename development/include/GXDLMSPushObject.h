@@ -35,6 +35,7 @@
 #ifndef GXDLMSPUSHOBJECT_H
 #define GXDLMSPUSHOBJECT_H
 
+#include <string>
 #include "enums.h"
 
 class CGXDLMSPushObject

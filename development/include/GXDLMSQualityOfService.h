@@ -34,6 +34,7 @@
 #ifndef GXDLMSQUALITYOFSERVICE_H
 #define GXDLMSQUALITYOFSERVICE_H
 
+#include <string>
 #include "enums.h"
 
 class CGXDLMSQualityOfService

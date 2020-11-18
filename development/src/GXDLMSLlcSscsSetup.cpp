@@ -35,6 +35,7 @@
 #include "../include/GXDLMSLlcSscsSetup.h"
 #include "../include/GXDLMSClient.h"
 
+#ifndef DLMS_IGNORE_LLC_SSCS_SETUP
 //Constructor.
 CGXDLMSLlcSscsSetup::CGXDLMSLlcSscsSetup() :
     CGXDLMSLlcSscsSetup("0.0.28.0.0.255", 0)
@@ -206,3 +207,5 @@ int CGXDLMSLlcSscsSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventAr
     }
     return ret;
 }
+
+#endif //DLMS_IGNORE_LLC_SSCS_SETUP

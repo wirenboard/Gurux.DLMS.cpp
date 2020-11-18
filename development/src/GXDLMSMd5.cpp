@@ -32,6 +32,7 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
+#include <string.h>
 #include "../include/GXDLMSMd5.h"
 unsigned int gxmd5_F(unsigned int x, unsigned int y, unsigned int z)
 {

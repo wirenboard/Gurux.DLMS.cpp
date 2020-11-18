@@ -32,8 +32,9 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#include "../include/GXXmlReader.h"
 #include <string.h>
+#include "../include/GXXmlReader.h"
+
 CGXXmlReader::CGXXmlReader(FILE* f)
 {
     m_f = f;
@@ -97,9 +98,15 @@ bool CGXXmlReader::IsStartElement()
 std::string& CGXXmlReader::GetText()
 {
     char tag[256];
+#if _MSC_VER > 1000
+    strcpy_s(tag, sizeof(tag), "</");
+    strcat_s(tag, m_Name.c_str());
+    strcat_s(tag, ">");
+#else
     strcpy(tag, "</");
     strcat(tag, m_Name.c_str());
     strcat(tag, ">");
+#endif
     char* s = strstr(m_Buffer + m_Index, tag);
     m_Value.append(m_Buffer + m_Index, s);
     m_Index = (int)(s - m_Buffer);

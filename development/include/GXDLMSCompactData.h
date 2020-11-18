@@ -35,6 +35,8 @@
 #ifndef GXDLMSCOMPACT_DATA_H
 #define GXDLMSCOMPACT_DATA_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_COMPACT_DATA
 #include "GXDLMSObject.h"
 #include "GXDLMSCaptureObject.h"
 
@@ -166,4 +168,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_COMPACT_DATA
 #endif //GXDLMSCOMPACT_DATA_H

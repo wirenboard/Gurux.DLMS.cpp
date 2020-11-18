@@ -37,6 +37,8 @@
 #include "../include/GXDLMSRegisterActivation.h"
 #include <sstream>
 
+#ifndef DLMS_IGNORE_REGISTER_ACTIVATION
+
 //Constructor.
 CGXDLMSRegisterActivation::CGXDLMSRegisterActivation() :
     CGXDLMSRegisterActivation("", 0)
@@ -305,3 +307,4 @@ int CGXDLMSRegisterActivation::SetValue(CGXDLMSSettings& settings, CGXDLMSValueE
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_REGISTER_ACTIVATION

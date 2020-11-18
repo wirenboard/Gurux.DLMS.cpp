@@ -49,6 +49,7 @@ public:
         bool UseLogicalNameReferencing = true,
         DLMS_INTERFACE_TYPE intefaceType = DLMS_INTERFACE_TYPE_HDLC);
 
+#ifndef DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
     /**
     * Constructor.
     *
@@ -71,6 +72,8 @@ public:
     CGXDLMSSecureServer(
         CGXDLMSAssociationLogicalName* ln, CGXDLMSTcpUdpSetup* wrapper);
 
+#endif //DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
+#ifndef DLMS_IGNORE_ASSOCIATION_SHORT_NAME
     /**
     * Constructor.
     *
@@ -93,6 +96,7 @@ public:
     CGXDLMSSecureServer(
         CGXDLMSAssociationShortName* sn, CGXDLMSTcpUdpSetup* wrapper);
 
+#endif //DLMS_IGNORE_ASSOCIATION_SHORT_NAME
     /////////////////////////////////////////////////////////////////////////////
     //Destructor.
     /////////////////////////////////////////////////////////////////////////////

@@ -35,6 +35,8 @@
 #ifndef GXDLMSASSOCIATIONSHORTNAME_H
 #define GXDLMSASSOCIATIONSHORTNAME_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_ASSOCIATION_SHORT_NAME
 #include "GXDLMSObject.h"
 
 /**
@@ -106,4 +108,5 @@ public:
         CGXDLMSSettings& settings,
         CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_ASSOCIATION_SHORT_NAME
 #endif //GXDLMSASSOCIATIONSHORTNAME_H

@@ -35,6 +35,7 @@
 #ifndef GXDLMSVARIANT_H
 #define GXDLMSVARIANT_H
 
+#include <vector>
 #include "GXDate.h"
 #include "GXTime.h"
 #include "GXDateTime.h"

@@ -36,7 +36,7 @@
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSObjectFactory.h"
 #include <sstream>
-
+#ifndef DLMS_IGNORE_PUSH_SETUP
 //Constructor.
 CGXDLMSPushSetup::CGXDLMSPushSetup() :
     CGXDLMSPushSetup("0.7.25.9.0.255", 0)
@@ -441,3 +441,4 @@ int CGXDLMSPushSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_PUSH_SETUP

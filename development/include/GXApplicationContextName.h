@@ -35,8 +35,8 @@
 #ifndef GXAPPLICATIONCONTEXTNAME_H
 #define GXAPPLICATIONCONTEXTNAME_H
 
+#include <string>
 #include "enums.h"
-
 class CGXApplicationContextName
 {
 private:

@@ -36,6 +36,9 @@
 #define GXDLMSREGISTERACTIVATION_H
 
 #include "IGXDLMSBase.h"
+
+#ifndef DLMS_IGNORE_REGISTER_ACTIVATION
+#include "GXIgnore.h"
 #include "GXDLMSObject.h"
 #include "GXHelpers.h"
 #include "GXDLMSObjectDefinition.h"
@@ -92,4 +95,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_REGISTER_ACTIVATION
 #endif //GXDLMSREGISTERACTIVATION_H

@@ -35,6 +35,8 @@
 #ifndef GXDLMSIECOPTICALPORTSETUP_H
 #define GXDLMSIECOPTICALPORTSETUP_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_IEC_LOCAL_PORT_SETUP
 #include "GXDLMSObject.h"
 
 /**
@@ -118,4 +120,5 @@ public:
 class CGXDLMSIECOpticalPortSetup : public CGXDLMSIECLocalPortSetup
 {
 };
+#endif //DLMS_IGNORE_IEC_LOCAL_PORT_SETUP
 #endif //GXDLMSIECOPTICALPORTSETUP_H

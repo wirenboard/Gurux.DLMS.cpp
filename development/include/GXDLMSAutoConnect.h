@@ -35,6 +35,8 @@
 #ifndef GXDLMSAUTOCONNECT_H
 #define GXDLMSAUTOCONNECT_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_AUTO_CONNECT
 #include "GXDLMSObject.h"
 
 typedef enum
@@ -164,4 +166,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_AUTO_CONNECT
 #endif //GXDLMSAUTOCONNECT_H

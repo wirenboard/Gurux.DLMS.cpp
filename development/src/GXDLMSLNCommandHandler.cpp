@@ -40,6 +40,7 @@
 #include "../include/GXDLMSObjectFactory.h"
 #include "../include/GXDLMSSecuritySetup.h"
 
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
 void AppendAttributeDescriptor(CGXDLMSTranslatorStructure* xml, int ci, unsigned char* ln, unsigned char attributeIndex)
 {
     xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_ATTRIBUTE_DESCRIPTOR);
@@ -77,6 +78,7 @@ void AppendMethodDescriptor(CGXDLMSTranslatorStructure* xml, int ci, unsigned ch
     xml->AppendLine(DLMS_TRANSLATOR_TAGS_METHOD_ID, "", tmp);
     xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_METHOD_DESCRIPTOR);
 }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
 
 int CGXDLMSLNCommandHandler::GetRequestNormal(
     CGXDLMSSettings& settings,
@@ -124,6 +126,7 @@ int CGXDLMSLNCommandHandler::GetRequestNormal(
             return ret;
         }
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         AppendAttributeDescriptor(xml, (int)ci, ln, attributeIndex);
@@ -146,6 +149,7 @@ int CGXDLMSLNCommandHandler::GetRequestNormal(
         }
         return 0;
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     CGXDLMSVariant parameters;
     if (selection != 0)
     {
@@ -244,6 +248,7 @@ int CGXDLMSLNCommandHandler::GetRequestNextDataBlock(
         {
             return ret;
         }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             std::string tmp;
@@ -251,7 +256,7 @@ int CGXDLMSLNCommandHandler::GetRequestNextDataBlock(
             xml->AppendLine(DLMS_TRANSLATOR_TAGS_BLOCK_NUMBER, "", tmp);
             return 0;
         }
-
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         if (index != settings.GetBlockIndex())
         {
             CGXDLMSLNParameters p(&settings, invokeID, DLMS_COMMAND_GET_RESPONSE, 2,
@@ -347,12 +352,14 @@ int CGXDLMSLNCommandHandler::GetRequestWithList(
         return ret;
     }
     GXHelpers::SetObjectCount(cnt, bb);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         std::string tmp;
         xml->IntegerToHex(cnt, 2, tmp);
         xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_ATTRIBUTE_DESCRIPTOR_LIST, "Qty", tmp);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     for (pos = 0; pos != cnt; ++pos)
     {
         if ((ret = data.GetUInt16(&id)) != 0)
@@ -387,6 +394,7 @@ int CGXDLMSLNCommandHandler::GetRequestWithList(
                 return ret;
             }
         }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             std::string tmp;
@@ -405,6 +413,7 @@ int CGXDLMSLNCommandHandler::GetRequestWithList(
             xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_ATTRIBUTE_DESCRIPTOR_WITH_SELECTION);
         }
         else
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         {
             CGXDLMSObject* obj = settings.GetObjects().FindByLN(ci, ln);
             if (obj == NULL)
@@ -432,11 +441,13 @@ int CGXDLMSLNCommandHandler::GetRequestWithList(
             }
         }
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_ATTRIBUTE_DESCRIPTOR_LIST);
         return 0;
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     server->PreRead(list);
     pos = 0;
     for (std::vector<CGXDLMSValueEventArg*>::iterator it = list.begin(); it != list.end(); ++it)
@@ -508,6 +519,7 @@ int CGXDLMSLNCommandHandler::HandleGetRequest(
             return ret;
         }
         settings.UpdateInvokeId(invokeID);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             std::string tmp;
@@ -516,6 +528,7 @@ int CGXDLMSLNCommandHandler::HandleGetRequest(
             xml->IntegerToHex((long)invokeID, 2, tmp);
             xml->AppendLine((unsigned long)DLMS_TRANSLATOR_TAGS_INVOKE_ID, "", tmp);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     }
     // GetRequest normal
     if (type == DLMS_GET_COMMAND_TYPE_NORMAL)
@@ -542,11 +555,13 @@ int CGXDLMSLNCommandHandler::HandleGetRequest(
             type, NULL, &bb, DLMS_ERROR_CODE_OK, cipheredCommand);
         ret = CGXDLMS::GetLNPdu(p, *replyData);
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         xml->AppendEndTag(DLMS_COMMAND_GET_REQUEST, (unsigned long)type);
         xml->AppendEndTag(DLMS_COMMAND_GET_REQUEST);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return ret;
 }
 
@@ -613,6 +628,7 @@ int CGXDLMSLNCommandHandler::HandleSetRequestNormal(
             p.SetStatus(DLMS_ERROR_CODE_DATA_BLOCK_UNAVAILABLE);
             return 0;
         }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             AppendAttributeDescriptor(xml, ci, ln, index);
@@ -625,8 +641,10 @@ int CGXDLMSLNCommandHandler::HandleSetRequestNormal(
             xml->AppendLine(DLMS_TRANSLATOR_TAGS_RAW_DATA, "", str);
             xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_DATA_BLOCK);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         return 0;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         AppendAttributeDescriptor(xml, (int)ci, ln, index);
@@ -649,6 +667,7 @@ int CGXDLMSLNCommandHandler::HandleSetRequestNormal(
         xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_VALUE);
         return 0;
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     if (!p.IsMultipleBlocks())
     {
         settings.ResetBlockIndex();
@@ -761,6 +780,7 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithDataBlock(
         {
             p.SetStatus(DLMS_ERROR_CODE_DATA_BLOCK_UNAVAILABLE);
         }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             std::string str;
@@ -774,6 +794,7 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithDataBlock(
             xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_DATA_BLOCK);
             return 0;
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         server->m_Transaction->GetData().Set(&data, data.GetPosition());
         // If all data is received.
         if (!p.IsMultipleBlocks())
@@ -840,11 +861,13 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
         return ret;
     }
     std::map<unsigned short, unsigned char> status;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         xml->IntegerToHex(cnt, 2, str);
         xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_ATTRIBUTE_DESCRIPTOR_LIST, "Qty", str);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     for (unsigned short pos = 0; pos != cnt; ++pos)
     {
         status[pos] = 0;
@@ -882,6 +905,7 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
         {
             selector = 0;
         }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_ATTRIBUTE_DESCRIPTOR_WITH_SELECTION);
@@ -899,6 +923,7 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
             xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_ATTRIBUTE_DESCRIPTOR_WITH_SELECTION);
         }
         else
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         {
             CGXDLMSObject* obj = settings.GetObjects().FindByLN(ci, ln);
             if (obj == NULL)
@@ -926,21 +951,25 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
     {
         return ret;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_ATTRIBUTE_DESCRIPTOR_LIST);
         xml->IntegerToHex(cnt, 2, str);
         xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_VALUE_LIST, "Qty", str);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     for (unsigned short pos = 0; pos != cnt; ++pos)
     {
         CGXDLMSVariant value;
         CGXDataInfo di;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         di.SetXml(xml);
         if (xml != NULL && xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML)
         {
             xml->AppendStartTag(DLMS_COMMAND_WRITE_REQUEST, DLMS_SINGLE_READ_RESPONSE_DATA);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         if ((ret = GXHelpers::GetData(&settings, data, di, value)) != 0)
         {
             status[pos] = DLMS_ERROR_CODE_READ_WRITE_DENIED;
@@ -955,17 +984,21 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
             {
                 value = GXHelpers::BytesToHex(value.byteArr, value.GetSize(), false);
             }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             if (xml != NULL && xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML)
             {
                 xml->AppendEndTag(DLMS_COMMAND_WRITE_REQUEST, (unsigned long)DLMS_SINGLE_READ_RESPONSE_DATA);
             }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         }
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_VALUE_LIST);
     }
     else
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     {
         p.SetStatus(0xFF);
         GXHelpers::SetObjectCount((unsigned long) status.size(), *p.GetAttributeDescriptor());
@@ -1010,7 +1043,9 @@ int CGXDLMSLNCommandHandler::HandleSetRequest(
         return ret;
     }
     settings.UpdateInvokeId(invoke);
-    if (xml != NULL) {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+    if (xml != NULL)
+    {
         xml->AppendStartTag(DLMS_COMMAND_SET_REQUEST);
         xml->AppendStartTag(DLMS_COMMAND_SET_REQUEST, type);
         // InvokeIdAndPriority
@@ -1018,6 +1053,7 @@ int CGXDLMSLNCommandHandler::HandleSetRequest(
         xml->IntegerToHex((long)invoke, 2, str);
         xml->AppendLine(DLMS_TRANSLATOR_TAGS_INVOKE_ID, "", str);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
 
     CGXByteBuffer attributeDescriptor;
     CGXDLMSLNParameters p(&settings, invoke, DLMS_COMMAND_SET_RESPONSE, type, &attributeDescriptor, NULL, 0, cipheredCommand);
@@ -1040,12 +1076,14 @@ int CGXDLMSLNCommandHandler::HandleSetRequest(
         settings.ResetBlockIndex();
         p.SetStatus(DLMS_ERROR_CODE_HARDWARE_FAULT);
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         xml->AppendEndTag(DLMS_COMMAND_SET_REQUEST, (unsigned long)type);
         xml->AppendEndTag(DLMS_COMMAND_SET_REQUEST);
         return 0;
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return CGXDLMS::GetLNPdu(p, *replyData);
 }
 
@@ -1102,6 +1140,7 @@ int CGXDLMSLNCommandHandler::HandleMethodRequest(
     {
         return ret;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         xml->AppendStartTag(DLMS_COMMAND_METHOD_REQUEST);
@@ -1130,6 +1169,7 @@ int CGXDLMSLNCommandHandler::HandleMethodRequest(
         xml->AppendEndTag(DLMS_COMMAND_METHOD_REQUEST);
         return 0;
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     // Get parameters.
     if (selection != 0)
     {
@@ -1190,6 +1230,7 @@ int CGXDLMSLNCommandHandler::HandleMethodRequest(
     }
     CGXDLMSLNParameters p(&settings, invokeId, DLMS_COMMAND_METHOD_RESPONSE, 1, NULL, &bb, error, cipheredCommand);
     ret = CGXDLMS::GetLNPdu(p, *replyData);
+#ifndef DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
     if (error == 0 && obj->GetObjectType() == DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME && id == 1)
     {
         if (((CGXDLMSAssociationLogicalName*)obj)->GetAssociationStatus() == DLMS_ASSOCIATION_STATUS_ASSOCIATED)
@@ -1204,10 +1245,13 @@ int CGXDLMSLNCommandHandler::HandleMethodRequest(
             settings.SetConnected((DLMS_CONNECTION_STATE)(settings.GetConnected() & ~DLMS_CONNECTION_STATE_DLMS));
         }
     }
+#endif //DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
+#ifndef DLMS_IGNORE_SECURITY_SETUP
     if (e != NULL && error == 0 && obj->GetObjectType() == DLMS_OBJECT_TYPE_SECURITY_SETUP && id == 2)
     {
         ((CGXDLMSSecuritySetup*)obj)->ApplyKeys(settings, *e);
     }
+#endif //DLMS_IGNORE_SECURITY_SETUP
     return ret;
 }
 
@@ -1272,6 +1316,7 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
     {
         return ret;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         std::string tmp2;
@@ -1284,9 +1329,12 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
         xml->IntegerToHex(cnt, 2, tmp2);
         xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_LIST_OF_ACCESS_REQUEST_SPECIFICATION, "Qty", tmp2);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     DLMS_ACCESS_SERVICE_COMMAND_TYPE type;
     unsigned short id;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     unsigned char* ln;
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     unsigned char attributeIndex;
     for (unsigned long pos = 0; pos != cnt; ++pos)
     {
@@ -1306,24 +1354,28 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
         {
             return ret;
         }
-        DLMS_OBJECT_TYPE ci = (DLMS_OBJECT_TYPE)id;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         ln = data.GetData() + data.GetPosition();
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         data.SetPosition(data.GetPosition() + 6);
         // Attribute Id
         if ((ret = data.GetUInt8(&attributeIndex)) != 0)
         {
             return ret;
         }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_ACCESS_REQUEST_SPECIFICATION);
             xml->AppendStartTag(DLMS_COMMAND_ACCESS_REQUEST, type);
-            AppendAttributeDescriptor(xml, (int)ci, ln, attributeIndex);
+            AppendAttributeDescriptor(xml, id, ln, attributeIndex);
             xml->AppendEndTag(DLMS_COMMAND_ACCESS_REQUEST, (unsigned long)type);
             xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_ACCESS_REQUEST_SPECIFICATION);
 
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         std::string tmp2;
@@ -1331,6 +1383,7 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
         xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_LIST_OF_ACCESS_REQUEST_SPECIFICATION);
         xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_ACCESS_REQUEST_LIST_OF_DATA, "Qty", tmp2);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     // Get data count.
     if ((ret = GXHelpers::GetObjectCount(data, cnt)) != 0)
     {
@@ -1340,11 +1393,13 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
     {
         CGXDLMSVariant value;
         CGXDataInfo di;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         di.SetXml(xml);
         if (xml != NULL && xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML)
         {
             xml->AppendStartTag(DLMS_COMMAND_WRITE_REQUEST, DLMS_SINGLE_READ_RESPONSE_DATA);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         if ((ret = GXHelpers::GetData(&settings, data, di, value)) != 0)
         {
             return ret;
@@ -1357,17 +1412,21 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
         {
             value = GXHelpers::BytesToHex(value.byteArr, value.GetSize());
         }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL && xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML)
         {
             xml->AppendEndTag(DLMS_COMMAND_WRITE_REQUEST, (unsigned long)DLMS_SINGLE_READ_RESPONSE_DATA);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_ACCESS_REQUEST_LIST_OF_DATA);
         xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_ACCESS_REQUEST_BODY);
         xml->AppendEndTag(DLMS_COMMAND_ACCESS_REQUEST);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -1399,6 +1458,7 @@ int CGXDLMSLNCommandHandler::HandleEventNotification(
         }
         reply.SetTime(&value.dateTime.GetValue());
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (reply.GetXml() != NULL)
     {
         reply.GetXml()->AppendStartTag(DLMS_COMMAND_EVENT_NOTIFICATION);
@@ -1410,33 +1470,42 @@ int CGXDLMSLNCommandHandler::HandleEventNotification(
             reply.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_TIME, "", str);
         }
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     unsigned short ci;
     if ((ret = reply.GetData().GetUInt16(&ci)) != 0)
     {
         return ret;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     unsigned char* ln = reply.GetData().GetData() + reply.GetData().GetPosition();
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     reply.GetData().SetPosition(reply.GetData().GetPosition() + 6);
     if ((ret = reply.GetData().GetUInt8(&ch)) != 0)
     {
         return ret;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (reply.GetXml() != NULL)
     {
         AppendAttributeDescriptor(reply.GetXml(), ci, ln, ch);
         reply.GetXml()->AppendStartTag(DLMS_TRANSLATOR_TAGS_ATTRIBUTE_VALUE);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     CGXDataInfo di;
     CGXDLMSVariant value;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     di.SetXml(reply.GetXml());
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     if ((ret = GXHelpers::GetData(&settings, reply.GetData(), di, value)) != 0)
     {
         return ret;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (reply.GetXml() != NULL)
     {
         reply.GetXml()->AppendEndTag(DLMS_TRANSLATOR_TAGS_ATTRIBUTE_VALUE);
         reply.GetXml()->AppendEndTag(DLMS_COMMAND_EVENT_NOTIFICATION);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }

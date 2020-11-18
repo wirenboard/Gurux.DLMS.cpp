@@ -32,6 +32,9 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
+#include <fstream>
+#include <algorithm>
+#include <functional>
 #include "../include/GXDate.h"
 #include "../include/GXTime.h"
 #include "../include/GXHelpers.h"
@@ -64,12 +67,14 @@ static int GetArray(CGXDLMSSettings* settings, CGXByteBuffer& buff, CGXDataInfo&
         info.SetCount(cnt);
         value.Arr.reserve(cnt);
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         std::string tmp;
         info.GetXml()->IntegerToHex((unsigned long)info.GetCount(), 2, tmp);
         info.GetXml()->AppendStartTag(DATA_TYPE_OFFSET | info.GetType(), "Qty", tmp);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     int size = buff.GetSize() - buff.GetPosition();
     if (info.GetCount() != 0 && size < 1)
     {
@@ -84,7 +89,9 @@ static int GetArray(CGXDLMSSettings* settings, CGXByteBuffer& buff, CGXDataInfo&
     {
         info2.Clear();
         tmp.Clear();
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         info2.SetXml(info.GetXml());
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         if ((ret = GXHelpers::GetData(settings, buff, info2, tmp)) != 0)
         {
             return ret;
@@ -104,10 +111,12 @@ static int GetArray(CGXDLMSSettings* settings, CGXByteBuffer& buff, CGXDataInfo&
             }
         }
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         info.GetXml()->AppendEndTag(DATA_TYPE_OFFSET + info.GetType());
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     info.SetIndex(pos);
     return 0;
 }
@@ -131,11 +140,13 @@ int GetTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         info.SetComplete(false);
         return 0;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     std::string str;
     if (info.GetXml() != NULL)
     {
         str = buff.ToHexString(buff.GetPosition(), 4, false);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
 
     // Get time.
     if ((ret = buff.GetUInt8(&hour)) != 0)
@@ -164,11 +175,13 @@ int GetTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     }
     CGXTime dt(hour, minute, second, ms);
     value = dt;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         info.GetXml()->AppendComment(dt.ToString());
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", str);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -192,11 +205,13 @@ int GetDate(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         info.SetComplete(false);
         return 0;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     std::string str;
     if (info.GetXml() != NULL)
     {
         str = buff.ToHexString(buff.GetPosition(), 5, false);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     // Get year.
     if ((ret = buff.GetUInt16(&year)) != 0)
     {
@@ -249,11 +264,13 @@ int GetDate(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         dt.SetSkip((DATETIME_SKIPS)(dt.GetSkip() | DATETIME_SKIPS_DAYOFWEEK));
     }
     value = dt;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         info.GetXml()->AppendComment(dt.ToString());
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", str);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -280,11 +297,13 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         info.SetComplete(false);
         return 0;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     std::string str;
     if (info.GetXml() != NULL)
     {
         str = buff.ToHexString(buff.GetPosition(), 12, false);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     // Get year.
     if ((ret = buff.GetUInt16(&year)) != 0)
     {
@@ -432,11 +451,13 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     dt.SetDeviation(deviation);
     dt.SetSkip(skip);
     value = dt;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         info.GetXml()->AppendComment(dt.ToString());
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", str);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -457,13 +478,16 @@ int GetDouble(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         info.SetComplete(false);
         return 0;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     std::string str;
     if (info.GetXml() != NULL)
     {
         str = buff.ToHexString(buff.GetPosition(), 8, false);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     value.vt = DLMS_DATA_TYPE_FLOAT64;
     int ret = buff.GetDouble(&value.dblVal);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         if (info.GetXml()->GetComments())
@@ -472,6 +496,7 @@ int GetDouble(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         }
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", str);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return ret;
 }
 
@@ -492,13 +517,16 @@ int GetFloat(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         info.SetComplete(false);
         return 0;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     std::string str;
     if (info.GetXml() != NULL)
     {
         str = buff.ToHexString(buff.GetPosition(), 4, false);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     value.vt = DLMS_DATA_TYPE_FLOAT32;
     int ret = buff.GetFloat(&value.fltVal);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         if (info.GetXml()->GetComments())
@@ -507,6 +535,7 @@ int GetFloat(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         }
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", str);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return ret;
 }
 
@@ -535,12 +564,14 @@ int GetEnum(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     }
     value = ch;
     value.vt = DLMS_DATA_TYPE_ENUM;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         std::string tmp;
         info.GetXml()->IntegerToHex((long)ch, 2, tmp);
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", tmp);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -568,12 +599,14 @@ int GetUInt64(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         return ret;
     }
     value = val;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         std::string tmp;
         info.GetXml()->IntegerToHex(val, tmp);
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", tmp);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -601,12 +634,14 @@ int GetInt64(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         return ret;
     }
     value = val;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         std::string tmp;
         info.GetXml()->IntegerToHex(val, tmp);
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", tmp);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -634,12 +669,14 @@ int GetUInt16(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         return ret;
     }
     value = val;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         std::string tmp;
         info.GetXml()->IntegerToHex((long)val, 4, tmp);
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", tmp);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -667,12 +704,14 @@ int GetUInt8(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         return ret;
     }
     value = val;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         std::string tmp;
         info.GetXml()->IntegerToHex((long)val, 2, tmp);
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", tmp);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -700,12 +739,14 @@ int GetInt16(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         return ret;
     }
     value = val;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         std::string tmp;
         info.GetXml()->IntegerToHex((long)val, 4, tmp);
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", tmp);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -733,12 +774,14 @@ int GetInt8(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
         return ret;
     }
     value = val;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         std::string tmp;
         info.GetXml()->IntegerToHex((long)val, 2, tmp);
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", tmp);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -762,12 +805,14 @@ int GetBcd(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMSVarian
     }
     value = ch;
     value.vt = DLMS_DATA_TYPE_BINARY_CODED_DESIMAL;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         std::string tmp;
         info.GetXml()->IntegerToHex((long)ch, 2, tmp);
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", tmp);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -1004,10 +1049,12 @@ int GetUtfString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMS
         value.vt = DLMS_DATA_TYPE_STRING_UTF8;
         value.strVal.append(tmp, len);
         delete tmp;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (info.GetXml() != NULL)
         {
             info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", value.strVal);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     }
     else
     {
@@ -1060,6 +1107,7 @@ int GetOctetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDL
         }
     }
     value.vt = DLMS_DATA_TYPE_OCTET_STRING;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         std::string str;
@@ -1115,6 +1163,7 @@ int GetOctetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDL
         str = GXHelpers::BytesToHex(value.byteArr, value.GetSize(), false);
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", str);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -1169,10 +1218,12 @@ int GetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMSVar
     {
         value = "";
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", value.strVal);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -1195,10 +1246,12 @@ int GetUInt32(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     }
     value.vt = DLMS_DATA_TYPE_UINT32;
     int ret = buff.GetUInt32(&value.ulVal);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (ret == 0 && info.GetXml() != NULL)
     {
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", value);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return ret;
 }
 
@@ -1221,10 +1274,12 @@ int GetInt32(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     }
     value.vt = DLMS_DATA_TYPE_INT32;
     int ret = buff.GetInt32(&value.lVal);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (ret == 0 && info.GetXml() != NULL)
     {
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", value);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return ret;
 }
 
@@ -1296,12 +1351,14 @@ static int GetBitString(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& 
         }
         cnt -= 8;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         std::string str = bb.ToString();
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()),
             "", str);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     value = bb.ToString();
     value.vt = DLMS_DATA_TYPE_BIT_STRING;
     return 0;
@@ -1332,11 +1389,13 @@ static int GetBool(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value
     }
     value.vt = DLMS_DATA_TYPE_BOOLEAN;
     value.boolVal = ch != 0;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (info.GetXml() != NULL)
     {
         std::string str = value.boolVal != 0 ? "true" : "false";
         info.GetXml()->AppendLine(info.GetXml()->GetDataType(info.GetType()), "", str);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -1500,20 +1559,29 @@ int GXHelpers::AppendDataTypeAsXml(
     {
         if (it->vt == DLMS_DATA_TYPE_ARRAY)
         {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             info.GetXml()->AppendStartTag(DATA_TYPE_OFFSET + DLMS_DATA_TYPE_ARRAY, "", val);
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             AppendDataTypeAsXml(it->Arr, info);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             info.GetXml()->AppendEndTag(DATA_TYPE_OFFSET + DLMS_DATA_TYPE_ARRAY);
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         }
         else if (it->vt == DLMS_DATA_TYPE_STRUCTURE)
         {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             info.GetXml()->AppendStartTag(DATA_TYPE_OFFSET + DLMS_DATA_TYPE_STRUCTURE, "", val);
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             AppendDataTypeAsXml(it->Arr, info);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             info.GetXml()->AppendEndTag(DATA_TYPE_OFFSET + DLMS_DATA_TYPE_STRUCTURE);
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         }
-        else
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         {
             info.GetXml()->AppendEmptyTag(info.GetXml()->GetDataType((DLMS_DATA_TYPE)it->bVal));
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR        else
     }
     return 0;
 }
@@ -1560,6 +1628,7 @@ int GXHelpers::GetCompactArray(
         {
             return ret;
         }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (info.GetXml() != NULL)
         {
             info.GetXml()->AppendStartTag(info.GetXml()->GetDataType(DLMS_DATA_TYPE_COMPACT_ARRAY));
@@ -1580,6 +1649,8 @@ int GXHelpers::GetCompactArray(
                 info.GetXml()->AppendStartTag(DLMS_TRANSLATOR_TAGS_ARRAY_CONTENTS);
             }
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+
         value.vt = DLMS_DATA_TYPE_ARRAY;
         int start = buff.GetPosition();
         while (buff.GetPosition() - start < len)
@@ -1627,6 +1698,7 @@ int GXHelpers::GetCompactArray(
                 break;
             }
         }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (info.GetXml() != NULL && info.GetXml()->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
         {
             for (std::vector<CGXDLMSVariant>::iterator row = value.Arr.begin(); row != value.Arr.end(); ++row)
@@ -1675,10 +1747,12 @@ int GXHelpers::GetCompactArray(
             str = info.GetXml()->GetDataType(DLMS_DATA_TYPE_COMPACT_ARRAY);
             info.GetXml()->AppendEndTag(str);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         return 0;
     }
     else
     {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (info.GetXml() != NULL)
         {
             info.GetXml()->AppendStartTag(info.GetXml()->GetDataType(DLMS_DATA_TYPE_COMPACT_ARRAY));
@@ -1695,7 +1769,9 @@ int GXHelpers::GetCompactArray(
                 info.GetXml()->AppendEndTag(str);
             }
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         GetCompactArrayItem(settings, buff, dt, value.Arr, len);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (info.GetXml() != NULL && info.GetXml()->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
         {
             std::string separator = ";";
@@ -1713,6 +1789,7 @@ int GXHelpers::GetCompactArray(
             str = info.GetXml()->GetDataType(DLMS_DATA_TYPE_COMPACT_ARRAY);
             info.GetXml()->AppendEndTag(str);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     }
     return 0;
 }
@@ -1745,10 +1822,12 @@ int GXHelpers::GetData(
     }
     if (info.GetType() == DLMS_DATA_TYPE_NONE)
     {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (info.GetXml() != NULL)
         {
             info.GetXml()->AppendLine("<" + info.GetXml()->GetDataType(info.GetType()) + " />");
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         return 0;
     }
     if (data.GetPosition() == data.GetSize())
@@ -1979,7 +2058,7 @@ static int SetDateTime(CGXDLMSSettings* settings, CGXByteBuffer& buff, CGXDLMSVa
     DATETIME_SKIPS skip = value.dateTime.GetSkip();
     if (settings->GetDateTimeSkips() != DATETIME_SKIPS_NONE)
     {
-        skip = (DATETIME_SKIPS) (skip | settings->GetDateTimeSkips());
+        skip = (DATETIME_SKIPS)(skip | settings->GetDateTimeSkips());
     }
     if (dt.tm_year != -1 && (skip & DATETIME_SKIPS_YEAR) == 0)
     {

@@ -36,6 +36,7 @@
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSActionSchedule.h"
 #include <sstream>
+#ifndef DLMS_IGNORE_ACTION_SCHEDULE
 
 /**
  Constructor.
@@ -292,3 +293,4 @@ int CGXDLMSActionSchedule::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
 }
+#endif //DLMS_IGNORE_ACTION_SCHEDULE

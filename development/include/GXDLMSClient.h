@@ -224,7 +224,16 @@ public:
     int SetMaxReceivePDUSize(unsigned short value);
     unsigned short GetMaxReceivePDUSize();
 
+    //HDLC connection settings. GetLimits is obsolete. Use GetHdlcSettings instead.
     CGXDLMSLimits& GetLimits();
+
+    /////////////////////////////////////////////////////////////////////////////
+    //HDLC connection settings.
+    CGXHdlcSettings& GetHdlcSettings();
+
+    /////////////////////////////////////////////////////////////////////////////
+    //PLC connection settings.
+    CGXPlcSettings& GetPlcSettings();
 
     /////////////////////////////////////////////////////////////////////////////
     // Collection of the objects.

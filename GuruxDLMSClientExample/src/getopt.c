@@ -19,8 +19,8 @@
 
 #if defined(_WIN32) || defined(_WIN64)//Windows
 
-#include "../include/getopt.h"
 #include <string.h>
+#include "../include/getopt.h"
 
 char* optarg = 0;
 int optind = 1;

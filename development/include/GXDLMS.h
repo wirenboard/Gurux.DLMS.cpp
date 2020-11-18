@@ -50,8 +50,14 @@ class CGXDLMS
 {
 private:
     friend class CGXDLMSClient;
+    friend class CGXDLMSServer;
+
+    static int AppendMultipleSNBlocks(
+        CGXDLMSSNParameters& p,
+        CGXByteBuffer& reply);
 
     static unsigned short CountFCS16(CGXByteBuffer& buff, int index, int count);
+    static uint32_t CountFCS24(unsigned char* buff, int index, int count);
 
     /////////////////////////////////////////////////////////////////////////////
     // Get adress as GXDLMSVariant.
@@ -62,6 +68,14 @@ private:
     // Get address as an byte array.
     /////////////////////////////////////////////////////////////////////////////
     static int GetAddressBytes(unsigned long value, CGXByteBuffer& bytes);
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Returns true if HDLC us used.
+    /////////////////////////////////////////////////////////////////////////////
+    // type : Interface type.
+    // Returns True, if HDLC is used.
+    /////////////////////////////////////////////////////////////////////////////
+    static bool UseHdlc(DLMS_INTERFACE_TYPE type);
 
     /////////////////////////////////////////////////////////////////////////////
     // Returns true if executed command is reply.
@@ -108,6 +122,40 @@ private:
         CGXByteBuffer& reply,
         CGXReplyData& info,
         bool hdlc);
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Get data from Wireless M-Bus frame.
+    /////////////////////////////////////////////////////////////////////////////
+    /// <param name="settings">DLMS settings.</param>
+    /// <param name="buff">Received data.</param>
+    /// <param name="data">Reply information.</param>
+    static int GetMBusData(
+        CGXDLMSSettings& settings,
+        CGXByteBuffer& buff,
+        CGXReplyData& data);
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Get data from S-FSK PLC frame.
+    /////////////////////////////////////////////////////////////////////////////
+    // settings: DLMS settings.
+    // buff: Received data.
+    // data: Reply information.
+    static int GetPlcData(
+        CGXDLMSSettings& settings,
+        CGXByteBuffer& buff,
+        CGXReplyData& data);
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Get data from S-FSK PLC Hdlc frame.
+    /////////////////////////////////////////////////////////////////////////////
+    // settings: DLMS settings.
+    // buff: Received data.
+    // data: Reply information.
+    static int GetPlcHdlcData(
+        CGXDLMSSettings& settings,
+        CGXByteBuffer& buff,
+        CGXReplyData& data,
+        unsigned char* frame);
 
     /**
     * Handle read response data block result.
@@ -248,13 +296,10 @@ public:
     /**
     * Get HDLC frame for data.
     *
-    * @param settings
-    *            DLMS settings.
-    * @param frame
-    *            Frame ID. If zero new is generated.
-    * @param data
-    *            Data to add.
-    * @return HDLC frame.
+    * settings: DLMS settings.
+    * frame: Frame ID. If zero new is generated.
+    * data: Data to add.
+    * reply: HDLC frame.
     */
     static int GetHdlcFrame(
         CGXDLMSSettings& settings,
@@ -269,6 +314,49 @@ public:
         CGXReplyData& data,
         unsigned char& frame,
         CGXReplyData* notify);
+
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Get MAC LLC frame for data.
+    /////////////////////////////////////////////////////////////////////////////
+    // settings: DLMS settings.
+    // frame: HDLC frame sequence number.
+    // creditFields: Credit fields.
+    // data: Data to add.
+    // reply: MAC frame.
+    static int GetMacFrame(
+        CGXDLMSSettings& settings,
+        unsigned char frame,
+        unsigned char creditFields,
+        CGXByteBuffer* data,
+        CGXByteBuffer& reply);
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Get MAC LLC frame for data.
+    /////////////////////////////////////////////////////////////////////////////
+    // settings: DLMS settings.
+    // data: Data to add.
+    // reply: MAC frame.
+    static int GetPlcFrame(
+        CGXDLMSSettings& settings,
+        unsigned char creditFields,
+        CGXByteBuffer* data,
+        CGXByteBuffer& reply);
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Get MAC HDLC frame for data.
+    /////////////////////////////////////////////////////////////////////////////
+    // settings: DLMS settings.
+    // frame: HDLC frame.
+    // creditFields: Credit fields.
+    // data: Data to add.
+    // reply: MAC frame.
+    static int GetMacHdlcFrame(
+        CGXDLMSSettings& settings,
+        unsigned char frame,
+        unsigned char creditFields,
+        CGXByteBuffer* data,
+        CGXByteBuffer& reply);
 
     /**
      * Get HDLC address from byte array.
@@ -428,7 +516,7 @@ public:
 
     static int ParseSnrmUaResponse(
         CGXByteBuffer& data,
-        CGXDLMSLimits* limits);
+        CGXHdlcSettings* limits);
 
     // Add HDLC parameter.
     static void AppendHdlcParameter(CGXByteBuffer& data, unsigned short value);

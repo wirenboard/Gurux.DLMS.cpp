@@ -34,13 +34,14 @@
 
 #include "../include/GXDLMSSettings.h"
 
-CGXDLMSSettings::CGXDLMSSettings(bool isServer)
+CGXDLMSSettings::CGXDLMSSettings(bool isServer) :
+    m_Server(isServer),
+    m_PlcSettings(this)
 {
     m_UseCustomChallenge = false;
     m_BlockIndex = 1;
     m_Connected = DLMS_CONNECTION_STATE_NONE;
     m_DlmsVersionNumber = DLMS_VERSION;
-    m_Server = isServer;
     ResetFrameSequence();
     m_InvokeID = 1;
     m_LongInvokeID = 1;
@@ -260,9 +261,14 @@ bool CGXDLMSSettings::IsServer()
     return m_Server;
 }
 
-CGXDLMSLimits& CGXDLMSSettings::GetLimits()
+CGXDLMSLimits& CGXDLMSSettings::GetHdlcSettings()
 {
-    return m_Limits;
+    return m_HdlcSettings;
+}
+
+CGXPlcSettings& CGXDLMSSettings::GetPlcSettings()
+{
+    return m_PlcSettings;
 }
 
 DLMS_INTERFACE_TYPE CGXDLMSSettings::GetInterfaceType()

@@ -35,6 +35,8 @@
 #ifndef GXACCOUNT_H
 #define GXACCOUNT_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_ACCOUNT
 #include "GXDLMSObject.h"
 #include "GXCreditChargeConfiguration.h"
 #include "GXTokenGatewayConfiguration.h"
@@ -652,4 +654,5 @@ public:
         CGXDLMSClient* client,
         std::vector<CGXByteBuffer>& reply);
 };
+#endif //DLMS_IGNORE_ACCOUNT
 #endif //GXACCOUNT_H

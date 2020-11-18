@@ -35,6 +35,7 @@
 #include "../include/GXDLMSMBusMasterPortSetup.h"
 #include "../include/GXDLMSConverter.h"
 
+#ifndef DLMS_IGNORE_MBUS_MASTER_PORT_SETUP
 //Constructor.
 CGXDLMSMBusMasterPortSetup::CGXDLMSMBusMasterPortSetup() :
     CGXDLMSMBusMasterPortSetup("", 0)
@@ -156,3 +157,4 @@ int CGXDLMSMBusMasterPortSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValue
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_MBUS_MASTER_PORT_SETUP

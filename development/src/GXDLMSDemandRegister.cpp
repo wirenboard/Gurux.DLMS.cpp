@@ -32,11 +32,13 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
+#include <cmath>
 #include "../include/GXDLMSVariant.h"
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSConverter.h"
 #include "../include/GXDLMSDemandRegister.h"
 
+#ifndef DLMS_IGNORE_DEMAND_REGISTER
 bool CGXDLMSDemandRegister::IsRead(int index)
 {
     if (index == 4)
@@ -506,3 +508,4 @@ int CGXDLMSDemandRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEvent
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_DEMAND_REGISTER

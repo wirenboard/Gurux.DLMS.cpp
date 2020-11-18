@@ -31,11 +31,13 @@
 // This code is licensed under the GNU General Public License v2.
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
+#include <cmath>
 #include "../include/GXDLMSVariant.h"
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSRegister.h"
 #include "../include/GXDLMSConverter.h"
 
+#ifndef DLMS_IGNORE_REGISTER
 bool CGXDLMSRegister::IsRead(int index)
 {
     if (index == 3)
@@ -297,3 +299,4 @@ int CGXDLMSRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_REGISTER

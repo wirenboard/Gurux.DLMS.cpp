@@ -34,7 +34,7 @@
 
 #ifndef GXMACDIRECTTABLE_H
 #define GXMACDIRECTTABLE_H
-
+#include <sstream>
 class CGXMacDirectTable
 {
     /*

@@ -110,8 +110,6 @@ public:
     int Open(
         //Serial port name.
         const char* pPortName,
-        //Is IEC or DLMS used as starting protocol.
-        bool IEC,
         //Maximum baud rate.
         int maxBaudrate = 19200);
 

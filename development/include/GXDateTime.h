@@ -35,6 +35,12 @@
 #ifndef GXDATETIME_H
 #define GXDATETIME_H
 
+#include <cctype>
+#include <locale>
+#include <stdio.h>
+#include <string>
+#include <sstream>
+#include <time.h>
 #include "enums.h"
 
 // DataType enumerates skipped fields from date time.

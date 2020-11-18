@@ -66,14 +66,19 @@ private:
         CGXCipher* cipher,
         CGXByteBuffer& buff,
         DLMS_ASSOCIATION_RESULT& result,
-        DLMS_SOURCE_DIAGNOSTIC& diagnostic,
-        CGXDLMSTranslatorStructure* xml);
+        DLMS_SOURCE_DIAGNOSTIC& diagnostic
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+        , CGXDLMSTranslatorStructure* xml
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+    );
 
     static int Parse(bool initiateRequest,
         CGXDLMSSettings& settings,
         CGXCipher* cipher,
         CGXByteBuffer& data,
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         CGXDLMSTranslatorStructure* xml,
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         unsigned char tag);
 public:
 
@@ -83,8 +88,11 @@ public:
     static int ParseUserInformation(
         CGXDLMSSettings& settings,
         CGXCipher* cipher,
-        CGXByteBuffer& data,
-        CGXDLMSTranslatorStructure* xml);
+        CGXByteBuffer& data
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+        , CGXDLMSTranslatorStructure* xml
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+    );
 
     /**
      * Generates Aarq.
@@ -117,8 +125,11 @@ public:
         CGXCipher* cipher,
         CGXByteBuffer& buff,
         DLMS_ASSOCIATION_RESULT &result,
-        DLMS_SOURCE_DIAGNOSTIC& diagnostic,
-        CGXDLMSTranslatorStructure* xml);
+        DLMS_SOURCE_DIAGNOSTIC& diagnostic
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+        , CGXDLMSTranslatorStructure* xml
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+        );
 
     /**
      * Server generates AARE message.
@@ -141,8 +152,11 @@ public:
         bool initiateRequest,
         CGXDLMSSettings& settings,
         CGXCipher* cipher,
-        CGXByteBuffer& data,
-        CGXDLMSTranslatorStructure* xml);
+        CGXByteBuffer& data
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+        , CGXDLMSTranslatorStructure* xml
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+        );
 };
 
 #endif //GXAPDU_H

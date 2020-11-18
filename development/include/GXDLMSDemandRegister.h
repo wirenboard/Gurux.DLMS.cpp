@@ -35,8 +35,9 @@
 #ifndef GXDLMSDEMANDREGISTER_H
 #define GXDLMSDEMANDREGISTER_H
 
+#include "GXIgnore.h"
 #include "GXDLMSObject.h"
-
+#ifndef DLMS_IGNORE_DEMAND_REGISTER
 /**
 Online help:
 http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSDemandRegister
@@ -165,5 +166,5 @@ public:
 
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
-
+#endif //DLMS_IGNORE_DEMAND_REGISTER
 #endif //GXDLMSDEMANDREGISTER_H

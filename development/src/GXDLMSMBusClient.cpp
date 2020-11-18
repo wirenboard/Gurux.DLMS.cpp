@@ -35,7 +35,7 @@
 #include "../include/GXDLMSMBusClient.h"
 #include "../include/GXDLMSClient.h"
 #include <sstream>
-
+#ifndef DLMS_IGNORE_MBUS_CLIENT
 CGXDLMSMBusClient::CGXDLMSMBusClient() :
     CGXDLMSMBusClient("", 0)
 {
@@ -543,3 +543,4 @@ int CGXDLMSMBusClient::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg&
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_MBUS_CLIENT

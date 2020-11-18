@@ -44,21 +44,19 @@
 
 static void ShowHelp()
 {
-    printf("GuruxDlmsSample reads data from the DLMS/COSEM device.\r\n");
-    printf("GuruxDlmsSample -h [Meter IP Address] -p [Meter Port No] -c 16 -s 1 -r SN\r\n");
-    printf(" -h \t host name or IP address.\r\n");
-    printf(" -p \t port number or name (Example: 1000).\r\n");
+    printf("GuruxDlmsSample reads data from the DLMS/COSEM device.\n");
+    printf("GuruxDlmsSample -h [Meter IP Address] -p [Meter Port No] -c 16 -s 1 -r SN\n");
+    printf(" -h \t host name or IP address.\n");
+    printf(" -p \t port number or name (Example: 1000).\n");
     printf(" -S [COM1:9600:8None1]\t serial port.");
-    printf(" -i IEC is a start protocol.\r\n");
-    printf(" -a \t Authentication (None, Low, High, HighMd5, HighSha1, HighGmac, HighSha256).\r\n");
-    printf(" -P \t Password for authentication.\r\n");
-    printf(" -c \t Client address. (Default: 16)\r\n");
-    printf(" -s \t Server address. (Default: 1)\r\n");
-    printf(" -n \t Server address as serial number.\r\n");
-    printf(" -r [sn, sn]\t Short name or Logican Name (default) referencing is used.\r\n");
-    printf(" -w WRAPPER profile is used. HDLC is default.\r\n");
-    printf(" -t Trace messages.\r\n");
-    printf(" -g \"0.0.1.0.0.255:1; 0.0.1.0.0.255:2\" Get selected object(s) with given attribute index.\r\n");
+    printf(" -a \t Authentication (None, Low, High, HighMd5, HighSha1, HighGmac, HighSha256).\n");
+    printf(" -P \t Password for authentication.\n");
+    printf(" -c \t Client address. (Default: 16)\n");
+    printf(" -s \t Server address. (Default: 1)\n");
+    printf(" -n \t Server address as serial number.\n");
+    printf(" -r [sn, sn]\t Short name or Logican Name (default) referencing is used.\n");
+    printf(" -t Trace messages.\n");
+    printf(" -g \"0.0.1.0.0.255:1; 0.0.1.0.0.255:2\" Get selected object(s) with given attribute index.\n");
     printf(" -C \t Security Level. (None, Authentication, Encrypted, AuthenticationEncryption)");
     printf(" -v \t Invocation counter data object Logical Name. Ex. 0.0.43.1.1.255");
     printf(" -I \t Auto increase invoke ID");
@@ -67,13 +65,15 @@ static void ShowHelp()
     printf(" -A \t Authentication key that is used with chiphering. Ex -A D0D1D2D3D4D5D6D7D8D9DADBDCDDDEDF");
     printf(" -B \t Block cipher key that is used with chiphering. Ex -B 000102030405060708090A0B0C0D0E0F");
     printf(" -D \t Dedicated key that is used with chiphering. Ex -D 00112233445566778899AABBCCDDEEFF");
-    printf("Example:\r\n");
-    printf("Read LG device using TCP/IP connection.\r\n");
-    printf("GuruxDlmsSample -r SN -c 16 -s 1 -h [Meter IP Address] -p [Meter Port No]\r\n");
-    printf("Read LG device using serial port connection.\r\n");
-    printf("GuruxDlmsSample -r SN -c 16 -s 1 -sp COM1 -i\r\n");
-    printf("Read Indian device using serial port connection.\r\n");
-    printf("GuruxDlmsSample -S COM1 -c 16 -s 1 -a Low -P [password]\r\n");
+    printf(" -i \t Used communication interface. Ex. -i WRAPPER.");
+    printf(" -m \t Used PLC MAC address. Ex. -m 1.");
+    printf("Example:\n");
+    printf("Read LG device using TCP/IP connection.\n");
+    printf("GuruxDlmsSample -r SN -c 16 -s 1 -h [Meter IP Address] -p [Meter Port No]\n");
+    printf("Read LG device using serial port connection.\n");
+    printf("GuruxDlmsSample -r SN -c 16 -s 1 -sp COM1 -i\n");
+    printf("Read Indian device using serial port connection.\n");
+    printf("GuruxDlmsSample -S COM1:9600:8None1 -c 16 -s 1 -a Low -P [password]\n");
 }
 
 #if defined(_WIN32) || defined(_WIN64)//Windows
@@ -110,7 +110,6 @@ int main(int argc, char* argv[])
         int port = 0;
         char* address = NULL;
         char* serialPort = NULL;
-        bool iec = false;
         bool autoIncreaseInvokeID = false;
         char* invocationCounter = NULL;
         char* outputFile = NULL;
@@ -118,14 +117,11 @@ int main(int argc, char* argv[])
         char* authenticationKey = NULL;
         char* blockCipherKey = NULL;
         char* dedicatedKey = NULL;
-
-        while ((opt = getopt(argc, argv, "h:p:c:s:r:iIt:a:wP:g:S:n:C:v:o:T:A:B:D:")) != -1)
+        uint16_t macDestinationAddress;
+        while ((opt = getopt(argc, argv, "h:p:c:s:r:i:It:a:P:g:S:n:C:v:o:T:A:B:D:m:")) != -1)
         {
             switch (opt)
             {
-            case 'w':
-                interfaceType = DLMS_INTERFACE_TYPE_WRAPPER;
-                break;
             case 'r':
                 if (strcasecmp("sn", optarg) == 0)
                 {
@@ -171,9 +167,24 @@ int main(int argc, char* argv[])
                 password = optarg;
                 break;
             case 'i':
-                //IEC.
-                iec = 1;
-                break;
+                //Interface
+                if (strcasecmp("HDLC", optarg) == 0)
+                    interfaceType = DLMS_INTERFACE_TYPE_HDLC;
+                else  if (strcasecmp("WRAPPER", optarg) == 0)
+                    interfaceType = DLMS_INTERFACE_TYPE_WRAPPER;
+                else  if (strcasecmp("HdlcModeE", optarg) == 0)
+                    interfaceType = DLMS_INTERFACE_TYPE_HDLC_WITH_MODE_E;
+                else  if (strcasecmp("Plc", optarg) == 0)
+                    interfaceType = DLMS_INTERFACE_TYPE_PLC;
+                else if (strcasecmp("PlcHdlc", optarg) == 0)
+                    interfaceType = DLMS_INTERFACE_TYPE_PLC_HDLC;
+                else if (strcasecmp("PlcPrime", optarg) == 0)
+                    interfaceType = DLMS_INTERFACE_TYPE_PLC_PRIME;
+                else
+                {
+                    printf("Invalid interface option '%s'. (HDLC, WRAPPER, HdlcModeE, Plc, PlcHdlc)", optarg);
+                    return 1;
+                }
             case 'I':
                 // AutoIncreaseInvokeID.
                 autoIncreaseInvokeID = true;
@@ -296,6 +307,9 @@ int main(int argc, char* argv[])
             case 'n':
                 serverAddress = CGXDLMSClient::GetServerAddress(atoi(optarg));
                 break;
+            case 'm':
+                macDestinationAddress = atoi(optarg);
+                break;
             case '?':
             {
                 if (optarg[0] == 'c') {
@@ -396,21 +410,22 @@ int main(int argc, char* argv[])
             }
             if ((ret = comm.Connect(address, port)) != 0)
             {
-                printf("Connect failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
+                printf("Connect failed %s.\n", CGXDLMSConverter::GetErrorMessage(ret));
                 return 1;
             }
         }
         else if (serialPort != NULL)
         {
-            if ((ret = comm.Open(serialPort, iec)) != 0)
+            if ((ret = comm.Open(serialPort)) != 0)
             {
                 if (ret == DLMS_ERROR_CODE_RECEIVE_FAILED)
                 {
-                    printf("Failed to receive reply for IEC. Check is DLMS connection already established.\r\n");
+                    printf("Failed to receive reply for IEC. Check is DLMS connection already established.\n");
                 }
                 else
                 {
-                    printf("Serial port open failed %d.\r\n", ret);
+                    printf("Serial port open failed %s.\n", CGXDLMSConverter::GetErrorMessage(ret));
+                    comm.Close();
                     return 1;
                 }
             }
@@ -467,9 +482,9 @@ int main(int argc, char* argv[])
                         if ((ret = comm.Read(obj, index, value)) != DLMS_ERROR_CODE_OK)
                         {
 #if _MSC_VER > 1000
-                            sprintf_s(buff, 100, "Error! Index: %d %s\r\n", index, CGXDLMSConverter::GetErrorMessage(ret));
+                            sprintf_s(buff, 100, "Error! Index: %d %s\n", index, CGXDLMSConverter::GetErrorMessage(ret));
 #else
-                            sprintf(buff, "Error! Index: %d read failed: %s\r\n", index, CGXDLMSConverter::GetErrorMessage(ret));
+                            sprintf(buff, "Error! Index: %d read failed: %s\n", index, CGXDLMSConverter::GetErrorMessage(ret));
 #endif
                             comm.WriteValue(GX_TRACE_LEVEL_ERROR, buff);
                             //Continue reading.
@@ -483,7 +498,7 @@ int main(int argc, char* argv[])
 #endif
                             comm.WriteValue(trace, buff);
                             comm.WriteValue(trace, value.c_str());
-                            comm.WriteValue(trace, "\r\n");
+                            comm.WriteValue(trace, "\n");
                         }
                     }
                     else

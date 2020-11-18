@@ -35,6 +35,8 @@
 #ifndef GXCHARGE_H
 #define GXCHARGE_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_CHARGE
 #include "GXDLMSObject.h"
 #include "GXUnitCharge.h"
 
@@ -349,4 +351,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_CHARGE
 #endif //GXCHARGE_H

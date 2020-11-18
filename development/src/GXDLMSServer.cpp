@@ -49,8 +49,12 @@
 CGXDLMSServer::CGXDLMSServer(bool logicalNameReferencing,
     DLMS_INTERFACE_TYPE type) : m_Transaction(NULL), m_Settings(true)
 {
+#ifndef DLMS_IGNORE_IEC_HDLC_SETUP
     m_Hdlc = NULL;
+#endif //DLMS_IGNORE_IEC_HDLC_SETUP
+#ifndef DLMS_IGNORE_TCP_UDP_SETUP
     m_Wrapper = NULL;
+#endif //DLMS_IGNORE_TCP_UDP_SETUP
     m_DataReceived = 0;
     m_Settings.SetUseLogicalNameReferencing(logicalNameReferencing);
     m_Settings.SetInterfaceType(type);
@@ -74,6 +78,7 @@ CGXDLMSServer::CGXDLMSServer(bool logicalNameReferencing,
     Reset();
 }
 
+#ifndef DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
 CGXDLMSServer::CGXDLMSServer(
     CGXDLMSAssociationLogicalName* ln,
     CGXDLMSIecHdlcSetup* hdlc) :
@@ -93,7 +98,9 @@ CGXDLMSServer::CGXDLMSServer(
     m_Settings.GetObjects().push_back(wrapper);
     m_Wrapper = wrapper;
 }
+#endif //DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
 
+#ifndef DLMS_IGNORE_ASSOCIATION_SHORT_NAME
 CGXDLMSServer::CGXDLMSServer(
     CGXDLMSAssociationShortName* sn,
     CGXDLMSIecHdlcSetup* hdlc) :
@@ -113,6 +120,7 @@ CGXDLMSServer::CGXDLMSServer(
     m_Settings.GetObjects().push_back(wrapper);
     m_Wrapper = wrapper;
 }
+#endif //DLMS_IGNORE_ASSOCIATION_SHORT_NAME
 
 CGXDLMSServer::~CGXDLMSServer()
 {
@@ -129,35 +137,30 @@ void CGXDLMSServer::SetPushClientAddress(unsigned long value)
     m_Settings.SetPushClientAddress(value);
 }
 
-/**
-* @return HDLC settings.
-*/
-CGXDLMSIecHdlcSetup* CGXDLMSServer::GetHdlc() {
+#ifndef DLMS_IGNORE_IEC_HDLC_SETUP
+CGXDLMSIecHdlcSetup* CGXDLMSServer::GetHdlc()
+{
     return m_Hdlc;
 }
 
-/**
-* @param value
-*            HDLC settings.
-*/
-void CGXDLMSServer::SetHdlc(CGXDLMSIecHdlcSetup* value) {
+void CGXDLMSServer::SetHdlc(CGXDLMSIecHdlcSetup* value)
+{
     m_Hdlc = value;
 }
+#endif //DLMS_IGNORE_IEC_HDLC_SETUP
 
-/**
-* @return Wrapper settings.
-*/
-CGXDLMSTcpUdpSetup* CGXDLMSServer::GetWrapper() {
+#ifndef DLMS_IGNORE_TCP_UDP_SETUP
+
+CGXDLMSTcpUdpSetup* CGXDLMSServer::GetWrapper()
+{
     return m_Wrapper;
 }
 
-/**
-* @param value
-*            Wrapper settings.
-*/
-void CGXDLMSServer::SetWrapper(CGXDLMSTcpUdpSetup* value) {
+void CGXDLMSServer::SetWrapper(CGXDLMSTcpUdpSetup* value)
+{
     m_Wrapper = value;
 }
+#endif //DLMS_IGNORE_TCP_UDP_SETUP
 
 CGXDLMSObjectCollection& CGXDLMSServer::GetItems()
 {
@@ -200,9 +203,14 @@ int CGXDLMSServer::GetInvokeID()
     return m_Settings.GetInvokeID();
 }
 
-CGXDLMSLimits CGXDLMSServer::GetLimits()
+CGXDLMSLimits& CGXDLMSServer::GetLimits()
 {
-    return m_Settings.GetLimits();
+    return m_Settings.GetHdlcSettings();
+}
+
+CGXHdlcSettings& CGXDLMSServer::GetHdlcSettings()
+{
+    return m_Settings.GetHdlcSettings();
 }
 
 unsigned short CGXDLMSServer::GetMaxReceivePDUSize()
@@ -254,34 +262,39 @@ int CGXDLMSServer::Initialize()
                 //TODO: Start thread. new GXProfileGenericUpdater(this, pg).start();
             }
         }
+#ifndef DLMS_IGNORE_ASSOCIATION_SHORT_NAME
         else if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME
             && !m_Settings.GetUseLogicalNameReferencing())
         {
-            CGXDLMSObjectCollection& list = ((CGXDLMSAssociationShortName*)* it)->GetObjectList();
+            CGXDLMSObjectCollection& list = ((CGXDLMSAssociationShortName*)*it)->GetObjectList();
             if (list.size() == 0)
             {
                 list.insert(list.end(), GetItems().begin(), GetItems().end());
             }
             associationObject = *it;
         }
+#endif //DLMS_IGNORE_ASSOCIATION_SHORT_NAME
+#ifndef DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
         else if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME
             && m_Settings.GetUseLogicalNameReferencing())
         {
-            CGXDLMSObjectCollection& list = ((CGXDLMSAssociationLogicalName*)* it)->GetObjectList();
+            CGXDLMSObjectCollection& list = ((CGXDLMSAssociationLogicalName*)*it)->GetObjectList();
             if (list.size() == 0)
             {
                 list.insert(list.end(), GetItems().begin(), GetItems().end());
             }
             associationObject = *it;
-            ((CGXDLMSAssociationLogicalName*)* it)->GetXDLMSContextInfo().SetMaxReceivePduSize(m_Settings.GetMaxServerPDUSize());
-            ((CGXDLMSAssociationLogicalName*)* it)->GetXDLMSContextInfo().SetMaxSendPduSize(m_Settings.GetMaxServerPDUSize());
-            ((CGXDLMSAssociationLogicalName*)* it)->GetXDLMSContextInfo().SetConformance(m_Settings.GetProposedConformance());
+            ((CGXDLMSAssociationLogicalName*)*it)->GetXDLMSContextInfo().SetMaxReceivePduSize(m_Settings.GetMaxServerPDUSize());
+            ((CGXDLMSAssociationLogicalName*)*it)->GetXDLMSContextInfo().SetMaxSendPduSize(m_Settings.GetMaxServerPDUSize());
+            ((CGXDLMSAssociationLogicalName*)*it)->GetXDLMSContextInfo().SetConformance(m_Settings.GetProposedConformance());
         }
+#endif //DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
     }
     if (associationObject == NULL)
     {
         if (GetUseLogicalNameReferencing())
         {
+#ifndef DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
             CGXDLMSAssociationLogicalName* it2 = (CGXDLMSAssociationLogicalName*)CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME);
             CGXDLMSObjectCollection& list = it2->GetObjectList();
             GetItems().push_back(it2);
@@ -289,13 +302,16 @@ int CGXDLMSServer::Initialize()
             ((CGXDLMSAssociationLogicalName*)it2)->GetXDLMSContextInfo().SetMaxReceivePduSize(m_Settings.GetMaxServerPDUSize());
             ((CGXDLMSAssociationLogicalName*)it2)->GetXDLMSContextInfo().SetMaxSendPduSize(m_Settings.GetMaxServerPDUSize());
             ((CGXDLMSAssociationLogicalName*)it2)->GetXDLMSContextInfo().SetConformance(m_Settings.GetProposedConformance());
+#endif //DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
         }
         else
         {
+#ifndef DLMS_IGNORE_ASSOCIATION_SHORT_NAME
             CGXDLMSAssociationShortName* it2 = (CGXDLMSAssociationShortName*)CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME);
             CGXDLMSObjectCollection& list = it2->GetObjectList();
             GetItems().push_back(it2);
             list.insert(list.end(), GetItems().begin(), GetItems().end());
+#endif //DLMS_IGNORE_ASSOCIATION_SHORT_NAME
         }
     }
     // Arrange items by Short Name.
@@ -415,12 +431,17 @@ int CGXDLMSServer::HandleAarqRequest(
     {
         Reset(true);
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     ret = CGXAPDU::ParsePDU(m_Settings, m_Settings.GetCipher(), data, result, diagnostic, NULL);
+#else
+    ret = CGXAPDU::ParsePDU(m_Settings, m_Settings.GetCipher(), data, result, diagnostic);
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+
     if (ret == DLMS_ERROR_CODE_INVOCATION_COUNTER_TOO_SMALL ||
         ret == DLMS_ERROR_CODE_INVALID_DECIPHERING_ERROR ||
         ret == DLMS_ERROR_CODE_INVALID_SECURITY_SUITE)
     {
-        if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC)
+        if (CGXDLMS::UseHdlc(m_Settings.GetInterfaceType()))
         {
             m_ReplyData.Set(LLC_REPLY_BYTES, 3);
         }
@@ -513,6 +534,7 @@ int CGXDLMSServer::HandleAarqRequest(
         }
         if (m_Settings.GetUseLogicalNameReferencing())
         {
+#ifndef DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
             unsigned char l[] = { 0,0,40,0,0,255 };
             CGXDLMSAssociationLogicalName* ln = (CGXDLMSAssociationLogicalName*)m_Settings.GetObjects().FindByLN(DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME, l);
             if (ln != NULL)
@@ -528,10 +550,12 @@ int CGXDLMSServer::HandleAarqRequest(
                 ln->GetAuthenticationMechanismName().SetMechanismId(m_Settings.GetAuthentication());
                 ln->SetAssociationStatus(DLMS_ASSOCIATION_STATUS_ASSOCIATION_PENDING);
             }
+#endif //DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
         }
     }
     else
     {
+#ifndef DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
         unsigned char l[] = { 0,0,40,0,0,255 };
         CGXDLMSAssociationLogicalName* ln = (CGXDLMSAssociationLogicalName*)m_Settings.GetObjects().FindByLN(DLMS_OBJECT_TYPE_ASSOCIATION_LOGICAL_NAME, l);
         if (ln != NULL)
@@ -547,8 +571,9 @@ int CGXDLMSServer::HandleAarqRequest(
             ln->GetAuthenticationMechanismName().SetMechanismId(m_Settings.GetAuthentication());
             ln->SetAssociationStatus(DLMS_ASSOCIATION_STATUS_ASSOCIATED);
         }
+#endif //DLMS_IGNORE_ASSOCIATION_LOGICAL_NAME
     }
-    if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC)
+    if (CGXDLMS::UseHdlc(m_Settings.GetInterfaceType()))
     {
         m_ReplyData.Set(LLC_REPLY_BYTES, 3);
     }
@@ -569,7 +594,7 @@ int CGXDLMSServer::HandleSnrmRequest(
 {
     int ret;
     Reset(true);
-    if ((ret = CGXDLMS::ParseSnrmUaResponse(data, &m_Settings.GetLimits())) != 0)
+    if ((ret = CGXDLMS::ParseSnrmUaResponse(data, &m_Settings.GetHdlcSettings())) != 0)
     {
         return ret;
     }
@@ -577,29 +602,31 @@ int CGXDLMSServer::HandleSnrmRequest(
     reply.SetUInt8(0x80); // GroupID
     reply.SetUInt8(0); // Length
 
+#ifndef DLMS_IGNORE_IEC_HDLC_SETUP
     if (m_Hdlc != NULL)
     {
         //If client wants send larger HDLC frames what meter accepts.
-        if (m_Settings.GetLimits().GetMaxInfoTX() > m_Hdlc->GetMaximumInfoLengthReceive())
+        if (m_Settings.GetHdlcSettings().GetMaxInfoTX() > m_Hdlc->GetMaximumInfoLengthReceive())
         {
-            m_Settings.GetLimits().SetMaxInfoTX(m_Hdlc->GetMaximumInfoLengthReceive());
+            m_Settings.GetHdlcSettings().SetMaxInfoTX(m_Hdlc->GetMaximumInfoLengthReceive());
         }
         //If client wants receive larger HDLC frames what meter accepts.
-        if (m_Settings.GetLimits().GetMaxInfoRX() > m_Hdlc->GetMaximumInfoLengthTransmit())
+        if (m_Settings.GetHdlcSettings().GetMaxInfoRX() > m_Hdlc->GetMaximumInfoLengthTransmit())
         {
-            m_Settings.GetLimits().SetMaxInfoRX(m_Hdlc->GetMaximumInfoLengthTransmit());
+            m_Settings.GetHdlcSettings().SetMaxInfoRX(m_Hdlc->GetMaximumInfoLengthTransmit());
         }
         //If client asks higher window size what meter accepts.
-        if (m_Settings.GetLimits().GetWindowSizeTX() > m_Hdlc->GetWindowSizeReceive())
+        if (m_Settings.GetHdlcSettings().GetWindowSizeTX() > m_Hdlc->GetWindowSizeReceive())
         {
-            m_Settings.GetLimits().SetWindowSizeTX(m_Hdlc->GetWindowSizeReceive());
+            m_Settings.GetHdlcSettings().SetWindowSizeTX(m_Hdlc->GetWindowSizeReceive());
         }
         //If client asks higher window size what meter accepts.
-        if (m_Settings.GetLimits().GetWindowSizeRX() > m_Hdlc->GetWindowSizeTransmit())
+        if (m_Settings.GetHdlcSettings().GetWindowSizeRX() > m_Hdlc->GetWindowSizeTransmit())
         {
-            m_Settings.GetLimits().SetWindowSizeRX(m_Hdlc->GetWindowSizeTransmit());
+            m_Settings.GetHdlcSettings().SetWindowSizeRX(m_Hdlc->GetWindowSizeTransmit());
         }
     }
+#endif //DLMS_IGNORE_IEC_HDLC_SETUP
 
     reply.SetUInt8(HDLC_INFO_MAX_INFO_TX);
     CGXDLMS::AppendHdlcParameter(reply, GetLimits().GetMaxInfoTX());
@@ -609,11 +636,11 @@ int CGXDLMSServer::HandleSnrmRequest(
 
     reply.SetUInt8(HDLC_INFO_WINDOW_SIZE_TX);
     reply.SetUInt8(4);
-    reply.SetUInt32(m_Settings.GetLimits().GetWindowSizeTX());
+    reply.SetUInt32(m_Settings.GetHdlcSettings().GetWindowSizeTX());
 
     reply.SetUInt8(HDLC_INFO_WINDOW_SIZE_RX);
     reply.SetUInt8(4);
-    reply.SetUInt32(m_Settings.GetLimits().GetWindowSizeRX());
+    reply.SetUInt32(m_Settings.GetHdlcSettings().GetWindowSizeRX());
     int len = reply.GetSize() - 3;
     reply.SetUInt8(2, len); // Length
     return ret;
@@ -638,18 +665,18 @@ int GenerateDisconnectRequest(CGXDLMSSettings& settings, CGXByteBuffer& reply)
         reply.SetUInt8(0); // Length
 
         reply.SetUInt8(HDLC_INFO_MAX_INFO_TX);
-        CGXDLMS::AppendHdlcParameter(reply, settings.GetLimits().GetMaxInfoTX());
+        CGXDLMS::AppendHdlcParameter(reply, settings.GetHdlcSettings().GetMaxInfoTX());
 
         reply.SetUInt8(HDLC_INFO_MAX_INFO_RX);
-        CGXDLMS::AppendHdlcParameter(reply, settings.GetLimits().GetMaxInfoRX());
+        CGXDLMS::AppendHdlcParameter(reply, settings.GetHdlcSettings().GetMaxInfoRX());
 
         reply.SetUInt8(HDLC_INFO_WINDOW_SIZE_TX);
         reply.SetUInt8(4);
-        reply.SetUInt32(settings.GetLimits().GetWindowSizeTX());
+        reply.SetUInt32(settings.GetHdlcSettings().GetWindowSizeTX());
 
         reply.SetUInt8(HDLC_INFO_WINDOW_SIZE_RX);
         reply.SetUInt8(4);
-        reply.SetUInt32(settings.GetLimits().GetWindowSizeRX());
+        reply.SetUInt32(settings.GetHdlcSettings().GetWindowSizeRX());
         int len = reply.GetSize() - 3;
         reply.SetUInt8(2, len); // Length.
     }
@@ -783,7 +810,7 @@ unsigned short CGXDLMSServer::GetRowsToPdu(CGXDLMSProfileGeneric* pg)
 */
 int CGXDLMSServer::HandleReleaseRequest(CGXByteBuffer& data)
 {
-    if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC)
+    if (CGXDLMS::UseHdlc(m_Settings.GetInterfaceType()))
     {
         m_ReplyData.Set(LLC_REPLY_BYTES, 3);
     }
@@ -924,7 +951,7 @@ int CGXDLMSServer::HandleCommand(
 {
     int ret = 0;
     unsigned char frame = 0;
-    if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC && m_ReplyData.GetSize() != 0)
+    if (CGXDLMS::UseHdlc(m_Settings.GetInterfaceType()) && m_ReplyData.GetSize() != 0)
     {
         //Get next frame.
         frame = m_Settings.GetNextSend(false);
@@ -1126,6 +1153,7 @@ int CGXDLMSServer::HandleRequest(
         }
     }
     // Check inactivity time out.
+#ifndef DLMS_IGNORE_IEC_HDLC_SETUP
     if (m_Hdlc != NULL && m_Hdlc->GetInactivityTimeout() != 0)
     {
         if (m_Info.GetCommand() != DLMS_COMMAND_SNRM)
@@ -1140,7 +1168,9 @@ int CGXDLMSServer::HandleRequest(
             }
         }
     }
-    else if (m_Wrapper != NULL && m_Wrapper->GetInactivityTimeout() != 0)
+#endif //DLMS_IGNORE_IEC_HDLC_SETUP
+#ifndef DLMS_IGNORE_TCP_UDP_SETUP
+    if (m_Wrapper != NULL && m_Wrapper->GetInactivityTimeout() != 0)
     {
         if (m_Info.GetCommand() != DLMS_COMMAND_AARQ)
         {
@@ -1154,6 +1184,7 @@ int CGXDLMSServer::HandleRequest(
             }
         }
     }
+#endif //DLMS_IGNORE_TCP_UDP_SETUP
     ret = HandleCommand(m_Info.GetCommand(), m_Info.GetData(), sr, m_Info.GetCipheredCommand());
     if (ret != 0)
     {
@@ -1238,6 +1269,7 @@ int CGXDLMSServer::GenerateDataNotificationMessages(
     return GenerateDataNotificationMessages(date, buff, reply);
 }
 
+#ifndef DLMS_IGNORE_PUSH_SETUP
 int CGXDLMSServer::GeneratePushSetupMessages(
     struct tm* date,
     CGXDLMSPushSetup* push,
@@ -1256,7 +1288,7 @@ int CGXDLMSServer::GeneratePushSetupMessages(
     }
     return GenerateDataNotificationMessages(date, buff, reply);
 }
-
+#endif //DLMS_IGNORE_PUSH_SETUP
 
 bool CGXDLMSServer::GetUseUtc2NormalTime()
 {

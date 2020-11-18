@@ -37,6 +37,7 @@
 #include "../include/GXDLMSSpecialDaysTable.h"
 #include <sstream>
 
+#ifndef DLMS_IGNORE_SPECIAL_DAYS_TABLE
 //Constructor.
 CGXDLMSSpecialDaysTable::CGXDLMSSpecialDaysTable() :
     CGXDLMSSpecialDaysTable("", 0)
@@ -241,3 +242,4 @@ int CGXDLMSSpecialDaysTable::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_SPECIAL_DAYS_TABLE

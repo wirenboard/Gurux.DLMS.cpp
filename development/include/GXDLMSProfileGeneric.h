@@ -34,6 +34,9 @@
 #ifndef GXDLMSPROFILEGENERIC_H
 #define GXDLMSPROFILEGENERIC_H
 
+#include "GXIgnore.h"
+
+#ifndef DLMS_IGNORE_PROFILE_GENERIC
 #include "GXDLMSCaptureObject.h"
 #include "GXDLMSRegister.h"
 
@@ -274,4 +277,5 @@ public:
     */
     int Capture(CGXDLMSClient& client, std::vector<CGXByteBuffer>& reply);
 };
+#endif //DLMS_IGNORE_PROFILE_GENERIC
 #endif //GXDLMSPROFILEGENERIC_H

@@ -80,11 +80,13 @@ int CGXDLMSSNCommandHandler::HandleReadRequest(
         {
             return ret;
         }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             xml->IntegerToHex(cnt, 2, str);
             xml->AppendStartTag(DLMS_COMMAND_READ_REQUEST, "Qty", str);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         CGXSNInfo info;
         for (unsigned long pos = 0; pos != cnt; ++pos)
         {
@@ -116,11 +118,13 @@ int CGXDLMSSNCommandHandler::HandleReadRequest(
             server->PreAction(actions);
         }
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         xml->AppendEndTag(DLMS_COMMAND_READ_REQUEST);
         return 0;
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     DLMS_SINGLE_READ_RESPONSE requestType;
     ret = GetReadData(settings, list, bb, requestType);
     if (reads.size() != 0)
@@ -175,6 +179,7 @@ int CGXDLMSSNCommandHandler::HandleWriteRequest(
     {
         return ret;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         xml->AppendStartTag(DLMS_COMMAND_WRITE_REQUEST);
@@ -185,6 +190,7 @@ int CGXDLMSSNCommandHandler::HandleWriteRequest(
             xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_VARIABLE_ACCESS_SPECIFICATION);
         }
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     CGXByteBuffer results(cnt);
     for (pos = 0; pos != cnt; ++pos)
     {
@@ -201,6 +207,7 @@ int CGXDLMSSNCommandHandler::HandleWriteRequest(
             {
                 return ret;
             }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             if (xml != NULL)
             {
                 xml->IntegerToHex((long)sn, 4, str);
@@ -209,6 +216,7 @@ int CGXDLMSSNCommandHandler::HandleWriteRequest(
                     "", str);
             }
             else
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             {
                 if ((ret = FindSNObject(server, sn, i)) != 0)
                 {
@@ -238,6 +246,7 @@ int CGXDLMSSNCommandHandler::HandleWriteRequest(
             results.SetUInt8(DLMS_ERROR_CODE_HARDWARE_FAULT);
         }
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         if (xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML)
@@ -246,21 +255,25 @@ int CGXDLMSSNCommandHandler::HandleWriteRequest(
         }
         xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_LIST_OF_VARIABLE_ACCESS_SPECIFICATION);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     // Get data count.
     if ((ret = GXHelpers::GetObjectCount(data, cnt)) != 0)
     {
         return ret;
     }
     CGXDataInfo di;
-    di.SetXml(xml);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
+        di.SetXml(xml);
         xml->IntegerToHex(cnt, 2, str);
         xml->AppendStartTag(DLMS_TRANSLATOR_TAGS_LIST_OF_DATA, "Qty", str);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     for (pos = 0; pos != cnt; ++pos)
     {
         di.Clear();
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             if (xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML)
@@ -282,6 +295,7 @@ int CGXDLMSSNCommandHandler::HandleWriteRequest(
             }
         }
         else
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         {
             if ((ret = results.GetUInt8(pos, &ch)) != 0)
             {
@@ -333,12 +347,14 @@ int CGXDLMSSNCommandHandler::HandleWriteRequest(
             }
         }
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_LIST_OF_DATA);
         xml->AppendEndTag(DLMS_COMMAND_WRITE_REQUEST);
         return 0;
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     CGXByteBuffer bb((2 * cnt));
     for (pos = 0; pos != cnt; ++pos)
     {
@@ -487,6 +503,7 @@ int CGXDLMSSNCommandHandler::HandleRead(
     {
         return ret;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         std::string str;
@@ -533,6 +550,7 @@ int CGXDLMSSNCommandHandler::HandleRead(
         }
         return 0;
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     if ((ret = FindSNObject(server, sn, i)) != 0)
     {
         return ret;
@@ -693,6 +711,7 @@ int CGXDLMSSNCommandHandler::HandleReadDataBlockAccess(
     {
         return ret;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         std::string str;
@@ -718,6 +737,7 @@ int CGXDLMSSNCommandHandler::HandleReadDataBlockAccess(
         }
         return 0;
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     if (blockNumber != settings.GetBlockIndex())
     {
         CGXByteBuffer bb;
@@ -846,6 +866,7 @@ int CGXDLMSSNCommandHandler::HandleInformationReport(
     {
         return ret;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (reply.GetXml() != NULL)
     {
         reply.GetXml()->AppendStartTag(DLMS_COMMAND_INFORMATION_REPORT);
@@ -867,6 +888,7 @@ int CGXDLMSSNCommandHandler::HandleInformationReport(
         reply.GetXml()->IntegerToHex(count, 2, str);
         reply.GetXml()->AppendStartTag(DLMS_TRANSLATOR_TAGS_LIST_OF_VARIABLE_ACCESS_SPECIFICATION, "Qty", str);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     for (unsigned long pos = 0; pos != count; ++pos)
     {
         if ((ret = reply.GetData().GetUInt8(&ch)) != 0)
@@ -880,6 +902,7 @@ int CGXDLMSSNCommandHandler::HandleInformationReport(
             {
                 return ret;
             }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             if (reply.GetXml() != NULL)
             {
                 reply.GetXml()->IntegerToHex((long)sn, 4, str);
@@ -887,21 +910,26 @@ int CGXDLMSSNCommandHandler::HandleInformationReport(
                     DLMS_COMMAND_WRITE_REQUEST << 8 | DLMS_VARIABLE_ACCESS_SPECIFICATION_VARIABLE_NAME,
                     "", str);
             }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         }
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (reply.GetXml() != NULL)
     {
         reply.GetXml()->IntegerToHex(count, 2, str);
         reply.GetXml()->AppendEndTag(DLMS_TRANSLATOR_TAGS_LIST_OF_VARIABLE_ACCESS_SPECIFICATION);
         reply.GetXml()->AppendStartTag(DLMS_TRANSLATOR_TAGS_LIST_OF_DATA, "Qty", str);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     //Get values.
     if ((ret = GXHelpers::GetObjectCount(reply.GetData(), count)) != 0)
     {
         return ret;
     }
     CGXDataInfo di;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     di.SetXml(reply.GetXml());
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     CGXDLMSVariant value;
     for (unsigned long pos = 0; pos != count; ++pos)
     {
@@ -914,10 +942,12 @@ int CGXDLMSSNCommandHandler::HandleInformationReport(
             }
         }
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (reply.GetXml() != NULL)
     {
         reply.GetXml()->AppendEndTag(DLMS_TRANSLATOR_TAGS_LIST_OF_DATA);
         reply.GetXml()->AppendEndTag(DLMS_COMMAND_INFORMATION_REPORT);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }

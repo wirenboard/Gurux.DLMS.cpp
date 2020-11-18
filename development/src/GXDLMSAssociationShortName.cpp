@@ -38,6 +38,7 @@
 #include "../include/GXDLMSObjectFactory.h"
 #include "../include/GXDLMSServer.h"
 
+#ifndef DLMS_IGNORE_ASSOCIATION_SHORT_NAME
 int CGXDLMSAssociationShortName::GetAccessRights(CGXDLMSObject* pObj, CGXDLMSServer* server, CGXByteBuffer& data)
 {
     int ret, cnt = pObj->GetAttributeCount();
@@ -502,3 +503,4 @@ int CGXDLMSAssociationShortName::SetValue(CGXDLMSSettings& settings, CGXDLMSValu
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_ASSOCIATION_SHORT_NAME

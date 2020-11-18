@@ -34,6 +34,7 @@
 
 #include "../include/GXDLMSPrimeNbOfdmPlcApplicationsIdentification.h"
 
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION
 //Constructor.
 CGXDLMSPrimeNbOfdmPlcApplicationsIdentification::CGXDLMSPrimeNbOfdmPlcApplicationsIdentification() :
     CGXDLMSPrimeNbOfdmPlcApplicationsIdentification("0.0.28.7.0.255", 0)
@@ -169,7 +170,8 @@ int CGXDLMSPrimeNbOfdmPlcApplicationsIdentification::GetValue(CGXDLMSSettings& s
     }
     else if (e.GetIndex() == 2)
     {
-        e.SetValue(m_FirmwareVersion);
+        CGXDLMSVariant tmp((unsigned char*)m_FirmwareVersion.c_str(), (int)m_FirmwareVersion.size(), DLMS_DATA_TYPE_OCTET_STRING);
+        e.SetValue(tmp);
     }
     else if (e.GetIndex() == 3)
     {
@@ -196,7 +198,7 @@ int CGXDLMSPrimeNbOfdmPlcApplicationsIdentification::SetValue(CGXDLMSSettings& s
     }
     else if (e.GetIndex() == 2)
     {
-        m_FirmwareVersion = e.GetValue().ChangeType(DLMS_DATA_TYPE_STRING);
+        m_FirmwareVersion = e.GetValue().ToString();
     }
     else if (e.GetIndex() == 3)
     {
@@ -212,3 +214,5 @@ int CGXDLMSPrimeNbOfdmPlcApplicationsIdentification::SetValue(CGXDLMSSettings& s
     }
     return ret;
 }
+
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION

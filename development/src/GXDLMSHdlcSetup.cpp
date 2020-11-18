@@ -35,6 +35,7 @@
 #include "../include/GXDLMSHdlcSetup.h"
 #include "../include/GXDLMSConverter.h"
 
+#ifndef DLMS_IGNORE_IEC_HDLC_SETUP
 //Constructor.
 CGXDLMSIecHdlcSetup::CGXDLMSIecHdlcSetup() :
     CGXDLMSIecHdlcSetup("0.0.22.0.0.255", 0)
@@ -352,3 +353,4 @@ int CGXDLMSIecHdlcSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventAr
     }
     return DLMS_ERROR_CODE_OK;
 }
+#endif //DLMS_IGNORE_IEC_HDLC_SETUP

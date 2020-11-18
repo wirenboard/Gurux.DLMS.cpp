@@ -36,6 +36,7 @@
 #include "../include/GXBitString.h"
 #include "../include/GXDLMSClient.h"
 
+#ifndef DLMS_IGNORE_CREDIT
 //Constructor.
 CGXDLMSCredit::CGXDLMSCredit() :
     CGXDLMSCredit("", 0)
@@ -346,3 +347,5 @@ int CGXDLMSCredit::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
     }
     return DLMS_ERROR_CODE_OK;
 }
+
+#endif //DLMS_IGNORE_CREDIT

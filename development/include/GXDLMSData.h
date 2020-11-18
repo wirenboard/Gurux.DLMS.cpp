@@ -35,7 +35,9 @@
 #ifndef GXDLMSDATA_H
 #define GXDLMSDATA_H
 
+#include "GXIgnore.h"
 #include "GXDLMSObject.h"
+#ifndef DLMS_IGNORE_DATA
 
 /**
 Online help:
@@ -87,4 +89,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_DATA
 #endif //GXDLMSDATA_H

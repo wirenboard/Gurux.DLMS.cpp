@@ -35,6 +35,10 @@
 #ifndef GXDLMSPPPSETUP_H
 #define GXDLMSPPPSETUP_H
 
+
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_PPP_SETUP
+
 #include "GXDLMSPppSetupIPCPOption.h"
 #include "GXDLMSPppSetupLcpOption.h"
 /**
@@ -133,4 +137,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_PPP_SETUP
 #endif //GXDLMSPPPSETUP_H

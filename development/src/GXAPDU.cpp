@@ -320,6 +320,7 @@ int CGXAPDU::GenerateUserInformation(
     return 0;
 }
 
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
 void GetConformance(unsigned long value, CGXDLMSTranslatorStructure* xml)
 {
     std::string str;
@@ -350,12 +351,14 @@ void GetConformance(unsigned long value, CGXDLMSTranslatorStructure* xml)
         }
     }
 }
-
+#endif //DLMS_IGNORE_XML_TRANSLATOR
 int CGXAPDU::Parse(bool initiateRequest,
     CGXDLMSSettings& settings,
     CGXCipher* cipher,
     CGXByteBuffer& data,
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     CGXDLMSTranslatorStructure* xml,
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     unsigned char tag)
 {
     int ret;
@@ -364,10 +367,12 @@ int CGXAPDU::Parse(bool initiateRequest,
     bool response = tag == DLMS_COMMAND_INITIATE_RESPONSE;
     if (response)
     {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             xml->AppendStartTag(DLMS_COMMAND_INITIATE_RESPONSE);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         // Optional usage field of the negotiated quality of service
         // component
         if ((ret = data.GetUInt8(&tag)) != 0)
@@ -381,6 +386,7 @@ int CGXAPDU::Parse(bool initiateRequest,
                 return ret;
             }
             settings.SetQualityOfService(tag);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             if (xml != NULL)
             {
                 //NegotiatedQualityOfService
@@ -388,14 +394,17 @@ int CGXAPDU::Parse(bool initiateRequest,
                 xml->IntegerToHex((long)tag, 2, str);
                 xml->AppendLine(TRANSLATOR_GENERAL_TAGS_NEGOTIATED_QUALITY_OF_SERVICE, "", str);
             }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         }
     }
     else if (tag == DLMS_COMMAND_INITIATE_REQUEST)
     {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             xml->AppendStartTag(DLMS_COMMAND_INITIATE_REQUEST);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         //Optional usage field of dedicated key.
         if ((ret = data.GetUInt8(&tag)) != 0)
         {
@@ -417,11 +426,13 @@ int CGXAPDU::Parse(bool initiateRequest,
             {
                 settings.GetCipher()->SetDedicatedKey(tmp);
             }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             if (xml != NULL)
             {
                 str = tmp.ToHexString(false);
                 xml->AppendLine(TRANSLATOR_GENERAL_TAGS_DEDICATED_KEY, "", str);
             }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         }
         // Optional usage field of the negotiated quality of service
         // component
@@ -436,19 +447,23 @@ int CGXAPDU::Parse(bool initiateRequest,
                 return ret;
             }
             settings.SetQualityOfService(tag);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             if (xml != NULL && (initiateRequest || xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML))
             {
                 xml->IntegerToHex((long)tag, 2, str);
                 xml->AppendLine(TRANSLATOR_GENERAL_TAGS_PROPOSED_QUALITY_OF_SERVICE, "", str);
             }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         }
         else
         {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             if (xml != NULL && xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML)
             {
                 str = "true";
                 xml->AppendLine(TRANSLATOR_GENERAL_TAGS_RESPONSE_ALLOWED, "", str);
             }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         }
         // Optional usage field of the proposed quality of service component
         if ((ret = data.GetUInt8(&tag)) != 0)
@@ -463,16 +478,18 @@ int CGXAPDU::Parse(bool initiateRequest,
                 return ret;
             }
             settings.SetQualityOfService(len);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             if (xml != NULL && xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
             {
                 xml->IntegerToHex((long)len, 2, str);
                 xml->AppendLine(TRANSLATOR_GENERAL_TAGS_PROPOSED_QUALITY_OF_SERVICE, "", str);
             }
-
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         }
     }
     else if (tag == DLMS_COMMAND_CONFIRMED_SERVICE_ERROR)
     {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             xml->AppendStartTag(DLMS_COMMAND_CONFIRMED_SERVICE_ERROR);
@@ -523,7 +540,7 @@ int CGXAPDU::Parse(bool initiateRequest,
             xml->AppendEndTag(DLMS_COMMAND_CONFIRMED_SERVICE_ERROR);
             return 0;
         }
-
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         if ((ret = data.GetUInt8(&ch)) != 0)
         {
             return ret;
@@ -542,12 +559,14 @@ int CGXAPDU::Parse(bool initiateRequest,
     }
     else
     {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             xml->AppendComment("Error: Failed to decrypt data.");
             data.SetPosition(data.GetSize());
             return 0;
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         return DLMS_ERROR_CODE_INVALID_TAG;
     }
     // Get DLMS version number.
@@ -559,11 +578,13 @@ int CGXAPDU::Parse(bool initiateRequest,
         }
         settings.SetDLMSVersion(ch);
         //ProposedDlmsVersionNumber
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL && (initiateRequest || xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML))
         {
             xml->IntegerToHex((long)ch, 2, str);
             xml->AppendLine(TRANSLATOR_GENERAL_TAGS_PROPOSED_DLMS_VERSION_NUMBER, "", str);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     }
     else
     {
@@ -571,16 +592,19 @@ int CGXAPDU::Parse(bool initiateRequest,
         {
             return ret;
         }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL && (initiateRequest || xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML))
         {
             xml->IntegerToHex((long)ch, 2, str);
             xml->AppendLine(TRANSLATOR_GENERAL_TAGS_NEGOTIATED_DLMS_VERSION_NUMBER, "", str);
         }
-        else if (ch != 6)
-        {
-            //Invalid DLMS version number.
-            return DLMS_ERROR_CODE_INVALID_VERSION_NUMBER;
-        }
+        else
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+            if (ch != 6)
+            {
+                //Invalid DLMS version number.
+                return DLMS_ERROR_CODE_INVALID_VERSION_NUMBER;
+            }
     }
 
     // Tag for conformance block
@@ -618,12 +642,14 @@ int CGXAPDU::Parse(bool initiateRequest,
     }
     if (settings.IsServer())
     {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             xml->AppendStartTag(TRANSLATOR_GENERAL_TAGS_PROPOSED_CONFORMANCE);
             GetConformance(v, xml);
         }
         else
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         {
             v &= settings.GetProposedConformance();
             settings.SetNegotiatedConformance((DLMS_CONFORMANCE)v);
@@ -631,11 +657,13 @@ int CGXAPDU::Parse(bool initiateRequest,
     }
     else
     {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             xml->AppendStartTag(TRANSLATOR_GENERAL_TAGS_NEGOTIATED_CONFORMANCE);
             GetConformance(v, xml);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         settings.SetNegotiatedConformance((DLMS_CONFORMANCE)v);
     }
 
@@ -646,6 +674,7 @@ int CGXAPDU::Parse(bool initiateRequest,
             return ret;
         }
         settings.SetMaxReceivePDUSize(pduSize);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             // ProposedConformance closing
@@ -661,6 +690,7 @@ int CGXAPDU::Parse(bool initiateRequest,
             xml->IntegerToHex((long)pduSize, 4, str);
             xml->AppendLine(TRANSLATOR_GENERAL_TAGS_PROPOSED_MAX_PDU_SIZE, "", str);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         //If client asks too high PDU.
         if (pduSize > settings.GetMaxServerPDUSize())
         {
@@ -674,6 +704,7 @@ int CGXAPDU::Parse(bool initiateRequest,
             return ret;
         }
         settings.SetMaxReceivePDUSize(pduSize);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             // NegotiatedConformance closing
@@ -689,6 +720,7 @@ int CGXAPDU::Parse(bool initiateRequest,
             xml->IntegerToHex((long)pduSize, 4, str);
             xml->AppendLine(TRANSLATOR_GENERAL_TAGS_NEGOTIATED_MAX_PDU_SIZE, "", str);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     }
     if (response)
     {
@@ -698,6 +730,7 @@ int CGXAPDU::Parse(bool initiateRequest,
         {
             return ret;
         }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             if (initiateRequest || xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
@@ -706,6 +739,7 @@ int CGXAPDU::Parse(bool initiateRequest,
                 xml->AppendLine(TRANSLATOR_GENERAL_TAGS_VAA_NAME, "", str);
             }
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         if (vaa == 0x0007)
         {
             // If LN
@@ -729,15 +763,19 @@ int CGXAPDU::Parse(bool initiateRequest,
             // Unknown VAA.
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             xml->AppendEndTag(DLMS_COMMAND_INITIATE_RESPONSE);
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     else if (xml != NULL)
     {
         xml->AppendEndTag(DLMS_COMMAND_INITIATE_REQUEST);
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -745,13 +783,19 @@ int CGXAPDU::ParseInitiate(
     bool initiateRequest,
     CGXDLMSSettings& settings,
     CGXCipher* cipher,
-    CGXByteBuffer& data,
-    CGXDLMSTranslatorStructure* xml)
+    CGXByteBuffer& data
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+    , CGXDLMSTranslatorStructure* xml
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+)
 {
     int ret;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     int originalPos;
-    unsigned char tag, tag1;
     unsigned long cnt;
+    unsigned char tag1;
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+    unsigned char tag;
     CGXByteBuffer encrypted;
     // Tag for xDLMS-Initate.response
     if ((ret = data.GetUInt8(&tag)) != 0)
@@ -765,6 +809,7 @@ int CGXAPDU::ParseInitiate(
         tag == DLMS_COMMAND_GENERAL_GLO_CIPHERING ||
         tag == DLMS_COMMAND_GENERAL_DED_CIPHERING)
     {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL)
         {
             std::string str;
@@ -824,6 +869,7 @@ int CGXAPDU::ParseInitiate(
             xml->AppendLine(tag, "", str);
             return 0;
         }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         data.SetPosition(data.GetPosition() - 1);
         DLMS_SECURITY security = DLMS_SECURITY_NONE;
         DLMS_SECURITY_SUITE suite;
@@ -856,7 +902,14 @@ int CGXAPDU::ParseInitiate(
             return ret;
         }
     }
-    return Parse(initiateRequest, settings, cipher, data, xml, tag);
+    return Parse(initiateRequest,
+        settings,
+        cipher,
+        data,
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+        xml,
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+        tag);
 }
 
 /**
@@ -865,18 +918,25 @@ int CGXAPDU::ParseInitiate(
 int CGXAPDU::ParseUserInformation(
     CGXDLMSSettings& settings,
     CGXCipher* cipher,
-    CGXByteBuffer& data,
-    CGXDLMSTranslatorStructure* xml)
+    CGXByteBuffer& data
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+    , CGXDLMSTranslatorStructure* xml
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+)
 {
     int ret;
     unsigned char len, tag;
     if ((ret = data.GetUInt8(&len)) != 0)
     {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml == NULL)
+#endif //DLMS_IGNORE_XML_TRANSLATOR
         {
             return ret;
         }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         xml->AppendComment("Error: Invalid data size.");
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     }
     if (data.GetSize() - data.GetPosition() < len)
     {
@@ -895,6 +955,7 @@ int CGXAPDU::ParseUserInformation(
     {
         return ret;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL && xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML)
     {
         std::string str = data.ToHexString(data.GetPosition(), len, false);
@@ -902,7 +963,15 @@ int CGXAPDU::ParseUserInformation(
         data.SetPosition(data.GetPosition() + len);
         return 0;
     }
-    return ParseInitiate(false, settings, cipher, data, xml);
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+    return ParseInitiate(false,
+        settings,
+        cipher,
+        data
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+        , xml
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+    );
 }
 
 /**
@@ -915,8 +984,11 @@ int CGXAPDU::ParseUserInformation(
  */
 int ParseApplicationContextName(
     CGXDLMSSettings& settings,
-    CGXByteBuffer& buff,
-    CGXDLMSTranslatorStructure* xml)
+    CGXByteBuffer& buff
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+    , CGXDLMSTranslatorStructure* xml
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+)
 {
     int ret;
     unsigned char len, ch, name;
@@ -1002,6 +1074,7 @@ int ParseApplicationContextName(
     {
         return ret;
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         std::string str;
@@ -1032,7 +1105,7 @@ int ParseApplicationContextName(
         xml->AppendLine(TRANSLATOR_GENERAL_TAGS_APPLICATION_CONTEXT_NAME, "", str);
         return 0;
     }
-
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     if (settings.GetUseLogicalNameReferencing())
     {
         if (name == 1 || name == 3)
@@ -1081,8 +1154,11 @@ int ValidateAare(
 
 int UpdatePassword(
     CGXDLMSSettings& settings,
-    CGXByteBuffer& buff,
-    CGXDLMSTranslatorStructure* xml)
+    CGXByteBuffer& buff
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+    , CGXDLMSTranslatorStructure* xml
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+)
 {
     CGXByteBuffer tmp;
     int ret;
@@ -1114,6 +1190,7 @@ int UpdatePassword(
     {
         settings.SetCtoSChallenge(tmp);
     }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         if (xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
@@ -1155,6 +1232,7 @@ int UpdatePassword(
             xml->AppendEndTag(TRANSLATOR_GENERAL_TAGS_CALLING_AUTHENTICATION);
         }
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return 0;
 }
 
@@ -1358,6 +1436,7 @@ int ParseProtocolVersion(CGXDLMSSettings& settings,
 }
 
 
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
 void AppendServerSystemTitleToXml(
     CGXDLMSSettings& settings,
     CGXDLMSTranslatorStructure* xml,
@@ -1385,13 +1464,18 @@ void AppendServerSystemTitleToXml(
         }
     }
 }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+
 int CGXAPDU::ParsePDU2(
     CGXDLMSSettings& settings,
     CGXCipher* cipher,
     CGXByteBuffer& buff,
     DLMS_ASSOCIATION_RESULT& result,
-    DLMS_SOURCE_DIAGNOSTIC& diagnostic,
-    CGXDLMSTranslatorStructure* xml)
+    DLMS_SOURCE_DIAGNOSTIC& diagnostic
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+    , CGXDLMSTranslatorStructure* xml
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+)
 {
     CGXByteBuffer tmp;
     unsigned char tag, len;
@@ -1409,7 +1493,12 @@ int CGXAPDU::ParsePDU2(
             //0xA1
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_APPLICATION_CONTEXT_NAME:
         {
-            if ((ret = ParseApplicationContextName(settings, buff, xml)) != 0)
+            if ((ret = ParseApplicationContextName(settings,
+                buff
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+                , xml
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+            )) != 0)
             {
                 return DLMS_ERROR_CODE_REJECTED_PERMAMENT;
             }
@@ -1443,12 +1532,14 @@ int CGXAPDU::ParsePDU2(
                 CGXByteBuffer bb;
                 bb.Set(&buff, buff.GetPosition(), len);
                 settings.SetSourceSystemTitle(bb);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
                 if (xml != NULL)
                 {
                     //RespondingAPTitle
                     str = bb.ToHexString(false);
                     xml->AppendLine(DLMS_TRANSLATOR_TAGS_CALLED_AP_TITLE, "", str);
                 }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             }
             else
             {
@@ -1475,6 +1566,7 @@ int CGXAPDU::ParsePDU2(
                     return ret;
                 }
                 result = (DLMS_ASSOCIATION_RESULT)tag;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
                 if (xml != NULL)
                 {
                     if (result != DLMS_ASSOCIATION_RESULT_ACCEPTED)
@@ -1487,6 +1579,7 @@ int CGXAPDU::ParsePDU2(
                     xml->AppendLine(TRANSLATOR_GENERAL_TAGS_ASSOCIATION_RESULT, "", str);
                     xml->AppendStartTag(TRANSLATOR_GENERAL_TAGS_RESULT_SOURCE_DIAGNOSTIC);
                 }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             }
             break;
             // 0xA3 SourceDiagnostic
@@ -1508,11 +1601,13 @@ int CGXAPDU::ParsePDU2(
             {
                 CGXByteBuffer calledAEQualifier;
                 calledAEQualifier.Set(&buff, buff.GetPosition(), len);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
                 if (xml != NULL)
                 {
                     str = calledAEQualifier.ToHexString(false);
                     xml->AppendLine(DLMS_TRANSLATOR_TAGS_CALLED_AE_QUALIFIER, "", str);
                 }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             }
             else
             {
@@ -1538,6 +1633,7 @@ int CGXAPDU::ParsePDU2(
                     return ret;
                 }
                 diagnostic = (DLMS_SOURCE_DIAGNOSTIC)tag;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
                 if (xml != NULL)
                 {
                     if (diagnostic != DLMS_SOURCE_DIAGNOSTIC_NONE)
@@ -1550,6 +1646,7 @@ int CGXAPDU::ParsePDU2(
                     xml->AppendLine(TRANSLATOR_GENERAL_TAGS_ACSE_SERVICE_USER, "", str);
                     xml->AppendEndTag(TRANSLATOR_GENERAL_TAGS_RESULT_SOURCE_DIAGNOSTIC);
                 }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             }
             break;
             // 0xA4 Result
@@ -1588,6 +1685,7 @@ int CGXAPDU::ParsePDU2(
                 {
                     return ret;
                 }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
                 if (xml != NULL)
                 {
                     //RespondingAPTitle
@@ -1595,6 +1693,7 @@ int CGXAPDU::ParsePDU2(
                     xml->IntegerToHex((long)len, 2, str);
                     xml->AppendLine(DLMS_TRANSLATOR_TAGS_CALLED_AP_INVOCATION_ID, "", str);
                 }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             }
             else
             {
@@ -1620,12 +1719,14 @@ int CGXAPDU::ParsePDU2(
                 tmp.Clear();
                 tmp.Set(&buff, buff.GetPosition(), len);
                 settings.SetSourceSystemTitle(tmp);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
                 if (xml != NULL)
                 {
                     //RespondingAPTitle
                     str = tmp.ToHexString(false);
                     xml->AppendLine(TRANSLATOR_GENERAL_TAGS_RESPONDING_AP_TITLE, "", str);
                 }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             }
             break;
             // 0xA6 Client system title.
@@ -1645,12 +1746,14 @@ int CGXAPDU::ParsePDU2(
             tmp.Clear();
             tmp.Set(&buff, buff.GetPosition(), len);
             settings.SetSourceSystemTitle(tmp);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             if (xml != NULL)
             {
                 //CallingAPTitle
                 str = tmp.ToHexString(false);
                 xml->AppendLine(TRANSLATOR_GENERAL_TAGS_CALLING_AP_TITLE, "", str);
             }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             break;
             // 0xAA Server system title.
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_SENDER_ACSE_REQUIREMENTS:
@@ -1669,7 +1772,9 @@ int CGXAPDU::ParsePDU2(
             tmp.Clear();
             tmp.Set(&buff, buff.GetPosition(), len);
             settings.SetStoCChallenge(tmp);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             AppendServerSystemTitleToXml(settings, xml, tag);
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             break;
             //Client AEInvocationId.
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AE_INVOCATION_ID://0xA9
@@ -1690,12 +1795,14 @@ int CGXAPDU::ParsePDU2(
                 return ret;
             }
             settings.SetUserID(tag);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             if (xml != NULL)
             {
                 std::string str;
                 xml->IntegerToHex((long)tag, 2, str);
                 xml->AppendLine(TRANSLATOR_GENERAL_TAGS_CALLING_AE_INVOCATION_ID, "", str);
             }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             break;
             //Client CalledAeInvocationId.
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLED_AE_INVOCATION_ID://0xA5
@@ -1730,6 +1837,7 @@ int CGXAPDU::ParsePDU2(
                 {
                     return ret;
                 }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
                 if (xml != NULL)
                 {
                     //CalledAEInvocationId
@@ -1737,6 +1845,7 @@ int CGXAPDU::ParsePDU2(
                     xml->IntegerToHex((long)tag, 2, str);
                     xml->AppendLine(DLMS_TRANSLATOR_TAGS_CALLED_AE_INVOCATION_ID, "", str);
                 }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             }
             else
             {
@@ -1757,12 +1866,14 @@ int CGXAPDU::ParsePDU2(
                     return ret;
                 }
                 settings.SetUserID(tag);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
                 if (xml != NULL)
                 {
                     std::string str;
                     xml->IntegerToHex((long)tag, 2, str);
                     xml->AppendLine(TRANSLATOR_GENERAL_TAGS_CALLED_AE_INVOCATION_ID, "", str);
                 }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             }
             break;
             //Server RespondingAEInvocationId.
@@ -1784,11 +1895,13 @@ int CGXAPDU::ParsePDU2(
                 return ret;
             }
             settings.SetUserID(tag);
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             if (xml != NULL)
             {
                 xml->IntegerToHex((long)tag, 2, str);
                 xml->AppendLine(TRANSLATOR_GENERAL_TAGS_RESPONDING_AE_INVOCATION_ID, "", str);
             }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             break;
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AP_INVOCATION_ID://0xA8
             if ((ret = buff.GetUInt8(&len)) != 0)
@@ -1820,6 +1933,7 @@ int CGXAPDU::ParsePDU2(
             {
                 return ret;
             }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             if (xml != NULL)
             {
                 //CallingApInvocationId
@@ -1827,6 +1941,7 @@ int CGXAPDU::ParsePDU2(
                 xml->IntegerToHex((long)len, 2, str);
                 xml->AppendLine(DLMS_TRANSLATOR_TAGS_CALLING_AP_INVOCATION_ID, "Value", str);
             }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             break;
             //  0x8A or 0x88
         case BER_TYPE_CONTEXT | PDU_TYPE_SENDER_ACSE_REQUIREMENTS:
@@ -1854,11 +1969,13 @@ int CGXAPDU::ParsePDU2(
                 return ret;
             }
             //SenderACSERequirements
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             if (xml != NULL)
             {
                 str = "1";
                 xml->AppendLine(tag, "", str);
             }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             break;
             //  0x8B or 0x89
         case BER_TYPE_CONTEXT | PDU_TYPE_MECHANISM_NAME:
@@ -1867,6 +1984,7 @@ int CGXAPDU::ParsePDU2(
             {
                 return ret;
             }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
             if (xml != NULL)
             {
                 if (xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
@@ -1880,10 +1998,17 @@ int CGXAPDU::ParsePDU2(
                     xml->AppendLine((unsigned long)tag, "", str);
                 }
             }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
             break;
             // 0xAC
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AUTHENTICATION_VALUE:
-            if ((ret = UpdatePassword(settings, buff, xml)) != 0)
+            if ((ret = UpdatePassword(settings,
+                buff
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+                , xml
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+
+            )) != 0)
             {
                 return ret;
             }
@@ -1891,12 +2016,22 @@ int CGXAPDU::ParsePDU2(
             // 0xBE
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_USER_INFORMATION:
             //Check result component. Some meters are returning invalid user-information if connection failed.
-            if (xml == NULL && result != DLMS_ASSOCIATION_RESULT_ACCEPTED
+            if (
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+                xml == NULL &&
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+                result != DLMS_ASSOCIATION_RESULT_ACCEPTED
                 && diagnostic != DLMS_SOURCE_DIAGNOSTIC_NONE)
             {
                 return handleResultComponent(diagnostic);
             }
-            if ((ret = ParseUserInformation(settings, cipher, buff, xml)) != 0)
+            if ((ret = ParseUserInformation(settings,
+                cipher,
+                buff
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+                , xml
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+            )) != 0)
             {
                 if (ret == DLMS_ERROR_CODE_INVOCATION_COUNTER_TOO_SMALL ||
                     ret == DLMS_ERROR_CODE_INVALID_DECIPHERING_ERROR ||
@@ -1932,7 +2067,9 @@ int CGXAPDU::ParsePDU2(
     }
     //All meters don't send user-information if connection is failed.
     //For this reason result component is check again.
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml == NULL)
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     {
         return handleResultComponent(diagnostic);
     }
@@ -1944,8 +2081,11 @@ int CGXAPDU::ParsePDU(
     CGXCipher* cipher,
     CGXByteBuffer& buff,
     DLMS_ASSOCIATION_RESULT& result,
-    DLMS_SOURCE_DIAGNOSTIC& diagnostic,
-    CGXDLMSTranslatorStructure* xml)
+    DLMS_SOURCE_DIAGNOSTIC& diagnostic
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+    , CGXDLMSTranslatorStructure* xml
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+)
 {
     CGXByteBuffer tmp;
     unsigned long len;
@@ -1963,14 +2103,20 @@ int CGXAPDU::ParsePDU(
     unsigned int size = buff.GetSize() - buff.GetPosition();
     if (len > size)
     {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml == NULL)
         {
             //Encoding failed. Not enough data.
             return DLMS_ERROR_CODE_OUTOFMEMORY;
         }
         xml->AppendComment("Error: Invalid data size.");
+#else
+        //Encoding failed. Not enough data.
+        return DLMS_ERROR_CODE_OUTOFMEMORY;
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     }
     //Opening tags
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         if (settings.IsServer())
@@ -1982,14 +2128,19 @@ int CGXAPDU::ParsePDU(
             xml->AppendStartTag(DLMS_COMMAND_AARE);
         }
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     ret = ParsePDU2(
         settings,
         cipher,
         buff,
         result,
-        diagnostic,
-        xml);
+        diagnostic
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+        , xml
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+    );
     //Closing tags
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
     {
         if (settings.IsServer())
@@ -2001,6 +2152,7 @@ int CGXAPDU::ParsePDU(
             xml->AppendEndTag(DLMS_COMMAND_AARE);
         }
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     return ret;
 }
 

@@ -235,12 +235,13 @@ void CGXReplyData::SetTime(struct tm* value)
     {
         if (m_Time == NULL)
         {
-            m_Time = (struct tm*) malloc(sizeof(struct tm));
+            m_Time = (struct tm*)malloc(sizeof(struct tm));
         }
         memcpy(m_Time, value, sizeof(struct tm));
     }
 }
 
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
 CGXDLMSTranslatorStructure* CGXReplyData::GetXml()
 {
     return m_pXml;
@@ -250,6 +251,7 @@ void CGXReplyData::SetXml(CGXDLMSTranslatorStructure* value)
 {
     m_pXml = value;
 }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
 
 long CGXReplyData::GetInvokeId()
 {

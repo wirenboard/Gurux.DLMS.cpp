@@ -35,6 +35,9 @@
 #ifndef GXDLMSTCPUDPSETUP_H
 #define GXDLMSTCPUDPSETUP_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_TCP_UDP_SETUP
+
 /**
 Online help:
 http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSTcpUdpSetup
@@ -116,4 +119,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_TCP_UDP_SETUP
 #endif //GXDLMSTCPUDPSETUP_H

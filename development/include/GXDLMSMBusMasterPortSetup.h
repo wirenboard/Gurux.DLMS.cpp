@@ -35,6 +35,9 @@
 #ifndef GXDLMSMBUSMASTERPORTSETUP_H
 #define GXDLMSMBUSMASTERPORTSETUP_H
 
+#include "GXIgnore.h"
+
+#ifndef DLMS_IGNORE_MBUS_MASTER_PORT_SETUP
 #include "GXDLMSObject.h"
 
 /**
@@ -85,4 +88,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_MBUS_MASTER_PORT_SETUP
 #endif //GXDLMSMBUSMASTERPORTSETUP_H

@@ -33,6 +33,7 @@
 //---------------------------------------------------------------------------
 
 #include "../include/GXDLMSTranslator.h"
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
 #include "../include/GXDLMSSettings.h"
 #include "../include/GXReplyData.h"
 #include "../include/GXAPDU.h"
@@ -792,3 +793,4 @@ void CGXDLMSTranslator::SetDedicatedKey(CGXByteBuffer& value)
     m_DedicatedKey.Clear();
     m_DedicatedKey.Set(value.GetData(), value.GetSize() - value.GetPosition());
 }
+#endif //DLMS_IGNORE_XML_TRANSLATOR

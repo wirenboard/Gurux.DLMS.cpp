@@ -33,6 +33,8 @@
 //---------------------------------------------------------------------------
 
 #include "../include/GXDLMSParameterMonitor.h"
+
+#ifndef DLMS_IGNORE_PARAMETER_MONITOR
 #include "../include/GXDLMSObjectFactory.h"
 #include "../include/GXDLMSSettings.h"
 
@@ -351,3 +353,5 @@ int CGXDLMSParameterMonitor::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEve
     }
     return DLMS_ERROR_CODE_OK;
 }
+
+#endif //DLMS_IGNORE_PARAMETER_MONITOR

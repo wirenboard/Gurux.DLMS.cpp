@@ -437,7 +437,7 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
 }
 
 //Open serial port.
-int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
+int CGXCommunication::Open(const char* settings, int maxBaudrate)
 {
     Close();
     unsigned short baudRate;
@@ -455,6 +455,11 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
     port = tmp[0];
     if (tmp.size() > 1)
     {
+        if (tmp.size() < 3)
+        {
+            printf("Serial port settings format is:COM1:9800:8None1.\n");
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
         baudRate = atoi(tmp[1].c_str());
         dataBits = atoi(tmp[2].substr(0, 1).c_str());
         tmp2 = tmp[2].substr(1, tmp[2].size() - 2);
@@ -551,23 +556,13 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
     dcb.fOutX = dcb.fInX = 0;
     //Abort all reads and writes on Error.
     dcb.fAbortOnError = 1;
-    if (iec)
-    {
-        dcb.BaudRate = 300;
-        dcb.StopBits = ONESTOPBIT;
-        dcb.Parity = EVENPARITY;
-        dcb.ByteSize = 7;
-    }
-    else
-    {
-        dcb.BaudRate = baudRate;
-        dcb.ByteSize = dataBits;
-        dcb.StopBits = stopBits;
-        dcb.Parity = parity;
-    }
+    dcb.BaudRate = baudRate;
+    dcb.ByteSize = dataBits;
+    dcb.StopBits = stopBits;
+    dcb.Parity = parity;
     if ((ret = GXSetCommState(m_hComPort, &dcb)) != 0)
     {
-        return DLMS_ERROR_TYPE_COMMUNICATION_ERROR | ret;
+        return ret;
     }
 #else //#if defined(__LINUX__)
     struct termios options;
@@ -630,7 +625,7 @@ int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
         }
     }
 #endif
-    if (iec)
+    if (this->m_Parser->GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC_WITH_MODE_E)
     {
 #if _MSC_VER > 1000
         strcpy_s(buff, 50, "/?!\r\n");

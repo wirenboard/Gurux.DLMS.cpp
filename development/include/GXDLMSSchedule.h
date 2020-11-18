@@ -35,6 +35,8 @@
 #ifndef GXDLMSSCHEDULE_H
 #define GXDLMSSCHEDULE_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_SCHEDULE
 #include "GXDLMSObject.h"
 #include "GXDLMSScheduleEntry.h"
 
@@ -125,4 +127,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_SCHEDULE
 #endif //GXDLMSSCHEDULE_H

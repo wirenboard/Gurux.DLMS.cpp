@@ -36,6 +36,7 @@
 #include "../include/GXDLMSObjectFactory.h"
 #include "../include/GXDLMSServer.h"
 
+#ifndef DLMS_IGNORE_COMPACT_DATA
 //Constructor.
 CGXDLMSCompactData::CGXDLMSCompactData() :
     CGXDLMSCompactData("", 0)
@@ -342,3 +343,5 @@ int CGXDLMSCompactData::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
     }
     return DLMS_ERROR_CODE_OK;
 }
+
+#endif //DLMS_IGNORE_COMPACT_DATA

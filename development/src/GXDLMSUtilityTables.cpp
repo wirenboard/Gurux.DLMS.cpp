@@ -34,6 +34,7 @@
 
 #include "../include/GXDLMSUtilityTables.h"
 
+#ifndef DLMS_IGNORE_UTILITY_TABLES
 //Constructor.
 CGXDLMSUtilityTables::CGXDLMSUtilityTables() :
     CGXDLMSUtilityTables("0.0.65.0.0.255", 0)
@@ -199,3 +200,4 @@ int CGXDLMSUtilityTables::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     }
     return ret;
 }
+#endif //DLMS_IGNORE_UTILITY_TABLES

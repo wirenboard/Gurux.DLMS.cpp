@@ -35,6 +35,10 @@
 #ifndef GXDLMSIMAGETRANSFER_H
 #define GXDLMSIMAGETRANSFER_H
 
+#include "GXIgnore.h"
+
+#ifndef DLMS_IGNORE_IMAGE_TRANSFER
+
 #include "GXDLMSObject.h"
 #include "GXDLMSImageActivateInfo.h"
 
@@ -143,4 +147,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_IMAGE_TRANSFER
 #endif //GXDLMSIMAGETRANSFER_H

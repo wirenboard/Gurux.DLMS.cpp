@@ -1276,6 +1276,51 @@ const char* CGXDLMSConverter::ToString(DLMS_OBJECT_TYPE type)
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION:
         str = "GXDLMSPrimeNbOfdmPlcApplicationsIdentification";
         break;
+#ifndef DLMS_IGNORE_IEC_8802_LLC_TYPE1_SETUP
+    case DLMS_OBJECT_TYPE_IEC_8802_LLC_TYPE1_SETUP:
+        str = "GXDLMSIec8802LlcType1Setup";
+        break;
+#endif //DLMS_IGNORE_IEC_8802_LLC_TYPE1_SETUP
+#ifndef DLMS_IGNORE_IEC_8802_LLC_TYPE2_SETUP
+    case DLMS_OBJECT_TYPE_IEC_8802_LLC_TYPE2_SETUP:
+        str = "GXDLMSIec8802LlcType2Setup";
+        break;
+#endif //DLMS_IGNORE_IEC_8802_LLC_TYPE2_SETUP
+#ifndef DLMS_IGNORE_IEC_8802_LLC_TYPE3_SETUP
+    case DLMS_OBJECT_TYPE_IEC_8802_LLC_TYPE3_SETUP:
+        str = "GXDLMSIec8802LlcType3Setup";
+        break;
+#endif //DLMS_IGNORE_IEC_8802_LLC_TYPE3_SETUP
+#ifndef DLMS_IGNORE_SFSK_REPORTING_SYSTEM_LIST
+    case DLMS_OBJECT_TYPE_SFSK_REPORTING_SYSTEM_LIST:
+        str = "GXDLMSSFSKReportingSystemList";
+        break;
+#endif //DLMS_IGNORE_SFSK_REPORTING_SYSTEM_LIST
+#ifndef DLMS_IGNORE_ARBITRATOR
+    case DLMS_OBJECT_TYPE_ARBITRATOR:
+        str = "GXDLMSArbitrator";
+        break;
+#endif //DLMS_IGNORE_ARBITRATOR
+#ifndef DLMS_IGNORE_SFSK_MAC_COUNTERS
+    case DLMS_OBJECT_TYPE_SFSK_MAC_COUNTERS:
+        str = "GXDLMSSFSKMacCounters";
+        break;
+#endif //DLMS_IGNORE_SFSK_MAC_COUNTERS
+#ifndef DLMS_IGNORE_SFSK_MAC_SYNCHRONIZATION_TIMEOUTS
+    case DLMS_OBJECT_TYPE_SFSK_MAC_SYNCHRONIZATION_TIMEOUTS:
+        str = "GXDLMSSFSKMacSynchronizationTimeouts";
+        break;
+#endif //DLMS_IGNORE_SFSK_MAC_SYNCHRONIZATION_TIMEOUTS
+#ifndef DLMS_IGNORE_SFSK_ACTIVE_INITIATOR
+    case DLMS_OBJECT_TYPE_SFSK_ACTIVE_INITIATOR:
+        str = "GXDLMSSFSKActiveInitiator";
+        break;
+#endif //DLMS_IGNORE_SFSK_ACTIVE_INITIATOR
+#ifndef DLMS_IGNORE_SFSK_PHY_MAC_SETUP
+    case DLMS_OBJECT_TYPE_SFSK_PHY_MAC_SETUP:
+        str = "GXDLMSSFSKPhyMacSetUp";
+        break;
+#endif //DLMS_IGNORE_SFSK_PHY_MAC_SETUP
     default:
         str = "Manufacture spesific.";
         break;
@@ -1404,6 +1449,42 @@ DLMS_OBJECT_TYPE CGXDLMSConverter::ValueOfObjectType(const char* value)
         type = DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA;
     else if (strcmp(value, "GXDLMSPrimeNbOfdmPlcApplicationsIdentification") == 0)
         type = DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION;
+#ifndef DLMS_IGNORE_IEC_8802_LLC_TYPE1_SETUP
+    else if (strcmp(value, "GXDLMSIec8802LlcType1Setup") == 0)
+        type = DLMS_OBJECT_TYPE_IEC_8802_LLC_TYPE1_SETUP;
+#endif //DLMS_IGNORE_IEC_8802_LLC_TYPE1_SETUP
+#ifndef DLMS_IGNORE_IEC_8802_LLC_TYPE2_SETUP
+    else if (strcmp(value, "GXDLMSIec8802LlcType2Setup") == 0)
+        type = DLMS_OBJECT_TYPE_IEC_8802_LLC_TYPE2_SETUP;
+#endif //DLMS_IGNORE_IEC_8802_LLC_TYPE2_SETUP
+#ifndef DLMS_IGNORE_IEC_8802_LLC_TYPE3_SETUP
+    else if (strcmp(value, "GXDLMSIec8802LlcType3Setup") == 0)
+        type = DLMS_OBJECT_TYPE_IEC_8802_LLC_TYPE3_SETUP;
+#endif //DLMS_IGNORE_IEC_8802_LLC_TYPE3_SETUP
+#ifndef DLMS_IGNORE_SFSK_REPORTING_SYSTEM_LIST
+    else if (strcmp(value, "GXDLMSSFSKReportingSystemList") == 0)
+        type = DLMS_OBJECT_TYPE_SFSK_REPORTING_SYSTEM_LIST;
+#endif //DLMS_IGNORE_SFSK_REPORTING_SYSTEM_LIST
+#ifndef DLMS_IGNORE_ARBITRATOR
+    else if (strcmp(value, "GXDLMSArbitrator") == 0)
+        type = DLMS_OBJECT_TYPE_ARBITRATOR;
+#endif //DLMS_IGNORE_ARBITRATOR
+#ifndef DLMS_IGNORE_SFSK_MAC_COUNTERS
+    else if (strcmp(value, "GXDLMSSFSKMacCounters") == 0)
+        type = DLMS_OBJECT_TYPE_SFSK_MAC_COUNTERS;
+#endif //DLMS_IGNORE_SFSK_MAC_COUNTERS
+#ifndef DLMS_IGNORE_SFSK_MAC_SYNCHRONIZATION_TIMEOUTS
+    else if (strcmp(value, "GXDLMSSFSKMacSynchronizationTimeouts") == 0)
+        type = DLMS_OBJECT_TYPE_SFSK_MAC_SYNCHRONIZATION_TIMEOUTS;
+#endif //DLMS_IGNORE_SFSK_MAC_SYNCHRONIZATION_TIMEOUTS
+#ifndef DLMS_IGNORE_SFSK_ACTIVE_INITIATOR
+    else if (strcmp(value, "GXDLMSSFSKActiveInitiator") == 0)
+        type = DLMS_OBJECT_TYPE_SFSK_ACTIVE_INITIATOR;
+#endif //DLMS_IGNORE_SFSK_ACTIVE_INITIATOR
+#ifndef DLMS_IGNORE_SFSK_PHY_MAC_SETUP
+    else if (strcmp(value, "GXDLMSSFSKPhyMacSetUp") == 0)
+        type = DLMS_OBJECT_TYPE_SFSK_PHY_MAC_SETUP;
+#endif //DLMS_IGNORE_SFSK_PHY_MAC_SETUP
     else
         type = DLMS_OBJECT_TYPE_NONE;
     return type;
@@ -1414,17 +1495,24 @@ void CGXDLMSConverter::UpdateObisCodes()
     if (m_Codes.empty())
     {
         std::stringstream sb;
-        sb << OBIS_CODES1;
-        sb << OBIS_CODES2;
-        sb << OBIS_CODES3;
-        sb << OBIS_CODES4;
-        sb << OBIS_CODES5;
-        sb << OBIS_CODES6;
-        sb << OBIS_CODES7;
-        sb << OBIS_CODES8;
-        sb << OBIS_CODES9;
-        sb << OBIS_CODES10;
-        sb << OBIS_CODES11;
+        sb << OBIS_CODES_ABSTRACT_1;
+        sb << OBIS_CODES_ABSTRACT_2;
+#ifndef DLMS_IGNORE_OBIS_ELECTRICITY
+        sb << OBIS_CODES_ELECTRICITY_1;
+        sb << OBIS_CODES_ELECTRICITY_2;
+        sb << OBIS_CODES_ELECTRICITY_3;
+        sb << OBIS_CODES_ELECTRICITY_3;
+        sb << OBIS_CODES_ELECTRICITY_4;
+        sb << OBIS_CODES_ELECTRICITY_5;
+#endif //DLMS_IGNORE_OBIS_ELECTRICITY
+#ifndef DLMS_IGNORE_OBIS_GAS
+        sb << OBIS_CODES_GAS_1;
+        sb << OBIS_CODES_GAS_2;
+        sb << OBIS_CODES_GAS_3;
+        sb << OBIS_CODES_GAS_4;
+        sb << OBIS_CODES_GAS_5;
+        sb << OBIS_CODES_GAS_6;
+#endif //DLMS_IGNORE_OBIS_GAS
         std::string str = sb.str();
         std::vector< std::string > rows = GXHelpers::Split(str, "\r\n", true);
         int row = 0;
@@ -1561,5 +1649,5 @@ void CGXDLMSConverter::UpdateOBISCodeInformation(CGXDLMSObjectCollection& object
             delete* it;
         }
         list.clear();
+        }
     }
-}

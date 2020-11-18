@@ -36,6 +36,7 @@
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSTcpUdpSetup.h"
 
+#ifndef DLMS_IGNORE_TCP_UDP_SETUP
 /**
  Constructor.
 */
@@ -324,3 +325,5 @@ int CGXDLMSTcpUdpSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
     }
     return DLMS_ERROR_CODE_OK;
 }
+
+#endif //DLMS_IGNORE_TCP_UDP_SETUP

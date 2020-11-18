@@ -62,7 +62,12 @@ CGXDLMSObjectCollection& CGXDLMSNotify::GetObjects()
 
 CGXDLMSLimits& CGXDLMSNotify::GetLimits()
 {
-    return m_Settings.GetLimits();
+    return m_Settings.GetHdlcSettings();
+}
+
+CGXHdlcSettings& CGXDLMSNotify::GetHdlcSettings()
+{
+    return m_Settings.GetHdlcSettings();
 }
 
 int CGXDLMSNotify::GetMaxPduSize()
@@ -183,6 +188,7 @@ int CGXDLMSNotify::GenerateDataNotificationMessages(
     return GenerateDataNotificationMessages(date, buff, reply);
 }
 
+#ifndef DLMS_IGNORE_PUSH_SETUP
 int CGXDLMSNotify::GeneratePushSetupMessages(
     struct tm* date,
     CGXDLMSPushSetup* push,
@@ -201,6 +207,7 @@ int CGXDLMSNotify::GeneratePushSetupMessages(
     }
     return GenerateDataNotificationMessages(date, buff, reply);
 }
+#endif //DLMS_IGNORE_PUSH_SETUP
 
 int CGXDLMSNotify::ParsePush(std::vector<CGXDLMSVariant>& data, std::vector<std::pair<CGXDLMSObject*, unsigned char> >& items)
 {

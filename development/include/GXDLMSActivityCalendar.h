@@ -35,6 +35,9 @@
 #ifndef GXDLMSACTIVITYCALENDAR_H
 #define GXDLMSACTIVITYCALENDAR_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_ACTIVITY_CALENDAR
+
 #include "GXDLMSObject.h"
 #include "GXDLMSSeasonProfile.h"
 #include "GXDLMSWeekProfile.h"
@@ -122,4 +125,6 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_ACTIVITY_CALENDAR
+
 #endif //GXDLMSACTIVITYCALENDAR_H

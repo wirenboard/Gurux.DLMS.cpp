@@ -33,8 +33,8 @@
 //---------------------------------------------------------------------------
 
 #pragma once
-//Mikko #include "GXDLMSTranslatorStructure.h"
 
+#include "GXIgnore.h"
 class CGXDLMSTranslatorStructure;
 
 //This class is used in DLMS data parsing.
@@ -50,10 +50,15 @@ private:
     DLMS_DATA_TYPE m_Type;
     // Is data parsed to the end.
     bool m_Complete;
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     CGXDLMSTranslatorStructure* m_xml;
+#endif //DLMS_IGNORE_XML_TRANSLATOR
 public:
     //Constructor.
-    CGXDataInfo() : m_xml(NULL)
+    CGXDataInfo()
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+        : m_xml(NULL)
+#endif //DLMS_IGNORE_XML_TRANSLATOR
     {
         Clear();
     }
@@ -99,7 +104,7 @@ public:
     {
         return m_Complete;
     }
-    
+
     //Is all data parsed.
     void SetComplete(bool value)
     {
@@ -115,6 +120,7 @@ public:
         m_Complete = true;
     }
 
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
     void SetXml(CGXDLMSTranslatorStructure* value)
     {
         m_xml = value;
@@ -124,4 +130,5 @@ public:
     {
         return m_xml;
     }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
 };

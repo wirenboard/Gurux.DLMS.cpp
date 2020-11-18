@@ -35,6 +35,8 @@
 #ifndef GXDLMSPrimeNbOfdmPlcPhysicalLayerCounters_H
 #define GXDLMSPrimeNbOfdmPlcPhysicalLayerCounters_H
 
+#include "GXIgnore.h"
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS
 #include "GXDLMSObject.h"
 
 /*
@@ -155,4 +157,5 @@ public:
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS
 #endif //GXDLMSPrimeNbOfdmPlcPhysicalLayerCounters_H

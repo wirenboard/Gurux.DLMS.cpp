@@ -35,6 +35,7 @@
 #include "../include/GXDLMSPrimeNbOfdmPlcPhysicalLayerCounters.h"
 #include "../include/GXDLMSClient.h"
 
+#ifndef DLMS_IGNORE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS
 //Constructor.
 CGXDLMSPrimeNbOfdmPlcPhysicalLayerCounters::CGXDLMSPrimeNbOfdmPlcPhysicalLayerCounters() :
     CGXDLMSPrimeNbOfdmPlcPhysicalLayerCounters("0.0.28.1.0.255", 0)
@@ -252,3 +253,5 @@ int CGXDLMSPrimeNbOfdmPlcPhysicalLayerCounters::SetValue(CGXDLMSSettings& settin
     }
     return ret;
 }
+
+#endif //DLMS_IGNORE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS
