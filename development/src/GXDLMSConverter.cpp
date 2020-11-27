@@ -1638,6 +1638,27 @@ void CGXDLMSConverter::UpdateOBISCodeInformation(CGXDLMSObjectCollection& object
             case DLMS_OBJECT_TYPE_REGISTER:
             case DLMS_OBJECT_TYPE_REGISTER_ACTIVATION:
             case DLMS_OBJECT_TYPE_EXTENDED_REGISTER:
+                (*it)->SetDataType(2, type);
+                break;
+            default:
+                break;
+            }
+        }
+        if (code->GetUIDataType() != "")
+        {
+            int value;
+#if _MSC_VER > 1000
+            sscanf_s(code->GetUIDataType().c_str(), "%d", &value);
+#else
+            sscanf(code->GetUIDataType().c_str(), "%d", &value);
+#endif
+            DLMS_DATA_TYPE type = (DLMS_DATA_TYPE)value;
+            switch ((*it)->GetObjectType())
+            {
+            case DLMS_OBJECT_TYPE_DATA:
+            case DLMS_OBJECT_TYPE_REGISTER:
+            case DLMS_OBJECT_TYPE_REGISTER_ACTIVATION:
+            case DLMS_OBJECT_TYPE_EXTENDED_REGISTER:
                 (*it)->SetUIDataType(2, type);
                 break;
             default:

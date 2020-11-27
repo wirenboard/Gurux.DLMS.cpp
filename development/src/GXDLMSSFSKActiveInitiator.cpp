@@ -175,12 +175,13 @@ int CGXDLMSSFSKActiveInitiator::GetValue(CGXDLMSSettings& settings, CGXDLMSValue
 // Set value of given attribute.
 int CGXDLMSSFSKActiveInitiator::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
-    if (e.GetIndex() == 1)
+    int ret = 0;
+    switch (e.GetIndex())
     {
-        return SetLogicalName(this, e.GetValue());
-    }
-    else if (e.GetIndex() == 2)
-    {
+    case 1:
+        ret = SetLogicalName(this, e.GetValue());
+        break;
+    case 2:
         if (e.GetValue().vt == DLMS_DATA_TYPE_STRUCTURE)
         {
             m_SystemTitle.Clear();
@@ -194,11 +195,10 @@ int CGXDLMSSFSKActiveInitiator::SetValue(CGXDLMSSettings& settings, CGXDLMSValue
             m_MacAddress = 0;
             m_LSapSelector = 0;
         }
+        break;
+    default:
+        ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    else
-    {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
-    return DLMS_ERROR_CODE_OK;
+    return ret;
 }
 #endif //DLMS_IGNORE_SFSK_ACTIVE_INITIATOR

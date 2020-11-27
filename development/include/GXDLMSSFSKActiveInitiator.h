@@ -52,7 +52,7 @@ class CGXDLMSSFSKActiveInitiator : public CGXDLMSObject
     /**
      * MAC address of active initiator.
      */
-    int m_MacAddress;
+    uint16_t m_MacAddress;
     /**
      * L SAP selector of active initiator.
      */

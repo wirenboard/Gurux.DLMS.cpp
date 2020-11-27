@@ -225,7 +225,7 @@ int CGXDLMSSFSKMacSynchronizationTimeouts::SetValue(CGXDLMSSettings& settings, C
         m_TimeOutFrameNotOK = e.GetValue().ToInteger();
         break;
     default:
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     return ret;
 }

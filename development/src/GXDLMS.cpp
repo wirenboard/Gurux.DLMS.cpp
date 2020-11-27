@@ -1204,8 +1204,10 @@ int CGXDLMS::GetLnMessages(
                 {
                     frame = p.GetSettings()->GetNextSend(0);
                 }
+                break;
             case DLMS_INTERFACE_TYPE_PDU:
                 tmp = reply;
+                reply.SetPosition(reply.GetSize());
                 break;
             case DLMS_INTERFACE_TYPE_PLC:
                 ret = GetPlcFrame(*p.GetSettings(), 0x90, &reply, tmp);
@@ -1966,13 +1968,13 @@ int HandleActionResponseNormal(
 #else
                     return type;
 #endif //DLMS_IGNORE_XML_TRANSLATOR
+                    }
                 }
-            }
             else
             {
                 GetDataFromBlock(data.GetData(), 0);
             }
-        }
+            }
         else
         {
             //Invalid tag.
@@ -2007,9 +2009,9 @@ int HandleActionResponseNormal(
             }
         }
 #endif //DLMS_IGNORE_XML_TRANSLATOR
-    }
+        }
     return 0;
-}
+    }
 
 int VerifyInvokeId(CGXDLMSSettings& settings, CGXReplyData& reply)
 {
@@ -3711,8 +3713,8 @@ int CGXDLMS::HandleReadResponse(
         default:
             //HandleReadResponse failed. Invalid tag.
             return DLMS_ERROR_CODE_INVALID_TAG;
+            }
         }
-    }
 #ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (reply.GetXml() != NULL)
     {
@@ -3729,7 +3731,7 @@ int CGXDLMS::HandleReadResponse(
         return DLMS_ERROR_CODE_FALSE;
     }
     return 0;
-}
+    }
 
 int CGXDLMS::GetTcpData(
     CGXDLMSSettings& settings,

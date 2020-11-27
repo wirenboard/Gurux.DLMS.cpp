@@ -212,9 +212,13 @@ void CGXDLMSSFSKMacCounters::GetValues(std::vector<std::string>& values)
     std::stringstream sb;
     sb << "";
     sb << m_PhysicalLayerDesynchronization;
+    sb << ", ";
     sb << m_TimeOutNotAddressedDesynchronization;
+    sb << ", ";
     sb << m_TimeOutFrameNotOkDesynchronization;
+    sb << ", ";
     sb << m_WriteRequestDesynchronization;
+    sb << ", ";
     sb << m_WrongInitiatorDesynchronization;
     values.push_back(sb.str());
     GetArrayAsString(m_BroadcastFramesCounter, ln);
