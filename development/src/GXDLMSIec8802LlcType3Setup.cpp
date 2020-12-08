@@ -172,11 +172,11 @@ int CGXDLMSIec8802LlcType3Setup::GetDataType(int index, DLMS_DATA_TYPE& type)
     switch (index) {
     case 1:
         type = DLMS_DATA_TYPE_OCTET_STRING;
-    case 2:
     case 3:
-    case 5:
         type = DLMS_DATA_TYPE_UINT8;
+    case 2:
     case 4:
+    case 5:
     case 6:
     case 7:
     case 8:

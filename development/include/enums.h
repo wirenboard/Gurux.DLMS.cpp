@@ -1303,13 +1303,9 @@ typedef enum
     DLMS_COMMAND_REGISTER_REQUEST = 0x1C,
     // PLC ping request.
     DLMS_COMMAND_PING_REQUEST = 0x19,
-    /// <summary>
-    /// PLC ping response.
-    /// </summary>
+    // PLC ping response.
     DLMS_COMMAND_PING_RESPONSE = 0x1A,
-    /// <summary>
-    /// PLC repeat call request.
-    /// </summary>
+    // PLC repeat call request.
     DLMS_COMMAND_REPEAT_CALL_REQUEST = 0x1F
 } DLMS_COMMAND;
 

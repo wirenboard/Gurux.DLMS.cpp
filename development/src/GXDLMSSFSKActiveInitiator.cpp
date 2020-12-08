@@ -146,9 +146,9 @@ int CGXDLMSSFSKActiveInitiator::GetDataType(int index, DLMS_DATA_TYPE& type)
 // Returns value of given attribute.
 int CGXDLMSSFSKActiveInitiator::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
+    int ret;
     if (e.GetIndex() == 1)
     {
-        int ret;
         CGXDLMSVariant tmp;
         if ((ret = GetLogicalName(this, tmp)) == 0)
         {
@@ -158,18 +158,20 @@ int CGXDLMSSFSKActiveInitiator::GetValue(CGXDLMSSettings& settings, CGXDLMSValue
     else if (e.GetIndex() == 2)
     {
         CGXByteBuffer bb;
-        bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
-        bb.SetUInt8(3);
-        GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_OCTET_STRING, m_SystemTitle);
-        GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_UINT16, m_MacAddress);
-        GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_UINT8, m_LSapSelector);
-        e.SetValue(bb);
+        if ((ret = bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE)) == 0 &&
+            (ret = bb.SetUInt8(3)) == 0 &&
+            (ret = GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_OCTET_STRING, m_SystemTitle)) == 0 &&
+            (ret = GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_UINT16, m_MacAddress)) == 0 &&
+            (ret = GXHelpers::SetData2(&settings, bb, DLMS_DATA_TYPE_UINT8, m_LSapSelector)) == 0)
+        {
+            e.SetValue(bb);
+        }
     }
     else
     {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return DLMS_ERROR_CODE_OK;
+    return ret;
 }
 
 // Set value of given attribute.

@@ -320,11 +320,6 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
     {
         return 0;
     }
-
-    if (m_Settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER)
-    {
-        return 0;
-    }
     CGXByteBuffer data(25);
     // FromatID
     data.SetUInt8(0x81);

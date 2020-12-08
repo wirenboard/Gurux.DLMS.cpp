@@ -1007,6 +1007,18 @@ int CGXDLMSServer::HandleCommand(
     case DLMS_COMMAND_GENERAL_BLOCK_TRANSFER:
         ret = HandleGeneralBlockTransfer(sr, data, m_Info.GetCipheredCommand());
         break;
+    case DLMS_COMMAND_DISCOVER_REQUEST:
+    {
+        CGXDLMSPlcRegister reg;
+        m_Settings.GetPlcSettings().ParseDiscoverRequest(data, reg);
+        bool newMeter = m_Settings.GetPlcSettings().GetMacSourceAddress() == 0xFFE && m_Settings.GetPlcSettings().GetMacDestinationAddress() == 0xFFF;
+        return m_Settings.GetPlcSettings().DiscoverReport(m_Settings.GetPlcSettings().GetSystemTitle(), newMeter, m_ReplyData);
+    }
+    case DLMS_COMMAND_REGISTER_REQUEST:
+        m_Settings.GetPlcSettings().ParseRegisterRequest(data);
+        return m_Settings.GetPlcSettings().DiscoverReport(m_Settings.GetPlcSettings().GetSystemTitle(), false, m_ReplyData);
+    case DLMS_COMMAND_PING_REQUEST:
+        break;
     case DLMS_COMMAND_NONE:
         // Client wants to get next block.
         break;

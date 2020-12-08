@@ -283,7 +283,7 @@ int GetDate(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 *            Data info.
 * Returns  Parsed date and time.
 */
-int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
+int GetDateTime(CGXDLMSSettings* settings, CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 {
     DATETIME_SKIPS skip = DATETIME_SKIPS_NONE;
     struct tm tm = { 0 };
@@ -361,6 +361,11 @@ int GetDateTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     if ((ret = buff.GetInt16(&deviation)) != 0)
     {
         return ret;
+    }
+    //0x8000 == -32768
+    if (settings != NULL && settings->GetUseUtc2NormalTime() && deviation != -32768)
+    {
+        deviation = -deviation;
     }
     if ((ret = buff.GetUInt8(&ch)) != 0)
     {
@@ -1897,7 +1902,7 @@ int GXHelpers::GetData(
         ret = GetDouble(data, info, value);
         break;
     case DLMS_DATA_TYPE_DATETIME:
-        ret = GetDateTime(data, info, value);
+        ret = GetDateTime(settings, data, info, value);
         break;
     case DLMS_DATA_TYPE_DATE:
         ret = GetDate(data, info, value);
@@ -2159,7 +2164,14 @@ static int SetDateTime(CGXDLMSSettings* settings, CGXByteBuffer& buff, CGXDLMSVa
     else
     {
         // Add devitation.
-        buff.SetUInt16(value.dateTime.GetDeviation());
+        if (settings != NULL && settings->GetUseUtc2NormalTime())
+        {
+            buff.SetUInt16(-value.dateTime.GetDeviation());
+        }
+        else
+        {
+            buff.SetUInt16(value.dateTime.GetDeviation());
+        }
     }
     // Add clock_status
     if ((skip & DATETIME_SKIPS_STATUS) != 0)

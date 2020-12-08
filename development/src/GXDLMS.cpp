@@ -4067,7 +4067,6 @@ int CGXDLMS::GetPlcData(
         data.SetComplete(false);
         return 0;
     }
-    uint16_t v;
     unsigned char ch;
     int ret;
     unsigned short pos;
@@ -4282,7 +4281,11 @@ int CGXDLMS::GetPlcHdlcData(
         unsigned short da = (unsigned short)(mac & 0xFFF);
         if (settings.IsServer())
         {
-            data.SetComplete(data.GetXml() != NULL ||
+            data.SetComplete(
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+                data.GetXml() != NULL ||
+#endif // DLMS_IGNORE_XML_TRANSLATOR
+
                 ((da == DLMS_PLC_DESTINATION_ADDRESS_ALL_PHYSICAL || da == settings.GetPlcSettings().GetMacSourceAddress()) &&
                     (sa == DLMS_PLC_HDLC_SOURCE_ADDRESS_INITIATOR || sa == settings.GetPlcSettings().GetMacDestinationAddress())));
             data.SetServerAddress(da);
@@ -4290,7 +4293,10 @@ int CGXDLMS::GetPlcHdlcData(
         }
         else
         {
-            data.SetComplete(data.GetXml() != NULL ||
+            data.SetComplete(
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+                data.GetXml() != NULL ||
+#endif // DLMS_IGNORE_XML_TRANSLATOR
                 (da == DLMS_PLC_HDLC_SOURCE_ADDRESS_INITIATOR || da == settings.GetPlcSettings().GetMacDestinationAddress()));
             data.SetServerAddress(da);
             data.SetClientAddress(sa);
@@ -4342,7 +4348,7 @@ int CGXDLMS::GetPlcHdlcData(
 
 // Check is this PLC S-FSK message.
 // buff: Received data.
-// Returns True, if this is M-Bus message.
+// Returns True, if this is PLC message.
 bool IsPlcSfskData(CGXByteBuffer& buff)
 {
     if (buff.Available() < 2)

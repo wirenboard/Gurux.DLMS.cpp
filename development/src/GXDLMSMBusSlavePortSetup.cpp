@@ -179,7 +179,7 @@ int CGXDLMSMBusSlavePortSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     else if (index == 5)
     {
-        type = DLMS_DATA_TYPE_UINT16;
+        type = DLMS_DATA_TYPE_UINT8;
     }
     else
     {

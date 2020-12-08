@@ -269,42 +269,39 @@ int GetAddress(CGXDLMSSettings& settings, std::vector<IN6_ADDR>& list, CGXDLMSVa
 // Returns value of given attribute.
 int CGXDLMSIp6Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
+    CGXDLMSVariant tmp;
     int ret = 0;
-    if (e.GetIndex() == 1)
+    switch (e.GetIndex())
     {
-        CGXDLMSVariant tmp;
-        if ((ret = GetLogicalName(this, tmp)) != 0)
+    case 1:
+    {
+        if ((ret = GetLogicalName(this, tmp)) == 0)
         {
-            return ret;
+            e.SetValue(tmp);
         }
-        e.SetValue(tmp);
+        break;
     }
-    else if (e.GetIndex() == 2)
+    case 2:
     {
-        CGXDLMSVariant tmp;
         GXHelpers::SetLogicalName(m_DataLinkLayerReference.c_str(), tmp);
         e.SetValue(tmp);
     }
-    else if (e.GetIndex() == 3)
-    {
+    break;
+    case 3:
         e.SetValue((unsigned char)m_AddressConfigMode);
-    }
-    else if (e.GetIndex() == 4)
-    {
+        break;
+    case 4:
         ret = GetAddress(settings, m_UnicastIPAddress, e);
-    }
-    else if (e.GetIndex() == 5)
-    {
+        break;
+    case 5:
         ret = GetAddress(settings, m_MulticastIPAddress, e);
-    }
-    else if (e.GetIndex() == 6)
-    {
+        break;
+    case 6:
         ret = GetAddress(settings, m_GatewayIPAddress, e);
-    }
-    else if (e.GetIndex() == 7)
+        break;
+    case 7:
     {
         e.SetByteArray(true);
-        CGXDLMSVariant tmp;
         CGXByteBuffer data;
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
         tmp.byteArr = m_PrimaryDNSAddress.u.Byte;
@@ -315,16 +312,15 @@ int CGXDLMSIp6Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         tmp.vt = DLMS_DATA_TYPE_OCTET_STRING;
         ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
         tmp.vt = DLMS_DATA_TYPE_NONE;
-        if (ret != 0)
+        if (ret == 0)
         {
-            return ret;
+            e.SetValue(data);
         }
-        e.SetValue(data);
     }
-    else if (e.GetIndex() == 8)
+    break;
+    case 8:
     {
         e.SetByteArray(true);
-        CGXDLMSVariant tmp;
         CGXByteBuffer data;
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
         tmp.byteArr = m_SecondaryDNSAddress.u.Byte;
@@ -335,20 +331,18 @@ int CGXDLMSIp6Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         tmp.vt = DLMS_DATA_TYPE_OCTET_STRING;
         ret = GXHelpers::SetData(&settings, data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
         tmp.vt = DLMS_DATA_TYPE_NONE;
-        if (ret != 0)
+        if (ret == 0)
         {
-            return ret;
+            e.SetValue(data);
         }
-        e.SetValue(data);
     }
-    else if (e.GetIndex() == 9)
-    {
+    break;
+    case 9:
         e.SetValue((unsigned char)m_TrafficClass);
-    }
-    else if (e.GetIndex() == 10)
+        break;
+    case 10:
     {
         e.SetByteArray(true);
-        CGXDLMSVariant tmp;
         CGXByteBuffer data;
         data.SetUInt8(DLMS_DATA_TYPE_ARRAY);
         GXHelpers::SetObjectCount((unsigned long)m_NeighborDiscoverySetup.size(), data);
@@ -363,11 +357,12 @@ int CGXDLMSIp6Setup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
         }
         e.SetValue(data);
     }
-    else
-    {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    break;
+    default:
+        ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
+        break;
     }
-    return DLMS_ERROR_CODE_OK;
+    return ret;
 }
 
 // Set value of given attribute.
