@@ -990,9 +990,9 @@ public:
         {
             ret = DLMS_CONFORMANCE_RESERVED_SEVEN;
         }
-        else if (value.compare("ReservedSix") == 0)
+        else if (value.compare("DeltaValueEncoding") == 0)
         {
-            ret = DLMS_CONFORMANCE_RESERVED_SIX;
+            ret = DLMS_CONFORMANCE_DELTA_VALUE_ENCODING;
         }
         else if (value.compare("ReservedZero") == 0)
         {
@@ -1077,8 +1077,8 @@ public:
         case DLMS_CONFORMANCE_RESERVED_SEVEN:
             str = "ReservedSeven";
             break;
-        case DLMS_CONFORMANCE_RESERVED_SIX:
-            str = "ReservedSix";
+        case DLMS_CONFORMANCE_DELTA_VALUE_ENCODING:
+            str = "DeltaValueEncoding";
             break;
         case DLMS_CONFORMANCE_RESERVED_ZERO:
             str = "ReservedZero";

@@ -224,16 +224,19 @@ int CGXDLMSIec8802LlcType2Setup::GetDataType(int index, DLMS_DATA_TYPE& type)
     {
     case 1:
         type = DLMS_DATA_TYPE_OCTET_STRING;
+        break;
     case 2:
     case 3:
     case 5:
         type = DLMS_DATA_TYPE_UINT8;
+        break;
     case 4:
     case 6:
     case 7:
     case 8:
     case 9:
         type = DLMS_DATA_TYPE_UINT16;
+        break;
     default:
         ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
     }

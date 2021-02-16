@@ -154,6 +154,7 @@
     <ClCompile Include="..\src\GXCommodity.cpp" />
     <ClCompile Include="..\src\GXCreditChargeConfiguration.cpp" />
     <ClCompile Include="..\src\GXCurrency.cpp" />
+    <ClCompile Include="..\src\GXDLMSAccessItem.cpp" />
     <ClCompile Include="..\src\GXDLMSAccount.cpp" />
     <ClCompile Include="..\src\GXDLMSArbitrator.cpp" />
     <ClCompile Include="..\src\GXDLMSCertificateInfo.cpp" />
@@ -303,6 +304,7 @@
     <ClInclude Include="..\include\GXDate.h" />
     <ClInclude Include="..\include\GXDateTime.h" />
     <ClInclude Include="..\include\GXDLMS.h" />
+    <ClInclude Include="..\include\GXDLMSAccessItem.h" />
     <ClInclude Include="..\include\GXDLMSAccount.h" />
     <ClInclude Include="..\include\GXDLMSActionItem.h" />
     <ClInclude Include="..\include\GXDLMSActionSchedule.h" />

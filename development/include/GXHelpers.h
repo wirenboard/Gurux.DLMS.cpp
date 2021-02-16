@@ -153,7 +153,7 @@ public:
     // count : Item count.
     // buff : Byte buffer.
     /////////////////////////////////////////////////////////////////////////////
-    static void SetObjectCount(unsigned long count, CGXByteBuffer& buff);
+    static int SetObjectCount(unsigned long count, CGXByteBuffer& buff);
 
     static std::vector< std::string > Split(std::string& s, char separator);
 

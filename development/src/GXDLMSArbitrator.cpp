@@ -199,13 +199,16 @@ int CGXDLMSArbitrator::GetDataType(int index, DLMS_DATA_TYPE& type)
     {
     case 1:
         type = DLMS_DATA_TYPE_OCTET_STRING;
+        break;
     case 2:
     case 3:
     case 4:
     case 5:
         type = DLMS_DATA_TYPE_ARRAY;
+        break;
     case 6:
         type = DLMS_DATA_TYPE_UINT8;
+        break;
     default:
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }

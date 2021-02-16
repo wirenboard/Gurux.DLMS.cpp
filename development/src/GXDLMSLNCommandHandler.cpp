@@ -39,6 +39,7 @@
 #include "../include/GXDLMSClient.h"
 #include "../include/GXDLMSObjectFactory.h"
 #include "../include/GXDLMSSecuritySetup.h"
+#include "../include/GXDLMSAccessItem.h"
 
 #ifndef DLMS_IGNORE_XML_TRANSLATOR
 void AppendAttributeDescriptor(CGXDLMSTranslatorStructure* xml, int ci, unsigned char* ln, unsigned char attributeIndex)
@@ -939,7 +940,7 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
             }
             else
             {
-                CGXDLMSValueEventArg e (server, obj, attributeIndex, selector, parameters);
+                CGXDLMSValueEventArg e(server, obj, attributeIndex, selector, parameters);
                 if ((server->GetAttributeAccess(&e) & DLMS_ACCESS_MODE_WRITE) == 0)
                 {
                     status[pos] = DLMS_ERROR_CODE_READ_WRITE_DENIED;
@@ -1001,8 +1002,8 @@ int CGXDLMSLNCommandHandler::HanleSetRequestWithList(
 #endif //DLMS_IGNORE_XML_TRANSLATOR
     {
         p.SetStatus(0xFF);
-        GXHelpers::SetObjectCount((unsigned long) status.size(), *p.GetAttributeDescriptor());
-        for(std::map<unsigned short, unsigned char >::iterator it = status.begin(); it != status.end(); ++it)
+        GXHelpers::SetObjectCount((unsigned long)status.size(), *p.GetAttributeDescriptor());
+        for (std::map<unsigned short, unsigned char >::iterator it = status.begin(); it != status.end(); ++it)
         {
             p.GetAttributeDescriptor()->SetUInt8(it->second);
         }
@@ -1336,6 +1337,7 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
     unsigned char* ln;
 #endif //DLMS_IGNORE_XML_TRANSLATOR
     unsigned char attributeIndex;
+    std::vector<CGXDLMSAccessItem> list;
     for (unsigned long pos = 0; pos != cnt; ++pos)
     {
         if ((ret = data.GetUInt8(&ch)) != 0)
@@ -1371,7 +1373,10 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
             AppendAttributeDescriptor(xml, id, ln, attributeIndex);
             xml->AppendEndTag(DLMS_COMMAND_ACCESS_REQUEST, (unsigned long)type);
             xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_ACCESS_REQUEST_SPECIFICATION);
-
+        }
+        else
+        {
+            list.push_back(CGXDLMSAccessItem(type, settings.GetObjects().FindByLN((DLMS_OBJECT_TYPE)id, ln), attributeIndex));
         }
 #endif //DLMS_IGNORE_XML_TRANSLATOR
     }
@@ -1389,6 +1394,14 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
     {
         return ret;
     }
+    CGXByteBuffer bb;
+    // access-request-specification.
+    bb.SetUInt8(0);
+    GXHelpers::SetObjectCount(cnt, bb);
+    CGXByteBuffer results;
+    GXHelpers::SetObjectCount(cnt, results);
+    CGXDLMSValueEventCollection args;
+    CGXDLMSValueEventArg* e = new CGXDLMSValueEventArg(server, NULL, 0);
     for (unsigned long pos = 0; pos != cnt; ++pos)
     {
         CGXDLMSVariant value;
@@ -1412,6 +1425,80 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
         {
             value = GXHelpers::BytesToHex(value.byteArr, value.GetSize());
         }
+        if (xml == NULL)
+        {
+            CGXDLMSAccessItem& it = list.at(pos);
+            results.SetUInt8(it.GetCommand());
+            if (it.GetTarget() == NULL)
+            {
+                //If target is unknown.
+                bb.SetUInt8(0);
+                results.SetUInt8(DLMS_ERROR_CODE_UNAVAILABLE_OBJECT);
+            }
+            else
+            {
+                e->SetTarget(it.GetTarget());
+                e->SetIndex(it.GetIndex());
+                e->SetValue(value);
+                args.push_back(e);
+                if (it.GetCommand() == DLMS_ACCESS_SERVICE_COMMAND_TYPE_GET)
+                {
+                    if ((server->GetAttributeAccess(e) & DLMS_ACCESS_MODE_READ) == 0)
+                    {
+                        //Read Write denied.
+                        results.SetUInt8(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+                    }
+                    else
+                    {
+                        server->PreRead(args);
+                        if (e->GetHandled())
+                        {
+                            value = e->GetValue();
+                        }
+                        else
+                        {
+                            if ((ret = it.GetTarget()->GetValue(settings, *e)) == 0)
+                            {
+                                value = e->GetValue();
+                            }
+                        }
+                        //If all data is not fit to PDU and GBT is not used.
+                        if (settings.GetIndex() != settings.GetCount())
+                        {
+                            settings.SetCount(0);
+                            settings.SetIndex(0);
+                            bb.SetUInt8(0);
+                            results.SetUInt8(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+                        }
+                        else
+                        {
+                            if (e->IsByteArray())
+                            {
+                                // If byte array is added do not add type.
+                                bb.Set(value.byteArr, value.GetSize());
+                            }
+                            else if ((ret = CGXDLMS::AppendData(&settings, it.GetTarget(), it.GetIndex(), bb, value)) != 0)
+                            {
+                                results.SetUInt8(DLMS_ERROR_CODE_HARDWARE_FAULT);
+                            }
+                            server->PostRead(args);
+                            if (ret == 0)
+                            {
+                                results.SetUInt8(DLMS_ERROR_CODE_OK);
+                            }
+                        }
+                    }
+                }
+                else if (it.GetCommand() == DLMS_ACCESS_SERVICE_COMMAND_TYPE_SET)
+                {
+                    results.SetUInt8(DLMS_ERROR_CODE_OK);
+                }
+                else
+                {
+                    results.SetUInt8(DLMS_ERROR_CODE_OK);
+                }
+            }
+        }
 #ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (xml != NULL && xml->GetOutputType() == DLMS_TRANSLATOR_OUTPUT_TYPE_STANDARD_XML)
         {
@@ -1426,7 +1513,14 @@ int CGXDLMSLNCommandHandler::HandleAccessRequest(
         xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_ACCESS_REQUEST_BODY);
         xml->AppendEndTag(DLMS_COMMAND_ACCESS_REQUEST);
     }
+    else
 #endif //DLMS_IGNORE_XML_TRANSLATOR
+    {
+        // Append status codes.
+        bb.Set(&results);
+        CGXDLMSLNParameters p(&settings, invokeId, DLMS_COMMAND_ACCESS_RESPONSE, 0xFF, NULL, &bb, 0xFF, cipheredCommand);
+        return CGXDLMS::GetLNPdu(p, *replyData);
+    }
     return 0;
 }
 

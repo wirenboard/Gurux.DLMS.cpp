@@ -889,27 +889,24 @@ unsigned char GXHelpers::GetObjectCountSizeInBytes(unsigned long count)
     }
 }
 
-void GXHelpers::SetObjectCount(unsigned long count, CGXByteBuffer& buff)
+int GXHelpers::SetObjectCount(unsigned long count, CGXByteBuffer& buff)
 {
     if (count < 0x80)
     {
-        buff.SetUInt8((unsigned char)count);
+        return buff.SetUInt8((unsigned char)count);
     }
-    else if (count < 0x100)
+    if (count < 0x100)
     {
         buff.SetUInt8(0x81);
-        buff.SetUInt8((unsigned char)count);
+        return buff.SetUInt8((unsigned char)count);
     }
-    else if (count < 0x10000)
+    if (count < 0x10000)
     {
         buff.SetUInt8(0x82);
-        buff.SetUInt16((unsigned short)count);
+        return buff.SetUInt16((unsigned short)count);
     }
-    else
-    {
-        buff.SetUInt8(0x84);
-        buff.SetUInt32(count);
-    }
+    buff.SetUInt8(0x84);
+    return buff.SetUInt32(count);
 }
 
 std::vector< std::string > GXHelpers::Split(std::string& s, char separator)
@@ -2303,10 +2300,10 @@ void GXHelpers::GetLogicalName(unsigned char* buff, std::string& ln)
         if (dataSize > 25)
         {
             assert(0);
-        }
+    }
         ln.clear();
         ln.append(tmp, dataSize - 1);
-    }
+}
 }
 
 void GXHelpers::GetLogicalName(CGXByteBuffer& buff, std::string& ln)
@@ -2345,7 +2342,7 @@ int GXHelpers::SetLogicalName(const char* name, unsigned char ln[6])
     if (ret != 6)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
+}
     ln[0] = (unsigned char)v1;
     ln[1] = (unsigned char)v2;
     ln[2] = (unsigned char)v3;

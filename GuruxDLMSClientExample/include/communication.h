@@ -200,5 +200,9 @@ public:
     * no need to read all data from the meter.
     */
     int ReadAll(char* outputFile);
-    };
+
+    //Read values using Access request.
+    int ReadByAccess(std::vector<CGXDLMSAccessItem>& list);
+
+};
 #endif //GXCOMMUNICATION_H

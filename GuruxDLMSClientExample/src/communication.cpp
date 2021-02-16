@@ -1449,9 +1449,33 @@ int CGXCommunication::ReadScalerAndUnits()
     int ret = 0;
     std::string str;
     std::string ln;
-    std::vector<std::pair<CGXDLMSObject*, unsigned char> > list;
-    if ((m_Parser->GetNegotiatedConformance() & DLMS_CONFORMANCE_MULTIPLE_REFERENCES) != 0)
+    if ((m_Parser->GetNegotiatedConformance() & DLMS_CONFORMANCE_ACCESS) != 0)
     {
+        std::vector<CGXDLMSAccessItem> list;
+        // Read scalers and units from the device.
+        for (std::vector<CGXDLMSObject*>::iterator it = m_Parser->GetObjects().begin(); it != m_Parser->GetObjects().end(); ++it)
+        {
+            if (((*it)->GetObjectType() == DLMS_OBJECT_TYPE_REGISTER ||
+                (*it)->GetObjectType() == DLMS_OBJECT_TYPE_EXTENDED_REGISTER) &&
+                ((*it)->GetAccess(3) & DLMS_ACCESS_MODE_READ) != 0)
+            {
+                list.push_back(CGXDLMSAccessItem(DLMS_ACCESS_SERVICE_COMMAND_TYPE_GET, *it, 3));
+            }
+            else if ((*it)->GetObjectType() == DLMS_OBJECT_TYPE_DEMAND_REGISTER &&
+                ((*it)->GetAccess(4) & DLMS_ACCESS_MODE_READ) != 0)
+            {
+                list.push_back(CGXDLMSAccessItem(DLMS_ACCESS_SERVICE_COMMAND_TYPE_GET, *it, 4));
+            }
+        }
+        if ((ret = ReadByAccess(list)) != 0)
+        {
+            printf("Err! Failed to read register: %s", CGXDLMSConverter::GetErrorMessage(ret));
+            return ret;
+        }
+    }
+    else if ((m_Parser->GetNegotiatedConformance() & DLMS_CONFORMANCE_MULTIPLE_REFERENCES) != 0)
+    {
+        std::vector<std::pair<CGXDLMSObject*, unsigned char> > list;
         // Read scalers and units from the device.
         for (std::vector<CGXDLMSObject*>::iterator it = m_Parser->GetObjects().begin(); it != m_Parser->GetObjects().end(); ++it)
         {
@@ -1784,4 +1808,30 @@ int CGXCommunication::ReadAll(char* outputFile)
         ret = m_Parser->GetObjects().Save(outputFile, settings);
     }
     return ret;
+}
+
+int CGXCommunication::ReadByAccess(std::vector<CGXDLMSAccessItem>& list)
+{
+    int ret;
+    CGXReplyData reply;
+    std::vector<CGXByteBuffer> data;
+    if (list.size() == 0)
+    {
+        return 0;
+    }
+    //Get values from the meter.
+    if ((ret = m_Parser->AccessRequest(NULL, list, data)) != 0)
+    {
+        return ret;
+    }
+
+    for (std::vector<CGXByteBuffer>::iterator it = data.begin(); it != data.end(); ++it)
+    {
+        reply.Clear();
+        if ((ret = ReadDataBlock(*it, reply)) != 0)
+        {
+            return ret;
+        }
+    }
+    return m_Parser->ParseAccessResponse(list, reply.GetData());
 }

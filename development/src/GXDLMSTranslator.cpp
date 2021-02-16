@@ -321,6 +321,7 @@ bool IsCiphered(unsigned char cmd)
     case DLMS_COMMAND_DED_METHOD_RESPONSE:
     case DLMS_COMMAND_GENERAL_GLO_CIPHERING:
     case DLMS_COMMAND_GENERAL_DED_CIPHERING:
+    case DLMS_COMMAND_GENERAL_CIPHERING:
         return true;
     default:
         return false;

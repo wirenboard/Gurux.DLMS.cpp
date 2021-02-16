@@ -65,7 +65,8 @@ CGXDLMSServer::CGXDLMSServer(bool logicalNameReferencing,
             DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_GET_OR_READ |
             DLMS_CONFORMANCE_SET | DLMS_CONFORMANCE_SELECTIVE_ACCESS |
             DLMS_CONFORMANCE_ACTION | DLMS_CONFORMANCE_MULTIPLE_REFERENCES |
-            DLMS_CONFORMANCE_GET | DLMS_CONFORMANCE_GENERAL_PROTECTION));
+            DLMS_CONFORMANCE_GET | DLMS_CONFORMANCE_GENERAL_PROTECTION |
+            DLMS_CONFORMANCE_ACCESS));
     }
     else
     {
@@ -959,6 +960,9 @@ int CGXDLMSServer::HandleCommand(
     CGXDLMSConnectionEventArgs& connectionInfo = sr.GetConnectionInfo();
     switch (cmd)
     {
+    case DLMS_COMMAND_ACCESS_REQUEST:
+        ret = CGXDLMSLNCommandHandler::HandleAccessRequest(m_Settings, this, data, &m_ReplyData, NULL, cipheredCommand);
+        break;
     case DLMS_COMMAND_SET_REQUEST:
         ret = CGXDLMSLNCommandHandler::HandleSetRequest(m_Settings, this, data, &m_ReplyData, NULL, cipheredCommand);
         break;

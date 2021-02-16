@@ -39,6 +39,7 @@
 #include "GXDLMSProfileGeneric.h"
 #include "GXSecure.h"
 #include "GXDateTime.h"
+#include "GXDLMSAccessItem.h"
 
 class CGXDLMSClient
 {
@@ -889,5 +890,16 @@ public:
     Get custom challenge.
     */
     CGXByteBuffer& GetCtoSChallenge();
+
+
+    // Generates a access service message.
+    // time: Send time. Set to NULL is not used.
+    // packets: Access request as a byte array.
+    int AccessRequest(struct tm* time, std::vector<CGXDLMSAccessItem>& list, std::vector<CGXByteBuffer>& packets);
+
+    /// Parse access response.
+    /// list: Collection of access items.
+    /// data: Received data from the meter.
+    int ParseAccessResponse(std::vector<CGXDLMSAccessItem>& list, CGXByteBuffer& data);
 };
 #endif //GXDLMSCLIENT_H

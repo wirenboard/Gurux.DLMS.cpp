@@ -271,16 +271,16 @@ int CGXDLMSSFSKMacCounters::GetDataType(int index, DLMS_DATA_TYPE& type)
         break;
     case 2:
     case 4:
-        ret = DLMS_DATA_TYPE_ARRAY;
+        type = DLMS_DATA_TYPE_ARRAY;
         break;
     case 3:
-        ret = DLMS_DATA_TYPE_STRUCTURE;
+        type = DLMS_DATA_TYPE_STRUCTURE;
         break;
     case 5:
     case 6:
     case 7:
     case 8:
-        ret = DLMS_DATA_TYPE_UINT32;
+        type = DLMS_DATA_TYPE_UINT32;
         break;
     default:
         ret = DLMS_ERROR_CODE_INVALID_PARAMETER;

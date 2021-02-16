@@ -67,7 +67,7 @@ CGXDLMSClient::CGXDLMSClient(bool UseLogicalNameReferencing,
             DLMS_CONFORMANCE_BLOCK_TRANSFER_WITH_GET_OR_READ |
             DLMS_CONFORMANCE_SET | DLMS_CONFORMANCE_SELECTIVE_ACCESS |
             DLMS_CONFORMANCE_ACTION | DLMS_CONFORMANCE_MULTIPLE_REFERENCES |
-            DLMS_CONFORMANCE_GET));
+            DLMS_CONFORMANCE_GET | DLMS_CONFORMANCE_ACCESS));
     }
     else
     {
@@ -1083,7 +1083,7 @@ int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets)
     int ret;
     CGXByteBuffer reply;
     packets.clear();
-    if (CGXDLMS::UseHdlc(GetInterfaceType())&& (m_Settings.GetConnected() & DLMS_CONNECTION_STATE_HDLC) != 0)
+    if (CGXDLMS::UseHdlc(GetInterfaceType()) && (m_Settings.GetConnected() & DLMS_CONNECTION_STATE_HDLC) != 0)
     {
         if (GetInterfaceType() == DLMS_INTERFACE_TYPE_PLC_HDLC)
         {
@@ -1960,4 +1960,146 @@ void CGXDLMSClient::SetCtoSChallenge(CGXByteBuffer& value)
 CGXByteBuffer& CGXDLMSClient::GetCtoSChallenge()
 {
     return m_Settings.GetCtoSChallenge();
+}
+
+int CGXDLMSClient::AccessRequest(struct tm* time, std::vector<CGXDLMSAccessItem>& list, std::vector<CGXByteBuffer>& packets)
+{
+    int ret;
+    if (list.size() == 0)
+    {
+        //Invalid parameter
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    if ((GetNegotiatedConformance() & DLMS_CONFORMANCE_ACCESS) == 0) {
+        //Meter doesn't support access.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    unsigned char ln[6];
+    std::string tmp;
+    CGXByteBuffer bb;
+    if ((ret = GXHelpers::SetObjectCount(list.size(), bb)) == 0)
+    {
+        for (std::vector< CGXDLMSAccessItem >::iterator it = list.begin(); it != list.end(); ++it)
+        {
+            if ((ret = bb.SetUInt8(it->GetCommand())) != 0 ||
+                //Object type.
+                (ret = bb.SetUInt16(it->GetTarget()->GetObjectType())) != 0)
+            {
+                break;
+            }
+            //LN
+            GXHelpers::GetLogicalName(ln, tmp);
+            bb.Set(it->GetTarget()->m_LN, 6);
+            // Attribute ID.
+            bb.SetUInt8(it->GetIndex());
+        }
+        //Data
+        DLMS_DATA_TYPE type;
+        GXHelpers::SetObjectCount(list.size(), bb);
+        for (std::vector< CGXDLMSAccessItem >::iterator it = list.begin(); it != list.end(); ++it)
+        {
+            if (it->GetCommand() == DLMS_ACCESS_SERVICE_COMMAND_TYPE_GET)
+            {
+                bb.SetUInt8(0);
+            }
+            else if (it->GetCommand() == DLMS_ACCESS_SERVICE_COMMAND_TYPE_SET ||
+                it->GetCommand() == DLMS_ACCESS_SERVICE_COMMAND_TYPE_ACTION)
+            {
+                CGXDLMSValueEventArg e(it->GetTarget(), it->GetIndex());
+                if ((ret = it->GetTarget()->GetValue(m_Settings, e)) != 0)
+                {
+                    break;
+                }
+                CGXDLMSVariant& value = e.GetValue();
+                it->GetTarget()->GetDataType(it->GetIndex(), type);
+                if (type == DLMS_DATA_TYPE_NONE)
+                {
+                    type = value.vt;
+                }
+                if ((ret = GXHelpers::SetData(&m_Settings, bb, type, value)) != 0)
+                {
+                    break;
+                }
+            }
+            else
+            {
+                ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
+                break;
+            }
+        }
+        if (ret == 0)
+        {
+            CGXDLMSLNParameters p(&m_Settings, 0, DLMS_COMMAND_ACCESS_REQUEST, 0xFF, NULL, &bb, 0XFF, DLMS_COMMAND_NONE);
+            p.SetTime(time);
+            ret = CGXDLMS::GetLnMessages(p, packets);
+        }
+    }
+    return ret;
+}
+
+/// <summary>
+/// Parse access response.
+/// </summary>
+/// <param name="list">Collection of access items.</param>
+/// <param name="data">Received data from the meter.</param>
+/// <returns>Collection of received data and status codes.</returns>
+/// <seealso cref="AccessRequest"/>
+int CGXDLMSClient::ParseAccessResponse(std::vector<CGXDLMSAccessItem>& list, CGXByteBuffer& data)
+{
+    unsigned char ch;
+    unsigned long count;
+    int ret;
+    //Get count
+    CGXDataInfo info;
+    CGXDLMSVariant value;
+    if ((ret = GXHelpers::GetObjectCount(data, count)) != 0)
+    {
+        return ret;
+    }
+    if (list.size() != count)
+    {
+        //List size and values size do not match.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    for (std::vector< CGXDLMSAccessItem >::iterator it = list.begin(); it != list.end(); ++it)
+    {
+        info.Clear();
+        if ((ret = GXHelpers::GetData(&m_Settings, data, info, value)) != 0)
+        {
+            return ret;
+        }
+        it->SetValue(value);
+    }
+    //Get status codes.
+    if ((ret = GXHelpers::GetObjectCount(data, count)) != 0)
+    {
+        return ret;
+    }
+    if (list.size() != count)
+    {
+        //List size and values size do not match.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    for (std::vector< CGXDLMSAccessItem >::iterator it = list.begin(); it != list.end(); ++it)
+    {
+        //Get access type.
+        if ((ret = data.GetUInt8(&ch)) != 0)
+        {
+            break;
+        }
+        //Get status.
+        if ((ret = data.GetUInt8(&ch)) != 0)
+        {
+            break;
+        }
+        it->SetError((DLMS_ERROR_CODE)ch);
+        if (it->GetCommand() == DLMS_ACCESS_SERVICE_COMMAND_TYPE_GET && it->GetError() == DLMS_ERROR_CODE_OK)
+        {
+            if ((ret = UpdateValue(*it->GetTarget(), it->GetIndex(), it->GetValue())) != 0)
+            {
+                break;
+            }
+        }
+    }
+    return ret;
 }

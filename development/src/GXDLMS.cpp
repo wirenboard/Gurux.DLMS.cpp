@@ -38,6 +38,7 @@
 #include "../include/GXDLMSObjectFactory.h"
 #include "../include/GXBytebuffer.h"
 #include "../include/GXDLMSTranslator.h"
+#include "../include/GXDLMSLNCommandHandler.h"
 
 static unsigned char CIPHERING_HEADER_SIZE = 7 + 12 + 3;
 //CRC table.
@@ -1968,13 +1969,13 @@ int HandleActionResponseNormal(
 #else
                     return type;
 #endif //DLMS_IGNORE_XML_TRANSLATOR
-                    }
                 }
+            }
             else
             {
                 GetDataFromBlock(data.GetData(), 0);
             }
-            }
+        }
         else
         {
             //Invalid tag.
@@ -2009,9 +2010,9 @@ int HandleActionResponseNormal(
             }
         }
 #endif //DLMS_IGNORE_XML_TRANSLATOR
-        }
-    return 0;
     }
+    return 0;
+}
 
 int VerifyInvokeId(CGXDLMSSettings& settings, CGXReplyData& reply)
 {
@@ -2878,6 +2879,17 @@ int CGXDLMS::GetPdu(
         case DLMS_COMMAND_METHOD_RESPONSE:
             ret = HandleMethodResponse(settings, data);
             break;
+        case DLMS_COMMAND_ACCESS_REQUEST:
+            if (
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+                data.GetXml() != NULL ||
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+                (!settings.IsServer() &&
+                    (data.GetMoreData() & DLMS_DATA_REQUEST_TYPES_FRAME) == 0))
+            {
+                ret = CGXDLMSLNCommandHandler::HandleAccessRequest(settings, NULL, data.GetData(), NULL, data.GetXml(), DLMS_COMMAND_NONE);
+            }
+            break;
         case DLMS_COMMAND_ACCESS_RESPONSE:
             ret = HandleAccessResponse(settings, data);
             break;
@@ -3031,6 +3043,8 @@ int CGXDLMS::GetPdu(
             case DLMS_COMMAND_DED_SET_RESPONSE:
             case DLMS_COMMAND_DED_METHOD_RESPONSE:
             case DLMS_COMMAND_GENERAL_DED_CIPHERING:
+            case DLMS_COMMAND_GENERAL_CIPHERING:
+            case DLMS_COMMAND_ACCESS_RESPONSE:
                 data.GetData().SetPosition(data.GetCipherIndex());
                 ret = GetPdu(settings, data);
                 break;
@@ -3693,7 +3707,7 @@ int CGXDLMS::HandleReadResponse(
             if ((ret = ReadResponseDataBlockResult(settings, reply, index)) != 0)
             {
                 return ret;
-            }
+        }
             break;
         case DLMS_SINGLE_READ_RESPONSE_BLOCK_NUMBER:
             // Get Block number.
@@ -3713,8 +3727,8 @@ int CGXDLMS::HandleReadResponse(
         default:
             //HandleReadResponse failed. Invalid tag.
             return DLMS_ERROR_CODE_INVALID_TAG;
-            }
-        }
+    }
+}
 #ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (reply.GetXml() != NULL)
     {
@@ -4206,9 +4220,9 @@ int CGXDLMS::GetPlcData(
                 data.SetPacketLength(len);
             }
         }
-    }
+            }
     return ret;
-}
+        }
 
 int CGXDLMS::GetPlcHdlcData(
     CGXDLMSSettings& settings,
@@ -4342,9 +4356,9 @@ int CGXDLMS::GetPlcHdlcData(
         {
             buff.SetPosition(buff.GetPosition() + frameLen - index - 4);
         }
-    }
+        }
     return ret;
-}
+    }
 
 // Check is this PLC S-FSK message.
 // buff: Received data.

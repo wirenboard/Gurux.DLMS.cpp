@@ -411,6 +411,9 @@
     <ClCompile Include="..\src\GXPlcSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\GXDLMSAccessItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Enums.h">
@@ -897,6 +900,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\GXDLMSPlcMeterInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GXDLMSAccessItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

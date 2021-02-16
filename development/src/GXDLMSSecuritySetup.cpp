@@ -446,10 +446,12 @@ int CGXDLMSSecuritySetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     }
     else if (e.GetIndex() == 4)
     {
+        m_ClientSystemTitle.Clear();
         m_ClientSystemTitle.Set(e.GetValue().byteArr, e.GetValue().size);
     }
     else if (e.GetIndex() == 5)
     {
+        m_ServerSystemTitle.Clear();
         m_ServerSystemTitle.Set(e.GetValue().byteArr, e.GetValue().size);
     }
     else if (e.GetIndex() == 6)
