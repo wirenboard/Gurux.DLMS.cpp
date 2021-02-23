@@ -37,7 +37,7 @@
 
 #include <vector>
 #include "enums.h"
-#include "GXByteBuffer.h"
+#include "GXBytebuffer.h"
 #include "GXDLMSPlcRegister.h"
 #include "GXDLMSPlcMeterInfo.h"
 

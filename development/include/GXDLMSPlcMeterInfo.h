@@ -36,7 +36,7 @@
 #define GXDLMSPLCMETERINFO_H
 
 #include "enums.h"
-#include "GXByteBuffer.h"
+#include "GXBytebuffer.h"
 
 //Information from the discovered PLC meter(s).
 class CGXDLMSPlcMeterInfo
