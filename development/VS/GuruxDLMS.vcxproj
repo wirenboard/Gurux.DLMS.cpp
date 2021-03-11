@@ -425,6 +425,7 @@
     <ClInclude Include="..\include\GXMacDirectTable.h" />
     <ClInclude Include="..\include\GXMacMulticastEntry.h" />
     <ClInclude Include="..\include\GXMacPhyCommunication.h" />
+    <ClInclude Include="..\include\GXMBusClientData.h" />
     <ClInclude Include="..\include\GXNeighborDiscoverySetup.h" />
     <ClInclude Include="..\include\GXPlcSettings.h" />
     <ClInclude Include="..\include\GXReplyData.h" />

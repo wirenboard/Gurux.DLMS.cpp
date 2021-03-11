@@ -643,7 +643,6 @@ int CGXDLMSLNCommandHandler::HandleSetRequestNormal(
             xml->AppendEndTag(DLMS_TRANSLATOR_TAGS_DATA_BLOCK);
         }
 #endif //DLMS_IGNORE_XML_TRANSLATOR
-        return 0;
     }
 #ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (xml != NULL)
@@ -1057,9 +1056,13 @@ int CGXDLMSLNCommandHandler::HandleSetRequest(
 #endif //DLMS_IGNORE_XML_TRANSLATOR
 
     CGXByteBuffer attributeDescriptor;
-    CGXDLMSLNParameters p(&settings, invoke, DLMS_COMMAND_SET_RESPONSE, type, &attributeDescriptor, NULL, 0, cipheredCommand);
+    CGXDLMSLNParameters p(&settings, invoke, DLMS_COMMAND_SET_RESPONSE, type, &attributeDescriptor, NULL, 0xFF, cipheredCommand);
     if (type == DLMS_SET_COMMAND_TYPE_NORMAL || type == DLMS_SET_COMMAND_TYPE_FIRST_DATABLOCK)
     {
+        if (type == DLMS_SET_COMMAND_TYPE_NORMAL)
+        {
+            p.SetStatus(0);
+        }
         ret = HandleSetRequestNormal(settings, server, data, type, p, xml);
     }
     else if (type == DLMS_SET_COMMAND_TYPE_WITH_DATABLOCK)

@@ -202,6 +202,97 @@ int CGXDLMSMBusClient::GetMethodCount()
     return 8;
 }
 
+int CGXDLMSMBusClient::SlaveInstall(
+    CGXDLMSClient* client,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 1, data, reply);
+}
+
+int CGXDLMSMBusClient::SlaveDeInstall(
+    CGXDLMSClient* client,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 2, data, reply);
+}
+
+int CGXDLMSMBusClient::Capture(
+    CGXDLMSClient* client,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 3, data, reply);
+}
+
+int CGXDLMSMBusClient::ResetAlarm(
+    CGXDLMSClient* client,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 4, data, reply);
+}
+
+int CGXDLMSMBusClient::SynchronizeClock(
+    CGXDLMSClient* client,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 5, data, reply);
+}
+
+int CGXDLMSMBusClient::SendData(
+    CGXDLMSClient* client,
+    std::vector<CGXMBusClientData>& data,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXByteBuffer bb;
+    bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
+    bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+    GXHelpers::SetObjectCount(data.size(), bb);
+    for (std::vector<CGXMBusClientData>::iterator it = data.begin(); it != data.end(); ++it)
+    {
+        bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+        bb.SetUInt8(3);
+        bb.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
+        GXHelpers::SetObjectCount(it->GetDataInformation().GetSize(), bb);
+        bb.Set(&it->GetDataInformation());
+        bb.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
+        GXHelpers::SetObjectCount(it->GetValueInformation().GetSize(), bb);
+        bb.Set(&it->GetValueInformation());
+        GXHelpers::SetData(NULL, bb, it->GetData().vt, it->GetData());
+    }
+    CGXDLMSVariant tmp = bb;
+    return client->Method(this, 6, tmp, DLMS_DATA_TYPE_ARRAY, reply);
+}
+
+int CGXDLMSMBusClient::SetEncryptionKey(
+    CGXDLMSClient* client,
+    CGXByteBuffer& encryptionKey,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXByteBuffer bb;
+    bb.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
+    GXHelpers::SetObjectCount(encryptionKey.GetSize(), bb);
+    bb.Set(&encryptionKey);
+    CGXDLMSVariant tmp = bb;
+    return client->Method(this, 7, tmp, DLMS_DATA_TYPE_ARRAY, reply);
+}
+
+int CGXDLMSMBusClient::TransferKey(
+    CGXDLMSClient* client,
+    CGXByteBuffer& encryptionKey,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXByteBuffer bb;
+    bb.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
+    GXHelpers::SetObjectCount(encryptionKey.GetSize(), bb);
+    bb.Set(&encryptionKey);
+    CGXDLMSVariant tmp = bb;
+    return client->Method(this, 8, tmp, DLMS_DATA_TYPE_ARRAY, reply);
+}
+
 void CGXDLMSMBusClient::GetValues(std::vector<std::string>& values)
 {
     values.clear();

@@ -54,6 +54,7 @@ static void ShowHelp()
     printf(" -c \t Client address. (Default: 16)\n");
     printf(" -s \t Server address. (Default: 1)\n");
     printf(" -n \t Server address as serial number.\n");
+    printf(" -l \t Logical Server address.");
     printf(" -r [sn, sn]\t Short name or Logican Name (default) referencing is used.\n");
     printf(" -t Trace messages.\n");
     printf(" -g \"0.0.1.0.0.255:1; 0.0.1.0.0.255:2\" Get selected object(s) with given attribute index.\n");
@@ -118,7 +119,7 @@ int main(int argc, char* argv[])
         char* blockCipherKey = NULL;
         char* dedicatedKey = NULL;
         uint16_t macDestinationAddress;
-        while ((opt = getopt(argc, argv, "h:p:c:s:r:i:It:a:P:g:S:n:C:v:o:T:A:B:D:m:")) != -1)
+        while ((opt = getopt(argc, argv, "h:p:c:s:r:i:It:a:P:g:S:n:C:v:o:T:A:B:D:m:l:")) != -1)
         {
             switch (opt)
             {
@@ -302,10 +303,20 @@ int main(int argc, char* argv[])
                 clientAddress = atoi(optarg);
                 break;
             case 's':
-                serverAddress = atoi(optarg);
+                if (serverAddress != 1)
+                {
+                    serverAddress = CGXDLMSClient::GetServerAddress(serverAddress, atoi(optarg));
+                }
+                else
+                {
+                    serverAddress = atoi(optarg);
+                }
+                break;
+            case 'l':
+                serverAddress = CGXDLMSClient::GetServerAddress(atoi(optarg), serverAddress);
                 break;
             case 'n':
-                serverAddress = CGXDLMSClient::GetServerAddress(atoi(optarg));
+                serverAddress = CGXDLMSClient::GetServerAddressFromSerialNumber(atoi(optarg), 1);
                 break;
             case 'm':
                 macDestinationAddress = atoi(optarg);

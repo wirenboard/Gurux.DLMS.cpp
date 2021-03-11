@@ -1607,7 +1607,6 @@ int CGXCommunication::GetReadOut()
         {
             continue;
         }
-
         if (dynamic_cast<CGXDLMSCustomObject*>((*it)) != NULL)
         {
             //If interface is not implemented.

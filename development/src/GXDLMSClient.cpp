@@ -1886,16 +1886,27 @@ int CGXDLMSClient::ReadRowsByRange(
     return ReadRowsByRange(pg, start, end, reply);
 }
 
-int CGXDLMSClient::GetServerAddress(unsigned long serialNumber,
+int CGXDLMSClient::GetServerAddressFromSerialNumber(
+    unsigned long serialNumber,
+    unsigned short logicalAddress,
     const char* formula)
 {
+    int value;
     // If formula is not given use default formula.
     // This formula is defined in DLMS specification.
     if (formula == NULL || strlen(formula) == 0)
     {
-        return 0x4000 | CGXSerialNumberCounter::Count(serialNumber, "SN % 10000 + 1000");
+        value = CGXSerialNumberCounter::Count(serialNumber, "SN % 10000 + 1000");
     }
-    return 0x4000 | CGXSerialNumberCounter::Count(serialNumber, formula);
+    else
+    {
+        value = CGXSerialNumberCounter::Count(serialNumber, formula);
+    }
+    if (logicalAddress != 0)
+    {
+        value |= logicalAddress << 14;
+    }
+    return value;
 }
 
 int  CGXDLMSClient::GetServerAddress(unsigned long logicalAddress,

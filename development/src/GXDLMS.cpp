@@ -1011,20 +1011,26 @@ int CGXDLMS::GetLNPdu(
         }
 
         // Add attribute descriptor.
-        reply.Set(p.GetAttributeDescriptor());
+        if (p.GetAttributeDescriptor() != NULL)
+        {
+            reply.Set(p.GetAttributeDescriptor(), p.GetAttributeDescriptor()->GetPosition());
+        }
         // If multiple blocks.
         if (p.IsMultipleBlocks() && (p.GetSettings()->GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER) == 0)
         {
-            // Is last block.
-            if (p.IsLastBlock())
+            if (p.GetCommand() != DLMS_COMMAND_SET_RESPONSE)
             {
-                reply.SetUInt8(1);
-                p.GetSettings()->SetCount(0);
-                p.GetSettings()->SetIndex(0);
-            }
-            else
-            {
-                reply.SetUInt8(0);
+                // Is last block.
+                if (p.IsLastBlock())
+                {
+                    reply.SetUInt8(1);
+                    p.GetSettings()->SetCount(0);
+                    p.GetSettings()->SetIndex(0);
+                }
+                else
+                {
+                    reply.SetUInt8(0);
+                }
             }
             // Block index.
             reply.SetUInt32(p.GetBlockIndex());
@@ -1063,7 +1069,7 @@ int CGXDLMS::GetLNPdu(
                 len -= GXHelpers::GetObjectCountSizeInBytes(len);
             }
             GXHelpers::SetObjectCount(len, reply);
-            reply.Set(p.GetData(), 0, len);
+            reply.Set(p.GetData(), p.GetData()->GetPosition(), len);
         }
         // Add data that fits to one block.
         if (len == 0)
@@ -3096,6 +3102,7 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
     CGXReplyData* target = &data;
     int ret;
     unsigned char frame = 0;
+    bool isLast = true;
     bool isNotify = false;
     // If DLMS frame is generated.
     switch (settings.GetInterfaceType())
@@ -3106,6 +3113,7 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
         {
             return ret;
         }
+        isLast = (frame & 0x10) != 0;
         if (notify != NULL && frame == 0x13)
         {
             target = notify;
@@ -3191,6 +3199,10 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
         default:
             break;
         }
+    }
+    if (!isLast)
+    {
+        return GetData(settings, reply, data, notify);
     }
     if (ret == 0 && isNotify)
     {
@@ -3707,7 +3719,7 @@ int CGXDLMS::HandleReadResponse(
             if ((ret = ReadResponseDataBlockResult(settings, reply, index)) != 0)
             {
                 return ret;
-        }
+            }
             break;
         case DLMS_SINGLE_READ_RESPONSE_BLOCK_NUMBER:
             // Get Block number.
@@ -3727,8 +3739,8 @@ int CGXDLMS::HandleReadResponse(
         default:
             //HandleReadResponse failed. Invalid tag.
             return DLMS_ERROR_CODE_INVALID_TAG;
+        }
     }
-}
 #ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (reply.GetXml() != NULL)
     {
@@ -3745,7 +3757,7 @@ int CGXDLMS::HandleReadResponse(
         return DLMS_ERROR_CODE_FALSE;
     }
     return 0;
-    }
+}
 
 int CGXDLMS::GetTcpData(
     CGXDLMSSettings& settings,
@@ -4220,9 +4232,9 @@ int CGXDLMS::GetPlcData(
                 data.SetPacketLength(len);
             }
         }
-            }
+    }
     return ret;
-        }
+}
 
 int CGXDLMS::GetPlcHdlcData(
     CGXDLMSSettings& settings,
@@ -4356,9 +4368,9 @@ int CGXDLMS::GetPlcHdlcData(
         {
             buff.SetPosition(buff.GetPosition() + frameLen - index - 4);
         }
-        }
-    return ret;
     }
+    return ret;
+}
 
 // Check is this PLC S-FSK message.
 // buff: Received data.

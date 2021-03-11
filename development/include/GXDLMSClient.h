@@ -833,15 +833,15 @@ public:
      * All meters do not use standard formula or support serial number
      * addressing at all.
      *
-     * @param serialNumber
-     *            Meter serial number
-     * @param formula
-     *            Formula used to convert serial number to server address.
+     * serialNumber: Meter serial number.
+     * logicalAddress: Meter logical address.
+     * formula: Formula used to convert serial number to server address.
      *            Set to NULL if standard formula is used.
      * @return Server address.
      */
-    static int GetServerAddress(
+    static int GetServerAddressFromSerialNumber(
         unsigned long serialNumber,
+        unsigned short logicalAddress,
         const char* formula = NULL);
 
     /**

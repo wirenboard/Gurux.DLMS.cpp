@@ -196,6 +196,11 @@ bool CGXDLMSSettings::CheckFrame(unsigned char frame)
             m_ReceiverFrame = frame;
             return true;
         }
+        if (frame == (expected & ~0x10))
+        {
+            m_ReceiverFrame = IncreaseSendSequence(m_ReceiverFrame);
+            return true;
+        }
     }
     //If answer for RR.
     else

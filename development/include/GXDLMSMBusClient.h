@@ -38,6 +38,7 @@
 #include "GXIgnore.h"
 #ifndef DLMS_IGNORE_MBUS_CLIENT
 #include "GXDLMSObject.h"
+#include "GXMBusClientData.h"
 
 typedef enum
 {
@@ -150,6 +151,59 @@ public:
 
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+
+    //Installs a slave device.
+    int SlaveInstall(
+        CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
+
+    //De-installs a slave device.
+    int SlaveDeInstall(
+        CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
+
+    //Captures values.
+    int Capture(
+        CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
+
+    //Resets alarm state of the M-Bus slave device.
+    int ResetAlarm(
+        CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
+
+    //Synchronize the clock.
+    int SynchronizeClock(
+        CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
+
+    // Sends data to the M-Bus slave device.
+    // client: DLMS client settings.
+    // data: data to send
+    // Returns Generated DLMS data.
+    int SendData(
+        CGXDLMSClient* client,
+        std::vector<CGXMBusClientData>& data,
+        std::vector<CGXByteBuffer>& reply);
+
+    // Sets the encryption key in the M-Bus client and enables encrypted communication
+    // with the M-Bus slave device.
+    // client: DLMS client settings.
+    // encryptionKey: encryption key
+    // Returns Generated DLMS data.
+    int SetEncryptionKey(
+        CGXDLMSClient* client,
+        CGXByteBuffer& encryptionKey,
+        std::vector<CGXByteBuffer>& reply);
+
+    // Transfers an encryption key to the M-Bus slave device.
+    // client: DLMS client settings.
+    // encryptionKey: encryption key
+    // Returns Generated DLMS data.
+    int TransferKey(
+        CGXDLMSClient* client,
+        CGXByteBuffer& encryptionKey,
+        std::vector<CGXByteBuffer>& reply);
 };
 #endif //DLMS_IGNORE_MBUS_CLIENT
 #endif //GXDLMSMBUSCLIENT_H
