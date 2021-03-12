@@ -124,7 +124,10 @@ std::string CGXBitString::ToBitString(unsigned int value, unsigned int count)
             }
         }
     }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-compare"
     if (sb.width() > count)
+#pragma GCC diagnostic pop
     {
         return sb.str().substr(0, (unsigned int)(sb.width() - count));
     }

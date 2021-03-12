@@ -915,8 +915,8 @@ std::string CGXDateTime::ToString()
     if (m_Skip != DATETIME_SKIPS_NONE)
     {
         CGXByteBuffer ba;
-        GXDLMS_DATE_FORMAT format;
-        char separator;
+        GXDLMS_DATE_FORMAT format = GXDLMS_DATE_FORMAT_DMY;
+        char separator = '-';
         //Add year, month and date if used.
         if ((m_Skip & (DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY)) != (DATETIME_SKIPS_YEAR | DATETIME_SKIPS_MONTH | DATETIME_SKIPS_DAY))
         {
