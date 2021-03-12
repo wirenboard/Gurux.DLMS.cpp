@@ -1622,7 +1622,10 @@ int GXHelpers::GetCompactArray(
     {
         // Get data types.
         std::vector<CGXDLMSVariant> cols;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
         if ((ret = GetDataTypes(buff, cols, len)) != 0)
+#pragma GCC diagnostic pop
         {
             return ret;
         }
@@ -1655,7 +1658,10 @@ int GXHelpers::GetCompactArray(
 
         value.vt = DLMS_DATA_TYPE_ARRAY;
         int start = buff.GetPosition();
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
         while (buff.GetPosition() - start < len)
+#pragma GCC diagnostic pop
         {
             CGXDLMSVariant row;
             row.vt = DLMS_DATA_TYPE_ARRAY;
