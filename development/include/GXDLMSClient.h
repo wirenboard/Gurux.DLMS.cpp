@@ -487,7 +487,8 @@ public:
     * Returns error status.
     */
     int DisconnectRequest(
-        std::vector<CGXByteBuffer>& packets);
+        std::vector<CGXByteBuffer>& packets,
+        bool force = false);
 
     /**
     * Removes the HDLC frame from the packet, and returns COSEM data only.

@@ -1162,12 +1162,12 @@ int CGXDLMSClient::ReleaseRequest(std::vector<CGXByteBuffer>& packets)
     return ret;
 }
 
-int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets)
+int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets, bool force)
 {
     int ret;
     CGXByteBuffer reply;
     packets.clear();
-    if (CGXDLMS::UseHdlc(GetInterfaceType()) && (m_Settings.GetConnected() & DLMS_CONNECTION_STATE_HDLC) != 0)
+    if (CGXDLMS::UseHdlc(GetInterfaceType()) && (force || (m_Settings.GetConnected() & DLMS_CONNECTION_STATE_HDLC) != 0))
     {
         if (GetInterfaceType() == DLMS_INTERFACE_TYPE_PLC_HDLC)
         {
