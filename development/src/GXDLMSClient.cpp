@@ -1095,7 +1095,6 @@ int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets)
         }
         packets.push_back(reply);
         m_Settings.SetConnected(DLMS_CONNECTION_STATE_NONE);
-        return ret;
     }
     else
     {
