@@ -462,6 +462,10 @@ int CGXDLMSPushSetup::GetPushValues(CGXDLMSClient* client,
             CGXDLMSObject* obj = CGXDLMSObjectFactory::CreateObject(it->first->GetObjectType(), ln);
             obj->SetVersion(it->first->GetVersion());
             obj->SetDescription(it->first->GetDescription());
+            CGXAttributeCollection& target = obj->GetAttributes();
+            CGXAttributeCollection& att = it->first->GetAttributes();
+            target.clear();
+            target.insert(target.end(), att.begin(), att.end());
             value = values.at(pos);
             if ((ret = client->UpdateValue(*obj, it->second.GetAttributeIndex(), value)) != 0)
             {

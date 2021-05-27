@@ -138,7 +138,7 @@ int Test()
     {
         if (key == 10)
         {
-            printf("Sending Push message.");
+            printf("Sending Push message.\r\n");
             if ((ret = Connect("localhost", port, socket)) != 0)
             {
                 break;

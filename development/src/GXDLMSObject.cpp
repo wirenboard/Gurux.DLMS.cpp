@@ -259,9 +259,9 @@ int CGXDLMSObject::GetUIDataType(int index, DLMS_DATA_TYPE& type)
 {
     for (CGXAttributeCollection::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
     {
-        if ((*it).GetIndex() == index)
+        if (it->GetIndex() == index)
         {
-            type = (*it).GetUIDataType();
+            type = it->GetUIDataType();
             return DLMS_ERROR_CODE_OK;
         }
     }
@@ -273,9 +273,9 @@ void CGXDLMSObject::SetUIDataType(int index, DLMS_DATA_TYPE type)
 {
     for (CGXAttributeCollection::iterator it = m_Attributes.begin(); it != m_Attributes.end(); ++it)
     {
-        if ((*it).GetIndex() == index)
+        if (it->GetIndex() == index)
         {
-            return (*it).SetUIDataType(type);
+            return it->SetUIDataType(type);
         }
     }
     CGXDLMSAttribute att(index);
