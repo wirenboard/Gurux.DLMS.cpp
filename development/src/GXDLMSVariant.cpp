@@ -227,10 +227,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
         }
         if (tmp.vt == DLMS_DATA_TYPE_OCTET_STRING)
         {
-            for (int pos = 0; pos != tmp.size; ++pos)
-            {
-                item->strVal.push_back((char) tmp.byteArr[pos]);
-            }
+            item->strVal = GXHelpers::BytesToHex(tmp.byteArr, tmp.GetSize());
             item->vt = type;
             return DLMS_ERROR_CODE_OK;
         }
@@ -446,6 +443,7 @@ void CGXDLMSVariant::Clear()
 
 CGXDLMSVariant::CGXDLMSVariant()
 {
+    vt = DLMS_DATA_TYPE_NONE;
     size = 0;
     byteArr = NULL;
     Clear();

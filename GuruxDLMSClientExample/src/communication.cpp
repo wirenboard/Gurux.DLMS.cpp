@@ -585,7 +585,7 @@ int CGXCommunication::Open(const char* settings, int maxBaudrate)
         memset(&options, 0, sizeof(options));
         options.c_iflag = 0;
         options.c_oflag = 0;
-        if (iec)
+        if (m_Parser->GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC_WITH_MODE_E)
         {
             options.c_cflag |= PARENB;
             options.c_cflag &= ~PARODD;
@@ -625,7 +625,7 @@ int CGXCommunication::Open(const char* settings, int maxBaudrate)
         }
     }
 #endif
-    if (this->m_Parser->GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC_WITH_MODE_E)
+    if (m_Parser->GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC_WITH_MODE_E)
     {
 #if _MSC_VER > 1000
         strcpy_s(buff, 50, "/?!\r\n");

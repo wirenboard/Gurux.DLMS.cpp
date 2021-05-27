@@ -1672,7 +1672,7 @@ int CGXDLMS::GetHdlcData(
         }
     }
 
-    if (frame != 0x13 && (frame & HDLC_FRAME_TYPE_U_FRAME) == HDLC_FRAME_TYPE_U_FRAME)
+    if (frame != 0x3 && frame != 0x13 && (frame & HDLC_FRAME_TYPE_U_FRAME) == HDLC_FRAME_TYPE_U_FRAME)
     {
         // Get Eop if there is no data.
         if (reply.GetPosition() == packetStartID + frameLen + 1)
@@ -1689,7 +1689,7 @@ int CGXDLMS::GetHdlcData(
         }
         data.SetCommand((DLMS_COMMAND)frame);
     }
-    else if (frame != 0x13 && (frame & HDLC_FRAME_TYPE_S_FRAME) == HDLC_FRAME_TYPE_S_FRAME)
+    else if (frame != 0x3 && frame != 0x13 && frame != 0x13 && (frame & HDLC_FRAME_TYPE_S_FRAME) == HDLC_FRAME_TYPE_S_FRAME)
     {
         // If S-frame
         int tmp = (frame >> 2) & 0x3;
@@ -3126,7 +3126,7 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
         {
             return ret;
         }
-        if (ret == DLMS_ERROR_CODE_FALSE && target->IsComplete())
+        if (ret == DLMS_ERROR_CODE_FALSE)
         {
             if (notify != NULL)
             {

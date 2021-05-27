@@ -157,6 +157,14 @@ public:
 
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+
+    /////////////////////////////////////////////////////////////////////////
+    // Get received objects from push message.
+    // values : Received values.
+    // results: Push values.
+    int GetPushValues(CGXDLMSClient* client,
+        std::vector<CGXDLMSVariant>& values,
+        std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> >& results);
 };
 #endif //DLMS_IGNORE_PUSH_SETUP
 #endif //GXDLMSPUSHSETUP_H

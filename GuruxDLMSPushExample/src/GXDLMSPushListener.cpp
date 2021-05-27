@@ -57,6 +57,7 @@
 #include "../include/GXDLMSPushListener.h"
 #include "../../development/include/GXDLMSData.h"
 #include "../../development/include/GXDLMSTranslator.h"
+#include "../../development/include/GXDLMSClock.h"
 
 using namespace std;
 
@@ -90,12 +91,20 @@ void ListenerThread(void* pVoid)
     */
     CGXReplyData data;
     CGXReplyData notify;
+    //Add push objects if they are not included to received data.
+    CGXDLMSPushSetup push;
+    CGXDLMSData ldn("0.0.420.0.255");
+    //Logical device name is shown as string.
+    ldn.SetUIDataType(2, DLMS_DATA_TYPE_STRING);
+    CGXDLMSClock clock;
+    push.GetPushObjectList().push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject>(&ldn, CGXDLMSCaptureObject(2, 0)));
+    push.GetPushObjectList().push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject>(&clock, CGXDLMSCaptureObject(2, 0)));
 
     while (server->IsConnected())
     {
         len = sizeof(client);
         senderInfo.clear();
-        int socket = accept(server->GetSocket(), (struct sockaddr*) & client, &len);
+        int socket = accept(server->GetSocket(), (struct sockaddr*)&client, &len);
         if (server->IsConnected())
         {
             if ((ret = getpeername(socket, (sockaddr*)&add, &AddrLen)) == -1)
@@ -160,48 +169,43 @@ void ListenerThread(void* pVoid)
                     socket = -1;
 #endif
                 }
+                bb.SetSize(0);
 
                 // If all data is received.
                 if (notify.IsComplete())
                 {
-                    bb.Clear();
+                    bb.SetSize(0);
                     if (!notify.IsMoreData())
                     {
+                        std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> > result;
+                        if (push.GetPushValues(&cl, notify.GetValue().Arr, result) == 0)
+                        {
+                            for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> >::iterator it = result.begin(); it != result.end(); ++it)
+                            {                            
+                                std::vector<std::string> values;
+                                it->first->GetValues(values);
+                                printf("%s\r\n", values[it->second.GetAttributeIndex() - 1].c_str());
+                            }
+                            for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> >::iterator it = result.begin(); it != result.end(); ++it)
+                            {
+                                delete it->first;
+                            }
+                            result.clear();
+                        }
                         //Show data as XML.
                         string xml;
                         CGXDLMSTranslator t(DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML);
                         t.DataToXml(notify.GetData(), xml);
-                        printf(xml.c_str());
-                        //Example is sending list of push messages in first parameter.
-                        if (notify.GetValue().vt == DLMS_DATA_TYPE_STRUCTURE)
-                        {
-                            std::vector<std::pair<CGXDLMSObject*, unsigned char> > objects;
-                            ret = cl.ParsePushObjects(notify.GetValue().Arr[0].Arr, objects);
-                            //Remove first item because it's not needed anymore.
-                            objects.erase(objects.begin());
-                            //Update clock.
-                            int Valueindex = 1;
-                            std::vector<std::string> values;
-                            for (std::vector<std::pair<CGXDLMSObject*, unsigned char> >::iterator it = objects.begin(); it != objects.end(); ++it)
-                            {
-                                values.clear();
-                                cl.UpdateValue(*it->first, it->second, notify.GetValue().Arr[Valueindex]);
-                                ++Valueindex;
-                                //Print value
-                                std::string ln;
-                                it->first->GetLogicalName(ln);
-                                it->first->GetValues(values);
-                                printf("%s %s %d: %s\r\n", CGXDLMSConverter::ToString(it->first->GetObjectType()), ln.c_str(), it->second, values.at(it->second - 1).c_str());
-                            }
-                        }
+                        printf(xml.c_str());                       
                         printf("Server address: %d Client Address: %d\r\n", notify.GetServerAddress(), notify.GetClientAddress());
                         notify.Clear();
-                        bb.Trim();
+                        bb.SetSize(0);
                     }
                 }
             }
         }
     }
+    bb.Clear();
 }
 
 #if defined(_WIN32) || defined(_WIN64)//If Windows
@@ -234,6 +238,7 @@ int CGXDLMSPushListener::StartServer(int port)
     {
         return ret;
     }
+
     m_ServerSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (!IsConnected())
     {

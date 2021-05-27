@@ -441,4 +441,36 @@ int CGXDLMSPushSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& 
     }
     return DLMS_ERROR_CODE_OK;
 }
+
+int CGXDLMSPushSetup::GetPushValues(CGXDLMSClient* client,
+    std::vector<CGXDLMSVariant>& values,
+    std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> >& results)
+{
+    int ret = 0;
+    int pos = 0;
+    if (values.size() != m_PushObjectList.size())
+    {
+        ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    else
+    {
+        CGXDLMSVariant value;
+        std::string ln;
+        for (std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject> >::iterator it = m_PushObjectList.begin(); it != m_PushObjectList.end(); ++it)
+        {
+            it->first->GetLogicalName(ln);
+            CGXDLMSObject* obj = CGXDLMSObjectFactory::CreateObject(it->first->GetObjectType(), ln);
+            obj->SetVersion(it->first->GetVersion());
+            obj->SetDescription(it->first->GetDescription());
+            value = values.at(pos);
+            if ((ret = client->UpdateValue(*obj, it->second.GetAttributeIndex(), value)) != 0)
+            {
+                break;
+            }
+            results.push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject>(obj, it->second));
+            ++pos;
+        }
+    }
+    return ret;
+}
 #endif //DLMS_IGNORE_PUSH_SETUP

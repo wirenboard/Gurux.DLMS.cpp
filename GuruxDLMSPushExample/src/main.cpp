@@ -53,6 +53,7 @@
 #include <errno.h>
 #endif
 #include "../include/GXDLMSPushListener.h"
+#include "../../development/include/GXDLMSData.h"
 #include "../../development/include/GXDLMSClock.h"
 
 /**
@@ -109,7 +110,7 @@ int Connect(const char* address, int port, int& s)
     };
     return DLMS_ERROR_CODE_OK;
 }
-
+//This example sends Logical device name and current time i push message.
 int Test()
 {
     int socket = -1;
@@ -118,7 +119,12 @@ int Test()
     CGXDLMSNotify cl(true, 1, 1, DLMS_INTERFACE_TYPE_WRAPPER);
     CGXDLMSPushSetup p;
     CGXDLMSClock clock;
-    p.GetPushObjectList().push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject>(&p, CGXDLMSCaptureObject(2, 0)));
+    CGXDLMSData ldn("0.0.420.0.255");
+    //Add logical name as octet-string.
+    CGXDLMSVariant value;
+    value.Add("GRX00000", 8);
+    ldn.SetValue(value);
+    p.GetPushObjectList().push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject>(&ldn, CGXDLMSCaptureObject(2, 0)));
     p.GetPushObjectList().push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject>(&clock, CGXDLMSCaptureObject(2, 0)));
 
     ///////////////////////////////////////////////////////////////////////
@@ -154,6 +160,7 @@ int Test()
             Close(socket);
         }
     }
+    pushListener.StopServer();
     return 0;
 }
 
