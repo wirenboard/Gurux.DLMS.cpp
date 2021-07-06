@@ -35,8 +35,7 @@
 #include "../include/GXDLMSSettings.h"
 
 CGXDLMSSettings::CGXDLMSSettings(bool isServer) :
-    m_Server(isServer),
-    m_PlcSettings(this)
+    m_Server(isServer)
 {
     m_UseCustomChallenge = false;
     m_BlockIndex = 1;
@@ -69,6 +68,7 @@ CGXDLMSSettings::CGXDLMSSettings(bool isServer) :
     m_ExpectedInvocationCounter = 0;
     m_ExpectedSecurityPolicy = 0xFF;
     m_ExpectedSecuritySuite = 0xFF;
+    m_PlcSettings = std::make_unique<CGXPlcSettings>(this);
 }
 
 //Destructor.
@@ -268,7 +268,7 @@ CGXDLMSLimits& CGXDLMSSettings::GetHdlcSettings()
 
 CGXPlcSettings& CGXDLMSSettings::GetPlcSettings()
 {
-    return m_PlcSettings;
+    return *m_PlcSettings;
 }
 
 DLMS_INTERFACE_TYPE CGXDLMSSettings::GetInterfaceType()
