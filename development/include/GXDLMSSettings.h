@@ -150,7 +150,7 @@ class CGXDLMSSettings
     // HDLC connection settings.
     CGXDLMSLimits m_HdlcSettings;
     // PLC connection settings.
-    CGXPlcSettings m_PlcSettings;
+    std::unique_ptr<CGXPlcSettings> m_PlcSettings;
 
     // Block packet index.
     unsigned long m_BlockIndex;
