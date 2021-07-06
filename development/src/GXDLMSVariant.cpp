@@ -446,6 +446,7 @@ void CGXDLMSVariant::Clear()
 
 CGXDLMSVariant::CGXDLMSVariant()
 {
+    vt = DLMS_DATA_TYPE_NONE;
     size = 0;
     byteArr = NULL;
     Clear();
