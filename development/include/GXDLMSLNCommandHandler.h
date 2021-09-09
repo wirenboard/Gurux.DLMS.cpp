@@ -140,6 +140,27 @@ public:
         CGXDLMSTranslatorStructure* xml,
         unsigned char cipheredCommand);
 
+    static int MethodRequestNormal(
+        CGXDLMSSettings& settings,
+        uint8_t invokeId,
+        CGXDLMSServer* server,
+        CGXByteBuffer& data,
+        CGXDLMSConnectionEventArgs* connectionInfo,
+        CGXByteBuffer* replyData,
+        CGXDLMSTranslatorStructure* xml,
+        unsigned char cipheredCommand);
+
+    static int MethodRequestNextBlock(
+        CGXDLMSSettings& settings,
+        uint8_t invokeId,
+        CGXDLMSServer* server,
+        CGXByteBuffer& data,
+        CGXDLMSConnectionEventArgs* connectionInfo,
+        CGXByteBuffer* replyData,
+        CGXDLMSTranslatorStructure* xml,
+        bool streaming,
+        unsigned char cipheredCommand);
+
     /**
   * Handle action request.
   *

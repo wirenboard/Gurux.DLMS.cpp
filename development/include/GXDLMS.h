@@ -413,6 +413,12 @@ public:
         CGXReplyData& data,
         int index);
 
+    static int AddInvokeId(
+        CGXDLMSTranslatorStructure* xml, 
+        DLMS_COMMAND command, 
+        uint8_t type, 
+        uint32_t invokeId);
+
     /////////////////////////////////////////////////////////////////////////////
     // Handle method response and get data from block and/or update error status.
     /////////////////////////////////////////////////////////////////////////////
@@ -461,6 +467,16 @@ public:
     /////////////////////////////////////////////////////////////////////////////
     static int HandleWriteResponse(
         CGXReplyData& data);
+
+    static int HandleGetResponseNormal(
+        CGXDLMSSettings& settings,
+        CGXReplyData& reply,
+        bool& empty);
+
+    static int HandleGetResponseNextDataBlock(
+        CGXDLMSSettings& settings,
+        CGXReplyData& reply,
+        int index);
 
     /////////////////////////////////////////////////////////////////////////////
     // Handle get response and get data from block and/or update error status.

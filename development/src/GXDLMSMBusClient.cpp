@@ -250,7 +250,7 @@ int CGXDLMSMBusClient::SendData(
     CGXByteBuffer bb;
     bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
     bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
-    GXHelpers::SetObjectCount(data.size(), bb);
+    GXHelpers::SetObjectCount((unsigned long) data.size(), bb);
     for (std::vector<CGXMBusClientData>::iterator it = data.begin(); it != data.end(); ++it)
     {
         bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);

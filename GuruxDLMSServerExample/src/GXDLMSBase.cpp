@@ -1425,7 +1425,7 @@ DLMS_SOURCE_DIAGNOSTIC CGXDLMSBase::ValidateAuthentication(
                     DLMS_OBJECT_TYPE_ASSOCIATION_SHORT_NAME, name);
             expected = sn->GetSecret();
         }
-        if (expected.Compare(password.GetData(), password.GetSize()))
+        if (expected.GetSize() == password.GetSize() && expected.Compare(password.GetData(), password.GetSize()))
         {
             return DLMS_SOURCE_DIAGNOSTIC_NONE;
         }

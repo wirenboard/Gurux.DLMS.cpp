@@ -2822,6 +2822,19 @@ typedef enum
     DLMS_ACTION_REQUEST_TYPE_WITH_BLOCK = 6
 }DLMS_ACTION_REQUEST_TYPE;
 
+// Enumerates Action response types.
+typedef enum
+{
+    // Normal action.
+    DLMS_ACTION_RESPONSE_TYPE_NORMAL = 1,
+    // Action with first block.
+    DLMS_ACTION_RESPONSE_TYPE_WITH_FIRST_BLOCK = 2,
+    // Action with list.
+    DLMS_ACTION_RESPONSE_TYPE_WITH_LIST = 3,
+    // Next block.
+    DLMS_ACTION_RESPONSE_TYPE_WITH_BLOCK = 4
+}DLMS_ACTION_RESPONSE_TYPE;
+
 /*
  * Enumerates credit types.<br>
  * Online help:<br>

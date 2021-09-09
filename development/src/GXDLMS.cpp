@@ -1908,6 +1908,42 @@ int CGXDLMS::CheckHdlcAddress(
 }
 
 
+int CGXDLMS::AddInvokeId(CGXDLMSTranslatorStructure* xml, DLMS_COMMAND command, uint8_t type, uint32_t invokeId)
+{
+    if (xml != NULL)
+    {
+        xml->AppendStartTag(command);
+        xml->AppendStartTag(command, type);
+        std::string tmp2;
+        if (xml->GetComments())
+        {
+            std::string sb;
+            if ((invokeId & 0x80) != 0)
+            {
+                sb.append("Priority: High, ");
+            }
+            else
+            {
+                sb.append("Priority: Normal, ");
+            }
+            if ((invokeId & 0x40) != 0)
+            {
+                sb.append("ServiceClass: Confirmed, ");
+            }
+            else
+            {
+                sb.append("ServiceClass: UnConfirmed, ");
+            }
+            xml->IntegerToHex((long)invokeId & 0xF, 2, tmp2);
+            sb.append("Invoke ID: " + tmp2);
+            xml->AppendComment(sb);
+        }
+        xml->IntegerToHex((long)invokeId, 2, tmp2);
+        xml->AppendLine(DLMS_TRANSLATOR_TAGS_INVOKE_ID, "", tmp2);
+    }
+    return 0;
+}
+
 int HandleActionResponseNormal(
     CGXDLMSSettings& settings,
     CGXReplyData& data)
@@ -1975,13 +2011,13 @@ int HandleActionResponseNormal(
 #else
                     return type;
 #endif //DLMS_IGNORE_XML_TRANSLATOR
+                    }
                 }
-            }
             else
             {
                 GetDataFromBlock(data.GetData(), 0);
             }
-        }
+            }
         else
         {
             //Invalid tag.
@@ -2016,9 +2052,9 @@ int HandleActionResponseNormal(
             }
         }
 #endif //DLMS_IGNORE_XML_TRANSLATOR
-    }
+        }
     return 0;
-}
+    }
 
 int VerifyInvokeId(CGXDLMSSettings& settings, CGXReplyData& reply)
 {
@@ -3254,6 +3290,197 @@ int CGXDLMS::HandleGetResponseWithList(
     reply.SetValue(values);
     return 0;
 }
+int CGXDLMS::HandleGetResponseNormal(
+    CGXDLMSSettings& settings,
+    CGXReplyData& reply,
+    bool& empty)
+{
+    int ret = 0;
+    unsigned char ch;
+    CGXByteBuffer& data = reply.GetData();
+    if (data.Available() == 0)
+    {
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+        empty = true;
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+        GetDataFromBlock(data, 0);
+    }
+    else
+    {
+        // Result
+        if ((ret = data.GetUInt8(&ch)) != 0)
+        {
+            return ret;
+        }
+        if (ch != 0)
+        {
+            if ((ret = data.GetUInt8(&ch)) != 0)
+            {
+                return ret;
+            }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+            if (reply.GetXml() == NULL)
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+            {
+                return ch;
+            }
+        }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+        if (reply.GetXml() != NULL)
+        {
+            // Result start tag.
+            reply.GetXml()->AppendStartTag(DLMS_TRANSLATOR_TAGS_RESULT);
+            if (ch != 0)
+            {
+                std::string str;
+                CGXDLMSTranslator::ErrorCodeToString(reply.GetXml()->GetOutputType(), (DLMS_ERROR_CODE)ch, str);
+                reply.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_DATA_ACCESS_ERROR, "", str);
+            }
+            else
+            {
+                reply.GetXml()->AppendStartTag(DLMS_TRANSLATOR_TAGS_DATA);
+                CGXDataInfo di;
+                di.SetXml(reply.GetXml());
+                CGXDLMSVariant value;
+                if ((ret = GXHelpers::GetData(&settings, reply.GetData(), di, value)) != 0)
+                {
+                    return ret;
+                }
+                reply.GetXml()->AppendEndTag(DLMS_TRANSLATOR_TAGS_DATA);
+            }
+        }
+        else
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+        {
+            ret = GetDataFromBlock(data, 0);
+        }
+    }
+    return ret;
+}
+
+int CGXDLMS::HandleGetResponseNextDataBlock(
+    CGXDLMSSettings& settings,
+    CGXReplyData& reply,
+    int index)
+{
+    int ret = 0;
+    unsigned long number;
+    unsigned long count;
+    unsigned char ch;
+    CGXByteBuffer& data = reply.GetData();
+    // Is Last block.
+    if ((ret = data.GetUInt8(&ch)) != 0)
+    {
+        return ret;
+    }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+    if (reply.GetXml() != NULL)
+    {
+        //Result start tag.
+        reply.GetXml()->AppendStartTag(DLMS_TRANSLATOR_TAGS_RESULT);
+        //LastBlock
+        std::string str;
+        reply.GetXml()->IntegerToHex((unsigned long)ch, 2, str);
+        reply.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_LAST_BLOCK, "Value", str);
+    }
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+
+    if (ch == 0)
+    {
+        reply.SetMoreData(
+            (DLMS_DATA_REQUEST_TYPES)(reply.GetMoreData() | DLMS_DATA_REQUEST_TYPES_BLOCK));
+    }
+    else
+    {
+        reply.SetMoreData(
+            (DLMS_DATA_REQUEST_TYPES)(reply.GetMoreData() & ~DLMS_DATA_REQUEST_TYPES_BLOCK));
+    }
+    // Get Block number.
+    if ((ret = data.GetUInt32(&number)) != 0)
+    {
+        return ret;
+    }
+#ifndef DLMS_IGNORE_XML_TRANSLATOR
+    if (reply.GetXml() != NULL)
+    {
+        //BlockNumber
+        std::string str;
+        reply.GetXml()->IntegerToHex(number, 8, str);
+        reply.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_BLOCK_NUMBER, "Value", str);
+    }
+    else
+#endif //DLMS_IGNORE_XML_TRANSLATOR
+    {
+        // If meter's block index is zero based or Actaris is read.
+        // Actaris SL7000 might return wrong block index sometimes.
+        // It's not reseted to 1.
+        if (number != 1 && settings.GetBlockIndex() == 1)
+        {
+            settings.SetBlockIndex(number);
+        }
+        if (number != settings.GetBlockIndex())
+        {
+            return DLMS_ERROR_CODE_DATA_BLOCK_NUMBER_INVALID;
+        }
+    }
+    // Get status.
+    if ((ret = data.GetUInt8(&ch)) != 0)
+    {
+        return ret;
+    }
+    if (ch != 0)
+    {
+        if ((ret = data.GetUInt8(&ch)) != 0)
+        {
+            return ret;
+        }
+        return ch;
+    }
+    // Get data size.
+    GXHelpers::GetObjectCount(data, count);
+    // if whole block is read.
+    if ((reply.GetMoreData() & DLMS_DATA_REQUEST_TYPES_FRAME) == 0)
+    {
+        // Check Block length.
+        if (count > (unsigned long)(data.Available()))
+        {
+            return DLMS_ERROR_CODE_OUTOFMEMORY;
+        }
+        reply.SetCommand(DLMS_COMMAND_NONE);
+    }
+    if (count == 0)
+    {
+        // If meter sends empty data block.
+        data.SetSize(index);
+    }
+    else
+    {
+        if ((ret = GetDataFromBlock(data, index)) != 0)
+        {
+            return ret;
+        }
+    }
+    // If last packet and data is not try to peek.
+    if (reply.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE)
+    {
+        if (!reply.GetPeek())
+        {
+            data.SetPosition(0);
+        }
+        settings.ResetBlockIndex();
+    }
+    if (reply.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE &&
+        settings.GetCommand() == DLMS_COMMAND_GET_REQUEST
+        && settings.GetCommandType() == DLMS_GET_COMMAND_TYPE_WITH_LIST)
+    {
+        if ((ret = HandleGetResponseWithList(settings, reply)) != 0)
+        {
+            return ret;
+        }
+        ret = DLMS_ERROR_CODE_FALSE;
+    }
+    return ret;
+}
 
 int CGXDLMS::HandleGetResponse(
     CGXDLMSSettings& settings,
@@ -3262,9 +3489,7 @@ int CGXDLMS::HandleGetResponse(
 {
     int ret;
     unsigned char ch;
-    unsigned long number;
     short type;
-    unsigned long count;
 #ifndef DLMS_IGNORE_XML_TRANSLATOR
     bool empty = false;
 #endif //DLMS_IGNORE_XML_TRANSLATOR
@@ -3298,191 +3523,21 @@ int CGXDLMS::HandleGetResponse(
         reply.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_INVOKE_ID, "", str);
     }
 #endif //DLMS_IGNORE_XML_TRANSLATOR
-    // Response normal
-    if (type == DLMS_GET_COMMAND_TYPE_NORMAL)
-    {
-        if (data.Available() == 0)
-        {
-#ifndef DLMS_IGNORE_XML_TRANSLATOR
-            empty = true;
-#endif //DLMS_IGNORE_XML_TRANSLATOR
-            GetDataFromBlock(data, 0);
-        }
-        else
-        {
-            // Result
-            if ((ret = data.GetUInt8(&ch)) != 0)
-            {
-                return ret;
-            }
-            if (ch != 0)
-            {
-                if ((ret = data.GetUInt8(&ch)) != 0)
-                {
-                    return ret;
-                }
-#ifndef DLMS_IGNORE_XML_TRANSLATOR
-                if (reply.GetXml() == NULL)
-#endif //DLMS_IGNORE_XML_TRANSLATOR
-                {
-                    return ch;
-                }
-            }
-#ifndef DLMS_IGNORE_XML_TRANSLATOR
-            if (reply.GetXml() != NULL)
-            {
-                // Result start tag.
-                reply.GetXml()->AppendStartTag(DLMS_TRANSLATOR_TAGS_RESULT);
-                if (ch != 0)
-                {
-                    std::string str;
-                    CGXDLMSTranslator::ErrorCodeToString(reply.GetXml()->GetOutputType(), (DLMS_ERROR_CODE)ch, str);
-                    reply.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_DATA_ACCESS_ERROR, "", str);
-                }
-                else
-                {
-                    reply.GetXml()->AppendStartTag(DLMS_TRANSLATOR_TAGS_DATA);
-                    CGXDataInfo di;
-                    di.SetXml(reply.GetXml());
-                    CGXDLMSVariant value;
-                    if ((ret = GXHelpers::GetData(&settings, reply.GetData(), di, value)) != 0)
-                    {
-                        return ret;
-                    }
-                    reply.GetXml()->AppendEndTag(DLMS_TRANSLATOR_TAGS_DATA);
-                }
-            }
-            else
-#endif //DLMS_IGNORE_XML_TRANSLATOR
-            {
-                ret = GetDataFromBlock(data, 0);
-            }
-        }
-    }
-    else if (type == DLMS_GET_COMMAND_TYPE_NEXT_DATA_BLOCK)
-    {
-        // GetResponsewithDataBlock
-        // Is Last block.
-        if ((ret = data.GetUInt8(&ch)) != 0)
-        {
-            return ret;
-        }
-#ifndef DLMS_IGNORE_XML_TRANSLATOR
-        if (reply.GetXml() != NULL)
-        {
-            //Result start tag.
-            reply.GetXml()->AppendStartTag(DLMS_TRANSLATOR_TAGS_RESULT);
-            //LastBlock
-            std::string str;
-            reply.GetXml()->IntegerToHex((unsigned long)ch, 2, str);
-            reply.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_LAST_BLOCK, "Value", str);
-        }
-#endif //DLMS_IGNORE_XML_TRANSLATOR
 
-        if (ch == 0)
-        {
-            reply.SetMoreData(
-                (DLMS_DATA_REQUEST_TYPES)(reply.GetMoreData() | DLMS_DATA_REQUEST_TYPES_BLOCK));
-        }
-        else
-        {
-            reply.SetMoreData(
-                (DLMS_DATA_REQUEST_TYPES)(reply.GetMoreData() & ~DLMS_DATA_REQUEST_TYPES_BLOCK));
-        }
-        // Get Block number.
-        if ((ret = data.GetUInt32(&number)) != 0)
-        {
-            return ret;
-        }
-#ifndef DLMS_IGNORE_XML_TRANSLATOR
-        if (reply.GetXml() != NULL)
-        {
-            //BlockNumber
-            std::string str;
-            reply.GetXml()->IntegerToHex(number, 8, str);
-            reply.GetXml()->AppendLine(DLMS_TRANSLATOR_TAGS_BLOCK_NUMBER, "Value", str);
-        }
-        else
-#endif //DLMS_IGNORE_XML_TRANSLATOR
-        {
-            // If meter's block index is zero based or Actaris is read.
-            // Actaris SL7000 might return wrong block index sometimes.
-            // It's not reseted to 1.
-            if (number != 1 && settings.GetBlockIndex() == 1)
-            {
-                settings.SetBlockIndex(number);
-            }
-            if (number != settings.GetBlockIndex())
-            {
-                return DLMS_ERROR_CODE_DATA_BLOCK_NUMBER_INVALID;
-            }
-        }
-        // Get status.
-        if ((ret = data.GetUInt8(&ch)) != 0)
-        {
-            return ret;
-        }
-        if (ch != 0)
-        {
-            if ((ret = data.GetUInt8(&ch)) != 0)
-            {
-                return ret;
-            }
-            return ch;
-        }
-        // Get data size.
-        GXHelpers::GetObjectCount(data, count);
-        // if whole block is read.
-        if ((reply.GetMoreData() & DLMS_DATA_REQUEST_TYPES_FRAME) == 0)
-        {
-            // Check Block length.
-            if (count > (unsigned long)(data.Available()))
-            {
-                return DLMS_ERROR_CODE_OUTOFMEMORY;
-            }
-            reply.SetCommand(DLMS_COMMAND_NONE);
-        }
-        if (count == 0)
-        {
-            // If meter sends empty data block.
-            data.SetSize(index);
-        }
-        else
-        {
-            if ((ret = GetDataFromBlock(data, index)) != 0)
-            {
-                return ret;
-            }
-        }
-        // If last packet and data is not try to peek.
-        if (reply.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE)
-        {
-            if (!reply.GetPeek())
-            {
-                data.SetPosition(0);
-            }
-            settings.ResetBlockIndex();
-        }
-        if (reply.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE &&
-            settings.GetCommand() == DLMS_COMMAND_GET_REQUEST
-            && settings.GetCommandType() == DLMS_GET_COMMAND_TYPE_WITH_LIST) {
-            if ((ret = HandleGetResponseWithList(settings, reply)) != 0)
-            {
-                return ret;
-            }
-            ret = DLMS_ERROR_CODE_FALSE;
-        }
-    }
-    else if (type == DLMS_GET_COMMAND_TYPE_WITH_LIST)
+    switch (type)
     {
-        if ((ret = HandleGetResponseWithList(settings, reply)) != 0)
-        {
-            return ret;
-        }
+    case DLMS_GET_COMMAND_TYPE_NORMAL:
+        ret = HandleGetResponseNormal(settings, reply, empty);
+        break;
+    case DLMS_GET_COMMAND_TYPE_NEXT_DATA_BLOCK:
+        // Is Last block.
+        ret = HandleGetResponseNextDataBlock(settings, reply, index);
+        break;
+    case DLMS_GET_COMMAND_TYPE_WITH_LIST:
+        HandleGetResponseWithList(settings, reply);
         ret = DLMS_ERROR_CODE_FALSE;
-    }
-    else
-    {
+        break;
+    default:
         //Invalid Get response.
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
@@ -3739,8 +3794,8 @@ int CGXDLMS::HandleReadResponse(
         default:
             //HandleReadResponse failed. Invalid tag.
             return DLMS_ERROR_CODE_INVALID_TAG;
+            }
         }
-    }
 #ifndef DLMS_IGNORE_XML_TRANSLATOR
     if (reply.GetXml() != NULL)
     {
@@ -3757,7 +3812,7 @@ int CGXDLMS::HandleReadResponse(
         return DLMS_ERROR_CODE_FALSE;
     }
     return 0;
-}
+    }
 
 int CGXDLMS::GetTcpData(
     CGXDLMSSettings& settings,
@@ -4228,13 +4283,13 @@ int CGXDLMS::GetPlcData(
                     //Invalid data checksum.
                     return DLMS_ERROR_CODE_WRONG_CRC;
 #endif //DLMS_IGNORE_XML_TRANSLATOR
-                }
+                    }
                 data.SetPacketLength(len);
+                }
             }
         }
-    }
     return ret;
-}
+    }
 
 int CGXDLMS::GetPlcHdlcData(
     CGXDLMSSettings& settings,
@@ -4361,16 +4416,16 @@ int CGXDLMS::GetPlcHdlcData(
                 //Invalid data checksum.
                 return DLMS_ERROR_CODE_WRONG_CRC;
 #endif //DLMS_IGNORE_XML_TRANSLATOR
-            }
+                }
             data.SetPacketLength(2 + buff.GetPosition() - index);
-        }
+            }
         else
         {
             buff.SetPosition(buff.GetPosition() + frameLen - index - 4);
         }
-    }
+        }
     return ret;
-}
+    }
 
 // Check is this PLC S-FSK message.
 // buff: Received data.
