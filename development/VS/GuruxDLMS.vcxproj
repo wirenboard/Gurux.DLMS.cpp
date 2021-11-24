@@ -215,6 +215,7 @@
     <ClCompile Include="..\src\GXDLMSModemInitialisation.cpp" />
     <ClCompile Include="..\src\GXDLMSMonitoredValue.cpp" />
     <ClCompile Include="..\src\GXDLMSNotify.cpp" />
+    <ClCompile Include="..\src\GXDLMSNtpSetup.cpp" />
     <ClCompile Include="..\src\GXDLMSObject.cpp" />
     <ClCompile Include="..\src\GXDLMSObjectCollection.cpp" />
     <ClCompile Include="..\src\GXDLMSObjectDefinition.cpp" />
@@ -362,6 +363,7 @@
     <ClInclude Include="..\include\GXDLMSModemInitialisation.h" />
     <ClInclude Include="..\include\GXDLMSMonitoredValue.h" />
     <ClInclude Include="..\include\GXDLMSNotify.h" />
+    <ClInclude Include="..\include\GXDLMSNtpSetup.h" />
     <ClInclude Include="..\include\GXDLMSObject.h" />
     <ClInclude Include="..\include\GXDLMSObjectCollection.h" />
     <ClInclude Include="..\include\GXDLMSObjectDefinition.h" />

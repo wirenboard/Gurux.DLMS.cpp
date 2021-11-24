@@ -530,7 +530,7 @@ int CGXDLMSProfileGeneric::Capture(CGXDLMSServer* server)
             values.push_back(tmp.GetValue());
         }
         // Remove first items if buffer is full.
-        if (GetProfileEntries() == GetBuffer().size())
+        if (!m_Buffer.empty() && GetProfileEntries() == GetBuffer().size())
         {
             m_Buffer.pop_back();
         }
@@ -565,8 +565,15 @@ void CGXDLMSProfileGeneric::GetValues(std::vector<std::string>& values)
     {
         for (std::vector<CGXDLMSVariant>::iterator cell = row->begin(); cell != row->end(); ++cell)
         {
+            if (!empty)
+            {
+                sb << " | ";
+            }
+            else
+            {
+                empty = false;
+            }
             sb << cell->ToString();
-            sb << " | ";
         }
         sb << "\r\n";
     }
@@ -581,7 +588,10 @@ void CGXDLMSProfileGeneric::GetValues(std::vector<std::string>& values)
         {
             sb << ", ";
         }
-        empty = false;
+        else
+        {
+            empty = false;
+        }
         std::string str = it->first->GetName().ToString();
         sb.write(str.c_str(), str.size());
     }

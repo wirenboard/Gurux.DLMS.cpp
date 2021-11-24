@@ -165,7 +165,7 @@ int CGXDLMS::ReceiverReady(
 {
     CGXReplyData data;
     data.SetMoreData(type);
-    data.SetWindowSize(settings.GetWindowSize());
+    data.SetWindowSize(settings.GetGbtWindowSize());
     data.SetBlockNumberAck(settings.GetBlockNumberAck());
     data.SetBlockNumber(settings.GetBlockIndex());
     return ReceiverReady(settings, data, cipher, reply);
@@ -2497,7 +2497,7 @@ int CGXDLMS::HandleGbt(CGXDLMSSettings& settings, CGXReplyData& data)
     unsigned long len;
     unsigned short bn, bna;
     int index = data.GetData().GetPosition() - 1;
-    data.SetWindowSize(settings.GetWindowSize());
+    data.SetWindowSize(settings.GetGbtWindowSize());
     // BlockControl
     if ((ret = data.GetData().GetUInt8(&bc)) != 0)
     {

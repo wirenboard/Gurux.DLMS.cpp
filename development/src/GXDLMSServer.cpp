@@ -848,7 +848,7 @@ int CGXDLMSServer::HandleGeneralBlockTransfer(
             if (sr.GetCount() == 0)
             {
                 m_Settings.SetBlockNumberAck(m_Settings.GetBlockNumberAck() + 1);
-                sr.SetCount(m_Settings.GetWindowSize());
+                sr.SetCount(m_Settings.GetGbtWindowSize());
             }
             CGXDLMSLNCommandHandler::GetRequestNextDataBlock(m_Settings, 0,
                 this, data, &m_ReplyData, NULL, true, cipheredCommand);
@@ -885,8 +885,8 @@ int CGXDLMSServer::HandleGeneralBlockTransfer(
                 m_Transaction->GetData().Set(&data);
                 // Send ACK.
                 unsigned char igonoreAck = (bc & 0x40) != 0 &&
-                    (blockNumberAck * m_Settings.GetWindowSize()) + 1 > blockNumber;
-                int windowSize = m_Settings.GetWindowSize();
+                    (blockNumberAck * m_Settings.GetGbtWindowSize()) + 1 > blockNumber;
+                int windowSize = m_Settings.GetGbtWindowSize();
                 int bn = m_Settings.GetBlockIndex();
                 if ((bc & 0x80) != 0)
                 {
@@ -934,7 +934,7 @@ int CGXDLMSServer::HandleGeneralBlockTransfer(
             data.GetUInt8(&ch);
             m_Transaction = new CGXDLMSLongTransaction((DLMS_COMMAND)ch, data);
             m_ReplyData.SetUInt8(DLMS_COMMAND_GENERAL_BLOCK_TRANSFER);
-            m_ReplyData.SetUInt8((0x80 | m_Settings.GetWindowSize()));
+            m_ReplyData.SetUInt8((0x80 | m_Settings.GetGbtWindowSize()));
             m_ReplyData.SetUInt16(blockNumber);
             ++blockNumberAck;
             m_ReplyData.SetUInt16(blockNumberAck);

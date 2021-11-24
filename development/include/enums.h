@@ -959,6 +959,9 @@ typedef enum
     */
     DLMS_OBJECT_TYPE_G3_PLC6_LO_WPAN = 92,
 
+    /*NTP Setup is used for time synchronisation.*/
+    DLMS_OBJECT_TYPE_NTP_SETUP = 100,
+    
     /*
     * Configure a ZigBee PRO device with information necessary to create or
     * join the network.
@@ -3172,4 +3175,15 @@ typedef enum
     // TLS
     DLMS_MBUS_ENCRYPTION_MODE_TLS = 13
 }DLMS_MBUS_ENCRYPTION_MODE;
+
+/*Defines NTP authentication methods.*/
+typedef enum
+{
+    //No security is used.
+    DLMS_NTP_AUTHENTICATION_METHOD_NO_SECURITY = 0,
+    //Shared secrets are used.
+    DLMS_NTP_AUTHENTICATION_METHOD_SHARED_SECRETS = 1,
+    //IFF auto key is used.
+    DLMS_NTP_AUTHENTICATION_METHOD_AUTO_KEY_IFF = 2
+}DLMS_NTP_AUTHENTICATION_METHOD;
 #endif //ENUMS_H
