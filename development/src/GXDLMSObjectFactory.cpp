@@ -220,6 +220,9 @@
 #ifndef DLMS_IGNORE_IEC_TWISTED_PAIR_SETUP
 #include "../include/GXDLMSIecTwistedPairSetup.h"
 #endif //DLMS_IGNORE_IEC_TWISTED_PAIR_SETUP
+#ifndef DLMS_IGNORE_NTP_SETUP
+#include "../include/GXDLMSNtpSetup.h"
+#endif //DLMS_IGNORE_NTP_SETUP
 
 // Reserved for internal use.
 CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
@@ -494,6 +497,10 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
     case DLMS_OBJECT_TYPE_SFSK_PHY_MAC_SETUP:
         return new CGXDLMSSFSKPhyMacSetUp();
 #endif //DLMS_IGNORE_SFSK_PHY_MAC_SETUP
+#ifndef DLMS_IGNORE_NTP_SETUP
+    case DLMS_OBJECT_TYPE_NTP_SETUP:
+        return new CGXDLMSNtpSetup();
+#endif //DLMS_IGNORE_NTP_SETUP
     default:
 #ifdef _DEBUG
         printf("Unknown object: %d\r\n", type);
