@@ -333,4 +333,57 @@ int CGXDLMSNtpSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     return ret;
 }
+
+int CGXDLMSNtpSetup::Synchronize(CGXDLMSClient* client, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 1, data, DLMS_DATA_TYPE_ARRAY, reply);
+}
+
+int CGXDLMSNtpSetup::AddAuthenticationKey(CGXDLMSClient* client, uint32_t id, CGXByteBuffer& key, std::vector<CGXByteBuffer>& reply)
+{
+    int ret;
+    CGXByteBuffer bb;
+    if ((ret = bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE)) == 0 ||
+        (ret = bb.SetUInt8(2)) == 0 ||
+        (ret = bb.SetUInt8(DLMS_DATA_TYPE_UINT32)) == 0 ||
+        (ret = bb.SetUInt32(id)) == 0 ||
+        (ret = bb.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING)) == 0 ||
+        (ret = GXHelpers::SetObjectCount(key.GetSize(), bb)) == 0 ||
+        (ret = bb.Set(key.GetData(), key.GetSize())) == 0)
+    {
+        CGXDLMSVariant tmp = bb;
+        ret = client->Method(this, 2, tmp, DLMS_DATA_TYPE_ARRAY, reply);
+    }
+    return ret;
+}
+
+int CGXDLMSNtpSetup::DeleteAuthenticationKey(CGXDLMSClient* client, uint32_t id, std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data = id;
+    return client->Method(this, 3, data, DLMS_DATA_TYPE_ARRAY, reply);
+}
+
+int CGXDLMSNtpSetup::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
+{
+    if (e.GetIndex() == 1)
+    {
+        //Server must handle this. Do nothing...
+    }
+    else if (e.GetIndex() == 2)
+    {
+        CGXByteBuffer bb;
+        bb.Set(e.GetParameters().byteArr, e.GetParameters().GetSize());
+        m_Keys[e.GetParameters().ulVal] = bb;
+    }
+    else if (e.GetIndex() == 3)
+    {
+        m_Keys.erase(e.GetParameters().ulVal);
+    }
+    else
+    {
+        e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
+    }
+    return DLMS_ERROR_CODE_OK;
+}
 #endif //DLMS_IGNORE_NTP_SETUP

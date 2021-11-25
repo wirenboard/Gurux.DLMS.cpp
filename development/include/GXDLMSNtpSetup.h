@@ -69,6 +69,9 @@ class CGXDLMSNtpSetup : public CGXDLMSObject
      * Client key (NTP server public key).
      */
     CGXByteBuffer m_ClientKey;
+
+    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+
 public:
     //Constructor.
     CGXDLMSNtpSetup();
@@ -165,6 +168,15 @@ public:
 
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+
+    //Synchronizes the time of the DLMS server with the NTP server.
+    int Synchronize(CGXDLMSClient* client, std::vector<CGXByteBuffer>& reply);
+
+    int AddAuthenticationKey(CGXDLMSClient* client, uint32_t id, CGXByteBuffer& key, std::vector<CGXByteBuffer>& reply);
+
+    //Remove symmetric authentication key.
+    int DeleteAuthenticationKey(CGXDLMSClient* client, uint32_t id, std::vector<CGXByteBuffer>& reply);
+
 };
 #endif //DLMS_IGNORE_NTP_SETUP
 #endif //GXDLMSNTPSETUP_H
