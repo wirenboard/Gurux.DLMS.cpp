@@ -225,7 +225,7 @@ int CGXDLMSNtpSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
 // Returns value of given attribute.
 int CGXDLMSNtpSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
-    int ret;
+    int ret = DLMS_ERROR_CODE_OK;
     switch (e.GetIndex())
     {
     case 1:
@@ -272,10 +272,11 @@ int CGXDLMSNtpSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     case 7:
         e.SetValue(m_ClientKey);
+        break;
     default:
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    return DLMS_ERROR_CODE_OK;
+    return ret;
 }
 
 // Set value of given attribute.
@@ -373,8 +374,12 @@ int CGXDLMSNtpSetup::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
     else if (e.GetIndex() == 2)
     {
         CGXByteBuffer bb;
-        bb.Set(e.GetParameters().byteArr, e.GetParameters().GetSize());
-        m_Keys[e.GetParameters().ulVal] = bb;
+        if (e.GetParameters().vt != DLMS_DATA_TYPE_STRUCTURE)
+        {
+            return DLMS_ERROR_CODE_INCONSISTENT_CLASS_OR_OBJECT;
+        }
+        bb.Set(e.GetParameters().Arr[1].byteArr, e.GetParameters().Arr[1].GetSize());
+        m_Keys[e.GetParameters().Arr[0].ulVal] = bb;
     }
     else if (e.GetIndex() == 3)
     {
