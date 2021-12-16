@@ -195,6 +195,7 @@ int main(int argc, char* argv[])
                     printf("Invalid interface option '%s'. (HDLC, WRAPPER, HdlcModeE, Plc, PlcHdlc)", optarg);
                     return 1;
                 }
+                break;
             case 'I':
                 // AutoIncreaseInvokeID.
                 autoIncreaseInvokeID = true;
