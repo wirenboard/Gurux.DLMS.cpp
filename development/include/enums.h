@@ -586,64 +586,58 @@ typedef enum
     //No security is used.
     DLMS_SECURITY_POLICY_NOTHING = 0,
     /*
-     All messages to be authenticated.
+     All messages to be authenticated using Security Suite 0.
     */
     DLMS_SECURITY_POLICY_AUTHENTICATED = 1,
     /*
-     All messages to be encrypted.
+     All messages to be encrypted using Security Suite 0.
     */
     DLMS_SECURITY_POLICY_ENCRYPTED = 2,
     /*
-     All messages to be authenticated and encrypted.
+     All messages to be authenticated and encrypted using Security Suite 0.
     */
-    DLMS_SECURITY_POLICY_AUTHENTICATED_ENCRYPTED = 3
+    DLMS_SECURITY_POLICY_AUTHENTICATED_ENCRYPTED = 3,
+    /*
+    * Request is authenticated in Security Suite 1.
+    */
+    DLMS_SECURITY_POLICY_AUTHENTICATED_REQUEST = 0x4,
+    /*
+    * Request is encrypted in Security Suite 1.
+    */
+    DLMS_SECURITY_POLICY_ENCRYPTED_REQUEST = 0x8,
+    /*
+    * Request is digitally signed in Security Suite 1.
+    */
+    DLMS_SECURITY_POLICY_DIGITALLY_SIGNED_REQUEST = 0x10,
+    /*
+    * Response is authenticated in Security Suite 1.
+    */
+    DLMS_SECURITY_POLICY_AUTHENTICATED_RESPONSE = 0x20,
+    /*
+    * Response is encrypted in Security Suite 1.
+    */
+    DLMS_SECURITY_POLICY_ENCRYPTED_RESPONSE = 0x40,
+    /*
+    * Response is digitally signed in Security Suite 1.
+    */
+    DLMS_SECURITY_POLICY_DIGITALLY_SIGNED_RESPONSE = 0x80
 } DLMS_SECURITY_POLICY;
-
-// Security policy Enforces authentication and/or encryption algorithm provided with security_suite.
-  //Note! This enumeration values are used in Security Setup version 1.
-typedef enum
-{
-    /*
-    * Security is not used.
-    */
-    DLMS_SECURITY_POLICY1_NOTHING = 0,
-    /*
-    * Request is authenticated.
-    */
-    DLMS_SECURITY_POLICY1_AUTHENTICATED_REQUEST = 0x4,
-    /*
-    * Request is encrypted.
-    */
-    DLMS_SECURITY_POLICY1_ENCRYPTED_REQUEST = 0x8,
-    /*
-    * Request is digitally signed.
-    */
-    DLMS_SECURITY_POLICY1_DIGITALLY_SIGNED_REQUEST = 0x10,
-    /*
-    * Response is authenticated.
-    */
-    DLMS_SECURITY_POLICY1_AUTHENTICATED_RESPONSE = 0x20,
-    /*
-    * Response is encrypted.
-    */
-    DLMS_SECURITY_POLICY1_ENCRYPTED_RESPONSE = 0x40,
-    /*
-    * Response is digitally signed.
-    */
-    DLMS_SECURITY_POLICY1_DIGITALLY_SIGNED_RESPONSE = 0x80
-} DLMS_SECURITY_POLICY1;
 
 //Security suite Specifies authentication, encryption and key wrapping algorithm.
 typedef enum
 {
     /*
-     AES-GCM-128 for authenticated encryption and AES-128 for key wrapping.
+     GMAC ciphering is used with security setup version 0.
     */
     DLMS_SECURITY_SUITE_V0 = 0,
     /*
-     AES-GCM-128 authenticated encryption, ECDSA P-256 digital signature, ECDH P-256 key agreement, SHA-256 hash, V.44 compression and AES-128 key wrap,
+     AES-GCM-128 authenticated encryption, ECDSA P-256 digital signature, ECDH P-256 key agreement, SHA-256 hash, V.44 compression and AES-128 key wrap.
     */
-    DLMS_SECURITY_SUITE_V1 = 1
+    DLMS_SECURITY_SUITE_V1 = 1,
+    /*
+     AES-GCM-128 authenticated encryption, ECDSA P-384 digital signature, ECDH P-384 key agreement, SHA-384 hash, V.44 compression and AES-128 key wrap.
+    */
+    DLMS_SECURITY_SUITE_V2 = 2
 } DLMS_SECURITY_SUITE;
 
 typedef enum
@@ -986,7 +980,11 @@ typedef enum
     DLMS_OBJECT_TYPE_CREDIT = 112,
     DLMS_OBJECT_TYPE_CHARGE = 113,
     DLMS_OBJECT_TYPE_TOKEN_GATEWAY = 115,
-    DLMS_OBJECT_TYPE_COMPACT_DATA = 62
+    DLMS_OBJECT_TYPE_COMPACT_DATA = 62,
+    /*
+    * Communication port protection.
+    */
+    DLMS_OBJECT_TYPE_COMMUNICATION_PORT_PROTECTION = 124
 } DLMS_OBJECT_TYPE;
 
 /*
@@ -2734,21 +2732,21 @@ typedef enum {
  */
 typedef enum {
     /*
-     * Certificate type is digital signature.
-     */
+    * Certificate type is digital signature.
+    */
     DLMS_CERTIFICATE_TYPE_DIGITAL_SIGNATURE = 0,
     /*
-     * Certificate type is key agreement.
-     */
-     DLMS_CERTIFICATE_TYPE_KEY_AGREEMENT = 1,
-     /*
-      * Certificate type is TLS.
-      */
-      DLMS_CERTIFICATE_TYPE_TLS = 2,
-      /*
-       * Certificate type is other.
-       */
-       DLMS_CERTIFICATE_TYPE_OTHER = 3
+    * Certificate type is key agreement.
+    */
+    DLMS_CERTIFICATE_TYPE_KEY_AGREEMENT = 1,
+    /*
+    * Certificate type is TLS.
+    */
+    DLMS_CERTIFICATE_TYPE_TLS = 2,
+    /*
+    * Certificate type is other.
+    */
+    DLMS_CERTIFICATE_TYPE_OTHER = 3
 }DLMS_CERTIFICATE_TYPE;
 
 typedef enum
@@ -2830,12 +2828,12 @@ typedef enum
 {
     // Normal action.
     DLMS_ACTION_RESPONSE_TYPE_NORMAL = 1,
-    // Action with first block.
-    DLMS_ACTION_RESPONSE_TYPE_WITH_FIRST_BLOCK = 2,
+    // Action with block.
+    DLMS_ACTION_RESPONSE_TYPE_WITH_BLOCK = 2,
     // Action with list.
     DLMS_ACTION_RESPONSE_TYPE_WITH_LIST = 3,
     // Next block.
-    DLMS_ACTION_RESPONSE_TYPE_WITH_BLOCK = 4
+    DLMS_ACTION_RESPONSE_TYPE_NEXT_BLOCK = 4
 }DLMS_ACTION_RESPONSE_TYPE;
 
 /*
@@ -3186,4 +3184,42 @@ typedef enum
     //IFF auto key is used.
     DLMS_NTP_AUTHENTICATION_METHOD_AUTO_KEY_IFF = 2
 }DLMS_NTP_AUTHENTICATION_METHOD;
+
+/*Enumerates communication port protection mode values.*/
+typedef enum
+{
+    /**
+   * Port is locked. Communication is not possible.
+   */
+    DLMS_PROTECTION_MODE_LOCKED,
+    
+    /**
+    * The port becomes temporarily locked when failed connections exceeds an
+    * allowed.
+    */
+    DLMS_PROTECTION_MODE_LOCKED_ON_FAILED_ATTEMPTS,
+    
+    /**
+    * Port is unlocked.
+    */
+    DLMS_PROTECTION_MODE_UNLOCKED
+}DLMS_PROTECTION_MODE;
+
+/*Enumerates communication port protection status values.*/
+typedef enum
+{
+    /**
+    * Port is unlocked.
+    */
+    DLMS_PROTECTION_STATUS_UNLOCKED,
+    /**
+    * The port is temporarily locked. Communication is not possible.
+    */
+    DLMS_PROTECTION_STATUS_TEMPORARILY_LOCKED,
+    /**
+    * Port is locked. Communication is not possible.
+    */
+    DLMS_PROTECTION_STATUS_LOCKED
+}DLMS_PROTECTION_STATUS;
+
 #endif //ENUMS_H

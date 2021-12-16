@@ -637,20 +637,35 @@ const char* CGXDLMSConverter::ToString(DLMS_SECURITY_POLICY value)
 }
 
 //Get Security Setup security policy v1 as a std::string.
-int CGXDLMSConverter::ToString(DLMS_SECURITY_POLICY1 value, std::string& str)
+int CGXDLMSConverter::ToString(DLMS_SECURITY_POLICY value, std::string& str)
 {
     str.clear();
-    if (value == 0)
+    if (value == DLMS_SECURITY_POLICY_NOTHING)
     {
         str = "Nothing";
     }
     else
     {
-        if ((value & DLMS_SECURITY_POLICY1_AUTHENTICATED_REQUEST) != 0)
+        if (value == DLMS_SECURITY_POLICY_AUTHENTICATED)
+        {
+            str.append("Authenticated");
+            return 0;
+        }
+        if (value == DLMS_SECURITY_POLICY_ENCRYPTED)
+        {
+            str.append("Encrypted");
+            return 0;
+        }
+        if (value == DLMS_SECURITY_POLICY_AUTHENTICATED_ENCRYPTED)
+        {
+            str.append("AuthenticatedEncrypted");
+            return 0;
+        }
+        if ((value & DLMS_SECURITY_POLICY_AUTHENTICATED_REQUEST) != 0)
         {
             str.append("RequestAuthenticated");
         }
-        if ((value & DLMS_SECURITY_POLICY1_ENCRYPTED_REQUEST) != 0)
+        if ((value & DLMS_SECURITY_POLICY_ENCRYPTED_REQUEST) != 0)
         {
             if (!str.empty())
             {
@@ -658,7 +673,7 @@ int CGXDLMSConverter::ToString(DLMS_SECURITY_POLICY1 value, std::string& str)
             }
             str.append("RequestEncrypted");
         }
-        if ((value & DLMS_SECURITY_POLICY1_DIGITALLY_SIGNED_REQUEST) != 0)
+        if ((value & DLMS_SECURITY_POLICY_DIGITALLY_SIGNED_REQUEST) != 0)
         {
             if (!str.empty())
             {
@@ -666,7 +681,7 @@ int CGXDLMSConverter::ToString(DLMS_SECURITY_POLICY1 value, std::string& str)
             }
             str.append("RequestDigitallySigned");
         }
-        if ((value & DLMS_SECURITY_POLICY1_AUTHENTICATED_RESPONSE) != 0)
+        if ((value & DLMS_SECURITY_POLICY_AUTHENTICATED_RESPONSE) != 0)
         {
             if (!str.empty())
             {
@@ -674,7 +689,7 @@ int CGXDLMSConverter::ToString(DLMS_SECURITY_POLICY1 value, std::string& str)
             }
             str.append("ResponseAuthenticated");
         }
-        if ((value & DLMS_SECURITY_POLICY1_AUTHENTICATED_RESPONSE) != 0)
+        if ((value & DLMS_SECURITY_POLICY_AUTHENTICATED_RESPONSE) != 0)
         {
             if (!str.empty())
             {
@@ -682,7 +697,7 @@ int CGXDLMSConverter::ToString(DLMS_SECURITY_POLICY1 value, std::string& str)
             }
             str.append("ResponseEncrypted");
         }
-        if ((value & DLMS_SECURITY_POLICY1_ENCRYPTED_RESPONSE) != 0)
+        if ((value & DLMS_SECURITY_POLICY_ENCRYPTED_RESPONSE) != 0)
         {
             if (!str.empty())
             {
@@ -697,15 +712,23 @@ int CGXDLMSConverter::ToString(DLMS_SECURITY_POLICY1 value, std::string& str)
 //Get Security Setup security suite as a std::string.
 const char* CGXDLMSConverter::ToString(DLMS_SECURITY_SUITE value)
 {
+    const char* ret = NULL;
     switch (value)
     {
-    case 0://DLMS_SECURITY_SUITE_AES_GCM_128
-        return "AES_GCM_128";
+    case DLMS_SECURITY_SUITE_V0:
+        ret = "Version0";
+        break;
+    case DLMS_SECURITY_SUITE_V1:
+        ret = "Version1";
+        break;
+    case DLMS_SECURITY_SUITE_V2:
+        ret = "Version2";
         break;
     default:
+        ret = "Unknown security suite";
         break;
     }
-    return "Unknown security suite";
+    return ret;
 }
 
 const char* CGXDLMSConverter::ToString(DLMS_ASSOCIATION_STATUS value)

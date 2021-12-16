@@ -223,6 +223,10 @@
 #ifndef DLMS_IGNORE_NTP_SETUP
 #include "../include/GXDLMSNtpSetup.h"
 #endif //DLMS_IGNORE_NTP_SETUP
+#ifndef DLMS_IGNORE_COMMUNICATION_PORT_PROTECTION
+#include "../include/GXDLMSCommunicationPortProtection.h"
+#endif //DLMS_IGNORE_COMMUNICATION_PORT_PROTECTION
+
 
 // Reserved for internal use.
 CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
@@ -501,6 +505,11 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
     case DLMS_OBJECT_TYPE_NTP_SETUP:
         return new CGXDLMSNtpSetup();
 #endif //DLMS_IGNORE_NTP_SETUP
+#ifndef DLMS_IGNORE_COMMUNICATION_PORT_PROTECTION
+    case DLMS_OBJECT_TYPE_COMMUNICATION_PORT_PROTECTION:
+        return new CGXDLMSCommunicationPortProtection();
+#endif //DLMS_IGNORE_COMMUNICATION_PORT_PROTECTION
+
     default:
 #ifdef _DEBUG
         printf("Unknown object: %d\r\n", type);
