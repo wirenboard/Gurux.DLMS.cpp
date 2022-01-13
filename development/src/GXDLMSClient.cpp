@@ -2028,7 +2028,7 @@ int CGXDLMSClient::AccessRequest(struct tm* time, std::vector<CGXDLMSAccessItem>
     unsigned char ln[6];
     std::string tmp;
     CGXByteBuffer bb;
-    if ((ret = GXHelpers::SetObjectCount(list.size(), bb)) == 0)
+    if ((ret = GXHelpers::SetObjectCount((unsigned long)list.size(), bb)) == 0)
     {
         for (std::vector< CGXDLMSAccessItem >::iterator it = list.begin(); it != list.end(); ++it)
         {
@@ -2046,7 +2046,7 @@ int CGXDLMSClient::AccessRequest(struct tm* time, std::vector<CGXDLMSAccessItem>
         }
         //Data
         DLMS_DATA_TYPE type;
-        GXHelpers::SetObjectCount(list.size(), bb);
+        GXHelpers::SetObjectCount((unsigned long)list.size(), bb);
         for (std::vector< CGXDLMSAccessItem >::iterator it = list.begin(); it != list.end(); ++it)
         {
             if (it->GetCommand() == DLMS_ACCESS_SERVICE_COMMAND_TYPE_GET)
