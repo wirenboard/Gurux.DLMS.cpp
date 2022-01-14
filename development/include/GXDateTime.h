@@ -130,7 +130,7 @@ public:
     // Constructor for Unix time.
     CGXDateTime(const unsigned long value);
     // Constructor for Unix time.
-    CGXDateTime::CGXDateTime(const unsigned long long unixTime);
+    CGXDateTime(const unsigned long long unixTime);
 
     // Constructor.
     CGXDateTime(struct tm& value);
