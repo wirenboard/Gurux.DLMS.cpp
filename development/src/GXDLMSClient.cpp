@@ -314,6 +314,11 @@ CGXDLMSObjectCollection& CGXDLMSClient::GetObjects()
 int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
 {
     int ret;
+    //Save default values.
+    m_InitializeMaxInfoTX = GetHdlcSettings().GetMaxInfoTX();
+    m_InitializeMaxInfoRX = GetHdlcSettings().GetMaxInfoRX();
+    m_InitializeWindowSizeTX = GetHdlcSettings().GetWindowSizeTX();
+    m_InitializeWindowSizeRX = GetHdlcSettings().GetWindowSizeRX();
     m_Settings.SetConnected(DLMS_CONNECTION_STATE_NONE);
     packets.clear();
     m_IsAuthenticationRequired = false;
@@ -333,44 +338,30 @@ int CGXDLMSClient::SNRMRequest(std::vector<CGXByteBuffer>& packets)
         return 0;
     }
     CGXByteBuffer data(25);
-    // FromatID
-    data.SetUInt8(0x81);
-    // GroupID
-    data.SetUInt8(0x80);
-    // Length is updated later.
-    data.SetUInt8(0);
     // If custom HDLC parameters are used.
-    if (CGXHdlcSettings::DEFAULT_MAX_INFO_TX != GetLimits().GetMaxInfoTX())
+    if (CGXHdlcSettings::DEFAULT_MAX_INFO_TX != GetLimits().GetMaxInfoTX() ||
+        CGXHdlcSettings::DEFAULT_MAX_INFO_RX != GetLimits().GetMaxInfoRX() ||
+        CGXHdlcSettings::DEFAULT_WINDOWS_SIZE_TX != GetLimits().GetWindowSizeTX() ||
+        CGXHdlcSettings::DEFAULT_WINDOWS_SIZE_RX != GetLimits().GetWindowSizeRX())
     {
+        // FromatID
+        data.SetUInt8(0x81);
+        // GroupID
+        data.SetUInt8(0x80);
+        // Length is updated later.
+        data.SetUInt8(0);
         data.SetUInt8(HDLC_INFO_MAX_INFO_TX);
         CGXDLMS::AppendHdlcParameter(data, GetLimits().GetMaxInfoTX());
-    }
-    if (CGXHdlcSettings::DEFAULT_MAX_INFO_RX != GetLimits().GetMaxInfoRX())
-    {
         data.SetUInt8(HDLC_INFO_MAX_INFO_RX);
         CGXDLMS::AppendHdlcParameter(data, GetLimits().GetMaxInfoRX());
-    }
-    if (CGXHdlcSettings::DEFAULT_WINDOWS_SIZE_TX != GetLimits().GetWindowSizeTX())
-    {
         data.SetUInt8(HDLC_INFO_WINDOW_SIZE_TX);
         data.SetUInt8(4);
         data.SetUInt32(GetLimits().GetWindowSizeTX());
-    }
-    if (CGXHdlcSettings::DEFAULT_WINDOWS_SIZE_RX != GetLimits().GetWindowSizeRX())
-    {
         data.SetUInt8(HDLC_INFO_WINDOW_SIZE_RX);
         data.SetUInt8(4);
         data.SetUInt32(GetLimits().GetWindowSizeRX());
-    }
-    // If default HDLC parameters are not used.
-    if (data.GetSize() != 3)
-    {
         // Length.
         data.SetUInt8(2, (unsigned char)(data.GetSize() - 3));
-    }
-    else
-    {
-        data.Clear();
     }
     m_Settings.ResetFrameSequence();
     CGXByteBuffer reply;
@@ -816,6 +807,8 @@ int CGXDLMSClient::ParseUAResponse(CGXByteBuffer& data)
 
 int CGXDLMSClient::AARQRequest(std::vector<CGXByteBuffer>& packets)
 {
+    //Save default values.
+    m_InitializePduSize = GetMaxReceivePDUSize();
     CGXByteBuffer buff(20);
     m_Settings.ResetBlockIndex();
     m_Settings.SetNegotiatedConformance((DLMS_CONFORMANCE)0);
@@ -1082,6 +1075,8 @@ int CGXDLMSClient::ReleaseRequest(std::vector<CGXByteBuffer>& packets)
     {
         return 0;
     }
+    //Restore default valuess.
+    SetMaxReceivePDUSize(m_InitializePduSize);
     if (!m_UseProtectedRelease)
     {
         buff.SetUInt8(3);
@@ -1096,12 +1091,12 @@ int CGXDLMSClient::ReleaseRequest(std::vector<CGXByteBuffer>& packets)
         buff.SetUInt8(0x80);
         buff.SetUInt8(01);
         buff.SetUInt8(00);
+        CGXAPDU::GenerateUserInformation(m_Settings, m_Settings.GetCipher(), NULL, buff);
         //Increase IC.
         if (m_Settings.GetCipher() != NULL && m_Settings.GetCipher()->IsCiphered())
         {
             m_Settings.GetCipher()->SetInvocationCounter(1 + m_Settings.GetCipher()->GetInvocationCounter());
         }
-        CGXAPDU::GenerateUserInformation(m_Settings, m_Settings.GetCipher(), NULL, buff);
         buff.SetUInt8(0, (unsigned char)(buff.GetSize() - 1));
     }
     if (GetUseLogicalNameReferencing())
@@ -1134,14 +1129,21 @@ int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets)
             ret = CGXDLMS::GetHdlcFrame(m_Settings, DLMS_COMMAND_DISCONNECT_REQUEST, NULL, reply);
         }
         packets.push_back(reply);
-        m_Settings.SetConnected(DLMS_CONNECTION_STATE_NONE);
-        return ret;
     }
     else
     {
         ret = ReleaseRequest(packets);
     }
-    m_Settings.SetMaxReceivePDUSize(0xFFFF);
+    if (CGXDLMS::UseHdlc(m_Settings.GetInterfaceType()))
+    {
+        //Restore default HDLC values.
+        GetHdlcSettings().SetMaxInfoTX(m_InitializeMaxInfoTX);
+        GetHdlcSettings().SetMaxInfoRX(m_InitializeMaxInfoRX);
+        GetHdlcSettings().SetWindowSizeTX(m_InitializeWindowSizeTX);
+        GetHdlcSettings().SetWindowSizeRX(m_InitializeWindowSizeRX);
+    }
+    m_Settings.SetConnected(DLMS_CONNECTION_STATE_NONE);
+    m_Settings.ResetFrameSequence();
     return ret;
 }
 
@@ -2184,7 +2186,7 @@ int CGXDLMSClient::EncryptLandisGyrHighLevelAuthentication(CGXByteBuffer& passwo
         return ret;
     }
     unsigned char ch, ch2;
-    for (pos = 0; pos != password.GetSize(); ++pos)
+    for (pos = 0; pos != (int) password.GetSize(); ++pos)
     {
         if ((ret = password.GetUInt8(pos, &ch)) != 0)
         {

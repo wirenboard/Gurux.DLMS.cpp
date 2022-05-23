@@ -3436,6 +3436,11 @@ int CGXDLMS::HandleGetResponseWithList(
         {
             reply.SetReadPosition(reply.GetData().GetPosition());
             GetValueFromData(settings, reply);
+            if (reply.GetValue().vt == DLMS_DATA_TYPE_NONE)
+            {
+                // Increase read position if data is null. This is a special case.
+                reply.SetReadPosition(1 + reply.GetReadPosition());
+            }
             reply.GetData().SetPosition(reply.GetReadPosition());
             values.Arr.push_back(reply.GetValue());
             reply.GetValue().Clear();

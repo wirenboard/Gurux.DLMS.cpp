@@ -467,9 +467,20 @@ int CGXDLMSPushSetup::GetPushValues(CGXDLMSClient* client,
             target.clear();
             target.insert(target.end(), att.begin(), att.end());
             value = values.at(pos);
-            if ((ret = client->UpdateValue(*obj, it->second.GetAttributeIndex(), value)) != 0)
+            if (it->second.GetAttributeIndex() == 0)
             {
-                break;
+                std::vector<CGXDLMSVariant>& tmp = values.at(pos).Arr;
+                for (int index = 1; index <= it->first->GetAttributeCount(); ++index)
+                {
+                    client->UpdateValue(*obj, index, tmp.at(index - 1));
+                }
+            }
+            else
+            {
+                if ((ret = client->UpdateValue(*obj, it->second.GetAttributeIndex(), value)) != 0)
+                {
+                    break;
+                }
             }
             results.push_back(std::pair<CGXDLMSObject*, CGXDLMSCaptureObject>(obj, it->second));
             ++pos;

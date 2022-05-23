@@ -912,6 +912,18 @@ bool CGXDLMSVariant::Equals(CGXDLMSVariant& item)
     {
         return false;
     }
+    if (vt == DLMS_DATA_TYPE_FLOAT32)
+    {
+        return fltVal == item.fltVal;
+    }
+    if (vt == DLMS_DATA_TYPE_FLOAT64)
+    {
+        return dblVal == item.dblVal;
+    }
+    if (vt == DLMS_DATA_TYPE_STRING)
+    {
+        return strVal == item.strVal;
+    }
     int size = GetSize();
     if (size == -1 || size != item.GetSize())
     {

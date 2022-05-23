@@ -707,10 +707,10 @@ const char* CGXDLMSConverter::GetUnitAsString(int unit)
     case DLMS_UNIT_BRITISH_THERMAL_UNIT_PER_DAY:
         ret = "British thermal unit per day";
         break;
-    case 254:
+    case DLMS_UNIT_OTHER:
         ret = "Other unit";
         break;
-    case 255:
+    case DLMS_UNIT_NO_UNIT:
         ret = "NoUnit";
         break;
     default:
@@ -1527,6 +1527,11 @@ const char* CGXDLMSConverter::ToString(DLMS_OBJECT_TYPE type)
         str = "GXDLMSSFSKPhyMacSetUp";
         break;
 #endif //DLMS_IGNORE_SFSK_PHY_MAC_SETUP
+#ifndef DLMS_IGNORE_NTP_SETUP
+    case DLMS_OBJECT_TYPE_NTP_SETUP:
+        str = "GXDLMSNtpSetup";
+        break;
+#endif //DLMS_IGNORE_NTP_SETUP        
     default:
         str = "Manufacture spesific.";
         break;

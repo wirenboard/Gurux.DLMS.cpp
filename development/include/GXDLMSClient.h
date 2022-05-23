@@ -48,6 +48,28 @@ protected:
     CGXDLMSSettings m_Settings;
     char m_ManufacturerId[3];
 private:
+    /// <summary>
+    /// Initialize PDU size that is restored after the connection is closed.
+    /// </summary>
+    uint16_t m_InitializePduSize;
+
+    /// <summary>
+    /// Initialize Max HDLC transmission size that is restored after the connection is closed.
+    /// </summary>
+    uint16_t m_InitializeMaxInfoTX;
+
+    /// <summary>
+    /// Initialize Max HDLC receive size that is restored after the connection is closed.
+    /// </summary>
+    uint16_t m_InitializeMaxInfoRX;
+
+    /// Initialize max HDLC window size in transmission that is restored after the connection is closed.
+    unsigned char m_InitializeWindowSizeTX;
+
+    /// Initialize max HDLC window size in receive that is restored after the connection is closed.
+    unsigned char m_InitializeWindowSizeRX;
+
+
     // If protected release is used release is including a ciphered xDLMS Initiate request.
     bool m_UseProtectedRelease;
     bool m_IsAuthenticationRequired;
