@@ -754,14 +754,15 @@ int CGXDateTime::ToFormatString(const char* pattern, std::string& value)
     }
     else
     {
-        ret = (int)strftime(buff, sizeof(buff), pattern, &m_Value);
-        if (ret != 0)
-        {
-            ret = 0;
-            value = buff;
-        }
-        else
-        {
+        if (pattern != NULL) {
+            ret = (int)strftime(buff, sizeof(buff), pattern, &m_Value);
+            if (ret != 0) {
+                ret = 0;
+                value = buff;
+            } else {
+                ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
+            }
+        } else {
             ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
     }
