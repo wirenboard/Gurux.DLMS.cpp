@@ -770,16 +770,12 @@ void CGXByteBuffer::Trim()
     m_Position = 0;
 }
 
-/**
-   * Compares, whether two given arrays are similar starting from current
-   * position.
-   *
-   * @param arr
-   *            Array to compare.
-   * @return True, if arrays are similar. False, if the arrays differ.
-   */
 bool CGXByteBuffer::Compare(unsigned char* buff, unsigned long length)
 {
+    if (buff == NULL || length == 0)
+    {
+        return m_Size == 0;
+    }
     if (m_Size - m_Position < length)
     {
         return false;

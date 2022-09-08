@@ -3241,6 +3241,7 @@ int CGXDLMS::GetPdu(
             case DLMS_COMMAND_GENERAL_DED_CIPHERING:
             case DLMS_COMMAND_GENERAL_CIPHERING:
             case DLMS_COMMAND_ACCESS_RESPONSE:
+                data.SetCommand(DLMS_COMMAND_NONE);
                 data.GetData().SetPosition(data.GetCipherIndex());
                 ret = GetPdu(settings, data);
                 break;
