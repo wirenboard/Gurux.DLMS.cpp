@@ -35,6 +35,7 @@
 #ifndef GXDLMSSETTINGS_H
 #define GXDLMSSETTINGS_H
 
+#include <memory>
 #include "enums.h"
 #include "GXBytebuffer.h"
 #include "GXDLMSLimits.h"
