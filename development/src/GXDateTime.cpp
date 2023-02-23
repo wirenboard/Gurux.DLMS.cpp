@@ -143,6 +143,7 @@ CGXDateTime::CGXDateTime()
     m_Value.tm_mday = 1;
     m_Extra = DATE_TIME_EXTRA_INFO_NONE;
     m_Status = DLMS_CLOCK_STATUS_OK;
+    m_UseUtc2NormalTime = false;
 }
 
 // Constructor.
@@ -154,6 +155,7 @@ CGXDateTime::CGXDateTime(struct tm& value)
     m_Value = value;
     m_Skip = DATETIME_SKIPS_NONE;
     m_Extra = DATE_TIME_EXTRA_INFO_NONE;
+    m_UseUtc2NormalTime = false;
     if (value.tm_isdst)
     {
         m_Status = DLMS_CLOCK_STATUS_DAYLIGHT_SAVE_ACTIVE;
@@ -169,20 +171,30 @@ CGXDateTime::CGXDateTime(const unsigned long unixTime)
 {
     m_Deviation = 0;
     time_t t = unixTime;
+#if _MSC_VER > 1000
+    gmtime_s(&m_Value, &t);
+#else
     m_Value = *gmtime(&t);
+#endif
     m_Skip = DATETIME_SKIPS_NONE;
     m_Extra = DATE_TIME_EXTRA_INFO_NONE;
     m_Status = DLMS_CLOCK_STATUS_OK;
+    m_UseUtc2NormalTime = false;
 }
 
 CGXDateTime::CGXDateTime(const unsigned long long unixTime)
 {
     m_Deviation = 0;
     time_t t = unixTime;
+#if _MSC_VER > 1000
+    gmtime_s(&m_Value, &t);
+#else
     m_Value = *gmtime(&t);
+#endif
     m_Skip = DATETIME_SKIPS_NONE;
     m_Extra = DATE_TIME_EXTRA_INFO_NONE;
     m_Status = DLMS_CLOCK_STATUS_OK;
+    m_UseUtc2NormalTime = false;
 }
 
 // Constructor.
@@ -194,6 +206,7 @@ CGXDateTime::CGXDateTime(struct tm* value)
     m_Value = *value;
     m_Skip = DATETIME_SKIPS_NONE;
     m_Extra = DATE_TIME_EXTRA_INFO_NONE;
+    m_UseUtc2NormalTime = false;
     if (value->tm_isdst)
     {
         m_Status = DLMS_CLOCK_STATUS_DAYLIGHT_SAVE_ACTIVE;
@@ -1194,15 +1207,105 @@ int CGXDateTime::AddSeconds(int seconds)
 
 int CGXDateTime::CompareTo(CGXDateTime& antherDate)
 {
-    time_t time1 = mktime(&m_Value);
-    time_t time2 = mktime(&antherDate.GetValue());
-    if (time1 < time2)
+    uint16_t year1 = (uint16_t)(1900 + m_Value.tm_year);
+    unsigned char month1 = (unsigned char)(1 + m_Value.tm_mon);
+    unsigned char day1 = (unsigned char)(m_Value.tm_mday);
+    unsigned char hour1 = (unsigned char)(m_Value.tm_hour);
+    unsigned char minute1 = (unsigned char)(m_Value.tm_min);
+    unsigned char second1 = (unsigned char)(m_Value.tm_sec);
+
+    uint16_t year2 = (uint16_t)(1900 + antherDate.m_Value.tm_year);
+    unsigned char month2 = (unsigned char)(1 + antherDate.m_Value.tm_mon);
+    unsigned char day2 = (unsigned char)(antherDate.m_Value.tm_mday);
+    unsigned char hour2 = (unsigned char)(antherDate.m_Value.tm_hour);
+    unsigned char minute2 = (unsigned char)(antherDate.m_Value.tm_min);
+    unsigned char second2 = (unsigned char)(antherDate.m_Value.tm_sec);
+
+    uint32_t val1 = 0, val2 = 0;
+    if ((m_Skip & DATETIME_SKIPS_SECOND) == 0)
     {
-        return -1;
+        val1 = second1;
     }
-    if (time1 > time2)
+    if ((m_Skip & DATETIME_SKIPS_MINUTE) == 0)
     {
-        return 1;
+        val1 += 60L * minute1;
+    }
+    if ((m_Skip & DATETIME_SKIPS_HOUR) == 0)
+    {
+        val1 += 3600L * hour1;
+    }
+    if ((m_Skip & DATETIME_SKIPS_DAY) == 0)
+    {
+        val1 += 24L * 3600L * day1;
+    }
+    if (m_Deviation != (short)0x8000)
+    {
+        if (m_UseUtc2NormalTime)
+        {
+            val1 += (60 * m_Deviation);
+        }
+        else
+        {
+            val1 -= (60 * m_Deviation);
+        }
+    }
+
+    if ((antherDate.m_Skip & DATETIME_SKIPS_SECOND) == 0)
+    {
+        val2 = second2;
+    }
+    if ((antherDate.m_Skip & DATETIME_SKIPS_MINUTE) == 0)
+    {
+        val2 += 60L * minute2;
+    }
+    if ((antherDate.m_Skip & DATETIME_SKIPS_HOUR) == 0)
+    {
+        val2 += 3600L * hour2;
+    }
+    if ((antherDate.m_Skip & DATETIME_SKIPS_DAY) == 0)
+    {
+        val2 += 24L * 3600L * day2;
+    }
+    if (antherDate.m_Deviation != (short)0x8000)
+    {
+        if (m_UseUtc2NormalTime)
+        {
+            val2 += (60 * antherDate.m_Deviation);
+        }
+        else
+        {
+            val2 -= (60 * antherDate.m_Deviation);
+        }
+    }
+
+    if ((m_Skip & DATETIME_SKIPS_MONTH) == 0 && (antherDate.m_Skip & DATETIME_SKIPS_MONTH) == 0)
+    {
+        if ((m_Skip & DATETIME_SKIPS_YEAR) == 0 && (antherDate.m_Skip & DATETIME_SKIPS_YEAR) == 0)
+        {
+            if (year1 != year2)
+            {
+                return year1 < year2 ? -1 : 1;
+            }
+            if (month1 != month2)
+            {
+                return month1 < month2 ? -1 : 1;
+            }
+        }
+        else if (month1 != month2)
+        {
+            return month1 < month2 ? -1 : 1;
+        }
+    }
+    else if ((m_Skip & DATETIME_SKIPS_YEAR) == 0 && (antherDate.m_Skip & DATETIME_SKIPS_YEAR) == 0)
+    {
+        if (year1 != year2)
+        {
+            return year1 < year2 ? -1 : 1;
+        }
+    }
+    if (val1 != val2)
+    {
+        return val1 < val2 ? -1 : 1;
     }
     return 0;
 }
@@ -1212,7 +1315,10 @@ int CGXDateTime::ToLocalTime(struct tm& localTime)
     localTime = m_Value;
     if (m_Deviation != -32768)//0x8000
     {
-        localTime.tm_min += m_Deviation;
+        if (!m_UseUtc2NormalTime)
+        {
+            localTime.tm_min -= m_Deviation;
+        }
         time_t t = GetUtcTime(&localTime);
         if (t == -1)
         {
@@ -1325,7 +1431,26 @@ long CGXDateTime::GetDifference(struct tm& start, CGXDateTime& to)
     }
     return diff;
 }
+
 unsigned long CGXDateTime::ToUnixTime()
 {
-    return (unsigned long)mktime(&m_Value);
+    unsigned long value = (unsigned long)mktime(&m_Value);
+    if (!m_UseUtc2NormalTime)
+    {
+        if (m_Deviation != (short)0x8000)
+        {
+            value -= m_Deviation;
+        }
+    }
+    return value;
+}
+
+bool CGXDateTime::GetUseUtc2NormalTime()
+{
+    return m_UseUtc2NormalTime;
+}
+
+void CGXDateTime::SetUseUtc2NormalTime(bool value)
+{
+    m_UseUtc2NormalTime = value;
 }

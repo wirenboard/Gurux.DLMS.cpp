@@ -522,7 +522,7 @@ int main(int argc, char* argv[])
                         if ((ret = comm.Read(obj, index, value)) != DLMS_ERROR_CODE_OK)
                         {
 #if _MSC_VER > 1000
-                            sprintf_s(buff, 100, "Error! Index: %d %s\n", index, CGXDLMSConverter::GetErrorMessage(ret));
+                            sprintf_s(buff, sizeof(buff), "Error! Index: %d %s\n", index, CGXDLMSConverter::GetErrorMessage(ret));
 #else
                             sprintf(buff, "Error! Index: %d read failed: %s\n", index, CGXDLMSConverter::GetErrorMessage(ret));
 #endif
@@ -532,7 +532,7 @@ int main(int argc, char* argv[])
                         else
                         {
 #if _MSC_VER > 1000
-                            sprintf_s(buff, 100, "Index: %d Value: ", index);
+                            sprintf_s(buff, sizeof(buff), "Index: %d Value: ", index);
 #else
                             sprintf(buff, "Index: %d Value: ", index);
 #endif

@@ -378,6 +378,10 @@ int GetDateTime(CGXDLMSSettings* settings, CGXByteBuffer& buff, CGXDataInfo& inf
         status = 0;
         skip = (DATETIME_SKIPS)(skip | DATETIME_SKIPS_STATUS);
     }
+    if (settings != NULL)
+    {
+        dt.SetUseUtc2NormalTime(settings->GetUseUtc2NormalTime());
+    }
     dt.SetStatus((DLMS_CLOCK_STATUS)status);
     if (year < 1 || year == 0xFFFF)
     {

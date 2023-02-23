@@ -140,6 +140,8 @@ void CGXReplyData::Clear()
     m_ServerAddress = 0;
     m_CommandType = 0;
     m_CipheredCommand = 0;
+    m_ReadPosition = 0;
+    m_CipherIndex = 0;
 }
 
 bool CGXReplyData::IsMoreData()

@@ -229,3 +229,5 @@ GuruxDLMSClientExample/VS/
 *.zip
 GuruxDLMSClientExample/VS/DvlErrLog.txt
 *.exe
+development/VS/.vs/
+GuruxDLMSClientExample/VS/.vs/

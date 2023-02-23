@@ -1144,6 +1144,8 @@ int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets)
     }
     m_Settings.SetConnected(DLMS_CONNECTION_STATE_NONE);
     m_Settings.ResetFrameSequence();
+    //Restore default valuess.
+    SetMaxReceivePDUSize(m_InitializePduSize);
     return ret;
 }
 

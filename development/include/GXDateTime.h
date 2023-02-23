@@ -107,6 +107,12 @@ class CGXDateTime
     struct tm m_Value;
     DATE_TIME_EXTRA_INFO m_Extra;
     DLMS_CLOCK_STATUS m_Status;
+
+    /////////////////////////////////////////////////////////////////////////
+    // DLMS Standard says that Time zone is from normal time to UTC in minutes.
+    // If meter is configured to use UTC time (UTC to normal time) set this to true.
+    bool m_UseUtc2NormalTime;
+
     void Init(int year, int month, int day, int hour, int minute, int second, int millisecond, int devitation);
     //Get date format.
     int GetDateFormat2(
@@ -257,5 +263,14 @@ public:
     /////////////////////////////////////////////////////////////////////////
     //Return datetime as unix time.
     unsigned long ToUnixTime();
+
+    /////////////////////////////////////////////////////////////////////////
+    // DLMS Standard says that Time zone is from normal time to UTC in minutes.
+    // If meter is configured to use UTC time (UTC to normal time) set this to true.
+    // Read nore: https://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSClock#dstDeviation
+    //
+    bool GetUseUtc2NormalTime();
+    void SetUseUtc2NormalTime(bool value);
+
 };
 #endif //GXDATETIME_H
