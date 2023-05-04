@@ -1224,6 +1224,149 @@ int CGXCommunication::ReadDataBlock(std::vector<CGXByteBuffer>& data, CGXReplyDa
     return ret;
 }
 
+// This method can be used to update firmware from the hex file.
+//
+int CGXCommunication::ImageUpdateFromFile(
+    CGXDLMSImageTransfer* target,
+    std::string& identifier,
+    std::string& fileName)
+{
+#if _MSC_VER > 1400
+    FILE* f = NULL;
+    fopen_s(&f, fileName.c_str(), "r");
+#else
+    FILE* f = fopen(fileName.c_str(), "r");
+#endif
+    int ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
+    if (f != NULL)
+    {
+        size_t imagesize;
+        char image[101];
+        CGXByteBuffer bb;
+        while (feof(f) == 0)
+        {
+            imagesize = fread(image, sizeof(char), sizeof(image) - 1, f);
+            image[imagesize] = 0;
+            bb.SetHexString(image);
+        }
+        fclose(f);
+        ret = ImageUpdate(target, identifier, bb);
+        bb.Clear();
+    }
+    return ret;
+}
+
+int CGXCommunication::ImageUpdate(CGXDLMSImageTransfer* target,
+    std::string& identification,
+    CGXByteBuffer& image)
+{
+    int ret;
+    //Check that image transfer is enabled.
+    CGXReplyData reply;
+    std::vector<CGXByteBuffer> data;
+    if ((ret = m_Parser->Read(target, 5, data)) != 0 ||
+        (ret = ReadDataBlock(data, reply)) != 0 ||
+        (ret = m_Parser->UpdateValue(*target, 5, reply.GetValue())) != 0)
+    {
+        return ret;
+    }
+    if (!target->GetImageTransferEnabled())
+    {
+        printf("%s\r\n", "Image transfer is not enabled");
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+
+    //Step 1: Read image block size.
+    data.clear();
+    reply.Clear();
+    if ((ret = m_Parser->Read(target, 2, data)) != 0 ||
+        (ret = ReadDataBlock(data, reply)) != 0 ||
+        (ret = m_Parser->UpdateValue(*target, 2, reply.GetValue())) != 0)
+    {
+        return ret;
+    }
+
+    // Step 2: Initiate the Image transfer process.
+    data.clear();
+    reply.Clear();
+    if ((ret = target->ImageTransferInitiate(m_Parser, identification, image.GetSize(), data)) != 0 ||
+        (ret = ReadDataBlock(data, reply)) != 0)
+    {
+        return ret;
+    }
+
+    // Step 3: Transfers ImageBlocks.
+    unsigned long imageBlockCount;
+    data.clear();
+    reply.Clear();
+    if ((ret = target->ImageBlockTransfer(m_Parser, image, imageBlockCount, data)) != 0 ||
+        (ret = ReadDataBlock(data, reply)) != 0)
+    {
+        return ret;
+    }
+
+
+    //Step 4: Check the completeness of the Image.
+    data.clear();
+    reply.Clear();
+    if ((ret = m_Parser->Read(target, 3, data)) != 0 ||
+        (ret = ReadDataBlock(data, reply)) != 0 ||
+        (ret = m_Parser->UpdateValue(*target, 3, reply.GetValue())) != 0)
+    {
+        return ret;
+    }
+
+    // Step 5: The Image is verified;
+    do
+    {
+        data.clear();
+        reply.Clear();
+        if ((ret = target->ImageVerify(m_Parser, data)) != 0 ||
+            (ret = ReadDataBlock(data, reply)) != 0)
+        {
+            if (ret != DLMS_ERROR_CODE_TEMPORARY_FAILURE)
+            {
+                return ret;
+            }
+            //Wait 10 seconds and check is verify succeeded.
+            printf("Waiting verify to complete...");
+#if defined(_WIN32) || defined(_WIN64)//Windows
+            Sleep(5000);
+#else
+            usleep(10000000);
+#endif
+        }
+    } while (ret == DLMS_ERROR_CODE_TEMPORARY_FAILURE);
+    // Step 6: Before activation, the Image is checked;
+
+    //Read image transfer status.
+    data.clear();
+    reply.Clear();
+    if ((ret = m_Parser->Read(target, 6, data)) != 0 ||
+        (ret = ReadDataBlock(data, reply)) != 0 ||
+        (ret = m_Parser->UpdateValue(*target, 6, reply.GetValue())) != 0)
+    {
+        return ret;
+    }
+
+    if (target->GetImageTransferStatus() != DLMS_IMAGE_TRANSFER_STATUS_VERIFICATION_SUCCESSFUL)
+    {
+        printf("Image transfer status is %d", target->GetImageTransferStatus());
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    //Step 7: Activate image.
+    data.clear();
+    reply.Clear();
+    if ((ret = target->ImageActivate(m_Parser, data)) != 0 ||
+        (ret = ReadDataBlock(data, reply)) != 0)
+    {
+        //Some meters return error here. 
+        return ret;
+    }
+    //The meter will usually reboot and the connection needs to be re-established.
+    return ret;
+}
+
 //Get Association view.
 int CGXCommunication::GetAssociationView()
 {

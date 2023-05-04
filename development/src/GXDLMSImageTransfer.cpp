@@ -184,6 +184,7 @@ int CGXDLMSImageTransfer::GetImageBlocks(CGXByteBuffer& image, std::vector<CGXBy
     for (unsigned long pos = 0; pos != cnt; ++pos)
     {
         CGXByteBuffer data;
+        CGXByteBuffer tmpImage;
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(2);
         tmp = pos;
@@ -196,13 +197,13 @@ int CGXDLMSImageTransfer::GetImageBlocks(CGXByteBuffer& image, std::vector<CGXBy
         if (bytes < 0)
         {
             bytes = (int)(image.GetSize() - (pos * m_ImageBlockSize));
-            data.Set(&image, data.GetSize(), bytes);
+            tmpImage.Set(&image, data.GetSize(), bytes);
         }
         else
         {
-            data.Set(&image, data.GetSize(), m_ImageBlockSize);
+            tmpImage.Set(&image, data.GetSize(), m_ImageBlockSize);
         }
-        tmp = data;
+        tmp = tmpImage;
         if ((ret = GXHelpers::SetData(NULL, data, DLMS_DATA_TYPE_OCTET_STRING, tmp)) != 0)
         {
             break;
