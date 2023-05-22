@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
         uint16_t maxInfo = 128;
         char* manufacturerId = NULL;
 
-        while ((opt = getopt(argc, argv, "h:p:c:s:r:i:It:a:P:g:S:n:C:v:o:T:A:B:D:m:l:W:w:f:L:")) != -1)
+        while ((opt = getopt(argc, argv, "h:p:c:s:r:i:d:t:a:P:g:S:n:C:v:o:T:A:B:D:m:l:W:w:f:L:")) != -1)
         {
             switch (opt)
             {
