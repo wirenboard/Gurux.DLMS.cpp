@@ -983,7 +983,7 @@ int CGXDLMSClient::ParseApplicationAssociationResponse(
     //Landis+Gyr is not returning StoC.
     if (memcmp(m_ManufacturerId, "LGZ", 3) == 0 && m_Settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH)
     {
-        m_Settings.SetConnected((DLMS_CONNECTION_STATE) (m_Settings.GetConnected() | DLMS_CONNECTION_STATE_DLMS));
+        m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() | DLMS_CONNECTION_STATE_DLMS));
     }
     else
     {
@@ -1616,6 +1616,51 @@ int CGXDLMSClient::Write(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType,
     return ret;
 }
 
+int CGXDLMSClient::Write(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType,
+    int index, CGXByteBuffer& value, std::vector<CGXByteBuffer>& reply)
+{
+    if (index < 1)
+    {
+        //Invalid parameter
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    int ret;
+    m_Settings.ResetBlockIndex();
+    CGXByteBuffer bb;
+    if (GetUseLogicalNameReferencing())
+    {
+        // Add CI.
+        bb.SetUInt16(objectType);
+        // Add LN.
+        unsigned char ln[6];
+        GXHelpers::SetLogicalName(name.strVal.c_str(), ln);
+        bb.Set(ln, 6);
+        // Attribute ID.
+        bb.SetUInt8(index);
+        // Access selection is not used.
+        bb.SetUInt8(0);
+        CGXDLMSLNParameters p(&m_Settings, 0,
+            DLMS_COMMAND_SET_REQUEST, DLMS_SET_COMMAND_TYPE_NORMAL,
+            &bb, &value, 0xff, DLMS_COMMAND_NONE);
+        ret = CGXDLMS::GetLnMessages(p, reply);
+    }
+    else
+    {
+        // Add name.
+        int sn = name.ToInteger();
+        sn += (index - 1) * 8;
+        bb.SetUInt16(sn);
+        // Add data count.
+        bb.SetUInt8(1);
+        CGXDLMSSNParameters p(&m_Settings,
+            DLMS_COMMAND_WRITE_REQUEST, 1,
+            DLMS_VARIABLE_ACCESS_SPECIFICATION_VARIABLE_NAME,
+            &bb, &value);
+        ret = CGXDLMS::GetSnMessages(p, reply);
+    }
+    return ret;
+}
+
 /**
     * Generate Method (Action) request.
     *
@@ -1756,6 +1801,73 @@ int CGXDLMSClient::Method(
         ret = CGXDLMS::GetSnMessages(p, reply);
     }
 
+    return ret;
+}
+
+
+int CGXDLMSClient::Method(
+    CGXDLMSVariant name,
+    DLMS_OBJECT_TYPE objectType,
+    int index,
+    CGXByteBuffer& value,
+    DLMS_DATA_TYPE dataType,
+    std::vector<CGXByteBuffer>& reply)
+{
+    int ret;
+    if (index < 1)
+    {
+        //Invalid parameter
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+
+    CGXByteBuffer bb;
+    m_Settings.ResetBlockIndex();
+    if (GetUseLogicalNameReferencing())
+    {
+        // CI
+        bb.SetUInt16(objectType);
+        // Add LN.
+        unsigned char ln[6];
+        GXHelpers::SetLogicalName(name.strVal.c_str(), ln);
+        bb.Set(ln, 6);
+        // Attribute ID.
+        bb.SetUInt8(index);
+        bb.SetUInt8(1);
+        CGXDLMSLNParameters p(&m_Settings, 0,
+            DLMS_COMMAND_METHOD_REQUEST, DLMS_ACTION_COMMAND_TYPE_NORMAL,
+            &bb, &value, 0xff, DLMS_COMMAND_NONE);
+        ret = CGXDLMS::GetLnMessages(p, reply);
+    }
+    else
+    {
+        int requestType;
+        requestType = DLMS_VARIABLE_ACCESS_SPECIFICATION_PARAMETERISED_ACCESS;
+        unsigned char ind, count;
+        if ((ret = CGXDLMS::GetActionInfo(objectType, ind, count)) != 0)
+        {
+            return ret;
+        }
+
+        if (index > count)
+        {
+            //Invalid parameter
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+        int sn = name.ToInteger();
+        index = (ind + (index - 1) * 0x8);
+        sn += index;
+        // Add SN count.
+        bb.SetUInt8(1);
+        // Add name length.
+        bb.SetUInt8(4);
+        // Add name.
+        bb.SetUInt16(sn);
+        // Method Invocation Parameters is not used.
+        bb.SetUInt8(1);
+        CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_READ_REQUEST, 1,
+            requestType, &bb, &value);
+        ret = CGXDLMS::GetSnMessages(p, reply);
+    }
     return ret;
 }
 
@@ -2188,7 +2300,7 @@ int CGXDLMSClient::EncryptLandisGyrHighLevelAuthentication(CGXByteBuffer& passwo
         return ret;
     }
     unsigned char ch, ch2;
-    for (pos = 0; pos != (int) password.GetSize(); ++pos)
+    for (pos = 0; pos != (int)password.GetSize(); ++pos)
     {
         if ((ret = password.GetUInt8(pos, &ch)) != 0)
         {
