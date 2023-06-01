@@ -394,8 +394,7 @@ int CGXDLMSClient::ParseSNObjectItem(
     {
         pObj->SetShortName(sn);
         pObj->SetVersion(version);
-        int cnt = ln.GetSize();
-        assert(cnt == 6);
+        assert(ln.GetSize() == 6);
         CGXDLMSObject::SetLogicalName(pObj, ln);
         std::string ln2;
         pObj->GetLogicalName(ln2);
@@ -499,7 +498,6 @@ int CGXDLMSClient::ParseLNObjectItem(
                 return DLMS_ERROR_CODE_INVALID_PARAMETER;
             }
             pObj->SetVersion(version);
-            int cnt;
             // attribute_access_descriptor Start
             if (value.Arr[3].Arr[0].vt != DLMS_DATA_TYPE_ARRAY)
             {
@@ -568,8 +566,7 @@ int CGXDLMSClient::ParseLNObjectItem(
                 }
             }
             // method_access_item End
-            cnt = ln.GetSize();
-            assert(cnt == 6);
+            assert(ln.GetSize() == 6);
             m_Settings.GetObjects().push_back(pObj);
         }
     }
