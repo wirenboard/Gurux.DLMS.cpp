@@ -3149,11 +3149,11 @@ int CGXDLMS::GetPdu(
         case DLMS_COMMAND_GENERAL_DED_CIPHERING:
             if (settings.IsServer())
             {
-                HandleGloDedRequest(settings, data);
+                ret = HandleGloDedRequest(settings, data);
             }
             else
             {
-                HandleGloDedResponse(settings, data, index);
+                ret = HandleGloDedResponse(settings, data, index);
             }
             break;
         case DLMS_COMMAND_DATA_NOTIFICATION:
