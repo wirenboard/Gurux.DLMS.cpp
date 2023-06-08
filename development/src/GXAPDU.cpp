@@ -298,7 +298,9 @@ int CGXAPDU::GenerateUserInformation(
             {
                 return ret;
             }
-            if ((ret = cipher->Encrypt(cipher->GetSecurity(),
+            if ((ret = cipher->Encrypt(
+                cipher->GetSecuritySuite(),
+                cipher->GetSecurity(),
                 DLMS_COUNT_TYPE_PACKET,
                 settings.GetCipher()->GetFrameCounter(),
                 cmd,
@@ -1338,7 +1340,9 @@ int CGXAPDU::GetUserInformation(
     }
     if (cipher != NULL && cipher->IsCiphered())
     {
-        return cipher->Encrypt(cipher->GetSecurity(),
+        return cipher->Encrypt(
+            cipher->GetSecuritySuite(), 
+            cipher->GetSecurity(),
             DLMS_COUNT_TYPE_PACKET,
             settings.GetCipher()->GetFrameCounter(),
             DLMS_COMMAND_GLO_INITIATE_RESPONSE,

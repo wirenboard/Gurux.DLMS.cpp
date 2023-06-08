@@ -220,11 +220,13 @@ int CGXSecure::Secure(
     else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
     {
         CGXByteBuffer& key = settings.GetCipher()->GetBlockCipherKey();
-        ret = cipher->Encrypt(DLMS_SECURITY_AUTHENTICATION,
+        ret = cipher->Encrypt(
+            cipher->GetSecuritySuite(),
+            DLMS_SECURITY_AUTHENTICATION,
             DLMS_COUNT_TYPE_TAG, ic, 0, secret, key, data, true);
         if (ret == 0)
         {
-            reply.SetUInt8(DLMS_SECURITY_AUTHENTICATION);
+            reply.SetUInt8(DLMS_SECURITY_AUTHENTICATION | cipher->GetSecuritySuite());
             reply.SetUInt32(ic);
             reply.Set(&data);
         }

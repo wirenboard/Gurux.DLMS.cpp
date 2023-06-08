@@ -280,6 +280,11 @@ int CGXXmlWriter::WriteElementString(const char* name, int value)
     return 0;
 }
 
+int CGXXmlWriter::WriteElementString(const char* name, bool value)
+{
+    int tmp = value ? 1 : 0;
+    return CGXXmlWriter::WriteElementString(name, tmp);
+}
 
 int CGXXmlWriter::WriteElementString(const char* name, long value)
 {

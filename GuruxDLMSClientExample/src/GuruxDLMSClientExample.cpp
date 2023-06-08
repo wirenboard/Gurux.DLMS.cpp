@@ -59,6 +59,7 @@ static void ShowHelp()
     printf(" -t Trace messages.\n");
     printf(" -g \"0.0.1.0.0.255:1; 0.0.1.0.0.255:2\" Get selected object(s) with given attribute index.\n");
     printf(" -C \t Security Level. (None, Authentication, Encrypted, AuthenticationEncryption)");
+    printf(" -V \t Security Suite version. (Default: Suite0). (Suite0, Suite1 or Suite2)");
     printf(" -v \t Invocation counter data object Logical Name. Ex. 0.0.43.1.1.255");
     printf(" -I \t Auto increase invoke ID");
     printf(" -o \t Cache association view to make reading faster. Ex. -o C:\\device.xml");
@@ -108,6 +109,7 @@ int main(int argc, char* argv[])
         DLMS_AUTHENTICATION authentication = DLMS_AUTHENTICATION_NONE;
         DLMS_INTERFACE_TYPE interfaceType = DLMS_INTERFACE_TYPE_HDLC;
         DLMS_SECURITY security = DLMS_SECURITY_NONE;
+        DLMS_SECURITY_SUITE securitySuite = DLMS_SECURITY_SUITE_V0;
         char* password = NULL;
         char* p, * p2, * readObjects = NULL;
         int index, a, b, c, d, e, f;
@@ -127,8 +129,7 @@ int main(int argc, char* argv[])
         unsigned char windowSize = 1;
         uint16_t maxInfo = 128;
         char* manufacturerId = NULL;
-
-        while ((opt = getopt(argc, argv, "h:p:c:s:r:i:d:t:a:P:g:S:n:C:v:o:T:A:B:D:m:l:W:w:f:L:")) != -1)
+        while ((opt = getopt(argc, argv, "h:p:c:s:r:i:d:t:a:P:g:S:n:C:v:o:T:A:B:D:m:l:W:w:f:L:V:")) != -1)
         {
             switch (opt)
             {
@@ -220,6 +221,25 @@ int main(int argc, char* argv[])
                 else
                 {
                     printf("Invalid Ciphering option '%s'. (None, Authentication, Encryption, AuthenticationEncryption)", optarg);
+                    return 1;
+                }
+                break;
+            case 'V':
+                if (strcasecmp("Suite0", optarg) == 0)
+                {
+                    securitySuite = DLMS_SECURITY_SUITE_V0;
+                }
+                else if (strcasecmp("Suite1", optarg) == 0)
+                {
+                    securitySuite = DLMS_SECURITY_SUITE_V1;
+                }
+                else if (strcasecmp("Suite2", optarg) == 0)
+                {
+                    securitySuite = DLMS_SECURITY_SUITE_V2;
+                }
+                else
+                {
+                    printf("Invalid Security suite option '%s'. (Suite0, Suite1, Suite2)", optarg);
                     return 1;
                 }
                 break;
@@ -398,9 +418,9 @@ int main(int argc, char* argv[])
                 ShowHelp();
                 return 1;
             }
-        }
         CGXDLMSSecureClient cl(useLogicalNameReferencing, clientAddress, serverAddress, authentication, password, interfaceType);
         cl.GetCiphering()->SetSecurity(security);
+        cl.GetCiphering()->SetSecuritySuite(securitySuite);
         cl.SetAutoIncreaseInvokeID(autoIncreaseInvokeID);
         cl.SetGbtWindowSize(gbtWindowSize);
         cl.GetHdlcSettings().SetWindowSizeRX(windowSize);

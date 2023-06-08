@@ -862,6 +862,7 @@ int Cipher0(CGXDLMSLNParameters& p,
     }
     CGXByteBuffer& title = p.GetSettings()->GetCipher()->GetSystemTitle();
     ret = p.GetSettings()->GetCipher()->Encrypt(
+        p.GetSettings()->GetCipher()->GetSecuritySuite(),
         p.GetSettings()->GetCipher()->GetSecurity(),
         DLMS_COUNT_TYPE_PACKET,
         p.GetSettings()->GetCipher()->GetFrameCounter(),
@@ -1422,6 +1423,7 @@ int CGXDLMS::GetSNPdu(
     {
         CGXByteBuffer tmp;
         ret = p.GetSettings()->GetCipher()->Encrypt(
+            p.GetSettings()->GetCipher()->GetSecuritySuite(),
             p.GetSettings()->GetCipher()->GetSecurity(),
             DLMS_COUNT_TYPE_PACKET,
             p.GetSettings()->GetCipher()->GetFrameCounter(),

@@ -170,6 +170,10 @@ public:
     /**
       * Encrypt PDU.
       *
+      * suite
+      *            Security suite.
+      * security
+      *            Security.
       * tag
       *            Tag.
       * systemTitle
@@ -180,6 +184,7 @@ public:
       *            Encrypted data.
       */
     int Encrypt(
+        DLMS_SECURITY_SUITE suite,
         DLMS_SECURITY security,
         DLMS_COUNT_TYPE type,
         unsigned long frameCounter,
@@ -261,7 +266,7 @@ public:
     /**
     *  value: System title.
     */
-    void SetSystemTitle(CGXByteBuffer& value);
+    int SetSystemTitle(CGXByteBuffer& value);
 
     /**
      * Returns Block cipher key.
@@ -271,7 +276,7 @@ public:
     /**
     *  value: Block cipher key.
     */
-    void SetBlockCipherKey(CGXByteBuffer& value);
+    int SetBlockCipherKey(CGXByteBuffer& value);
 
     /**
      * Returns Authentication key.
@@ -282,7 +287,7 @@ public:
      * value
      *            Authentication key.
      */
-    void SetAuthenticationKey(CGXByteBuffer& value);
+    int SetAuthenticationKey(CGXByteBuffer& value);
 
     /**
      * Returns Frame counter. AKA. Invocation counter.
