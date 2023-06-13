@@ -418,6 +418,7 @@ int main(int argc, char* argv[])
                 ShowHelp();
                 return 1;
             }
+        }
         CGXDLMSSecureClient cl(useLogicalNameReferencing, clientAddress, serverAddress, authentication, password, interfaceType);
         cl.GetCiphering()->SetSecurity(security);
         cl.GetCiphering()->SetSecuritySuite(securitySuite);
