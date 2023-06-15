@@ -763,8 +763,6 @@ public:
    *            Method index.
    * @param value
    *            Method data.
-   * @param dataType
-   *            Data type.
    * @return DLMS action message.
    */
     int Method(
@@ -772,8 +770,8 @@ public:
         DLMS_OBJECT_TYPE objectType,
         int methodIndex,
         CGXByteBuffer& data,
-        DLMS_DATA_TYPE dataType,
         std::vector<CGXByteBuffer>& reply);
+
     /**
     * Read rows by entry.
     *

@@ -1810,7 +1810,6 @@ int CGXDLMSClient::Method(
     DLMS_OBJECT_TYPE objectType,
     int index,
     CGXByteBuffer& value,
-    DLMS_DATA_TYPE dataType,
     std::vector<CGXByteBuffer>& reply)
 {
     int ret;
