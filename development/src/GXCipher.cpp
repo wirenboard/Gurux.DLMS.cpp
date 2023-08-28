@@ -530,7 +530,7 @@ void CGXCipher::AesGcmGhash(const unsigned char* H, const unsigned char* aad, in
     unsigned char len_buf[16];
     GetGHash(H, aad, aad_len, S);
     GetGHash(H, crypt, crypt_len, S);
-    //Here is expected that data is newer longger than 32 bit.
+    //Here is expected that data is never longer than 32 bit.
     //This is done because microcontrollers show warning here.
     PUT32(len_buf, (unsigned long)0);
     PUT32(len_buf + 4, (unsigned long)(aad_len * 8));

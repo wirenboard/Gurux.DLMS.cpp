@@ -353,7 +353,7 @@ int CGXDLMS::GetHdlcFrame(
     }
     else if (data->GetSize() - data->GetPosition() <= frameSize)
     {
-        len = data->GetSize() - data->GetPosition();
+        len = data->Available();
         // Is last packet.
         reply.SetUInt8(0xA0 | (((7 + primaryAddress.GetSize() +
             secondaryAddress.GetSize() + len) >> 8) & 0x7));
@@ -362,7 +362,8 @@ int CGXDLMS::GetHdlcFrame(
     {
         len = frameSize;
         // More data to left.
-        reply.SetUInt8(0xA8 | ((len >> 8) & 0x7));
+        reply.SetUInt8(0xA0 | (((7 + primaryAddress.GetSize() +
+            secondaryAddress.GetSize() + len) >> 8) & 0x7));
     }
     // Frame len.
     if (len == 0)

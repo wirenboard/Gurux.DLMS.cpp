@@ -635,7 +635,7 @@ typedef enum
     */
     DLMS_SECURITY_SUITE_V1 = 1,
     /*
-     AES-GCM-128 authenticated encryption, ECDSA P-384 digital signature, ECDH P-384 key agreement, SHA-384 hash, V.44 compression and AES-128 key wrap.
+     AES-GCM-256 authenticated encryption, ECDSA P-384 digital signature, ECDH P-384 key agreement, SHA-384 hash, V.44 compression and AES-256 key wrap.
     */
     DLMS_SECURITY_SUITE_V2 = 2
 } DLMS_SECURITY_SUITE;

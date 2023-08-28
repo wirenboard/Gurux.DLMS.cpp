@@ -436,10 +436,53 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
     return DLMS_ERROR_CODE_OK;
 }
 
+#if !defined(_WIN32) && !defined(_WIN64)//Windows
+
+static int GetLinuxBaudRate(int baudRate, unsigned short& br)
+{
+    switch (baudRate) {
+    case 110:
+        br = B110;
+        break;
+    case 300:
+        br = B300;
+        break;
+    case 600:
+        br = B600;
+        break;
+    case 1200:
+        br = B1200;
+        break;
+    case 2400:
+        br = B2400;
+        break;
+    case 4800:
+        br = B4800;
+        break;
+    case 9600:
+        br = B9600;
+        break;
+    case 19200:
+        br = B19200;
+        break;
+    case 38400:
+        br = B38400;
+        break;
+    case 57600:
+        br = B57600;
+        break;
+    default:
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    return 0;
+}
+#endif //!defined(_WIN32) && !defined(_WIN64)//Windows
+
 //Open serial port.
 int CGXCommunication::Open(const char* settings, int maxBaudrate)
 {
     Close();
+    int ret, len, pos;
     unsigned short baudRate;
 #if defined(_WIN32) || defined(_WIN64)
     unsigned char parity;
@@ -460,7 +503,14 @@ int CGXCommunication::Open(const char* settings, int maxBaudrate)
             printf("Serial port settings format is:COM1:9800:8None1.\n");
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
+#if defined(_WIN32) || defined(_WIN64)
         baudRate = atoi(tmp[1].c_str());
+#else //Linux
+        if ((ret = GetLinuxBaudRate(atoi(tmp[1].c_str()), baudRate)) != 0)
+        {
+            return ret;
+        }
+#endif        
         dataBits = atoi(tmp[2].substr(0, 1).c_str());
         tmp2 = tmp[2].substr(1, tmp[2].size() - 2);
         if (tmp2.compare("None") == 0)
@@ -525,7 +575,6 @@ int CGXCommunication::Open(const char* settings, int maxBaudrate)
     }
 
     CGXByteBuffer reply;
-    int ret, len, pos;
     unsigned char ch;
     //In Linux serial port name might be very long.
     char buff[50];
@@ -727,57 +776,36 @@ int CGXCommunication::Open(const char* settings, int maxBaudrate)
         switch (ch)
         {
         case '0':
-#if defined(_WIN32) || defined(_WIN64)
             baudRate = 300;
-#else
-            baudRate = B300;
-#endif
             break;
         case '1':
-#if defined(_WIN32) || defined(_WIN64)
             baudRate = 600;
-#else
-            baudRate = B600;
-#endif
             break;
         case '2':
-#if defined(_WIN32) || defined(_WIN64)
             baudRate = 1200;
-#else
-            baudRate = B1200;
-#endif
             break;
         case '3':
-#if defined(_WIN32) || defined(_WIN64)
             baudRate = 2400;
-#else
-            baudRate = B2400;
-#endif
             break;
         case '4':
-#if defined(_WIN32) || defined(_WIN64)
             baudRate = 4800;
-#else
-            baudRate = B4800;
-#endif
             break;
         case '5':
-#if defined(_WIN32) || defined(_WIN64)
             baudRate = 9600;
-#else
-            baudRate = B9600;
-#endif
             break;
         case '6':
-#if defined(_WIN32) || defined(_WIN64)
             baudRate = 19200;
-#else
-            baudRate = B19200;
-#endif
             break;
         default:
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
+#if !defined(_WIN32) && !defined(_WIN64)//Windows
+        if ((ret = GetLinuxBaudRate(baudRate, baudRate)) != 0)
+        {
+            return ret;
+        }
+#endif //!defined(_WIN32) && !defined(_WIN64)//Windows
+
         //Send ACK
         buff[0] = 0x06;
         //Send Protocol control character
