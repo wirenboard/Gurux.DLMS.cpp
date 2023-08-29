@@ -362,7 +362,7 @@ int CGXDLMS::GetHdlcFrame(
     {
         len = frameSize;
         // More data to left.
-        reply.SetUInt8(0xA0 | (((7 + primaryAddress.GetSize() +
+        reply.SetUInt8(0xA8 | (((7 + primaryAddress.GetSize() +
             secondaryAddress.GetSize() + len) >> 8) & 0x7));
     }
     // Frame len.
