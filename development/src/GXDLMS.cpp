@@ -4599,11 +4599,10 @@ bool IsPlcSfskData(CGXByteBuffer& buff)
     {
         return false;
     }
-    int ret;
     uint16_t len;
-    if ((ret = buff.GetUInt16(buff.GetPosition(), &len)) != 0)
+    if (buff.GetUInt16(buff.GetPosition(), &len) != 0)
     {
-        return ret;
+        return false;
     }
     switch (len)
     {
