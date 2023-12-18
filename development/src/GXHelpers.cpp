@@ -1054,7 +1054,7 @@ int GetUtfString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMS
         buff.Get((unsigned char*)tmp, len);
         value.vt = DLMS_DATA_TYPE_STRING_UTF8;
         value.strVal.append(tmp, len);
-        delete tmp;
+        delete[] tmp;
 #ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (info.GetXml() != NULL)
         {
@@ -1214,11 +1214,11 @@ int GetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMSVar
         tmp[len] = '\0';
         if ((ret = buff.Get((unsigned char*)tmp, len)) != 0)
         {
-            delete tmp;
+            delete[] tmp;
             return ret;
         }
         value = tmp;
-        delete tmp;
+        delete[] tmp;
     }
     else
     {
