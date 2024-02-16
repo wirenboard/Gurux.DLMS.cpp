@@ -1,0 +1,316 @@
+//
+// --------------------------------------------------------------------------
+//  Gurux Ltd
+//
+//
+//
+// Filename:        $HeadURL$
+//
+// Version:         $Revision$,
+//                  $Date$
+//                  $Author$
+//
+// Copyright (c) Gurux Ltd
+//
+//---------------------------------------------------------------------------
+//
+//  DESCRIPTION
+//
+// This file is a part of Gurux Device Framework.
+//
+// Gurux Device Framework is Open Source software; you can redistribute it
+// and/or modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; version 2 of the License.
+// Gurux Device Framework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// More information of Gurux products: http://www.gurux.org
+//
+// This code is licensed under the GNU General Public License v2.
+// Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
+//---------------------------------------------------------------------------
+
+#include "../include/GXPublicKey.h"
+
+CGXPublicKey::CGXPublicKey()
+{
+    m_Scheme = ECC_P256;
+}
+
+CGXPublicKey& CGXPublicKey::operator=(const CGXPublicKey& value)
+{
+    m_Scheme = value.m_Scheme;
+    m_RawValue = value.m_RawValue;
+    m_SystemTitle = value.m_SystemTitle;
+    return *this;
+}
+
+ECC CGXPublicKey::GetScheme()
+{
+    return m_Scheme;
+}
+
+CGXByteArray& CGXPublicKey::GetRawValue()
+{
+    return m_RawValue;
+}
+
+CGXByteArray& CGXPublicKey::GetSystemTitle()
+{
+    return m_SystemTitle;
+}
+
+void CGXPublicKey::SetSystemTitle(CGXByteBuffer& value)
+{
+    m_SystemTitle = value;
+}
+
+int CGXPublicKey::FromRawBytes(CGXByteBuffer& key,
+    CGXPublicKey& value)
+{
+    if (key.GetSize() == 65)
+    {
+        value.m_Scheme = ECC_P256;
+        value.m_RawValue = key;
+    }
+    else if (key.GetSize() == 97)
+    {
+        value.m_Scheme = ECC_P384;
+        value.m_RawValue = key;
+    }
+    else if (key.GetSize() == 64)
+    {
+        //Compression tag is not send in DLMS messages.
+        value.m_Scheme = ECC_P256;
+        value.m_RawValue = key;
+        value.m_RawValue.GetData()[0] = 4;
+    }
+    else if (key.GetSize() == 96)
+    {
+        //Compression tag is not send in DLMS messages.
+        value.m_Scheme = ECC_P384;
+        value.m_RawValue = key;
+        value.m_RawValue.GetData()[0] = 4;
+    }
+    else
+    {
+        //Invalid key.
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    return 0;
+}
+
+int CGXPublicKey::FromDer(std::string der,
+    CGXPublicKey& key)
+{
+    GXHelpers::Replace(der, "\r\n", "");
+    GXHelpers::Replace(der, "\n", "");
+    CGXByteBuffer bb;
+    bb.FromBase64(der);
+    CGXAsn1Base* value = NULL;
+    int ret = CGXAsn1Converter::FromByteArray(bb, value);
+    if (ret == 0)
+    {
+        if (CGXAsn1Sequence* seq = dynamic_cast<CGXAsn1Sequence*>(value))
+        {
+            if (CGXAsn1Variant* var = dynamic_cast<CGXAsn1Variant*>(seq->GetValues()->at(0)))
+            {
+                if (var->GetValue().bVal > 3)
+                {
+                    printf("Invalid private key version.");
+                    return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                }
+            }
+            else
+            {
+                printf("Invalid Certificate. This looks more like private key, not PKCS 8.");
+                return DLMS_ERROR_CODE_INVALID_PARAMETER;
+            }
+        }
+        else
+        {
+            ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+    }
+    /*
+    CGXAsn1Sequence seq = (GXAsn1Sequence)GXAsn1Converter.FromByteArray(key);
+    java.util.ArrayList<Object> tmp = (java.util.ArrayList<Object>)seq[0];
+    X9ObjectIdentifier id = X9ObjectIdentifierConverter.FromString(tmp.get(0).toString());
+    switch (id)
+    {
+    case X9ObjectIdentifier.Prime256v1:
+        value.Scheme = Ecc_P256;
+        break;
+    case X9ObjectIdentifier.Secp384r1:
+        value.Scheme = Ecc_P384;
+        break;
+    default:
+        if (id == X9ObjectIdentifier.None)
+        {
+            throw new IllegalArgumentException("Invalid key " + tmp.get(0).toString() + ".");
+        }
+        else
+        {
+            throw new IllegalArgumentException("Invalid key " + id + " " + tmp.get(0).toString() + ".");
+        }
+    }
+    //C# TO JAVA CONVERTER WARNING: Unsigned integer types have no direct equivalent in Java:
+    //ORIGINAL LINE: if (seq[1] is CGXByteBuffer)
+    if (seq[1] instanceof CGXByteBuffer)
+    {
+        //C# TO JAVA CONVERTER WARNING: Unsigned integer types have no direct equivalent in Java:
+        //ORIGINAL LINE: value.RawValue = (CGXByteBuffer)seq[1];
+        value.RawValue = (CGXByteBuffer)seq[1];
+    }
+    else
+    {
+        //Open SSL PEM.
+        value.RawValue = ((GXAsn1BitString)seq[1]).Value;
+    }
+    return value;
+    */
+    return ret;
+}
+
+int CGXPublicKey::FromPem(
+    std::string pem,
+    CGXPublicKey& key)
+{
+    GXHelpers::Replace(pem, "\r\n", "\n");
+    std::string START = "-----BEGIN KEY-----\n";
+    std::string END = "-----END KEY-----\n";
+    size_t index = pem.find(START);
+    if (index == std::string::npos)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    pem = pem.substr(index + START.length());
+    index = pem.rfind(END);
+    if (index == std::string::npos)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    pem = pem.substr(0, index);
+    return FromDer(pem, key);
+}
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+
+int CGXPublicKey::Load(std::string& path,
+    CGXPublicKey& value)
+{
+    std::string text;
+    int ret = GXHelpers::Load(path, text);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    return FromPem(text, value);
+}
+
+int CGXPublicKey::Save(std::string& path)
+{
+    std::string text;
+    int ret = ToPem(text);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    return GXHelpers::Save(path, text);
+    return 0;
+}
+#endif //defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+
+std::string CGXPublicKey::ToHex()
+{
+    return m_RawValue.ToHexString();
+}
+
+int CGXPublicKey::ToDer(std::string& value)
+{
+    int ret;
+    CGXByteBuffer bb;
+    if ((ret = GetEncoded(bb)) == 0)
+    {
+        bb.ToBase64(value);
+    }
+    return ret;
+}
+
+int CGXPublicKey::GetEncoded(
+    CGXByteBuffer& value)
+{
+    //Subject Key Info.
+    CGXAsn1Sequence d;
+    CGXAsn1Sequence* d1 = new CGXAsn1Sequence();
+    d1->GetValues()->push_back(new CGXAsn1ObjectIdentifier("1.2.840.10045.2.1"));
+    if (m_Scheme == ECC_P256)
+    {
+        d1->GetValues()->push_back(new CGXAsn1ObjectIdentifier("1.2.840.10045.3.1.7"));
+    }
+    else if (m_Scheme == ECC_P384)
+    {
+        d1->GetValues()->push_back(new CGXAsn1ObjectIdentifier("1.3.132.0.34"));
+    }
+    else
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    d.GetValues()->push_back(d1);
+    d.GetValues()->push_back(new CGXAsn1BitString(m_RawValue, 0));
+    return CGXAsn1Converter::ToByteArray(&d, value);
+}
+
+int CGXPublicKey::ToPem(std::string& value)
+{
+    std::string der;
+    int ret = ToDer(der);
+    if (ret == 0)
+    {
+        value = "-----BEGIN EC KEY-----\n";
+        value += der;
+        value += "-----END EC KEY-----";
+    }
+    return ret;
+}
+
+CGXByteArray CGXPublicKey::GetX()
+{
+    CGXByteArray bb;
+    int size = m_RawValue.GetSize() / 2;
+    m_RawValue.SubArray(1, size, bb);
+    return bb;
+}
+
+CGXByteArray CGXPublicKey::GetY()
+{
+    CGXByteArray bb;
+    int size = m_RawValue.GetSize() / 2;
+    m_RawValue.SubArray(1 + size, size, bb);
+    return bb;
+}
+
+std::string CGXPublicKey::ToString()
+{
+    std::string sb;
+    if (m_Scheme == ECC_P256)
+    {
+        sb += "NIST P-256\n";
+    }
+    else if (m_Scheme == ECC_P384)
+    {
+        sb += "NIST P-384\n";
+    }
+    CGXByteBuffer pk;
+    int size = pk.GetSize() / 2;
+    sb += " x coord: ";
+    m_RawValue.SubArray(1, size, pk);
+    sb += CGXBigInteger(pk).ToString();
+    sb += " y coord: ";
+    pk.SetSize(0);
+    m_RawValue.SubArray(1 + size, size, pk);
+    sb += CGXBigInteger(pk).ToString();
+    return sb;
+}

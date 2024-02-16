@@ -40,6 +40,8 @@
 #include "GXTime.h"
 #include "GXDateTime.h"
 #include "GXBytebuffer.h"
+#include "GXByteArray.h"
+
 
 #define __tagVARIANT
 #define __VARIANT_NAME_1
@@ -110,6 +112,7 @@ public:
     CGXDLMSVariant(unsigned short value);
     CGXDLMSVariant(unsigned long value);
     CGXDLMSVariant(std::string value);
+    CGXDLMSVariant(std::wstring value);
     CGXDLMSVariant(CGXByteBuffer& value);
     CGXDLMSVariant(const char* value);
     CGXDLMSVariant(unsigned int value);
@@ -122,6 +125,7 @@ public:
     CGXDLMSVariant& operator=(std::string value);
     CGXDLMSVariant& operator=(const char* value);
     CGXDLMSVariant& operator=(CGXByteBuffer& value);
+    CGXDLMSVariant& operator=(CGXByteArray& value);
     CGXDLMSVariant& operator=(float value);
     CGXDLMSVariant& operator=(double value);
     CGXDLMSVariant& operator=(unsigned long long value);

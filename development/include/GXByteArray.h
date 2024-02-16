@@ -32,37 +32,37 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXBYTEBUFFER_H
-#define GXBYTEBUFFER_H
+#ifndef GXBYTEARRAY_H
+#define GXBYTEARRAY_H
 
 #include <string>
 #include "errorcodes.h"
 #include "enums.h"
+#include "GXBytebuffer.h"
 
-const unsigned char VECTOR_CAPACITY = 50;
-class CGXByteBuffer
+class CGXByteArray
 {
-    friend class CGXByteArray;
     friend class CGXCipher;
+    friend class CGXByteBuffer;
+    friend class CGXPrivateKey;
+    friend class CGXEcdsa;
+    friend class CGXPkcs10;
+    friend class CGXPkcs8;
     unsigned char* m_Data;
     unsigned long m_Capacity;
     unsigned long m_Size;
-    unsigned long m_Position;
 public:
     //Constructor.
-    CGXByteBuffer();
+    CGXByteArray();
 
     //Constructor.
-    CGXByteBuffer(int capacity);
+    CGXByteArray(int capacity);
 
     //Copy constructor.
-    CGXByteBuffer(const CGXByteBuffer& value);
+    CGXByteArray(const CGXByteArray& value);
 
     //Destructor.
-    ~CGXByteBuffer();
-
-    //Amount of non read bytes in the buffer.
-    unsigned long Available();
+    ~CGXByteArray();
 
     //Returns buffer size.
     unsigned long GetSize();
@@ -72,12 +72,6 @@ public:
 
     //Increase buffer size.
     int IncreaseSize(unsigned long size);
-
-    //Returns position of the buffer.
-    unsigned long GetPosition();
-
-    //Returns position of the buffer.
-    void SetPosition(unsigned long value);
 
     //Allocate new size for the array in bytes.
     int Capacity(unsigned long capacity);
@@ -130,45 +124,15 @@ public:
 
     void Clear();
 
-    int GetUInt8(unsigned char* value);
-
     int GetUInt8(unsigned long index, unsigned char* value);
 
-    int GetUInt16(unsigned short* value);
-
     int GetUInt24(unsigned long index, unsigned int* value);
-    int GetUInt24(unsigned int* value);
-
-    int GetUInt32(unsigned long* value);
-
-    int GetInt8(char* value);
-
-    int GetInt16(short* value);
-
-    int GetInt32(long* value);
-
-    int GetInt64(long long* value);
-
-    int GetUInt64(unsigned long long* value);
-
-    int GetFloat(
-        float* value);
-
-    int GetDouble(
-        double* value);
-
-    int Get(unsigned char* value, unsigned long count);
 
     unsigned char* GetData();
 
     void ToArray(unsigned char*& value, unsigned long& count);
 
-    /**
-     * Remove handled bytes. This can be used in debugging to remove handled
-     * bytes.
-     */
-    void Trim();
-
+    int ToByteBuffer(CGXByteBuffer& value);
 
     /**
      * Compares, whether two given arrays are similar starting from current
@@ -210,14 +174,20 @@ public:
         */
     int SubArray(unsigned long index, 
         int count, 
+        CGXByteArray& bb);
+
+    /**
+    * Returns data as byte array.
+    *
+    * @param bb Byte buffer as a byte array.
+    */
+    int SubArray(unsigned long index,
+        int count,
         CGXByteBuffer& bb);
 
-    //Move data insize byte array.
-    int Move(unsigned long srcPos, 
-        unsigned long destPos, 
-        unsigned long count);
+    CGXByteArray& operator=(CGXByteArray& value);
 
-    CGXByteBuffer& operator=(CGXByteBuffer& value);
+    CGXByteArray& operator=(CGXByteBuffer& value);
 
     //Push the given hex string as byte array into this buffer at the current position, and then increments the position.
     void SetHexString(std::string& value);
@@ -233,10 +203,6 @@ public:
 
     //Check is byte buffer ASCII string.
     bool IsAsciiString();
-
-    // Get String value from byte array.
-    int GetString(int count,
-        std::string& value);
 
     // Get String value from byte array.
     int GetString(unsigned long index,
@@ -269,11 +235,15 @@ public:
    */
     int ToBase64(std::string& value);
 
-    CGXByteBuffer& operator=(const CGXByteBuffer& value);
+    CGXByteArray& operator=(
+        const CGXByteArray& value);
+
+    CGXByteArray& operator=(
+        const CGXByteBuffer& value);
 
     /*Reverse byte array.*/
     void Reverse(unsigned long index,
         unsigned long count);
 };
 
-#endif //GXBYTEBUFFER_H
+#endif //GXBYTEARRAY_H

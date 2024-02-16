@@ -1197,6 +1197,7 @@ int CGXDLMS::GetLnMessages(
     std::vector<CGXByteBuffer>& messages)
 {
     int ret;
+    messages.clear();
     CGXByteBuffer reply, tmp;
     unsigned char frame = 0;
     if (p.GetCommand() == DLMS_COMMAND_DATA_NOTIFICATION ||
@@ -3442,7 +3443,7 @@ int CGXDLMS::HandleGetResponseWithList(
             GetValueFromData(settings, reply);
             if (reply.GetValue().vt == DLMS_DATA_TYPE_NONE)
             {
-                // Increase read position if data is null. This is a special case.
+                // Increase read position if data is NULL. This is a special case.
                 reply.SetReadPosition(1 + reply.GetReadPosition());
             }
             reply.GetData().SetPosition(reply.GetReadPosition());
@@ -4130,7 +4131,7 @@ int CGXDLMS::GetValueFromData(CGXDLMSSettings& settings, CGXReplyData& reply)
     else if (info.IsComplete()
         && reply.GetCommand() == DLMS_COMMAND_DATA_NOTIFICATION)
     {
-        // If last item is null. This is a special case.
+        // If last item is NULL. This is a special case.
         reply.SetReadPosition(reply.GetData().GetPosition());
     }
     reply.GetData().SetPosition(index);

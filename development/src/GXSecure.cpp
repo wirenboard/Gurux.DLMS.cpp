@@ -215,7 +215,7 @@ int CGXSecure::Secure(
     }
     else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256)
     {
-        return CGXDLMSSha256::Encrypt(secret, reply);
+        return CGXDLMSSha256::Hash(secret, reply);
     }
     else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
     {

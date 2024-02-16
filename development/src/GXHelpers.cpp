@@ -35,6 +35,14 @@
 #include <fstream>
 #include <algorithm>
 #include <functional>
+
+#if defined(_WIN32) || defined(_WIN64)//Windows
+#include <direct.h>
+#endif
+#if defined(__linux__)
+#include <sys/stat.h>
+#endif
+
 #include "../include/GXDate.h"
 #include "../include/GXTime.h"
 #include "../include/GXHelpers.h"
@@ -825,7 +833,8 @@ int GetBcd(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMSVarian
     return 0;
 }
 
-int GXHelpers::GetObjectCount(CGXByteBuffer& data, unsigned long& count)
+int GXHelpers::GetObjectCount(CGXByteBuffer& data,
+    unsigned long& count)
 {
     int ret;
     unsigned char cnt;
@@ -913,7 +922,9 @@ int GXHelpers::SetObjectCount(unsigned long count, CGXByteBuffer& buff)
     return buff.SetUInt32(count);
 }
 
-std::vector< std::string > GXHelpers::Split(std::string& s, char separator)
+std::vector< std::string > GXHelpers::Split(
+    std::string& s, 
+    char separator)
 {
     std::vector< std::string > items;
     int last = 0;
@@ -935,7 +946,10 @@ std::vector< std::string > GXHelpers::Split(std::string& s, char separator)
     return items;
 }
 
-std::vector< std::string > GXHelpers::Split(std::string& s, std::string separators, bool ignoreEmpty)
+std::vector< std::string > GXHelpers::Split(
+    std::string& s, 
+    std::string separators, 
+    bool ignoreEmpty)
 {
     std::vector< std::string > items;
     int last = 0;
@@ -970,31 +984,43 @@ void GXHelpers::Replace(std::string& str, std::string oldString, std::string new
     }
 }
 
+bool GXHelpers::EndsWith(const std::string& value, const std::string& ending)
+{
+    if (ending.size() > value.size())
+    {
+        return false;
+    }
+    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
+
 std::string& GXHelpers::ltrim(std::string& s)
 {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
-        std::not1(std::ptr_fun<int, int>(std::isspace))));
+    s.erase(s.begin(), 
+        std::find_if(s.begin(), s.end(), [](int c)
+        {return !std::isspace(c);
+        }));
     return s;
 }
 
 std::string& GXHelpers::rtrim(std::string& s)
 {
-    s.erase(std::find_if(s.rbegin(), s.rend(),
-        std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+        }).base(), s.end()); 
     return s;
 }
 
-std::string& GXHelpers::trim(std::string& s)
+std::string& GXHelpers::Trim(std::string& s)
 {
     return ltrim(rtrim(s));
 }
 
-std::string GXHelpers::BytesToHex(unsigned char* pBytes, int count)
+std::string GXHelpers::BytesToHex(const unsigned char* pBytes, int count)
 {
     return BytesToHex(pBytes, count, ' ');
 }
 
-std::string GXHelpers::BytesToHex(unsigned char* pBytes, int count, char addSpaces)
+std::string GXHelpers::BytesToHex(const unsigned char* pBytes, int count, char addSpaces)
 {
     const char hexArray[] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
     std::string hexChars(addSpaces ? 3 * count : 2 * count, 0);
@@ -2288,7 +2314,7 @@ void GXHelpers::GetLogicalName(unsigned char* buff, std::string& ln)
 {
     int dataSize;
     char tmp[25];
-    //If Script Action target is not set it is null
+    //If Script Action target is not set it is NULL
     if (buff == NULL)
     {
         ln.clear();
@@ -2304,10 +2330,10 @@ void GXHelpers::GetLogicalName(unsigned char* buff, std::string& ln)
         if (dataSize > 25)
         {
             assert(0);
-    }
+        }
         ln.clear();
         ln.append(tmp, dataSize - 1);
-}
+    }
 }
 
 void GXHelpers::GetLogicalName(CGXByteBuffer& buff, std::string& ln)
@@ -2346,7 +2372,7 @@ int GXHelpers::SetLogicalName(const char* name, unsigned char ln[6])
     if (ret != 6)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
-}
+    }
     ln[0] = (unsigned char)v1;
     ln[1] = (unsigned char)v2;
     ln[2] = (unsigned char)v3;
@@ -2733,3 +2759,74 @@ unsigned char GXHelpers::SwapBits(unsigned char value)
     }
     return ret;
 }
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+int GXHelpers::Load(std::string& path,
+    std::string& value)
+{
+#if defined(_WIN32) || defined(_WIN64)//Windows
+    FILE* f = NULL;
+    if (fopen_s(&f, path.c_str(), "r") != 0)
+    {
+        return errno;
+    }
+#else
+    FILE* f = fopen(path.c_str(), "r");
+    if (f == NULL)
+    {
+        return errno;
+    }
+#endif
+    char buffer[256];
+    while (!feof(f))
+    {
+        char* s = fgets(buffer, sizeof(buffer), f);
+        if (s == NULL)
+        {
+            break;
+        }
+        value.append(s);
+    }
+    fclose(f);
+    return 0;
+}
+
+int GXHelpers::Save(std::string& path,
+    std::string& value)
+{
+    std::ofstream out(path);
+    out << value;
+    out.close();   
+    return 0;
+}
+
+int GXHelpers::CreateDir(std::string& path)
+{
+    return CreateDir(path.c_str());
+}
+
+int GXHelpers::CreateDir(const char* path)
+{
+#if defined(_WIN32) || defined(_WIN64)//Windows
+    return _mkdir(path);
+#else
+    return mkdir(path, 0777);
+#endif
+}
+
+bool GXHelpers::DirectoryExists(std::string& path)
+{
+    return DirectoryExists(path.c_str());
+}
+
+bool GXHelpers::DirectoryExists(const char* path)
+{
+    struct stat sb;
+    if (stat(path, &sb) == 0)
+    {
+        return true;
+    }
+    return false;
+}
+
+#endif //defined(_WIN32) || defined(_WIN64) || defined(__linux__)

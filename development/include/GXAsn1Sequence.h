@@ -32,22 +32,41 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSSHA256_H
-#define GXDLMSSHA256_H
+#ifndef GXASN1SEQUENCE_H
+#define GXASN1SEQUENCE_H
 
-#include "GXBytebuffer.h"
+#include <vector>
+#include "GXAsn1Base.h"
+#include "GXDLMSVariant.h"
 
-//This class is used to handle SHA-256.
-class CGXDLMSSha256
+class CGXAsn1Sequence : public CGXAsn1Base
 {
 private:
-    static void Transform(uint32_t *h, 
-        const unsigned char *message, 
-        uint32_t messageLength);
-       
+    std::vector<CGXAsn1Base*> m_Values;
 public:
-    /*Count hash for the given data.*/
-    static int Hash(CGXByteBuffer& data,
-        CGXByteBuffer& crypted);
+    /////////////////////////////////////////////////////////////////////////////
+    // Constructor.
+    /////////////////////////////////////////////////////////////////////////////
+    CGXAsn1Sequence()
+    {
+
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Destructor.
+    /////////////////////////////////////////////////////////////////////////////
+    ~CGXAsn1Sequence()
+    {
+        for (std::vector<CGXAsn1Base*>::iterator it = m_Values.begin(); it != m_Values.end(); ++it)
+        {
+            delete (*it);
+        }
+        m_Values.clear();
+    }
+    std::vector<CGXAsn1Base*>* GetValues()
+    {
+        return &m_Values;
+    }
 };
-#endif //GXDLMSSHA256_H
+
+#endif //GXASN1SEQUENCE_H

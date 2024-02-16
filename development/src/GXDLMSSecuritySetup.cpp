@@ -80,7 +80,7 @@ void CGXDLMSSecuritySetup::SetSecuritySuite(DLMS_SECURITY_SUITE value)
     m_SecuritySuite = value;
 }
 
-CGXByteBuffer CGXDLMSSecuritySetup::GetClientSystemTitle()
+CGXByteBuffer& CGXDLMSSecuritySetup::GetClientSystemTitle()
 {
     return m_ClientSystemTitle;
 }
@@ -90,7 +90,7 @@ void CGXDLMSSecuritySetup::SetClientSystemTitle(CGXByteBuffer& value)
     m_ClientSystemTitle = value;
 }
 
-CGXByteBuffer CGXDLMSSecuritySetup::GetServerSystemTitle()
+CGXByteBuffer& CGXDLMSSecuritySetup::GetServerSystemTitle()
 {
     return m_ServerSystemTitle;
 }
@@ -169,14 +169,75 @@ int CGXDLMSSecuritySetup::GlobalKeyTransfer(
     return ret;
 }
 
-int CGXDLMSSecuritySetup::ImportCertificate(
-    CGXDLMSClient* client,
-    CGXByteBuffer& key,
+/*
+* Agree on one or more symmetric keys using the key agreement algorithm.
+* client: DLMS client that is used to generate action.
+* list: List of keys.
+* Returns Generated action
+*/
+int CGXDLMSSecuritySetup::KeyAgreement(
+    CGXDLMSSecureClient* client,
+    std::vector<std::pair<DLMS_GLOBAL_KEY_TYPE, CGXByteBuffer>> list,
     std::vector<CGXByteBuffer>& reply)
 {
-    CGXDLMSVariant data = key;
-    reply.clear();
-    return client->Method(this, 6, data, reply);
+    if (list.size() == 0)
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    CGXByteBuffer bb;
+    bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
+    bb.SetUInt8((unsigned char)list.size());
+    for (std::vector<std::pair<DLMS_GLOBAL_KEY_TYPE, CGXByteBuffer>>::iterator it = list.begin();
+        it != list.end(); ++it)
+    {
+        bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+        bb.SetUInt8(2);
+        CGXDLMSVariant data = it->first;
+        GXHelpers::SetData(NULL, bb,
+            DLMS_DATA_TYPE_ENUM, data);
+        data = it->second;
+        GXHelpers::SetData(NULL, bb,
+            DLMS_DATA_TYPE_OCTET_STRING, data);
+    }
+    CGXDLMSVariant data = bb;
+    return client->Method(this, 3, data,
+        DLMS_DATA_TYPE_ARRAY, reply);
+}
+
+int CGXDLMSSecuritySetup::GenerateKeyPair(
+    CGXDLMSSecureClient* client,
+    DLMS_CERTIFICATE_TYPE type,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data = type;
+    return client->Method(this, 4, data,
+        DLMS_DATA_TYPE_ENUM, reply);
+}
+
+int CGXDLMSSecuritySetup::GenerateCertificate(
+    CGXDLMSSecureClient* client,
+    DLMS_CERTIFICATE_TYPE type,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data = type;
+    return client->Method(this, 5, data,
+        DLMS_DATA_TYPE_ENUM, reply);
+}
+
+int CGXDLMSSecuritySetup::ImportCertificate(
+    CGXDLMSClient* client,
+    CGXx509Certificate& certificate,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXByteBuffer bb;
+    int ret = certificate.GetEncoded(bb);
+    if (ret == 0)
+    {
+        CGXDLMSVariant data = bb;
+        reply.clear();
+        ret = client->Method(this, 6, data, reply);
+    }
+    return ret;
 }
 
 int CGXDLMSSecuritySetup::ExportCertificateByEntity(
@@ -217,7 +278,7 @@ int CGXDLMSSecuritySetup::ExportCertificateByEntity(
 
 int CGXDLMSSecuritySetup::ExportCertificateBySerial(
     CGXDLMSClient* client,
-    CGXByteBuffer& serialNumber,
+    CGXBigInteger& serialNumber,
     CGXByteBuffer& issuer,
     std::vector<CGXByteBuffer>& reply)
 {
@@ -225,6 +286,9 @@ int CGXDLMSSecuritySetup::ExportCertificateBySerial(
     CGXDLMSVariant data;
     CGXByteBuffer bb;
     reply.clear();
+    CGXByteBuffer sn;
+    serialNumber.ToArray(sn);
+   // sn.Reverse(0, sn.GetSize());
     if ((ret = bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE)) == 0 &&
         (ret = bb.SetUInt8(2)) == 0 &&
         //Add enum
@@ -235,12 +299,12 @@ int CGXDLMSSecuritySetup::ExportCertificateBySerial(
         (ret = bb.SetUInt8(2)) == 0 &&
         //serialNumber
         (ret = bb.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING)) == 0 &&
-        (ret = GXHelpers::SetObjectCount((unsigned long)serialNumber.GetSize(), bb)) == 0 &&
-        (ret = bb.Set(&serialNumber, 0, serialNumber.GetSize())) == 0 &&
+        (ret = GXHelpers::SetObjectCount((unsigned long)sn.GetSize(), bb)) == 0 &&
+        (ret = bb.Set(sn.GetData(), sn.GetSize())) == 0 &&
         //issuer
         (ret = bb.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING)) == 0 &&
         (ret = GXHelpers::SetObjectCount((unsigned long)issuer.GetSize(), bb)) == 0 &&
-        (ret = bb.Set(&issuer, 0, issuer.GetSize())) == 0)
+        (ret = bb.Set(issuer.GetData(), issuer.GetSize())) == 0)
     {
         data = bb;
         ret = client->Method(this, 7, data, DLMS_DATA_TYPE_ARRAY, reply);
@@ -385,7 +449,7 @@ int CGXDLMSSecuritySetup::ApplyKeys(CGXDLMSSettings& settings, CGXDLMSValueEvent
             e.SetError(DLMS_ERROR_CODE_READ_WRITE_DENIED);
             break;
         case DLMS_GLOBAL_KEY_TYPE_AUTHENTICATION:
-            // if settings.Cipher is null non secure server is used.
+            // if settings.Cipher is NULL non secure server is used.
             settings.GetCipher()->SetAuthenticationKey(reply);
             break;
         case DLMS_GLOBAL_KEY_TYPE_KEK:
@@ -429,7 +493,7 @@ void CGXDLMSSecuritySetup::GetValues(std::vector<std::string>& values)
             sb << ' ';
             sb << (int)(*it)->GetType();
             sb << ' ';
-            sb << (*it)->GetSerialNumber();
+            sb << (*it)->GetSerialNumber().ToString();
             sb << ' ';
             sb << (*it)->GetIssuer();
             sb << ' ';
@@ -557,7 +621,7 @@ int CGXDLMSSecuritySetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
             bb.SetUInt8((*it)->GetEntity());
             bb.SetUInt8(DLMS_DATA_TYPE_ENUM);
             bb.SetUInt8((*it)->GetType());
-            bb.AddString((*it)->GetSerialNumber());
+            (*it)->GetSerialNumber().ToArray(bb);
             bb.AddString((*it)->GetIssuer());
             bb.AddString((*it)->GetSubject());
             bb.AddString((*it)->GetSubjectAltName());
@@ -607,9 +671,10 @@ int CGXDLMSSecuritySetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
                 CGXDLMSCertificateInfo* info = new CGXDLMSCertificateInfo();
                 info->SetEntity((DLMS_CERTIFICATE_ENTITY)it->Arr[0].ToInteger());
                 info->SetType((DLMS_CERTIFICATE_TYPE)it->Arr[1].ToInteger());
-                tmp = it->Arr[2].ToString();
-                info->SetSerialNumber(tmp);
+                CGXBigInteger bi(it->Arr[2].byteArr, it->Arr[2].size);
+                info->SetSerialNumber(bi);
                 tmp = it->Arr[3].ToString();
+                info->m_IssuerRaw.Set(it->Arr[3].byteArr, it->Arr[3].size);
                 info->SetIssuer(tmp);
                 tmp = it->Arr[4].ToString();
                 info->SetSubject(tmp);

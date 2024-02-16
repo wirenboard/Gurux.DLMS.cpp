@@ -1038,6 +1038,7 @@ int CGXDLMSClient::ParseApplicationAssociationResponse(
                 return ret;
             }
             equals = challenge.Compare(value.byteArr, value.GetSize());
+            m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() | DLMS_CONNECTION_STATE_DLMS));
         }
         else
         {
@@ -1046,6 +1047,7 @@ int CGXDLMSClient::ParseApplicationAssociationResponse(
 
         if (!equals)
         {
+            m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() & ~DLMS_CONNECTION_STATE_DLMS));
             //ParseApplicationAssociationResponse failed. Server to Client do not match.
             return DLMS_ERROR_CODE_AUTHENTICATION_FAILURE;
         }

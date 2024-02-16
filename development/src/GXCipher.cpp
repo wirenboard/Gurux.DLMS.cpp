@@ -552,10 +552,10 @@ int CGXCipher::Encrypt(
 {
 #ifdef DEBUG
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
-    // printf("System title: %s\r\n", systemTitle.ToHexString().c_str());
-    // printf("key: %s\r\n", key.ToHexString().c_str());
-    // printf("Authentication Key: %s\r\n", m_AuthenticationKey.ToHexString().c_str());
-    // printf("Data: %s\r\n", input.ToHexString().c_str());
+    // sprintf("System title: %s\r\n", systemTitle.ToHexString().c_str());
+    // sprintf("key: %s\r\n", key.ToHexString().c_str());
+    // sprintf("Authentication Key: %s\r\n", m_AuthenticationKey.ToHexString().c_str());
+    // sprintf("Data: %s\r\n", input.ToHexString().c_str());
 #endif //defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
 #endif // DEBUG
     int ret;

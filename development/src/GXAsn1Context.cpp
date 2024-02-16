@@ -32,22 +32,49 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSSHA256_H
-#define GXDLMSSHA256_H
+#include "../include/GXAsn1Context.h"
 
-#include "GXBytebuffer.h"
-
-//This class is used to handle SHA-256.
-class CGXDLMSSha256
+CGXAsn1Context::CGXAsn1Context()
 {
-private:
-    static void Transform(uint32_t *h, 
-        const unsigned char *message, 
-        uint32_t messageLength);
-       
-public:
-    /*Count hash for the given data.*/
-    static int Hash(CGXByteBuffer& data,
-        CGXByteBuffer& crypted);
-};
-#endif //GXDLMSSHA256_H
+    m_Index = 0;
+    m_Constructed = true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Destructor.
+/////////////////////////////////////////////////////////////////////////////
+CGXAsn1Context::~CGXAsn1Context()
+{
+    for (std::vector<CGXAsn1Base*>::iterator it = m_Values.begin(); it != m_Values.end(); ++it)
+    {
+        delete (*it);
+    }
+    m_Values.clear();
+}
+/* Context index.*/
+int CGXAsn1Context::GetIndex()
+{
+	return m_Index;
+}
+
+/* Context index.*/
+void CGXAsn1Context::SetIndex(int value)
+{
+	m_Index = value;
+}
+
+/**
+ Constructed.
+*/
+bool CGXAsn1Context::GetConstructed()
+{
+	return m_Constructed;
+}
+
+/**
+ Constructed.
+*/
+void CGXAsn1Context::SetConstructed(bool value)
+{
+	m_Constructed = value;
+}

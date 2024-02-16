@@ -32,22 +32,48 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSSHA256_H
-#define GXDLMSSHA256_H
+#ifndef GXASN1UTF8STRING_H
+#define GXASN1UTF8STRING_H
 
-#include "GXBytebuffer.h"
+#include <string>
+#include "GXAsn1Base.h"
 
-//This class is used to handle SHA-256.
-class CGXDLMSSha256
+class CGXAsn1Utf8String : public CGXAsn1Base
 {
 private:
-    static void Transform(uint32_t *h, 
-        const unsigned char *message, 
-        uint32_t messageLength);
-       
+    std::string m_Value;
 public:
-    /*Count hash for the given data.*/
-    static int Hash(CGXByteBuffer& data,
-        CGXByteBuffer& crypted);
+    /////////////////////////////////////////////////////////////////////////////
+    // Constructor.
+    /////////////////////////////////////////////////////////////////////////////
+    CGXAsn1Utf8String()
+    {
+
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Constructor.
+    // value: IA5 string.
+    /////////////////////////////////////////////////////////////////////////////
+    CGXAsn1Utf8String(std::string& value)
+    {
+        m_Value = value;
+    }
+
+    std::string& GetValue()
+    {
+        return m_Value;
+    }
+
+    void SetValue(std::string& value)
+    {
+        m_Value = value;
+    }
+
+    std::string ToString()
+    {
+        return m_Value;
+    }
 };
-#endif //GXDLMSSHA256_H
+
+#endif //GXASN1UTF8STRING_H

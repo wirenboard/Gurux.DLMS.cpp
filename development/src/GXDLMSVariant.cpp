@@ -628,6 +628,13 @@ CGXDLMSVariant::CGXDLMSVariant(std::string value)
     strVal = value;
 }
 
+CGXDLMSVariant::CGXDLMSVariant(
+    std::wstring value)
+{
+    vt = DLMS_DATA_TYPE_STRING_UTF8;
+    //TODO: strVal = value;
+}
+
 CGXDLMSVariant::CGXDLMSVariant(unsigned char* value, int count)
 {
     vt = DLMS_DATA_TYPE_OCTET_STRING;
@@ -700,6 +707,18 @@ CGXDLMSVariant& CGXDLMSVariant::operator=(CGXByteBuffer& value)
     return *this;
 }
 
+CGXDLMSVariant& CGXDLMSVariant::operator=(CGXByteArray& value)
+{
+    Clear();
+    vt = DLMS_DATA_TYPE_OCTET_STRING;
+    size = (unsigned short)value.GetSize();
+    if (size != 0)
+    {
+        byteArr = (unsigned char*)malloc(size);
+        memcpy(byteArr, value.GetData(), size);
+    }
+    return *this;
+}
 CGXDLMSVariant::CGXDLMSVariant(const char* value)
 {
     vt = DLMS_DATA_TYPE_STRING;

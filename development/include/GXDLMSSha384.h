@@ -32,22 +32,21 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSSHA256_H
-#define GXDLMSSHA256_H
+#ifndef GXDLMSSHA384_H
+#define GXDLMSSHA384_H
 
 #include "GXBytebuffer.h"
 
-//This class is used to handle SHA-256.
-class CGXDLMSSha256
+//This class is used to handle SHA-384.
+class CGXDLMSSha384
 {
 private:
-    static void Transform(uint32_t *h, 
-        const unsigned char *message, 
-        uint32_t messageLength);
-       
+    static void Transform(uint64_t* h, 
+        const unsigned char* message, 
+        unsigned int messageLength);
 public:
     /*Count hash for the given data.*/
     static int Hash(CGXByteBuffer& data,
         CGXByteBuffer& crypted);
 };
-#endif //GXDLMSSHA256_H
+#endif //GXDLMSSHA384_H

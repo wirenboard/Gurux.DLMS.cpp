@@ -32,22 +32,48 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSSHA256_H
-#define GXDLMSSHA256_H
+#ifndef GXEccPoint_H
+#define GXEccPoint_H
 
-#include "GXBytebuffer.h"
+#include "GXBigInteger.h"
 
-//This class is used to handle SHA-256.
-class CGXDLMSSha256
+/*ECC x and y points in the curve.*/
+class CGXEccPoint
 {
-private:
-    static void Transform(uint32_t *h, 
-        const unsigned char *message, 
-        uint32_t messageLength);
-       
 public:
-    /*Count hash for the given data.*/
-    static int Hash(CGXByteBuffer& data,
-        CGXByteBuffer& crypted);
+    CGXBigInteger X;
+    CGXBigInteger Y;
+    CGXBigInteger Z;
+
+    /**
+     Constructor.
+    */
+    CGXEccPoint()
+    {
+    }
+
+    /**
+     Constructor.
+    */
+    CGXEccPoint(
+        CGXBigInteger& x,
+        CGXBigInteger& y,
+        CGXBigInteger& z)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+    }
+
+    /**
+     Constructor.
+    */
+    CGXEccPoint(int x, int y, int z)
+    {
+        X = CGXBigInteger(x);
+        Y = CGXBigInteger(y);
+        Z = CGXBigInteger(z);
+    }
 };
-#endif //GXDLMSSHA256_H
+
+#endif //GXEccPoint_H

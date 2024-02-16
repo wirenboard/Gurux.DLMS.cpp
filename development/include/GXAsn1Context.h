@@ -32,22 +32,51 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSSHA256_H
-#define GXDLMSSHA256_H
+#ifndef GXASN1CONTEXT_H
+#define GXASN1CONTEXT_H
 
-#include "GXBytebuffer.h"
+#include <vector>
+#include "GXAsn1Base.h"
+#include "GXDLMSVariant.h"
 
-//This class is used to handle SHA-256.
-class CGXDLMSSha256
+class CGXAsn1Context : public CGXAsn1Base
 {
 private:
-    static void Transform(uint32_t *h, 
-        const unsigned char *message, 
-        uint32_t messageLength);
-       
+    /* Context index.*/
+    int m_Index;
+    /**
+     Constructed.
+    */
+    bool m_Constructed;
+    std::vector<CGXAsn1Base*> m_Values;
 public:
-    /*Count hash for the given data.*/
-    static int Hash(CGXByteBuffer& data,
-        CGXByteBuffer& crypted);
+    /////////////////////////////////////////////////////////////////////////////
+    // Constructor.
+    /////////////////////////////////////////////////////////////////////////////
+    CGXAsn1Context();
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Destructor.
+    /////////////////////////////////////////////////////////////////////////////
+    ~CGXAsn1Context();
+
+    /* Context index.*/
+    int GetIndex();
+
+    /* Context index.*/
+    void SetIndex(int value);
+
+    /**Constructed.*/
+    bool GetConstructed();
+
+    /**Constructed.*/
+    void SetConstructed(bool value);
+
+    /* Returns collection values. */
+    std::vector<CGXAsn1Base*>* GetValues()
+    {
+        return &m_Values;
+    }
 };
-#endif //GXDLMSSHA256_H
+
+#endif //GXASN1CONTEXT_H

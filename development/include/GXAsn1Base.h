@@ -32,22 +32,28 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSSHA256_H
-#define GXDLMSSHA256_H
+#ifndef CGXASNBASE_H
+#define CGXASNBASE_H
 
-#include "GXBytebuffer.h"
+#include <string>
+#include <assert.h>
 
-//This class is used to handle SHA-256.
-class CGXDLMSSha256
+/// <summary>
+/// ASN1 value base class.
+/// </summary>
+class CGXAsn1Base
 {
-private:
-    static void Transform(uint32_t *h, 
-        const unsigned char *message, 
-        uint32_t messageLength);
-       
 public:
-    /*Count hash for the given data.*/
-    static int Hash(CGXByteBuffer& data,
-        CGXByteBuffer& crypted);
+    virtual std::string ToString()
+    {
+        assert(0);
+        return "";
+    }
+    /*Destructor.*/
+    virtual ~CGXAsn1Base()
+    {
+
+    }
 };
-#endif //GXDLMSSHA256_H
+
+#endif //CGXASNBASE_H

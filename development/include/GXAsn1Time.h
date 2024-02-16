@@ -32,22 +32,51 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSSHA256_H
-#define GXDLMSSHA256_H
+#ifndef GXAsn1Time_H
+#define GXAsn1Time_H
 
-#include "GXBytebuffer.h"
+#include "GXAsn1Base.h"
+#include "GXDateTime.h"
 
-//This class is used to handle SHA-256.
-class CGXDLMSSha256
+/// <summary>
+/// ASN1 time value base class.
+/// </summary>
+class CGXAsn1Time : public CGXAsn1Base
 {
 private:
-    static void Transform(uint32_t *h, 
-        const unsigned char *message, 
-        uint32_t messageLength);
-       
+    CGXDateTime m_Time;
 public:
-    /*Count hash for the given data.*/
-    static int Hash(CGXByteBuffer& data,
-        CGXByteBuffer& crypted);
+    /////////////////////////////////////////////////////////////////////////////
+    // Constructor.
+    /////////////////////////////////////////////////////////////////////////////
+    CGXAsn1Time()
+    {
+
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Constructor.
+    // value: date time.
+    /////////////////////////////////////////////////////////////////////////////
+    CGXAsn1Time(CGXDateTime& value)
+    {
+        m_Time = value;
+    }
+
+    CGXDateTime& GetValue()
+    {
+        return m_Time;
+    }
+
+    void SetValue(CGXDateTime& value)
+    {
+        m_Time = value;
+    }
+
+    std::string ToString()
+    {
+        return m_Time.ToString();
+    }
 };
-#endif //GXDLMSSHA256_H
+
+#endif //GXAsn1Time_H
