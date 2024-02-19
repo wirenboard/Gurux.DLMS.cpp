@@ -37,7 +37,8 @@
 #include "../include/GXDLMSSha384.h"
 
 void CGXEcdsa::Multiply(CGXEccPoint& p,
-    CGXBigInteger& n,
+    //Don't use reference for n. It's updated here.
+    CGXBigInteger n,
     CGXBigInteger& N,
     CGXBigInteger& A,
     CGXBigInteger& P)
@@ -167,9 +168,9 @@ CGXEccPoint CGXEcdsa::JacobianMultiply(
         return JacobianMultiply(p, n, N, A, P);
     }
     if (n.IsEven())
-    {        
+    {
         n.Rshift(1);
-        CGXEccPoint tmp2 = JacobianMultiply(p, 
+        CGXEccPoint tmp2 = JacobianMultiply(p,
             n, N, A, P);
         CGXEccPoint value;
         JacobianDouble(tmp2, A, P, value);
@@ -240,8 +241,8 @@ int CGXEcdsa::GetRandomNumber(CGXBigInteger& N,
     value.SetSize(0);
     value.Capacity(4 * N.GetCount());
     unsigned char val;
-    srand((unsigned int) time(NULL));
-    for (uint16_t pos = 0; pos != (uint16_t) value.Capacity(); ++pos)
+    srand((unsigned int)time(NULL));
+    for (uint16_t pos = 0; pos != (uint16_t)value.Capacity(); ++pos)
     {
         val = rand();
         if (val == 0 && pos == 0)
@@ -277,7 +278,6 @@ int CGXEcdsa::Sign(CGXByteBuffer& data,
     CGXByteBuffer& signature)
 {
     int ret;
-    CGXBigInteger msg;
     if (m_PrivateKey.GetRawValue().GetSize() == 0)
     {
         printf("Invalid private key.");
@@ -288,7 +288,7 @@ int CGXEcdsa::Sign(CGXByteBuffer& data,
         if ((ret = CGXDLMSSha256::Hash(data, signature)) != 0)
         {
             return ret;
-        }       
+        }
     }
     else
     {
@@ -297,19 +297,25 @@ int CGXEcdsa::Sign(CGXByteBuffer& data,
             return ret;
         }
     }
-    CGXByteBuffer rn;
-    CGXBigInteger pk(m_PrivateKey.m_RawValue.m_Data, 
-        (uint16_t) m_PrivateKey.m_RawValue.m_Size);
+    CGXBigInteger msg(signature);
+    signature.Clear();
+    CGXByteBuffer tmp;
+    CGXBigInteger pk(m_PrivateKey.m_RawValue.m_Data,
+        (uint16_t)m_PrivateKey.m_RawValue.m_Size);
     CGXBigInteger n;
     CGXBigInteger r;
     CGXBigInteger s;
     do
     {
-        GetRandomNumber(m_Curve.m_N, rn);
-        n = rn;
+        ret = GetRandomNumber(m_Curve.m_N, tmp);
+        if ((ret = s.Add(msg)) != 0)
+        {
+            break;
+        }
+        n = tmp;
         CGXBigInteger bi(1);
-        CGXEccPoint p = CGXEccPoint(m_Curve.m_G.X, 
-            m_Curve.m_G.Y, 
+        CGXEccPoint p = CGXEccPoint(m_Curve.m_G.X,
+            m_Curve.m_G.Y,
             bi);
         Multiply(p, n, m_Curve.m_N, m_Curve.m_A, m_Curve.m_P);
         r = p.X;
@@ -318,13 +324,21 @@ int CGXEcdsa::Sign(CGXByteBuffer& data,
         //s
         s = CGXBigInteger(r);
         s.Multiply(pk);
-        s.Add(msg);
+        if ((ret = s.Add(msg)) != 0)
+        {
+            break;
+        }
         s.Multiply(n);
         s.Mod(m_Curve.m_N);
     } while (r.IsZero() || s.IsZero());
-    r.ToArray(signature, false);
-    s.ToArray(signature, false);
-    return 0;
+    tmp.Clear();
+    if (ret == 0 &&
+        (ret = r.ToArray(signature, false)) == 0 &&
+        (ret = s.ToArray(tmp, false)) == 0)
+    {
+        ret = signature.Set(tmp.GetData(), tmp.GetSize());
+    }
+    return ret;
 }
 
 int CGXEcdsa::GenerateSecret(
@@ -354,12 +368,11 @@ int CGXEcdsa::GenerateSecret(
         raw.SubArray(1 + size, size, bb);
         CGXBigInteger y(bb);
         CGXBigInteger pk(m_PrivateKey.m_RawValue.m_Data,
-            (uint16_t) m_PrivateKey.m_RawValue.m_Size);
+            (uint16_t)m_PrivateKey.m_RawValue.m_Size);
         CGXCurve curve;
         curve.Init(m_PrivateKey.GetScheme());
         CGXBigInteger bi(1);
         CGXEccPoint p(x, y, bi);
-        unsigned char shift = 0;
         p = JacobianMultiply(p, pk, m_Curve.m_N, m_Curve.m_A, m_Curve.m_P);
         FromJacobian(p, m_Curve.m_P);
         ret = p.X.ToArray(secret);
@@ -435,7 +448,7 @@ int CGXEcdsa::Verify(CGXByteBuffer& signature,
     inv.Inv(m_Curve.m_N);
     // Calculate u1 and u2.
     CGXBigInteger bi(1);
-    CGXEccPoint u1(m_Curve.m_G.X, 
+    CGXEccPoint u1(m_Curve.m_G.X,
         m_Curve.m_G.Y,
         bi);
     CGXByteBuffer bb1, bb2;

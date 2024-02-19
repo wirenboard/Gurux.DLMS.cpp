@@ -36,7 +36,7 @@
 #define GXX509CERTIFICATE_H
 
 #include <vector>
-#include "Enums.h"
+#include "enums.h"
 #include "GXAsn1Base.h"
 #include "GXDLMSVariant.h"
 #include "GXPublicKey.h"
@@ -411,7 +411,7 @@ public:
     /**
      * Returns Public key in PEM format.
      */
-    int ToPem(std::string& sb);
+    int ToPem(std::string& value);
 
     /**
      * Returns Public key in DER format.

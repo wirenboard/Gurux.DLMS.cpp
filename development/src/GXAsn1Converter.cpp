@@ -34,6 +34,7 @@
 
 #include "../include/GXAsn1Converter.h"
 #include "../include/GXPkcs8.h"
+#include "../include/GXPkcs10.h"
 #include "../include/GXx509Certificate.h"
 
 CGXAsn1Converter::CGXAsn1Converter()
@@ -598,7 +599,7 @@ DLMS_PKCS_TYPE CGXAsn1Converter::GetCertificateType(
         data.SetPosition(0);
         seq = (CGXAsn1Sequence*)tmp;
     }
-    if (CGXAsn1Sequence* it = dynamic_cast<CGXAsn1Sequence*>(seq->GetValues()->at(0)))
+    if (dynamic_cast<CGXAsn1Sequence*>(seq->GetValues()->at(0)))
     {
         CGXx509Certificate cert;
         if (CGXx509Certificate::FromByteArray(data, cert) == 0)
@@ -607,11 +608,14 @@ DLMS_PKCS_TYPE CGXAsn1Converter::GetCertificateType(
         }
         else
         {
-            //TODO: new CGXPkcs10(data);
-            ret = DLMS_PKCS_TYPE_PKCS10;
+            CGXPkcs10 cert;
+            if (CGXPkcs10::FromByteArray(data, cert) == 0)
+            {
+                ret = DLMS_PKCS_TYPE_PKCS10;
+            }
         }
     }
-    if (CGXAsn1Variant* it = dynamic_cast<CGXAsn1Variant*>(seq->GetValues()->at(0)))
+    if (dynamic_cast<CGXAsn1Variant*>(seq->GetValues()->at(0)))
     {
         CGXPkcs8 cert;
         if (CGXPkcs8::FromByteArray(data, cert) == 0)

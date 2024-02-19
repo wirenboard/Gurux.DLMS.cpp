@@ -3640,7 +3640,7 @@ int CGXDLMSConverter::KeyUsageToCertificateType(
     DLMS_CERTIFICATE_TYPE& type)
 {
     int ret = 0;
-    switch (value)
+    switch ((uint16_t) value)
     {
     case DLMS_KEY_USAGE_DIGITAL_SIGNATURE:
         type = DLMS_CERTIFICATE_TYPE_DIGITAL_SIGNATURE;

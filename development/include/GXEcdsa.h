@@ -57,7 +57,7 @@ class CGXEcdsa
     CGXCurve m_Curve;
 
     static void Multiply(CGXEccPoint& p,
-        CGXBigInteger& n,
+        CGXBigInteger n,
         CGXBigInteger& N,
         CGXBigInteger& A,
         CGXBigInteger& P);

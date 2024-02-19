@@ -36,7 +36,7 @@
 #define GXASN1INTEGER_H
 
 #include "GXBytebuffer.h"
-#include "GXBiginteger.h"
+#include "GXBigInteger.h"
 #include "GXHelpers.h"
 #include "GXAsn1Base.h"
 

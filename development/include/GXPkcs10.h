@@ -238,23 +238,7 @@ public:
         std::pair<CGXPublicKey, CGXPrivateKey>& kp,
         std::string& subject,
         CGXPkcs10& pkc10);
-
-    /**
-     * Ask Gurux certificate server to generate the new certificate.
-     *
-     * address
-     *            Certificate server address.
-     * cert
-     *            PKCS #10 certificate.
-     * usage
-     *            Certificate usage.
-     * Returns Generated certificate.
-     */
-    static int GetCertificate(
-        CGXPkcs10& cert,
-        DLMS_KEY_USAGE usage,
-        CGXx509Certificate& x509);
-
+    
     /**
      * Ask Gurux certificate server to generate the new certificate.
      *

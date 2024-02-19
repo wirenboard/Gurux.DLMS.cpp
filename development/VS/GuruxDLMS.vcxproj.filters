@@ -458,7 +458,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\Enums.h">
+    <ClInclude Include="..\include\enums.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\ErrorCodes.h">

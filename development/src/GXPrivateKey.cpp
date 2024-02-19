@@ -280,12 +280,13 @@ int CGXPrivateKey::ToDer(std::string& value)
 int CGXPrivateKey::ToPem(std::string& value)
 {
     int ret;
-    std::string tmp;
-    if ((ret = ToDer(tmp)) == 0)
+    std::string der;
+    value.clear();
+    if ((ret = ToDer(der)) == 0)
     {
-        value = "-----BEGIN EC PRIVATE KEY-----\n" +
-            tmp +
-            "\n-----END EC PRIVATE KEY-----";
+        value = "-----BEGIN EC PRIVATE KEY-----\n";
+        value += der;
+        value += "\n-----END EC PRIVATE KEY-----";
     }
     return ret;
 }

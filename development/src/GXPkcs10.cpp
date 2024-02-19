@@ -38,6 +38,7 @@
 #include <Winsock.h> //Add support for sockets
 #endif
 #if defined(__linux__)//linux includes
+#include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -477,7 +478,6 @@ int CGXPkcs10::Sign(
     DLMS_HASH_ALGORITHM hashAlgorithm)
 {
     CGXByteBuffer data;
-    CGXAsn1Base* value = NULL;
     CGXAsn1Sequence s;
     int ret = GetData(&s);
     if (ret == 0)
@@ -530,7 +530,7 @@ int CGXPkcs10::CreateCertificateSigningRequest(
     pkc10.m_PublicKey = kp.first;
     pkc10.m_Subject = subject;
     DLMS_HASH_ALGORITHM algorithm;
-    if (kp.second.GetRawValue().GetSize() < 70)
+    if (kp.second.m_RawValue.m_Size < 70)
     {
         algorithm = DLMS_HASH_ALGORITHM_SHA_256_WITH_ECDSA;
     }
@@ -549,77 +549,10 @@ int CGXPkcs10::CreateCertificateSigningRequest(
 }
 
 int CGXPkcs10::GetCertificate(
-    CGXPkcs10& cert,
-    DLMS_KEY_USAGE usage,
-    CGXx509Certificate& x509)
-{
-    /*
-    std::string& der = "{\"DLMS_KEY_USAGE\":" + usage.getValue() + ",\"CSR\":[\""
-        + cert.toDer() + "\"]}";
-    URL url = new URL(address);
-    HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-    try {
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setDoOutput(true);
-        OutputStream os = connection.getOutputStream();
-        try {
-            os.write(der.getBytes());
-            os.flush();
-        }
-        finally {
-            os.close();
-        }
-        int ret = connection.getResponseCode();
-        if (ret == HttpURLConnection.HTTP_CREATED
-            || ret == HttpURLConnection.HTTP_OK) {
-            std::string& str;
-            StringBuilder data = new StringBuilder();
-            BufferedReader in = new BufferedReader(
-                new InputStreamReader(connection.getInputStream()));
-            try {
-                while ((str = in.readLine()) != null) {
-                    data.append(str);
-                }
-            }
-            finally {
-                in.close();
-            }
-            str = data.toString();
-            int pos = str.indexOf("[");
-            if (pos == -1) {
-                throw new IllegalArgumentException(
-                    "Certificates are missing.");
-            }
-            str = str.substring(pos + 2);
-            pos = str.indexOf("]");
-            if (pos == -1) {
-                throw new IllegalArgumentException(
-                    "Certificates are missing.");
-            }
-            str = str.substring(0, pos - 1);
-            GXx509Certificate x509 = GXx509Certificate.fromDer(str);
-            if (!cert.getPublicKey().equals(x509.getPublicKey())) {
-                throw new IllegalArgumentException(
-                    "Create certificate signingRequest generated wrong key.");
-            }
-            return x509;
-        }
-        return null;
-    }
-    finally {
-        connection.disconnect();
-    }
-    */
-    return -1;
-}
-
-int CGXPkcs10::GetCertificate(
     std::vector<CGXCertificateRequest>& certifications,
     std::vector <CGXx509Certificate>& certificates)
 {
     const char* address = "certificates.gurux.fi";
-    const char* path = "/api/CertificateGenerator";
     std::string usage;
     for (std::vector<CGXCertificateRequest>::iterator it = certifications.begin();
         it != certifications.end(); ++it)
@@ -664,7 +597,7 @@ int CGXPkcs10::GetCertificate(
     std::string input = "{\"Certificates\":[";
     input.append(usage);
     input.append("]}");
-    SOCKET conn = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    int conn = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     struct hostent* host = NULL;
     if (inet_addr(address) == INADDR_NONE)
     {
@@ -677,7 +610,11 @@ int CGXPkcs10::GetCertificate(
     }
     if (host == NULL)
     {
+#if defined(_WIN32) || defined(_WIN64)//Windows includes
         closesocket(conn);
+#else
+        close(conn);
+#endif
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     struct sockaddr_in server;
@@ -688,7 +625,11 @@ int CGXPkcs10::GetCertificate(
         (struct sockaddr*)&server,
         sizeof(server)))
     {
+#if defined(_WIN32) || defined(_WIN64)//Windows includes
         closesocket(conn);
+#else
+        close(conn);
+#endif
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     std::string data = "POST /api/CertificateGenerator HTTP/1.1\r\n";
@@ -707,7 +648,11 @@ int CGXPkcs10::GetCertificate(
     if (ret <= 0)
     {
         printf("Failed to get reply from the Gurux server.\r\n");
+#if defined(_WIN32) || defined(_WIN64)//Windows includes
         closesocket(conn);
+#else
+        close(conn);
+#endif
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     std::string reply;
@@ -715,7 +660,11 @@ int CGXPkcs10::GetCertificate(
     if (reply != "HTTP/1.1 100 Continue\r\n\r\n")
     {
         printf("Failed to get reply from the Gurux server.\r\n");
+#if defined(_WIN32) || defined(_WIN64)//Windows includes
         closesocket(conn);
+#else
+        close(conn);
+#endif
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     reply.clear();
@@ -736,7 +685,7 @@ int CGXPkcs10::GetCertificate(
     }
     else
     {
-        int pos = reply.find("[");
+        size_t pos = reply.find("[");
         if (pos == std::string::npos)
         {
             printf("Certificates are missing.\r\n");
@@ -754,7 +703,7 @@ int CGXPkcs10::GetCertificate(
             else
             {
                 reply = reply.substr(0, pos - 1);
-                std::vector< std::string >& list = GXHelpers::Split(reply, "\",", true);
+                std::vector< std::string > list = GXHelpers::Split(reply, "\",", true);
                 pos = 0;
                 for (std::vector< std::string >::iterator it = list.begin();
                     it != list.end(); ++it)

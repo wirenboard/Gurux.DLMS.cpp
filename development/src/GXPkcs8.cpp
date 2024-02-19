@@ -259,8 +259,12 @@ int CGXPkcs8::FromDer(std::string& der,
     GXHelpers::Replace(der, "\r\n", "");
     GXHelpers::Replace(der, "\n", "");
     CGXByteBuffer bb;
-    bb.FromBase64(der);
-    return cert.Init(bb);
+    int ret = bb.FromBase64(der);
+    if (ret == 0)
+    {
+        ret = cert.Init(bb);
+    }
+    return ret;
 }
 
 int CGXPkcs8::Init(CGXByteBuffer& data)
@@ -401,10 +405,15 @@ int CGXPkcs8::ToPem(std::string& pem)
         pem = "#Description";
         pem += m_Description;
     }
-    pem += "-----BEGIN PRIVATE KEY-----\n";
-    pem += ToDer(pem);
-    pem += "\n-----END PRIVATE KEY-----\n";
-    return 0;
+    int ret;
+    std::string der;
+    if ((ret = ToDer(der)) == 0)
+    {
+        pem += "-----BEGIN PRIVATE KEY-----\n";
+        pem += der;
+        pem += "\n-----END PRIVATE KEY-----\n";
+    }
+    return ret;
 }
 
 int CGXPkcs8::ToDer(std::string& value)

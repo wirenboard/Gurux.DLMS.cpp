@@ -756,7 +756,7 @@ std::string CGXBigInteger::ToString()
         {
             bb.SetUInt32(Data[pos]);
         }
-        for (pos = 0; pos != bb.GetSize(); ++pos)
+        for (pos = 0; pos != (int) bb.GetSize(); ++pos)
         {
             if (bb.GetData()[pos] != 0)
             {

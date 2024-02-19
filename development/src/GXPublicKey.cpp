@@ -133,44 +133,7 @@ int CGXPublicKey::FromDer(std::string der,
         {
             ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
-    }
-    /*
-    CGXAsn1Sequence seq = (GXAsn1Sequence)GXAsn1Converter.FromByteArray(key);
-    java.util.ArrayList<Object> tmp = (java.util.ArrayList<Object>)seq[0];
-    X9ObjectIdentifier id = X9ObjectIdentifierConverter.FromString(tmp.get(0).toString());
-    switch (id)
-    {
-    case X9ObjectIdentifier.Prime256v1:
-        value.Scheme = Ecc_P256;
-        break;
-    case X9ObjectIdentifier.Secp384r1:
-        value.Scheme = Ecc_P384;
-        break;
-    default:
-        if (id == X9ObjectIdentifier.None)
-        {
-            throw new IllegalArgumentException("Invalid key " + tmp.get(0).toString() + ".");
-        }
-        else
-        {
-            throw new IllegalArgumentException("Invalid key " + id + " " + tmp.get(0).toString() + ".");
-        }
-    }
-    //C# TO JAVA CONVERTER WARNING: Unsigned integer types have no direct equivalent in Java:
-    //ORIGINAL LINE: if (seq[1] is CGXByteBuffer)
-    if (seq[1] instanceof CGXByteBuffer)
-    {
-        //C# TO JAVA CONVERTER WARNING: Unsigned integer types have no direct equivalent in Java:
-        //ORIGINAL LINE: value.RawValue = (CGXByteBuffer)seq[1];
-        value.RawValue = (CGXByteBuffer)seq[1];
-    }
-    else
-    {
-        //Open SSL PEM.
-        value.RawValue = ((GXAsn1BitString)seq[1]).Value;
-    }
-    return value;
-    */
+    }   
     return ret;
 }
 
@@ -265,6 +228,7 @@ int CGXPublicKey::GetEncoded(
 
 int CGXPublicKey::ToPem(std::string& value)
 {
+    value.clear();
     std::string der;
     int ret = ToDer(der);
     if (ret == 0)

@@ -316,7 +316,7 @@ int CGXx509Certificate::UpdateKeyUsage(CGXAsn1Sequence* s,
         // critical is optional. BOOLEAN DEFAULT FALSE,
         m_KeyUsage = (DLMS_KEY_USAGE)tmp->ToInteger();
     }
-    else if (CGXAsn1Variant* tmp = dynamic_cast<CGXAsn1Variant*>(value))
+    else if (dynamic_cast<CGXAsn1Variant*>(value))
     {
         value = s->GetValues()->at(2);
         if (CGXAsn1BitString* tmp = dynamic_cast<CGXAsn1BitString*>(value))
@@ -462,7 +462,7 @@ int CGXx509Certificate::UpdateStandardExtensions(
 {
     int ret = 0;
     CGXAsn1Base* value = NULL;
-    if (CGXAsn1Sequence* tmp = dynamic_cast<CGXAsn1Sequence*>(reqInfo->GetValues()->at(4)))
+    if (dynamic_cast<CGXAsn1Sequence*>(reqInfo->GetValues()->at(4)))
     {
         // Get Standard Extensions.
         if (reqInfo->GetValues()->size() > 7)
@@ -910,9 +910,10 @@ int CGXx509Certificate::Save(std::string& path)
 }
 #endif //defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 
-int CGXx509Certificate::ToPem(std::string& sb)
+int CGXx509Certificate::ToPem(std::string& value)
 {
     int ret;
+    value.clear();
     if (m_PublicKey.GetRawValue().GetSize() == 0)
     {
         printf("Public or key is not set.");
@@ -920,9 +921,13 @@ int CGXx509Certificate::ToPem(std::string& sb)
     }
     else
     {
-        sb += "-----BEGIN CERTIFICATE-----\n";
-        ret = ToDer(sb);
-        sb += "\n-----END CERTIFICATE-----\n";
+        std::string der;
+        if ((ret = ToDer(der)) == 0)
+        {
+            value += "-----BEGIN CERTIFICATE-----\n";
+            value += der;
+            value += "\n-----END CERTIFICATE-----\n";
+        }
     }
     return ret;
 }
