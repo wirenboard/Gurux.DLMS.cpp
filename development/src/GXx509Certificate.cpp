@@ -66,7 +66,9 @@ int CGXx509Certificate::GetFilePath(
         printf("Unknown certificate type.");
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    CGXAsn1Converter::HexSystemTitleFromSubject(cert.GetSubject(), path);
+    std::string tmp;
+    CGXAsn1Converter::HexSystemTitleFromSubject(cert.GetSubject(), tmp);
+    path += tmp;
     path += ".pem";
     CGXByteBuffer bb;
     cert.m_PublicKey.GetEncoded(bb);
@@ -77,6 +79,47 @@ int CGXx509Certificate::GetFilePath(
     else
     {
         path = "Certificates384/" + path;
+    }
+    return 0;
+}
+
+int CGXx509Certificate::GetFilePath(
+    ECC ecc,
+    DLMS_KEY_USAGE usage,
+    std::string& systemTitle,
+    std::string& path)
+{
+    if ((usage & (DLMS_KEY_USAGE_DIGITAL_SIGNATURE | DLMS_KEY_USAGE_KEY_AGREEMENT)) ==
+        (DLMS_KEY_USAGE_DIGITAL_SIGNATURE | DLMS_KEY_USAGE_KEY_AGREEMENT))
+    {
+        path = "T";
+    }
+    else if ((usage & DLMS_KEY_USAGE_DIGITAL_SIGNATURE) != 0)
+    {
+        path = "D";
+    }
+    else if ((usage & DLMS_KEY_USAGE_KEY_AGREEMENT) != 0)
+    {
+        path = "A";
+    }
+    else
+    {
+        printf("Unknown certificate type.");
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    path += systemTitle;
+    path += ".pem";
+    if (ecc == ECC_P256)
+    {
+        path = "Certificates/" + path;
+    }
+    else if (ecc == ECC_P384)
+    {
+        path = "Certificates384/" + path;
+    }
+    else
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     return 0;
 }

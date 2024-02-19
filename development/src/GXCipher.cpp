@@ -550,14 +550,14 @@ int CGXCipher::Encrypt(
     CGXByteBuffer& input,
     bool encrypt)
 {
-#ifdef DEBUG
+#ifdef _DEBUG
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
     // sprintf("System title: %s\r\n", systemTitle.ToHexString().c_str());
     // sprintf("key: %s\r\n", key.ToHexString().c_str());
     // sprintf("Authentication Key: %s\r\n", m_AuthenticationKey.ToHexString().c_str());
     // sprintf("Data: %s\r\n", input.ToHexString().c_str());
 #endif //defined(_WIN32) || defined(_WIN64) || defined(__linux__)//If Windows or Linux
-#endif // DEBUG
+#endif // _DEBUG
     int ret;
     uint32_t aes[61] = { 0 };
     unsigned char H[16] = { 0 };
@@ -1102,4 +1102,38 @@ CGXByteBuffer& CGXCipher::GetDedicatedKey()
 void CGXCipher::SetDedicatedKey(CGXByteBuffer& value)
 {
     m_DedicatedKey = value;
+}
+
+std::pair<CGXPublicKey, CGXPrivateKey>& CGXCipher::GetKeyAgreementKeyPair()
+{
+    return m_KeyAgreementKeyPair;
+}
+
+void CGXCipher::SetKeyAgreementKeyPair(
+    std::pair<CGXPublicKey, CGXPrivateKey>& value)
+{
+    m_KeyAgreementKeyPair = value;
+}
+
+
+std::pair<CGXPublicKey, CGXPrivateKey>& CGXCipher::GetSigningKeyPair()
+{
+    return m_SigningKeyPair;
+}
+
+void CGXCipher::SetSigningKeyPair(
+    std::pair<CGXPublicKey, CGXPrivateKey>& value)
+{
+    m_SigningKeyPair = value;
+}
+
+std::vector<CGXx509Certificate>& CGXCipher::GetCertificates()
+{
+    return m_Certificates;
+}
+
+void CGXCipher::SetCertificates(
+    std::vector<CGXx509Certificate>& value)
+{
+    m_Certificates = value;
 }

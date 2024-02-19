@@ -288,7 +288,6 @@ int CGXDLMSSecuritySetup::ExportCertificateBySerial(
     reply.clear();
     CGXByteBuffer sn;
     serialNumber.ToArray(sn);
-   // sn.Reverse(0, sn.GetSize());
     if ((ret = bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE)) == 0 &&
         (ret = bb.SetUInt8(2)) == 0 &&
         //Add enum
@@ -665,14 +664,42 @@ int CGXDLMSSecuritySetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
         m_Certificates.clear();
         if (e.GetValue().vt != DLMS_DATA_TYPE_NONE)
         {
+            int ret;
             std::string tmp;
+            CGXByteBuffer bb;
             for (std::vector<CGXDLMSVariant >::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 CGXDLMSCertificateInfo* info = new CGXDLMSCertificateInfo();
                 info->SetEntity((DLMS_CERTIFICATE_ENTITY)it->Arr[0].ToInteger());
                 info->SetType((DLMS_CERTIFICATE_TYPE)it->Arr[1].ToInteger());
-                CGXBigInteger bi(it->Arr[2].byteArr, it->Arr[2].size);
-                info->SetSerialNumber(bi);
+                bb.Clear();
+                bb.Set(it->Arr[2].byteArr, it->Arr[2].size);
+                CGXAsn1Base* value = new CGXAsn1Base();
+                if ((ret = CGXAsn1Converter::FromByteArray(bb, value)) != 0)
+                {
+                    delete value;
+                    return ret;
+                }
+                if (CGXAsn1Integer* tmp = dynamic_cast<CGXAsn1Integer*>(value))
+                {
+                    tmp->GetValue().Reverse(0, tmp->GetValue().GetSize());                    
+                    CGXBigInteger bi = tmp->ToBigInteger();
+                    info->SetSerialNumber(bi);
+                    delete value;
+                }
+                else if (CGXAsn1Variant* tmp = dynamic_cast<CGXAsn1Variant*>(value))
+                {
+                    bb.Clear();
+                    bb.Set(tmp->GetValue().byteArr, tmp->GetValue().size);
+                    CGXBigInteger bi(bb);
+                    info->SetSerialNumber(bi);
+                    delete value;
+                }
+                else
+                {
+                    delete value;
+                    return ret;
+                }
                 tmp = it->Arr[3].ToString();
                 info->m_IssuerRaw.Set(it->Arr[3].byteArr, it->Arr[3].size);
                 info->SetIssuer(tmp);

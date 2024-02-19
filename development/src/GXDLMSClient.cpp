@@ -41,7 +41,7 @@
 #include "../include/GXSerialNumberCounter.h"
 #include "../include/GXDLMSLNParameters.h"
 #include "../include/GXDLMSSNParameters.h"
-
+#include "../include/GXEcdsa.h"
 
 CGXDLMSClient::CGXDLMSClient(bool UseLogicalNameReferencing,
     int clientAddress,
@@ -909,6 +909,7 @@ int CGXDLMSClient::GetApplicationAssociationRequest(
     std::vector<CGXByteBuffer>& packets)
 {
     int ret;
+    CGXCipher* c = m_Settings.GetCipher();
     CGXDLMSVariant name;
     packets.clear();
     if (m_Settings.GetAuthentication() != DLMS_AUTHENTICATION_HIGH_ECDSA &&
@@ -941,15 +942,41 @@ int CGXDLMSClient::GetApplicationAssociationRequest(
 
     if (m_Settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
     {
-        pw = m_Settings.GetCipher()->GetSystemTitle();
+        pw = c->GetSystemTitle();
     }
     else if (m_Settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256)
     {
-        pw.Set(&m_Settings.GetPassword());
-        pw.Set(&m_Settings.GetCipher()->GetSystemTitle());
-        pw.Set(&m_Settings.GetSourceSystemTitle());
-        pw.Set(&m_Settings.GetStoCChallenge());
-        pw.Set(&m_Settings.GetCtoSChallenge());
+        pw.Set(m_Settings.GetPassword().GetData(),
+            m_Settings.GetPassword().GetSize());
+        pw.Set(c->GetSystemTitle().GetData(),
+            c->GetSystemTitle().GetSize());
+        pw.Set(m_Settings.GetSourceSystemTitle().GetData(),
+            m_Settings.GetSourceSystemTitle().GetSize());
+        pw.Set(m_Settings.GetStoCChallenge().GetData(),
+            m_Settings.GetStoCChallenge().GetSize());
+        pw.Set(m_Settings.GetCtoSChallenge().GetData(),
+            m_Settings.GetCtoSChallenge().GetSize());
+    }
+    else if (m_Settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_ECDSA)
+    {
+        std::pair<CGXPublicKey, CGXPrivateKey>& kp =
+            c->GetSigningKeyPair();
+        if (kp.first.GetRawValue().GetSize() == 0 ||
+            kp.second.GetRawValue().GetSize() == 0)
+        {
+#ifdef _DEBUG
+            printf("Invalid signing key pair\n");
+#endif //_DEBUG
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+        pw.Set(c->GetSystemTitle().GetData(),
+            c->GetSystemTitle().GetSize());
+        pw.Set(m_Settings.GetSourceSystemTitle().GetData(),
+            m_Settings.GetSourceSystemTitle().GetSize());
+        pw.Set(m_Settings.GetStoCChallenge().GetData(),
+            m_Settings.GetStoCChallenge().GetSize());
+        pw.Set(m_Settings.GetCtoSChallenge().GetData(),
+            m_Settings.GetCtoSChallenge().GetSize());
     }
     else
     {
@@ -1000,45 +1027,65 @@ int CGXDLMSClient::ParseApplicationAssociationResponse(
         }
         if (value.vt != DLMS_DATA_TYPE_NONE)
         {
-            if (m_Settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
+            if (m_Settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_ECDSA)
             {
-                secret = m_Settings.GetSourceSystemTitle();
+                CGXByteBuffer tmp2;
+                tmp2.Set(m_Settings.GetSourceSystemTitle().GetData(),
+                    m_Settings.GetSourceSystemTitle().GetSize());
+                tmp2.Set(m_Settings.GetCipher()->GetSystemTitle().GetData(),
+                    m_Settings.GetCipher()->GetSystemTitle().GetSize());
+                tmp2.Set(m_Settings.GetCtoSChallenge().GetData(),
+                    m_Settings.GetCtoSChallenge().GetSize());
+                tmp2.Set(m_Settings.GetStoCChallenge().GetData(),
+                    m_Settings.GetStoCChallenge().GetSize());
+                CGXEcdsa sig(m_Settings.GetCipher()->GetSigningKeyPair().first);
                 CGXByteBuffer bb;
                 bb.Set(value.byteArr, value.GetSize());
-                if ((ret = bb.GetUInt8(&ch)) != 0)
-                {
-                    return ret;
-                }
-                if ((ret = bb.GetUInt32(&ic)) != 0)
-                {
-                    return ret;
-                }
-            }
-            else if (m_Settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256)
-            {
-                secret.Set(&m_Settings.GetPassword());
-                secret.Set(&m_Settings.GetSourceSystemTitle());
-                secret.Set(&m_Settings.GetCipher()->GetSystemTitle());
-                secret.Set(&m_Settings.GetCtoSChallenge());
-                secret.Set(&m_Settings.GetStoCChallenge());
+                ret = sig.Verify(bb, tmp2, equals);
+                m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() | DLMS_CONNECTION_STATE_DLMS));
             }
             else
             {
-                secret = m_Settings.GetPassword();
+                if (m_Settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
+                {
+                    secret = m_Settings.GetSourceSystemTitle();
+                    CGXByteBuffer bb;
+                    bb.Set(value.byteArr, value.GetSize());
+                    if ((ret = bb.GetUInt8(&ch)) != 0)
+                    {
+                        return ret;
+                    }
+                    if ((ret = bb.GetUInt32(&ic)) != 0)
+                    {
+                        return ret;
+                    }
+                }
+                else if (m_Settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256)
+                {
+                    secret.Set(&m_Settings.GetPassword());
+                    secret.Set(&m_Settings.GetSourceSystemTitle());
+                    secret.Set(&m_Settings.GetCipher()->GetSystemTitle());
+                    secret.Set(&m_Settings.GetCtoSChallenge());
+                    secret.Set(&m_Settings.GetStoCChallenge());
+                }
+                else
+                {
+                    secret = m_Settings.GetPassword();
+                }
+                CGXByteBuffer challenge, cToS = m_Settings.GetCtoSChallenge();
+                if ((ret = CGXSecure::Secure(
+                    m_Settings,
+                    m_Settings.GetCipher(),
+                    ic,
+                    cToS,
+                    secret,
+                    challenge)) != 0)
+                {
+                    return ret;
+                }
+                equals = challenge.Compare(value.byteArr, value.GetSize());
+                m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() | DLMS_CONNECTION_STATE_DLMS));
             }
-            CGXByteBuffer challenge, cToS = m_Settings.GetCtoSChallenge();
-            if ((ret = CGXSecure::Secure(
-                m_Settings,
-                m_Settings.GetCipher(),
-                ic,
-                cToS,
-                secret,
-                challenge)) != 0)
-            {
-                return ret;
-            }
-            equals = challenge.Compare(value.byteArr, value.GetSize());
-            m_Settings.SetConnected((DLMS_CONNECTION_STATE)(m_Settings.GetConnected() | DLMS_CONNECTION_STATE_DLMS));
         }
         else
         {

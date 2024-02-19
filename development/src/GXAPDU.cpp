@@ -140,7 +140,10 @@ int GenerateApplicationContextName(
     }
     // Add system title.
     if (!settings.IsServer() &&
-        (ciphered || settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC))
+        (ciphered || 
+            settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC ||
+            settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256||
+            settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_ECDSA))
     {
         if (cipher->GetSystemTitle().GetSize() == 0)
         {
@@ -1301,7 +1304,7 @@ int UpdateAuthentication(
     {
         return ret;
     }
-    if (ch > DLMS_AUTHENTICATION_HIGH_SHA256)
+    if (ch > DLMS_AUTHENTICATION_HIGH_ECDSA)
     {
         return DLMS_ERROR_CODE_INVALID_TAG;
     }

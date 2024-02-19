@@ -127,15 +127,15 @@ private:
         else if (scheme == ECC_P384)
         {
             //Table A. 2 – ECC_P384_Domain_Parameters
-            const uint32_t INIT_A[] = { 
+            const uint32_t INIT_A[] = {
                 0xFFFFFFFC, 0x00000000,
                 0x00000000, 0xFFFFFFFF,
                 0xFFFFFFFE, 0xFFFFFFFF,
                 0xFFFFFFFF, 0xFFFFFFFF,
-                0xFFFFFFFF, 0xFFFFFFFF, 
-                0xFFFFFFFF, 0xFFFFFFFF, 
+                0xFFFFFFFF, 0xFFFFFFFF,
+                0xFFFFFFFF, 0xFFFFFFFF,
             };
-            const uint32_t INIT_G1[] = { 
+            const uint32_t INIT_G1[] = {
                 0x72760AB7, 0x3A545E38,
                 0xBF55296C, 0x5502F25D,
                 0x82542A38, 0x59F741E0,
@@ -143,7 +143,7 @@ private:
                 0xF320AD74, 0x8EB1C71E,
                 0xBE8B0537, 0xAA87CA22,
             };
-            const uint32_t INIT_G2[] = { 
+            const uint32_t INIT_G2[] = {
                 0x90EA0E5F, 0x7A431D7C,
                 0x1D7E819D, 0x0A60B1CE,
                 0xB5F0B8C0, 0xE9DA3113,
@@ -151,15 +151,15 @@ private:
                 0x9292DC29, 0x5D9E98BF,
                 0x96262C6F, 0x3617DE4A,
             };
-            const uint32_t INIT_N[] = { 
+            const uint32_t INIT_N[] = {
                 0xCCC52973, 0xECEC196A,
                 0x48B0A77A, 0x581A0DB2,
                 0xF4372DDF, 0xC7634D81,
                 0xFFFFFFFF, 0xFFFFFFFF,
                 0xFFFFFFFF, 0xFFFFFFFF,
-                0xFFFFFFFF, 0xFFFFFFFF, 
+                0xFFFFFFFF, 0xFFFFFFFF,
             };
-            const uint32_t INIT_P[] = { 
+            const uint32_t INIT_P[] = {
                 0xFFFFFFFF, 0x00000000,
                 0x00000000, 0xFFFFFFFF,
                 0xFFFFFFFE, 0xFFFFFFFF,
@@ -167,7 +167,7 @@ private:
                 0xFFFFFFFF, 0xFFFFFFFF,
                 0xFFFFFFFF, 0xFFFFFFFF,
             };
-            const uint32_t INIT_B[] = { 
+            const uint32_t INIT_B[] = {
                 0xD3EC2AEF, 0x2A85C8ED,
                 0x8A2ED19D, 0xC656398D,
                 0x5013875A, 0x0314088F,
@@ -186,7 +186,9 @@ private:
         }
         else
         {
+#ifdef _DEBUG
             printf("%s\n", "Invalid scheme.");
+#endif //_DEBUG
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         return 0;

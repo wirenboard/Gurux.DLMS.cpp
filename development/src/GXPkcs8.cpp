@@ -312,7 +312,9 @@ int CGXPkcs8::Init(CGXByteBuffer& data)
                 }
                 else
                 {
+#ifdef _DEBUG
                     printf("Invalid Certificate. This looks more like private key, not PKCS 8.");
+#endif //_DEBUG
                     return DLMS_ERROR_CODE_INVALID_PARAMETER;
                 }
                 if (CGXAsn1Sequence* var = dynamic_cast<CGXAsn1Sequence*>(seq->GetValues()->at(2)))
@@ -323,7 +325,9 @@ int CGXPkcs8::Init(CGXByteBuffer& data)
                         bb.Set(tmp->GetValue().byteArr, tmp->GetValue().size);
                         if ((ret = CGXPrivateKey::FromRawBytes(bb, m_PrivateKey)) != 0)
                         {
-                            printf("Invalid private key.");
+#ifdef _DEBUG
+                            printf("Invalid private key.\n");
+#endif //_DEBUG
                             return ret;
                         }
                     }
@@ -334,7 +338,9 @@ int CGXPkcs8::Init(CGXByteBuffer& data)
                             ret = CGXPublicKey::FromRawBytes(tmp2->GetValue(), m_PublicKey);
                             if (ret != 0)
                             {
-                                printf("Invalid private key.");
+#ifdef _DEBUG
+                                printf("Invalid private key.\n");
+#endif //_DEBUG
                             }
                             else
                             {

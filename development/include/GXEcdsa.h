@@ -144,7 +144,7 @@ public:
 
      key Private key.
     */
-    CGXEcdsa(CGXPrivateKey key);
+    CGXEcdsa(CGXPrivateKey& key);
 
     /**
      Get scheme size in bytes.

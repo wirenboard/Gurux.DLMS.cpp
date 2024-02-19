@@ -39,6 +39,15 @@
 #include "../../development/include/GXDLMSTranslator.h"
 #include "../../development/include/GXDLMSData.h"
 
+#include "../../development/include/GXPrivateKey.h"
+#include "../../development/include/GXPublicKey.h"
+#include "../../development/include/GXx509Certificate.h"
+#include "../../development/include/GXPkcs8.h"
+#include "../../development/include/GXPkcs10.h"
+#include "../../development/include/GXDLMSSecuritySetup.h"
+#include "../../development/include/GXCertificateRequest.h"
+#include "../../development/include/GXEcdsa.h"
+
 void CGXCommunication::WriteValue(GX_TRACE_LEVEL trace, std::string line)
 {
     if (trace > GX_TRACE_LEVEL_WARNING)
@@ -983,6 +992,41 @@ int CGXCommunication::InitializeConnection()
         return ret;
     }
     reply.Clear();
+    ///////////////////////////////
+    //Load ECDSA keys from the file.
+    if (m_Parser->GetAuthentication() == DLMS_AUTHENTICATION_HIGH_ECDSA)
+    {
+        std::string str;
+        //Load private key in PKCS #8 format.
+        CGXByteBuffer& clientST = m_Parser->GetCiphering()->GetSystemTitle();
+        CGXPkcs8 key;
+        ret = CGXPkcs8::GetFilePath(ECC_P256, DLMS_CERTIFICATE_TYPE_DIGITAL_SIGNATURE,
+            clientST, str);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        ret = CGXPkcs8::Load(str, key);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        //Load meter certificate.
+        CGXx509Certificate cert;        
+        CGXx509Certificate::GetFilePath(ECC_P256,
+            DLMS_KEY_USAGE_DIGITAL_SIGNATURE, 
+            m_Parser->GetSourceSystemTitle().ToHexString(false), 
+            str);
+        ret = CGXx509Certificate::Load(str, cert);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        std::pair<CGXPublicKey, CGXPrivateKey> kp(cert.GetPublicKey(), 
+            key.GetPrivateKey());
+        m_Parser->GetCiphering()->SetSigningKeyPair(kp);
+    }
+
     // Get challenge Is HLS authentication is used.
     if (m_Parser->GetAuthentication() > DLMS_AUTHENTICATION_LOW)
     {
@@ -1931,6 +1975,411 @@ int CGXCommunication::GetProfileGenerics()
         }
     }
     return ret;
+}
+
+int CGXCommunication::GenerateCertificates(std::string& logicalName)
+{
+    if (!GXHelpers::DirectoryExists("Keys"))
+    {
+        GXHelpers::CreateDir("Keys");
+    }
+    if (!GXHelpers::DirectoryExists("Certificates"))
+    {
+        GXHelpers::CreateDir("Certificates");
+    }
+    if (!GXHelpers::DirectoryExists("Keys384"))
+    {
+        GXHelpers::CreateDir("Keys384");
+    }
+    if (!GXHelpers::DirectoryExists("Certificates384"))
+    {
+        GXHelpers::CreateDir("Certificates384");
+    }
+    std::vector<CGXx509Certificate> certs;
+    if (m_Parser->GetAuthentication() < DLMS_AUTHENTICATION_LOW)
+    {
+        printf("High authentication must be used to change the certificate keys.");
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    std::string str;
+    CGXReplyData reply;
+    std::vector<CGXByteBuffer> data;
+    int ret = InitializeConnection();
+    if (ret == 0)
+    {
+        CGXDLMSSecuritySetup ss(logicalName);
+        std::vector<CGXCertificateRequest> certifications;
+        //Read used security suite.
+        ret = Read(&ss, 3, str);
+        //Read client system title.
+        ret = Read(&ss, 4, str);
+        //Read server system title.
+        ret = Read(&ss, 5, str);
+        CGXByteBuffer& clientST = ss.GetClientSystemTitle();
+        if (clientST.GetSize() != 8)
+        {
+            clientST = m_Parser->GetCiphering()->GetSystemTitle();
+        }
+        //Get client subject.
+        std::string subject = CGXAsn1Converter::SystemTitleToSubject(clientST);
+        //Generate new digital signature for the client. In this example P-256 keys are used.
+        std::pair<CGXPublicKey, CGXPrivateKey> digitalKp;
+        std::pair<CGXPublicKey, CGXPrivateKey> signingKp;
+        ret = CGXEcdsa::GenerateKeyPair(ECC_P256, digitalKp);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        //Save private key in PKCS #8 format.
+        CGXPkcs8 digitalKey(digitalKp);
+        ret = CGXPkcs8::GetFilePath(ECC_P256, DLMS_CERTIFICATE_TYPE_DIGITAL_SIGNATURE,
+            clientST, str);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        ret = digitalKey.Save(str);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        //Generate x509 certificates.
+        CGXPkcs10 pkc10ClientDigital;
+        CGXPkcs10 pkc10ClientAgreement;
+        CGXPkcs10 pkc10ServerDigital;
+        CGXPkcs10 pkc10ServerAgreement;
+        ret = CGXPkcs10::CreateCertificateSigningRequest(digitalKp, subject, pkc10ClientDigital);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        //All certigicates are generated with one request.
+        certifications.push_back(CGXCertificateRequest(DLMS_CERTIFICATE_TYPE_DIGITAL_SIGNATURE, &pkc10ClientDigital));
+        //Generate new key agreement for the client. In this example P-256 keys are used.
+        ret = CGXEcdsa::GenerateKeyPair(ECC_P256, signingKp);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        //Save private key in PKCS #8 format.
+        CGXPkcs8 signingkey = CGXPkcs8(signingKp);
+        CGXPkcs8::GetFilePath(ECC_P256, DLMS_CERTIFICATE_TYPE_KEY_AGREEMENT, clientST, str);
+        ret = signingkey.Save(str);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        //Generate x509 certificates.
+        ret = CGXPkcs10::CreateCertificateSigningRequest(signingKp, subject, pkc10ClientAgreement);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        //All certigicates are generated with one request.
+        certifications.push_back(CGXCertificateRequest(DLMS_CERTIFICATE_TYPE_KEY_AGREEMENT, &pkc10ClientAgreement));
+        //Generate public/private key for digital signature.
+        ret = ss.GenerateKeyPair(m_Parser, DLMS_CERTIFICATE_TYPE_DIGITAL_SIGNATURE, data);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        if ((ret = ReadDataBlock(data, reply)) != 0)
+        {
+            return ret;
+        }
+        reply.Clear();
+        //Generate public/private key for key agreement.
+        ret = ss.GenerateKeyPair(m_Parser, DLMS_CERTIFICATE_TYPE_KEY_AGREEMENT, data);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        if ((ret = ReadDataBlock(data, reply)) != 0)
+        {
+            return ret;
+        }
+        reply.Clear();
+        //Generate certification request.
+        ret = ss.GenerateCertificate(m_Parser, DLMS_CERTIFICATE_TYPE_DIGITAL_SIGNATURE, data);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        if ((ret = ReadDataBlock(data, reply)) != 0)
+        {
+            return ret;
+        }
+        //Generate server certification.
+        ret = CGXPkcs10::FromByteArray(
+            reply.GetValue().byteArr,
+            reply.GetValue().size, pkc10ServerDigital);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        subject = CGXAsn1Converter::SystemTitleToSubject(
+            ss.GetServerSystemTitle());
+        //Validate subject.
+        if (pkc10ServerDigital.GetSubject().find(subject) == std::string::npos)
+        {
+            CGXAsn1Converter::HexSystemTitleFromSubject(pkc10ServerDigital.GetSubject(), str);
+            printf("Server system title '%s' is not the same as in the generated certificate request '%s'.",
+                ss.GetServerSystemTitle().ToHexString().c_str(),
+                str.c_str());
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+        certifications.push_back(CGXCertificateRequest(DLMS_CERTIFICATE_TYPE_DIGITAL_SIGNATURE, &pkc10ServerDigital));
+        reply.Clear();
+
+        //Generate certification request for key agreement.
+        ret = ss.GenerateCertificate(m_Parser, DLMS_CERTIFICATE_TYPE_KEY_AGREEMENT, data);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        if ((ret = ReadDataBlock(data, reply)) != 0)
+        {
+            return ret;
+        }
+        //Generate server certification.
+        ret = CGXPkcs10::FromByteArray(
+            reply.GetValue().byteArr,
+            reply.GetValue().size, pkc10ServerAgreement);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        //Validate subject.
+        if (pkc10ServerAgreement.GetSubject().find(subject) == -1)
+        {
+            CGXAsn1Converter::HexSystemTitleFromSubject(pkc10ServerAgreement.GetSubject(), str);
+            printf("Server system title '%s' is not the same as in the generated certificate request '%s'.",
+                ss.GetServerSystemTitle().ToHexString().c_str(),
+                str.c_str());
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+        certifications.push_back(CGXCertificateRequest(DLMS_CERTIFICATE_TYPE_KEY_AGREEMENT, &pkc10ServerAgreement));
+        reply.Clear();
+
+        //Note! There is a limit how many request you can do in a day.
+        ret = CGXPkcs10::GetCertificate(certifications, certs);
+        if (ret != 0)
+        {
+            return ret;
+        }
+        //Save server certificates.
+        for (std::vector<CGXx509Certificate>::iterator it = certs.begin();
+            it != certs.end(); ++it)
+        {
+            ret = CGXx509Certificate::GetFilePath(*it, str);
+            if (ret != 0)
+            {
+                return ret;
+            }
+            ret = (*it).Save(str);
+            if (ret != 0)
+            {
+                return ret;
+            }
+        }
+        reply.Clear();
+        //Import server certificates.
+        for (std::vector<CGXx509Certificate>::iterator it = certs.begin();
+            it != certs.end(); ++it)
+        {
+            ret = ss.ImportCertificate(m_Parser, *it, data);
+            if (ret != 0)
+            {
+                return ret;
+            }
+            if ((ret = ReadDataBlock(data, reply)) != 0)
+            {
+                return ret;
+            }
+            reply.Clear();
+        }
+        //Export server certificates and verify it.
+        for (std::vector<CGXx509Certificate>::iterator it = certs.begin();
+            it != certs.end(); ++it)
+        {
+            DLMS_CERTIFICATE_ENTITY entity;
+            CGXByteBuffer st;
+            if (it->GetSubject().find(CGXAsn1Converter::SystemTitleToSubject(ss.GetServerSystemTitle())) != -1)
+            {
+                st = ss.GetServerSystemTitle();
+                entity = DLMS_CERTIFICATE_ENTITY_SERVER;
+            }
+            else if (it->GetSubject().find(CGXAsn1Converter::SystemTitleToSubject(clientST)) != -1)
+            {
+                st = clientST;
+                entity = DLMS_CERTIFICATE_ENTITY_CLIENT;
+            }
+            else
+            {
+                //This is another certificate.
+                continue;
+            }
+            DLMS_CERTIFICATE_TYPE ct;
+            ret = CGXDLMSConverter::KeyUsageToCertificateType(it->GetKeyUsage(), ct);
+            if (ret != 0)
+            {
+                return ret;
+            }
+            ret = ss.ExportCertificateByEntity(m_Parser, entity,
+                ct, st, data);
+            if (ret != 0)
+            {
+                return ret;
+            }
+            if ((ret = ReadDataBlock(data, reply)) != 0)
+            {
+                return ret;
+            }
+            //Verify certificate.
+            CGXx509Certificate exported;
+            ret = CGXx509Certificate::FromByteArray(
+                reply.GetValue().byteArr,
+                reply.GetValue().size, exported);
+            if (ret != 0)
+            {
+                return ret;
+            }
+            if (exported.GetSerialNumber().Compare(it->GetSerialNumber()) != 0)
+            {
+                printf("Invalid server certificate.\n");
+                return DLMS_ERROR_CODE_INVALID_PARAMETER;
+            }
+            reply.Clear();
+        }
+        //Export server certificates using serial number and verify it.
+        for (std::vector<CGXx509Certificate>::iterator it = certs.begin();
+            it != certs.end(); ++it)
+        {
+            ret = ss.ExportCertificateBySerial(m_Parser,
+                it->GetSerialNumber(),
+                it->GetIssuerRaw(), data);
+            if (ret != 0)
+            {
+                return ret;
+            }
+            if ((ret = ReadDataBlock(data, reply)) != 0)
+            {
+                return ret;
+            }
+            //Verify certificate.
+            CGXx509Certificate exported;
+            ret = CGXx509Certificate::FromByteArray(
+                reply.GetValue().byteArr,
+                reply.GetValue().size, exported);
+            if (ret != 0)
+            {
+                return ret;
+            }
+            if (exported.GetSerialNumber().Compare(it->GetSerialNumber()) != 0)
+            {
+                printf("Invalid server certificate.");
+                return DLMS_ERROR_CODE_INVALID_PARAMETER;
+            }
+            reply.Clear();
+        }
+    }
+    if (ret == 0)
+    {
+        printf("The certificates have been successfully updated for the meter.\n");
+    }
+    return ret;
+}
+
+int CGXCommunication::ExportMeterCertificates(std::string& logicalName)
+{
+    std::vector<CGXByteBuffer> data;
+    std::string str;
+    int ret;
+    ret = InitializeConnection();
+    if (ret != 0)
+    {
+        return ret;
+    }
+    CGXDLMSSecuritySetup ss(logicalName);
+    //Read used security suite.
+    ret = Read(&ss, 3, str);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    //Client private keys are saved to this directory.
+    //Client might be different system title for each meter.
+    if (!GXHelpers::DirectoryExists("Keys"))
+    {
+        GXHelpers::CreateDir("Keys");
+    }
+    if (!GXHelpers::DirectoryExists("Certificates"))
+    {
+        GXHelpers::CreateDir("Certificates");
+    }
+    if (!GXHelpers::DirectoryExists("Keys384"))
+    {
+        GXHelpers::CreateDir("Keys384");
+    }
+    if (!GXHelpers::DirectoryExists("Certificates384"))
+    {
+        GXHelpers::CreateDir("Certificates384");
+    }
+    //Read server system title.
+    ret = Read(&ss, 5, str);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    //Read certificates.
+    ret = Read(&ss, 6, str);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    //Export meter certificates and save them.
+    CGXReplyData reply;
+    std::string path;
+    for (std::vector<CGXDLMSCertificateInfo*>::iterator it = ss.GetCertificates().begin();
+        it != ss.GetCertificates().end(); ++it)
+    {
+        reply.Clear();
+        //Export certification and verify it.
+        ret = ss.ExportCertificateBySerial(m_Parser,
+            (*it)->GetSerialNumber(),
+            (*it)->GetIssuerRaw(), data);
+        if (ret != 0)
+        {
+            break;
+        }
+        if ((ret = ReadDataBlock(data, reply)) != 0)
+        {
+            break;
+        }
+        CGXx509Certificate cert;
+        ret = CGXx509Certificate::FromByteArray(
+            reply.GetValue().byteArr,
+            reply.GetValue().size, cert);
+        if (ret != 0)
+        {
+            break;
+        }
+        ret = CGXx509Certificate::GetFilePath(cert, path);
+        if (ret != 0)
+        {
+            break;
+        }
+        ret = cert.Save(path);
+        if (ret != 0)
+        {
+            break;
+        }
+    }
+    if (ret == 0)
+    {
+        printf("The certificates have been successfully imported from the meter.\n");
+    }
+    return Close();
 }
 
 int CGXCommunication::ReadAll(char* outputFile)

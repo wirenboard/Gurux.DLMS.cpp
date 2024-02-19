@@ -49,7 +49,7 @@ static void ShowHelp()
     printf(" -h \t host name or IP address.\n");
     printf(" -p \t port number or name (Example: 1000).\n");
     printf(" -S [COM1:9600:8None1]\t serial port.");
-    printf(" -a \t Authentication (None, Low, High, HighMd5, HighSha1, HighGmac, HighSha256).\n");
+    printf(" -a \t Authentication (None, Low, High, HighMd5, HighSha1, HighGmac, HighSha256 and HighEcdsa).\n");
     printf(" -P \t Password for authentication.\n");
     printf(" -c \t Client address. (Default: 16)\n");
     printf(" -s \t Server address. (Default: 1)\n");
@@ -120,6 +120,12 @@ int main(int argc, char* argv[])
         bool autoIncreaseInvokeID = false;
         char* invocationCounter = NULL;
         char* outputFile = NULL;
+        //Client and server certificates are exported from the meter.
+        std::string exportSecuritySetupLN;
+
+        //Generate new client and server certificates and import them to the server.
+        std::string generateSecuritySetupLN;
+
         char* systemTitle = NULL;
         char* authenticationKey = NULL;
         char* blockCipherKey = NULL;
@@ -129,7 +135,7 @@ int main(int argc, char* argv[])
         unsigned char windowSize = 1;
         uint16_t maxInfo = 128;
         char* manufacturerId = NULL;
-        while ((opt = getopt(argc, argv, "h:p:c:s:r:i:d:t:a:P:g:S:n:C:v:o:T:A:B:D:m:l:W:w:f:L:V:")) != -1)
+        while ((opt = getopt(argc, argv, "h:p:c:s:r:i:d:t:a:P:g:S:n:C:v:o:T:A:B:D:m:l:W:w:f:L:V:N:E:")) != -1)
         {
             switch (opt)
             {
@@ -255,6 +261,12 @@ int main(int argc, char* argv[])
             case 'D':
                 dedicatedKey = optarg;
                 break;
+            case 'N':
+                generateSecuritySetupLN = optarg;
+                break;
+            case 'E':
+                exportSecuritySetupLN = optarg;
+                break;
             case 'o':
                 outputFile = optarg;
                 break;
@@ -278,7 +290,7 @@ int main(int argc, char* argv[])
                     if (p != optarg)
                     {
                         ++p;
-                    }
+                }
 #if defined(_WIN32) || defined(_WIN64)//Windows
                     if ((ret = sscanf_s(p, "%d.%d.%d.%d.%d.%d:%d", &a, &b, &c, &d, &e, &f, &index)) != 7)
 #else
@@ -288,9 +300,9 @@ int main(int argc, char* argv[])
                         ShowHelp();
                         return 1;
                     }
-                } while ((p = strchr(p, ',')) != NULL);
-                readObjects = optarg;
-                break;
+            } while ((p = strchr(p, ',')) != NULL);
+            readObjects = optarg;
+            break;
             case 'S':
                 serialPort = optarg;
                 break;
@@ -323,9 +335,13 @@ int main(int argc, char* argv[])
                 {
                     authentication = DLMS_AUTHENTICATION_HIGH_SHA256;
                 }
+                else if (strcasecmp("HighEcdsa", optarg) == 0)
+                {
+                    authentication = DLMS_AUTHENTICATION_HIGH_ECDSA;
+                }
                 else
                 {
-                    printf("Invalid Authentication option. (None, Low, High, HighMd5, HighSha1, HighGmac, HighSha256)\n");
+                    printf("Invalid Authentication option. (None, Low, High, HighMd5, HighSha1, HighGmac, HighSha256 and HighEcdsa)\n");
                     return 1;
                 }
                 break;
@@ -417,8 +433,8 @@ int main(int argc, char* argv[])
             default:
                 ShowHelp();
                 return 1;
-            }
         }
+    }
         CGXDLMSSecureClient cl(useLogicalNameReferencing, clientAddress, serverAddress, authentication, password, interfaceType);
         cl.GetCiphering()->SetSecurity(security);
         cl.GetCiphering()->SetSecuritySuite(securitySuite);
@@ -498,8 +514,17 @@ int main(int argc, char* argv[])
             ShowHelp();
             return 1;
         }
-
-        if (readObjects != NULL)
+        //Export client and server certificates from the meter.
+        if (!exportSecuritySetupLN.empty())
+        {
+            comm.ExportMeterCertificates(exportSecuritySetupLN);
+        }
+        //Generate new client and server certificates and import them to the server.
+        else if (!generateSecuritySetupLN.empty())
+        {
+            comm.GenerateCertificates(generateSecuritySetupLN);
+        }
+        else if (readObjects != NULL)
         {
             bool read = false;
             if (outputFile != NULL)
@@ -514,7 +539,7 @@ int main(int argc, char* argv[])
             if (ret == 0 && !read)
             {
                 ret = comm.GetAssociationView();
-        }
+            }
             if (ret == 0)
             {
                 std::string str;
@@ -526,7 +551,7 @@ int main(int argc, char* argv[])
                     if (p != readObjects)
                     {
                         ++p;
-                }
+                    }
                     str.clear();
                     p2 = strchr(p, ':');
                     ++p2;
@@ -560,8 +585,8 @@ int main(int argc, char* argv[])
                             comm.WriteValue(trace, buff);
                             comm.WriteValue(trace, value.c_str());
                             comm.WriteValue(trace, "\n");
-                        }
                     }
+                }
                     else
                     {
 #if _MSC_VER > 1000
@@ -579,14 +604,15 @@ int main(int argc, char* argv[])
             {
                 ret = cl.GetObjects().Save(outputFile);
             }
-    }
+        }
 }
-        else {
+        else
+        {
             ret = comm.ReadAll(outputFile);
         }
         //Close connection.
         comm.Close();
-}
+    }
 #if defined(_WIN32) || defined(_WIN64)//Windows
     WSACleanup();
 #if _MSC_VER > 1400

@@ -109,7 +109,9 @@ int CGXPrivateKey::UpdateSchema(
             key.m_Scheme = ECC_P384;
             break;
         default:
-            printf("Invalid private key.");
+#ifdef _DEBUG
+            printf("Invalid private key.\n");
+#endif //_DEBUG
             ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
     }
@@ -174,7 +176,9 @@ int CGXPrivateKey::FromDer(
                 {
                     if (var->GetValue().cVal > 3)
                     {
+#ifdef _DEBUG
                         printf("Invalid private key version.");
+#endif //_DEBUG
                         ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
                     }
                     if ((ret = UpdateSchema(seq, key)) == 0)
@@ -260,7 +264,9 @@ int CGXPrivateKey::ToDer(std::string& value)
     }
     else
     {
+#ifdef _DEBUG
         printf("%s\n", "Invalid ECC scheme.");
+#endif //_DEBUG
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     d.GetValues()->push_back(d1);

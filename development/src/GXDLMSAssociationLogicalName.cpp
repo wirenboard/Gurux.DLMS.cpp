@@ -119,14 +119,14 @@ int CGXDLMSAssociationLogicalName::UpdateSecret(CGXDLMSClient* client, std::vect
 {
     if (m_AuthenticationMechanismName.GetMechanismId() == DLMS_AUTHENTICATION_NONE)
     {
-#if defined(_WIN32) || defined(_WIN64)//Windows
+#if defined(_DEBUG)
         printf("Invalid authentication level in MechanismId.\n");
 #endif
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     if (m_AuthenticationMechanismName.GetMechanismId() == DLMS_AUTHENTICATION_HIGH_GMAC)
     {
-#if defined(_WIN32) || defined(_WIN64)//Windows
+#if defined(_DEBUG)
         printf("HighGMAC secret is updated using Security setup.\n");
 #endif
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
@@ -434,7 +434,7 @@ void CGXDLMSAssociationLogicalName::GetValues(std::vector<std::string>& values)
         }
         values.push_back(sb.str());
         sb.clear();
-        sb << (int) m_CurrentUser.first;
+        sb << (int)m_CurrentUser.first;
         sb << ':';
         sb << m_CurrentUser.second;
         values.push_back(sb.str());

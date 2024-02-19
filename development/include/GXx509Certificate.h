@@ -161,10 +161,10 @@ private:
     int UpdateStandardExtensions(
         CGXAsn1Sequence* reqInfo,
         bool& basicConstraintsExists);
-    int UpdateSubjectKeyIdentifier(CGXAsn1Base* value);  
+    int UpdateSubjectKeyIdentifier(CGXAsn1Base* value);
     int UpdateKeyUsage(CGXAsn1Sequence* s, CGXAsn1Base* value);
-    int UpdateExtendedKeyUsage(CGXAsn1Base* value); 
-    int UpdateBasicConstraints(CGXAsn1Base* value);    
+    int UpdateExtendedKeyUsage(CGXAsn1Base* value);
+    int UpdateBasicConstraints(CGXAsn1Base* value);
     int UpdateAuthorityKeyIdentifier(CGXAsn1Base* value);
 public:
     /////////////////////////////////////////////////////////////////////////////
@@ -179,6 +179,19 @@ public:
      */
     static int GetFilePath(
         CGXx509Certificate& cert,
+        std::string& path);
+
+    /**
+     * ecc: ECC scheme.
+     * usage: Certificate key usage.
+     * systemTitle: System title.
+     * path: Path.
+     * Returns error code.
+     */
+    static int GetFilePath(
+        ECC ecc,
+        DLMS_KEY_USAGE usage,
+        std::string& systemTitle,
         std::string& path);
 
     /**
@@ -397,7 +410,7 @@ public:
      * path File path.
      * Returns Created GXPkcs8 object.
      */
-    static int Load(std::string& path, 
+    static int Load(std::string& path,
         CGXx509Certificate& cert);
 
     /**

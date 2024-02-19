@@ -264,12 +264,14 @@ int CGXEcdsa::GetSchemeSize(ECC scheme)
     return scheme == ECC_P256 ? 32 : 48;
 }
 
-CGXEcdsa::CGXEcdsa(CGXPublicKey& key) : CGXEcdsa(key.GetScheme())
+CGXEcdsa::CGXEcdsa(CGXPublicKey& key) :
+    CGXEcdsa(key.GetScheme())
 {
     m_PublicKey = key;
 }
 
-CGXEcdsa::CGXEcdsa(CGXPrivateKey key) : CGXEcdsa(key.GetScheme())
+CGXEcdsa::CGXEcdsa(CGXPrivateKey& key) :
+    CGXEcdsa(key.GetScheme())
 {
     m_PrivateKey = key;
 }

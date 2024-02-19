@@ -109,7 +109,9 @@ int CGXPkcs10::Init(
         {
             if (seq->GetValues()->size() < 3)
             {
+#ifdef _DEBUG
                 printf("Wrong number of elements in sequence.");
+#endif //_DEBUG
                 ret = DLMS_ERROR_CODE_INVALID_DATA_FORMAT;
             }
             if (CGXAsn1Sequence* reqInfo = dynamic_cast<CGXAsn1Sequence*>(seq->GetValues()->at(0)))
@@ -174,8 +176,10 @@ int CGXPkcs10::Init(
                                             if (m_SignatureAlgorithm != DLMS_HASH_ALGORITHM_SHA_256_WITH_ECDSA &&
                                                 m_SignatureAlgorithm != DLMS_HASH_ALGORITHM_SHA_384_WITH_ECDSA)
                                             {
+#ifdef _DEBUG
                                                 printf("Invalid signature algorithm. %s\n",
                                                     sign->GetValues()->at(0)->ToString().c_str());
+#endif //_DEBUG
                                                 ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
                                             }
                                         }
@@ -215,7 +219,9 @@ int CGXPkcs10::Init(
                                                         if (e.Verify(bb, bb2, verify) != 0 ||
                                                             verify != true)
                                                         {
+#ifdef _DEBUG
                                                             printf("Invalid Signature.\n");
+#endif //_DEBUG
                                                             ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
                                                         }
                                                     }
@@ -323,14 +329,18 @@ int CGXPkcs10::FromPem(std::string data,
     size_t start = data.find(START);
     if (start == std::string::npos)
     {
+#ifdef _DEBUG
         printf("Invalid PEM file.");
+#endif //_DEBUG
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     data = data.substr(start + START.length());
     size_t end = data.find(END);
     if (end == std::string::npos)
     {
+#ifdef _DEBUG
         printf("Invalid PEM file.");
+#endif //_DEBUG
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     data = data.substr(0, end);
@@ -448,7 +458,9 @@ int CGXPkcs10::GetEncoded(CGXByteBuffer& value)
     }
     if (m_Signature.GetSize() == 0)
     {
+#ifdef _DEBUG
         printf("Sign first.");
+#endif //_DEBUG
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     // Certification request info.
@@ -576,7 +588,9 @@ int CGXPkcs10::GetCertificate(
                     DLMS_KEY_USAGE_KEY_AGREEMENT));
             break;
         default:
+#ifdef _DEBUG
             printf("Invalid type.");
+#endif //_DEBUG
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         if (it->GetExtendedKeyUsage() != DLMS_EXTENDED_KEY_USAGE_NONE)
@@ -647,7 +661,9 @@ int CGXPkcs10::GetCertificate(
     //Wait continue msg from the server.
     if (ret <= 0)
     {
+#ifdef _DEBUG
         printf("Failed to get reply from the Gurux server.\r\n");
+#endif //_DEBUG
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
         closesocket(conn);
 #else
@@ -659,7 +675,9 @@ int CGXPkcs10::GetCertificate(
     reply.append(buffer, ret);
     if (reply != "HTTP/1.1 100 Continue\r\n\r\n")
     {
+#ifdef _DEBUG
         printf("Failed to get reply from the Gurux server.\r\n");
+#endif //_DEBUG
 #if defined(_WIN32) || defined(_WIN64)//Windows includes
         closesocket(conn);
 #else
@@ -680,7 +698,9 @@ int CGXPkcs10::GetCertificate(
     } while (reply.rfind("\r\n0\r\n\r\n") == std::string::npos);
     if (reply.find("200 OK\r\n") == std::string::npos)
     {
+#ifdef _DEBUG
         printf("Failed to get certificates from the server.\r\n %s.\r\n", reply.c_str());
+#endif //_DEBUG
         ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     else
@@ -688,7 +708,9 @@ int CGXPkcs10::GetCertificate(
         size_t pos = reply.find("[");
         if (pos == std::string::npos)
         {
+#ifdef _DEBUG
             printf("Certificates are missing.\r\n");
+#endif //_DEBUG
             ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
         else
@@ -697,7 +719,9 @@ int CGXPkcs10::GetCertificate(
             pos = reply.rfind("]");
             if (pos == std::string::npos)
             {
+#ifdef _DEBUG
                 printf("Certificates are missing.\r\n");
+#endif //_DEBUG
                 ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
             }
             else
@@ -717,7 +741,9 @@ int CGXPkcs10::GetCertificate(
                     if (!certifications.at(pos).m_Certificate->m_PublicKey.m_RawValue.Compare(
                         cert.m_PublicKey.m_RawValue.m_Data, cert.m_PublicKey.m_RawValue.m_Size))
                     {
+#ifdef _DEBUG
                         printf("Create certificate signingRequest generated wrong public key.\r\n");
+#endif //_DEBUG
                         ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
                         break;
                     }

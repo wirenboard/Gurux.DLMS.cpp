@@ -319,7 +319,7 @@ int CGXBigInteger::Add(CGXBigInteger& value)
                 tmp += value.Data[pos];
             }
             tmp += overflow;
-            Data[pos] = tmp;
+            Data[pos] = (uint32_t) tmp;
             overflow = tmp >> 32;
         }
         if (overflow != 0)

@@ -221,5 +221,18 @@ public:
     //Read values using Access request.
     int ReadByAccess(std::vector<CGXDLMSAccessItem>& list);
 
+    /*
+    * Export client and server certificates from the meter.
+    *
+    * logicalName: Logical name of the security setup object.
+    */
+    int ExportMeterCertificates(std::string& logicalName);
+
+    /**
+    * Generates a new server and client public/private keys and register them and import certificates to the meter.
+    *
+    * logicalName: Logical name of the security setup object.
+    */
+    int GenerateCertificates(std::string& logicalName);
 };
 #endif //GXCOMMUNICATION_H

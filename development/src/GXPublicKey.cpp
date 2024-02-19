@@ -119,13 +119,17 @@ int CGXPublicKey::FromDer(std::string der,
             {
                 if (var->GetValue().bVal > 3)
                 {
+#ifdef _DEBUG
                     printf("Invalid private key version.");
+#endif //_DEBUG
                     return DLMS_ERROR_CODE_INVALID_PARAMETER;
                 }
             }
             else
             {
+#ifdef _DEBUG
                 printf("Invalid Certificate. This looks more like private key, not PKCS 8.");
+#endif //_DEBUG
                 return DLMS_ERROR_CODE_INVALID_PARAMETER;
             }
         }
