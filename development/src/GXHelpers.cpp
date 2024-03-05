@@ -2800,6 +2800,7 @@ int GXHelpers::Save(std::string& path,
     return 0;
 }
 
+#ifndef DLMS_IGNORE_DIRECTORY
 int GXHelpers::CreateDir(std::string& path)
 {
     return CreateDir(path.c_str());
@@ -2829,4 +2830,5 @@ bool GXHelpers::DirectoryExists(const char* path)
     return false;
 }
 
+#endif //DLMS_IGNORE_DIRECTORY
 #endif //defined(_WIN32) || defined(_WIN64) || defined(__linux__)

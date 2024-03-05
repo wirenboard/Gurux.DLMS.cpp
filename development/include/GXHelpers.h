@@ -240,6 +240,7 @@ public:
     static int Save(std::string& path,
         std::string& value);
 
+#ifndef DLMS_IGNORE_DIRECTORY
     /*Create new directory.*/
     static int CreateDir(std::string& path);
     /*Create new directory.*/
@@ -249,7 +250,7 @@ public:
     static bool DirectoryExists(std::string& path);
     /*Check if the directory exists.*/
     static  bool DirectoryExists(const char* path);
-
+#endif //DLMS_IGNORE_DIRECTORY
 #endif //defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 
 };
