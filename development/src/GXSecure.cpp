@@ -205,35 +205,29 @@ int CGXSecure::Secure(
     // Get server Challenge.
     CGXByteBuffer challenge;
     // Get shared secret
-    if (settings.GetAuthentication() ==
-        DLMS_AUTHENTICATION_HIGH_ECDSA)
+    if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_ECDSA)
     {
+        challenge.Set(&secret);
     }
-    else if (settings.GetAuthentication() !=
-        DLMS_AUTHENTICATION_HIGH_GMAC &&
-        settings.GetAuthentication() !=
-        DLMS_AUTHENTICATION_HIGH_SHA256)
+    else if (settings.GetAuthentication() != DLMS_AUTHENTICATION_HIGH_GMAC &&
+        settings.GetAuthentication() != DLMS_AUTHENTICATION_HIGH_SHA256)
     {
         challenge.Set(&data);
         challenge.Set(&secret);
     }
-    if (settings.GetAuthentication() ==
-        DLMS_AUTHENTICATION_HIGH_MD5)
+    if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_MD5)
     {
         return CGXDLMSMD5::Encrypt(challenge, reply);
     }
-    else if (settings.GetAuthentication() ==
-        DLMS_AUTHENTICATION_HIGH_SHA1)
+    else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA1)
     {
         return CGXDLMSSha1::Encrypt(challenge, reply);
     }
-    else if (settings.GetAuthentication() ==
-        DLMS_AUTHENTICATION_HIGH_SHA256)
+    else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256)
     {
         return CGXDLMSSha256::Hash(secret, reply);
     }
-    else if (settings.GetAuthentication() ==
-        DLMS_AUTHENTICATION_HIGH_GMAC)
+    else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC)
     {
         CGXByteBuffer& key = cipher->GetBlockCipherKey();
         ret = cipher->Encrypt(
@@ -247,8 +241,7 @@ int CGXSecure::Secure(
             reply.Set(&data);
         }
     }
-    else if (settings.GetAuthentication() ==
-        DLMS_AUTHENTICATION_HIGH_ECDSA)
+    else if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_ECDSA)
     {
         std::pair<CGXPublicKey, CGXPrivateKey>& kp =
             cipher->GetSigningKeyPair();
