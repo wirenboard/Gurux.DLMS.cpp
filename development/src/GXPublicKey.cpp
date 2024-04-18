@@ -84,15 +84,15 @@ int CGXPublicKey::FromRawBytes(CGXByteBuffer& key,
     {
         //Compression tag is not send in DLMS messages.
         value.m_Scheme = ECC_P256;
-        value.m_RawValue = key;
-        value.m_RawValue.GetData()[0] = 4;
+        value.m_RawValue.SetUInt8(4);
+        value.m_RawValue.Set(&key);
     }
     else if (key.GetSize() == 96)
     {
         //Compression tag is not send in DLMS messages.
         value.m_Scheme = ECC_P384;
-        value.m_RawValue = key;
-        value.m_RawValue.GetData()[0] = 4;
+        value.m_RawValue.SetUInt8(4);
+        value.m_RawValue.Set(&key);
     }
     else
     {
@@ -115,28 +115,54 @@ int CGXPublicKey::FromDer(std::string der,
     {
         if (CGXAsn1Sequence* seq = dynamic_cast<CGXAsn1Sequence*>(value))
         {
-            if (CGXAsn1Variant* var = dynamic_cast<CGXAsn1Variant*>(seq->GetValues()->at(0)))
+            if (CGXAsn1Sequence* tmp = dynamic_cast<CGXAsn1Sequence*>(seq->GetValues()->at(0)))
             {
-                if (var->GetValue().bVal > 3)
+                if (CGXAsn1ObjectIdentifier* id = dynamic_cast<CGXAsn1ObjectIdentifier*>(tmp->GetValues()->at(1)))
                 {
-#ifdef _DEBUG
-                    printf("Invalid private key version.");
-#endif //_DEBUG
-                    return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                    switch (CGXDLMSConverter::ValueOfX9Identifier(id->GetObjectIdentifier().c_str()))
+                    {
+                    case DLMS_X9_OBJECT_IDENTIFIER_PRIME_256_V1:
+                        key.m_Scheme = ECC_P256;
+                        break;
+                    case DLMS_X9_OBJECT_IDENTIFIER_SECP_384_R1:
+                        key.m_Scheme = ECC_P384;
+                        break;
+                    default:
+                        ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
+                    }
+                    if (ret == 0)
+                    {
+                        if (CGXAsn1BitString* bs = dynamic_cast<CGXAsn1BitString*>(seq->GetValues()->at(1)))
+                        {
+                            //Open SSL PEM.
+                            key.m_RawValue = bs->GetValue();
+                        }
+                        else
+                        {
+                            ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
+                        }                       
+                    }
+                }
+                else
+                {
+                    ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
                 }
             }
             else
             {
-#ifdef _DEBUG
-                printf("Invalid Certificate. This looks more like private key, not PKCS 8.");
-#endif //_DEBUG
-                return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
             }
         }
         else
         {
             ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }       
+#ifdef _DEBUG
+        if (ret != 0)
+        { 
+            printf("Invalid public key.");
         }
+#endif //_DEBUG
     }   
     return ret;
 }
@@ -146,8 +172,8 @@ int CGXPublicKey::FromPem(
     CGXPublicKey& key)
 {
     GXHelpers::Replace(pem, "\r\n", "\n");
-    std::string START = "-----BEGIN KEY-----\n";
-    std::string END = "-----END KEY-----\n";
+    std::string START = "-----BEGIN PUBLIC KEY-----\n";
+    std::string END = "\n-----END PUBLIC KEY-----";
     size_t index = pem.find(START);
     if (index == std::string::npos)
     {
@@ -237,9 +263,9 @@ int CGXPublicKey::ToPem(std::string& value)
     int ret = ToDer(der);
     if (ret == 0)
     {
-        value = "-----BEGIN EC KEY-----\n";
+        value = "-----BEGIN PUBLIC KEY-----\n";
         value += der;
-        value += "-----END EC KEY-----";
+        value += "\n-----END PUBLIC KEY-----\n";
     }
     return ret;
 }
