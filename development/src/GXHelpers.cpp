@@ -138,7 +138,9 @@ static int GetArray(CGXDLMSSettings* settings, CGXByteBuffer& buff, CGXDataInfo&
     *            Data info.
     * Returns  Parsed time.
     */
-int GetTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
+int GetTime(CGXByteBuffer& buff,
+    CGXDataInfo& info,
+    CGXDLMSVariant& value)
 {
     int ms, ret;
     unsigned char hour, minute, second, ch;
@@ -202,7 +204,9 @@ int GetTime(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
     *            Data info.
     * Returns  Parsed date.
     */
-int GetDate(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
+int GetDate(CGXByteBuffer& buff,
+    CGXDataInfo& info,
+    CGXDLMSVariant& value)
 {
     unsigned short year;
     int ret;
@@ -291,7 +295,10 @@ int GetDate(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 *            Data info.
 * Returns  Parsed date and time.
 */
-int GetDateTime(CGXDLMSSettings* settings, CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
+int GetDateTime(CGXDLMSSettings* settings,
+    CGXByteBuffer& buff,
+    CGXDataInfo& info,
+    CGXDLMSVariant& value)
 {
     DATETIME_SKIPS skip = DATETIME_SKIPS_NONE;
     struct tm tm = { 0 };
@@ -923,7 +930,7 @@ int GXHelpers::SetObjectCount(unsigned long count, CGXByteBuffer& buff)
 }
 
 std::vector< std::string > GXHelpers::Split(
-    std::string& s, 
+    std::string& s,
     char separator)
 {
     std::vector< std::string > items;
@@ -947,8 +954,8 @@ std::vector< std::string > GXHelpers::Split(
 }
 
 std::vector< std::string > GXHelpers::Split(
-    std::string& s, 
-    std::string separators, 
+    std::string& s,
+    std::string separators,
     bool ignoreEmpty)
 {
     std::vector< std::string > items;
@@ -995,10 +1002,10 @@ bool GXHelpers::EndsWith(const std::string& value, const std::string& ending)
 
 std::string& GXHelpers::ltrim(std::string& s)
 {
-    s.erase(s.begin(), 
+    s.erase(s.begin(),
         std::find_if(s.begin(), s.end(), [](int c)
-        {return !std::isspace(c);
-        }));
+            {return !std::isspace(c);
+            }));
     return s;
 }
 
@@ -1006,7 +1013,7 @@ std::string& GXHelpers::rtrim(std::string& s)
 {
     s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
         return !std::isspace(ch);
-        }).base(), s.end()); 
+        }).base(), s.end());
     return s;
 }
 
@@ -2796,7 +2803,7 @@ int GXHelpers::Save(std::string& path,
 {
     std::ofstream out(path);
     out << value;
-    out.close();   
+    out.close();
     return 0;
 }
 

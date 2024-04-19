@@ -384,7 +384,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
     int toSize = GetSize(type);
     //If we try to change bigger value to smaller check that value is not too big.
     //Example Int16 to Int8.
-    if (fromSize > toSize&& tmp.vt != DLMS_DATA_TYPE_FLOAT32 && tmp.vt != DLMS_DATA_TYPE_FLOAT64)
+    if (fromSize > toSize && tmp.vt != DLMS_DATA_TYPE_FLOAT32 && tmp.vt != DLMS_DATA_TYPE_FLOAT64)
     {
         unsigned char* pValue = &tmp.bVal;
         for (int pos = toSize; pos != fromSize; ++pos)
@@ -1461,12 +1461,6 @@ double CGXDLMSVariant::ToDouble()
     return 0;
 }
 
-/**
-* Add new object to the byte buffer.
-*
-* @param value
-*            Value to add.
-*/
 int CGXDLMSVariant::GetBytes(CGXByteBuffer& value)
 {
     if (vt == DLMS_DATA_TYPE_OCTET_STRING)

@@ -150,7 +150,7 @@ int CGXDLMSSha384::Hash(
     {
         if (data.Available() < 128)
         {
-            size = data.Available();
+            size = (unsigned char) data.Available();
         }
         memcpy(block, data.GetData() + data.GetPosition(), size);
         memset(block + size, 0, sizeof(block) - size);

@@ -358,6 +358,9 @@
     <ClInclude Include="..\include\GXDLMSConverter.h" />
     <ClInclude Include="..\include\GXDLMSCredit.h" />
     <ClInclude Include="..\include\GXDLMSData.h" />
+    <ClInclude Include="..\include\GXDLMSDataProtectionAgreedKey.h" />
+    <ClInclude Include="..\include\GXDLMSDataProtectionIdentifiedKey.h" />
+    <ClInclude Include="..\include\GXDLMSDataProtectionWrappeddKey.h" />
     <ClInclude Include="..\include\GXDLMSDayProfile.h" />
     <ClInclude Include="..\include\GXDLMSDayProfileAction.h" />
     <ClInclude Include="..\include\GXDLMSDemandRegister.h" />
@@ -467,6 +470,9 @@
     <ClInclude Include="..\include\GXPlcSettings.h" />
     <ClInclude Include="..\include\GXPrivateKey.h" />
     <ClInclude Include="..\include\GXPublicKey.h" />
+    <ClInclude Include="..\include\GXPushConfirmationParameter.h" />
+    <ClInclude Include="..\include\GXPushProtectionParameters.h" />
+    <ClInclude Include="..\include\GXRepetitionDelay.h" />
     <ClInclude Include="..\include\GXReplyData.h" />
     <ClInclude Include="..\include\GXSecure.h" />
     <ClInclude Include="..\include\GXSerialNumberCounter.h" />

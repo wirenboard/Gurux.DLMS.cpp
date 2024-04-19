@@ -155,6 +155,12 @@ public:
     std::string ToString();
     int ToInteger();
     double ToDouble();
+    /**
+    * Add new object to the byte buffer.
+    *
+    * @param value
+    *            Value to add.
+    */
     int GetBytes(CGXByteBuffer& value);
 
     //Returns true if value is number.
