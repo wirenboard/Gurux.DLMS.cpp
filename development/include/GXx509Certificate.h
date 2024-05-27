@@ -46,6 +46,7 @@ class CGXx509Certificate
 {
 private:
     friend class CGXPkcs10;
+    friend class CGXAPDU;
     /**
     * Loaded x509 Certificate certificate as a raw data.
     */

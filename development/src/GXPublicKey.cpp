@@ -140,7 +140,7 @@ int CGXPublicKey::FromDer(std::string der,
                         else
                         {
                             ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
-                        }                       
+                        }
                     }
                 }
                 else
@@ -156,14 +156,15 @@ int CGXPublicKey::FromDer(std::string der,
         else
         {
             ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }       
+        }
 #ifdef _DEBUG
         if (ret != 0)
-        { 
+        {
             printf("Invalid public key.");
         }
 #endif //_DEBUG
-    }   
+        delete value;
+    }
     return ret;
 }
 

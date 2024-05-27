@@ -91,17 +91,7 @@ int GetAuthenticationString(
     return 0;
 }
 
-/**
-* Code application context name.
-*
-* @param settings
-*            DLMS settings.
-* @param data
-*            Byte buffer where data is saved.
-* @param cipher
-*            Is ciphering settings.
-*/
-int GenerateApplicationContextName(
+int CGXAPDU::GenerateApplicationContextName(
     CGXDLMSSettings& settings,
     CGXByteBuffer& data,
     CGXCipher* cipher)
@@ -140,9 +130,9 @@ int GenerateApplicationContextName(
     }
     // Add system title.
     if (!settings.IsServer() &&
-        (ciphered || 
+        (ciphered ||
             settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC ||
-            settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256||
+            settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256 ||
             settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_ECDSA))
     {
         if (cipher->GetSystemTitle().GetSize() == 0)
@@ -157,6 +147,18 @@ int GenerateApplicationContextName(
         // LEN
         GXHelpers::SetObjectCount(cipher->GetSystemTitle().GetSize(), data);
         data.Set(cipher->GetSystemTitle().GetData(), cipher->GetSystemTitle().GetSize());
+        unsigned long len = settings.GetClientPublicKeyCertificate().m_RawData.GetSize();
+        if (len != 0)
+        {
+            //Add calling-AE-qualifier.
+            data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AE_QUALIFIER);
+            //LEN
+            GXHelpers::SetObjectCount(2 + len, data);
+            data.SetUInt8(BER_TYPE_OCTET_STRING);
+            //LEN
+            GXHelpers::SetObjectCount(2 + len, data);
+            data.Set(settings.GetClientPublicKeyCertificate().m_RawData.GetData(), len);
+        }
     }
     //Add CallingAEInvocationId.
     if (!settings.IsServer() && settings.GetUserID() != 0 && settings.GetCipher()->GetSecurity() != DLMS_SECURITY_NONE)
@@ -1344,7 +1346,7 @@ int CGXAPDU::GetUserInformation(
     if (cipher != NULL && cipher->IsCiphered())
     {
         return cipher->Encrypt(
-            cipher->GetSecuritySuite(), 
+            cipher->GetSecuritySuite(),
             cipher->GetSecurity(),
             DLMS_COUNT_TYPE_PACKET,
             settings.GetCipher()->GetFrameCounter(),
@@ -1813,61 +1815,41 @@ int CGXAPDU::ParsePDU2(
             break;
             //Client CalledAeInvocationId.
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLED_AE_INVOCATION_ID://0xA5
-            if (settings.IsServer())
+            if ((ret = buff.GetUInt8(&len)) != 0)
             {
-                if ((ret = buff.GetUInt8(&tag)) != 0)
+                return ret;
+            }
+            if ((ret = buff.GetUInt8(&tag)) != 0)
+            {
+                return ret;
+            }
+            if ((ret = buff.GetUInt8(&len)) != 0)
+            {
+                return ret;
+            }
+            if (tag == BER_TYPE_OCTET_STRING)
+            {
+                CGXByteBuffer tmp;
+                tmp.Set(&buff, buff.GetPosition(), len);
+                CGXx509Certificate cert;
+                if ((ret = CGXx509Certificate::FromByteArray(tmp, cert)) != 0)
                 {
                     return ret;
                 }
-                if (tag != 3)
+                settings.SetServerPublicKeyCertificate(cert);
+                if ((cert.GetKeyUsage() & DLMS_KEY_USAGE_KEY_CERT_SIGN) != 0)
                 {
-                    return DLMS_ERROR_CODE_INVALID_TAG;
+                    std::pair<CGXPublicKey, CGXPrivateKey> kp(cert.GetPublicKey(), settings.GetCipher()->GetKeyAgreementKeyPair().second);
+                    settings.GetCipher()->SetKeyAgreementKeyPair(kp);
                 }
-                if ((ret = buff.GetUInt8(&len)) != 0)
+                if ((cert.GetKeyUsage() & DLMS_KEY_USAGE_DIGITAL_SIGNATURE) != 0)
                 {
-                    return ret;
+                    std::pair<CGXPublicKey, CGXPrivateKey> kp(cert.GetPublicKey(), settings.GetCipher()->GetSigningKeyPair().second);
+                    settings.GetCipher()->SetSigningKeyPair(kp);
                 }
-                if (len != 2)
-                {
-                    return DLMS_ERROR_CODE_INVALID_TAG;
-                }
-                if ((ret = buff.GetUInt8(&len)) != 0)
-                {
-                    return ret;
-                }
-                if (len != 1)
-                {
-                    return DLMS_ERROR_CODE_INVALID_TAG;
-                }
-                //Get value.
-                if ((ret = buff.GetUInt8(&tag)) != 0)
-                {
-                    return ret;
-                }
-#ifndef DLMS_IGNORE_XML_TRANSLATOR
-                if (xml != NULL)
-                {
-                    //CalledAEInvocationId
-                    std::string str;
-                    xml->IntegerToHex((long)tag, 2, str);
-                    xml->AppendLine(DLMS_TRANSLATOR_TAGS_CALLED_AE_INVOCATION_ID, "", str);
-                }
-#endif //DLMS_IGNORE_XML_TRANSLATOR
             }
             else
             {
-                if ((ret = buff.GetUInt8(&len)) != 0)
-                {
-                    return ret;
-                }
-                if ((ret = buff.GetUInt8(&tag)) != 0)
-                {
-                    return ret;
-                }
-                if ((ret = buff.GetUInt8(&len)) != 0)
-                {
-                    return ret;
-                }
                 if ((ret = buff.GetUInt8(&tag)) != 0)
                 {
                     return ret;
@@ -1884,7 +1866,7 @@ int CGXAPDU::ParsePDU2(
             }
             break;
             //Server RespondingAEInvocationId.
-        case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | 7://0xA7
+        case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AE_QUALIFIER://0xA7
             if ((ret = buff.GetUInt8(&len)) != 0)
             {
                 return ret;
@@ -1897,18 +1879,45 @@ int CGXAPDU::ParsePDU2(
             {
                 return ret;
             }
-            if ((ret = buff.GetUInt8(&tag)) != 0)
+            if (tag == BER_TYPE_OCTET_STRING)
             {
-                return ret;
+                //If public key certificate is coming part of AARQ.
+                CGXByteBuffer tmp;
+                tmp.Set(&buff, buff.GetPosition(), len);
+                CGXx509Certificate cert;
+                if ((ret = CGXx509Certificate::FromByteArray(tmp, cert)) != 0)
+                {
+                    return ret;
+                }
+                settings.SetClientPublicKeyCertificate(cert);
+                if ((cert.GetKeyUsage() & DLMS_KEY_USAGE_KEY_CERT_SIGN) != 0)
+                {
+                    std::pair<CGXPublicKey, CGXPrivateKey> kp(cert.GetPublicKey(),
+                        settings.GetCipher()->GetKeyAgreementKeyPair().second);
+                    settings.GetCipher()->SetKeyAgreementKeyPair(kp);
+                }
+                if ((cert.GetKeyUsage() & DLMS_KEY_USAGE_DIGITAL_SIGNATURE) != 0)
+                {
+                    std::pair<CGXPublicKey, CGXPrivateKey> kp(cert.GetPublicKey(),
+                        settings.GetCipher()->GetSigningKeyPair().second);
+                    settings.GetCipher()->SetSigningKeyPair(kp);
+                }
             }
-            settings.SetUserID(tag);
+            else
+            {
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+                settings.SetUserID(tag);
 #ifndef DLMS_IGNORE_XML_TRANSLATOR
-            if (xml != NULL)
-            {
-                xml->IntegerToHex((long)tag, 2, str);
-                xml->AppendLine(TRANSLATOR_GENERAL_TAGS_RESPONDING_AE_INVOCATION_ID, "", str);
-            }
+                if (xml != NULL)
+                {
+                    xml->IntegerToHex((long)tag, 2, str);
+                    xml->AppendLine(TRANSLATOR_GENERAL_TAGS_RESPONDING_AE_INVOCATION_ID, "", str);
+                }
 #endif //DLMS_IGNORE_XML_TRANSLATOR
+            }
             break;
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AP_INVOCATION_ID://0xA8
             if ((ret = buff.GetUInt8(&len)) != 0)
@@ -2206,14 +2215,37 @@ int CGXAPDU::GenerateAARE(
     data.SetUInt8(diagnostic);
     // SystemTitle
     if (cipher != NULL
-        && (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC
-            || cipher->IsCiphered()))
+        && (cipher->IsCiphered() ||
+            settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_GMAC ||
+            settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_SHA256 ||
+            settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_ECDSA))
     {
         data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLED_AP_INVOCATION_ID);
         GXHelpers::SetObjectCount(2 + cipher->GetSystemTitle().GetSize(), data);
         data.SetUInt8(BER_TYPE_OCTET_STRING);
         GXHelpers::SetObjectCount(cipher->GetSystemTitle().GetSize(), data);
         data.Set(&cipher->GetSystemTitle());
+    }
+    //Add CallingAeQualifier.
+    if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_ECDSA &&
+        settings.GetServerPublicKeyCertificate().m_RawData.GetSize() != 0)
+    {
+        unsigned long len = settings.GetServerPublicKeyCertificate().m_RawData.GetSize();
+        data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AE_QUALIFIER);
+        GXHelpers::SetObjectCount(4 + len, data);
+        data.SetUInt8(BER_TYPE_OCTET_STRING);
+        GXHelpers::SetObjectCount(len, data);
+        data.Set(settings.GetServerPublicKeyCertificate().m_RawData.GetData(), len);
+    }
+    else if (settings.GetUserID() != -1)
+    {
+        data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AE_QUALIFIER);
+        //LEN
+        data.SetUInt8(3);
+        data.SetUInt8(BER_TYPE_INTEGER);
+        //LEN
+        data.SetUInt8(1);
+        data.SetUInt8(settings.GetUserID());
     }
     if (settings.GetAuthentication() > DLMS_AUTHENTICATION_LOW)
     {

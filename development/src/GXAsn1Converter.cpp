@@ -117,6 +117,10 @@ int CGXAsn1Converter::GetValue(
         {
             objects->push_back(new CGXAsn1Set(CGXAsn1Helpers::Clone(t), NULL));
         }
+        for (std::vector<CGXAsn1Base*>::iterator it = tmp.begin(); it != tmp.end(); ++it)
+        {
+            delete (*it);
+        }
     }
     break;
     case BER_TYPE_OBJECT_IDENTIFIER:
@@ -702,6 +706,7 @@ int CGXAsn1Converter::FromByteArray(
     {
         if ((ret = GetValue(data, &objects, false)) != 0)
         {
+            value = objects.at(0);
             return ret;
         }
     }

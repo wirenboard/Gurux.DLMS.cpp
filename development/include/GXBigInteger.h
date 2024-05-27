@@ -44,12 +44,17 @@ private:
     /**
      List of values. Least Significated is in the first item.
     */
-    uint32_t Data[48];
+    uint32_t* m_Data;
 
     /**
      Items count in the data buffer.
     */
     uint16_t m_Count;
+
+    /**
+     Items count in the data buffer.
+    */
+    uint16_t m_Capacity;
 
     /**
      Is value IsNegative.
@@ -67,13 +72,14 @@ private:
 
     void SetIsNegative(bool value);
 
-    void Add(const uint32_t value);
+    int Add(const uint32_t value);
 
     int AddValue(uint32_t* list,
         uint16_t length,
         uint32_t value,
         uint16_t index);
 
+    int Capacity(uint16_t value);
 public:
     /**
     * Constructor.
@@ -113,6 +119,8 @@ public:
     CGXBigInteger(CGXByteBuffer& value);
 
     CGXBigInteger(CGXBigInteger* value);
+
+    CGXBigInteger(const CGXBigInteger& value);
 
     /**
     * Destructor.
@@ -158,7 +166,7 @@ public:
     /**
      Convert value to byte array.
     */
-    int ToArray(CGXByteBuffer &data,
+    int ToArray(CGXByteBuffer& data,
         bool removeLeadingZeroes);
 
     /**
@@ -173,7 +181,7 @@ public:
         uint32_t size,
         CGXByteBuffer& data);
 
-    void AddRange(const uint32_t* values, uint16_t count);
+    int AddRange(const uint32_t* values, uint16_t count);
 
     void Or(CGXBigInteger& value);
     int Add(CGXBigInteger& value);
@@ -215,5 +223,8 @@ public:
     void Inv(CGXBigInteger& value);
 
     std::string ToString();
+
+    CGXBigInteger& operator=(
+        const CGXBigInteger& value);
 };
 #endif //GXBIGINTEGER_H

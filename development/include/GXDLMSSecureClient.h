@@ -92,5 +92,17 @@ public:
         CGXByteBuffer& kek,
         CGXByteBuffer& data,
         CGXByteBuffer& reply);
+
+    // Optional ECDSA public key certificate that is send in part of AARE.
+    CGXx509Certificate& GetClientPublicKeyCertificate();
+
+    // Optional ECDSA public key certificate that is send in part of AARE.
+    void SetClientPublicKeyCertificate(CGXx509Certificate& value);
+
+    // Optional ECDSA public key certificate that is send in part of AARE.
+    CGXx509Certificate& GetServerPublicKeyCertificate();
+
+    // Optional ECDSA public key certificate that is send in part of AARE.
+    void SetServerPublicKeyCertificate(CGXx509Certificate& value);
 };
 #endif //GXDLMSCLIENT_H

@@ -39,6 +39,8 @@
 // Constructor.
 CGXBigInteger::CGXBigInteger()
 {
+    m_Data = NULL;
+    m_Capacity = 0;
     m_Count = 0;
     m_IsNegative = false;
 }
@@ -87,13 +89,51 @@ CGXBigInteger::CGXBigInteger(CGXByteBuffer& value) : CGXBigInteger()
 
 CGXBigInteger::CGXBigInteger(CGXBigInteger* value) : CGXBigInteger()
 {
-    AddRange((uint32_t*)value->Data, value->m_Count);
+    AddRange(value->m_Data, value->m_Count);
     m_IsNegative = value->m_IsNegative;
+}
+
+CGXBigInteger::CGXBigInteger(const CGXBigInteger& value) : CGXBigInteger()
+{
+    AddRange(value.m_Data, value.m_Count);
+    m_IsNegative = value.m_IsNegative;
+}
+
+CGXBigInteger& CGXBigInteger::operator=(const CGXBigInteger& value)
+{
+    Clear();
+    AddRange(value.m_Data, value.m_Count);
+    return *this;
 }
 
 CGXBigInteger::~CGXBigInteger()
 {
+    delete m_Data;
+    m_Data = NULL;
+}
 
+int CGXBigInteger::Capacity(uint16_t value)
+{
+    if (!(m_Capacity > value) && value != 0)
+    {
+        uint32_t* tmp;
+        if (m_Data == NULL)
+        {
+            tmp = (uint32_t*)malloc(sizeof(uint32_t) * value);
+        }
+        else
+        {
+            tmp = (uint32_t*)realloc(m_Data, sizeof(uint32_t) * value);
+        }
+        //If not enought memory available.
+        if (tmp == NULL)
+        {
+            return DLMS_ERROR_CODE_OUTOFMEMORY;
+        }
+        m_Capacity = value;
+        m_Data = tmp;
+    }
+    return 0;
 }
 
 int CGXBigInteger::FromByteBuffer(CGXByteBuffer& value)
@@ -102,6 +142,8 @@ int CGXBigInteger::FromByteBuffer(CGXByteBuffer& value)
     unsigned long tmp;
     unsigned char ch;
     unsigned short ival;
+    Clear();
+    Capacity(value.GetSize() / 4);
     for (int pos = value.GetSize() - 4; pos > -1; pos = pos - 4)
     {
         ret = value.GetUInt32(pos, &tmp);
@@ -145,7 +187,7 @@ int CGXBigInteger::FromByteBuffer(CGXByteBuffer& value)
                 break;
             }
             tmp |= ival;
-            Add(tmp);            
+            Add(tmp);
             break;
         default:
             break;
@@ -159,16 +201,24 @@ void CGXBigInteger::SetIsNegative(bool value)
     m_IsNegative = value;
 }
 
-void CGXBigInteger::Add(const uint32_t value)
+int CGXBigInteger::Add(const uint32_t value)
 {
-    Data[m_Count] = value;
-    ++m_Count;
+    return AddRange(&value, 1);
 }
 
-void CGXBigInteger::AddRange(const uint32_t* values, uint16_t count)
+int CGXBigInteger::AddRange(const uint32_t* values, uint16_t count)
 {
-    memcpy(Data + m_Count, values, sizeof(uint32_t) * count);
+    if ((m_Count + count) > m_Capacity)
+    {
+        int ret = Capacity(count + m_Count);
+        if (ret != 0)
+        {
+            return ret;
+        }
+    }
+    memcpy(m_Data + m_Count, values, sizeof(uint32_t) * count);
     m_Count += count;
+    return 0;
 }
 
 int CGXBigInteger::AddValue(uint32_t* list,
@@ -213,18 +263,18 @@ bool CGXBigInteger::IsNegative()
 bool CGXBigInteger::IsZero()
 {
     return m_Count == 0 ||
-        (m_Count == 1 && Data[0] == 0);
+        (m_Count == 1 && m_Data[0] == 0);
 }
 
 bool CGXBigInteger::IsEven()
 {
     return m_Count != 0 &&
-        Data[0] % 2 == 0;
+        m_Data[0] % 2 == 0;
 }
 
 bool CGXBigInteger::IsOne()
 {
-    return m_Count == 1 && Data[0] == 1;
+    return m_Count == 1 && m_Data[0] == 1;
 }
 
 int CGXBigInteger::ToArray(CGXByteBuffer& data,
@@ -236,7 +286,7 @@ int CGXBigInteger::ToArray(CGXByteBuffer& data,
     uint32_t zeroIndex = -1;
     for (pos = 0; pos != m_Count; ++pos)
     {
-        value = Data[pos];
+        value = m_Data[pos];
         if (value == 0)
         {
             zeroIndex = pos;
@@ -278,7 +328,7 @@ int CGXBigInteger::ToArray(uint32_t start,
     uint32_t pos;
     for (pos = start; pos != size; ++pos)
     {
-        data.SetUInt32(Data[pos]);
+        data.SetUInt32(m_Data[pos]);
     }
     return 0;
 }
@@ -292,7 +342,7 @@ void CGXBigInteger::Or(CGXBigInteger& value)
     }
     for (pos = 0; pos < value.m_Count; ++pos)
     {
-        Data[pos] |= value.Data[pos];
+        m_Data[pos] |= value.m_Data[pos];
     }
 }
 
@@ -313,13 +363,13 @@ int CGXBigInteger::Add(CGXBigInteger& value)
         uint64_t overflow = 0;
         for (uint32_t pos = 0; pos != m_Count; ++pos)
         {
-            uint64_t tmp = Data[pos];
+            uint64_t tmp = m_Data[pos];
             if (pos < value.m_Count)
             {
-                tmp += value.Data[pos];
+                tmp += value.m_Data[pos];
             }
             tmp += overflow;
-            Data[pos] = (uint32_t) tmp;
+            m_Data[pos] = (uint32_t)tmp;
             overflow = tmp >> 32;
         }
         if (overflow != 0)
@@ -345,7 +395,7 @@ void CGXBigInteger::Sub(CGXBigInteger& value)
             CGXBigInteger tmp(value);
             tmp.Sub(*this);
             Clear();
-            AddRange(tmp.Data, tmp.m_Count);
+            AddRange(tmp.m_Data, tmp.m_Count);
             m_Count = tmp.m_Count;
             SetIsNegative(true);
         }
@@ -367,7 +417,7 @@ void CGXBigInteger::Sub(CGXBigInteger& value)
             {
                 SetIsNegative(true);
                 Clear();
-                AddRange((uint32_t*)value.Data, value.m_Count);
+                AddRange(value.m_Data, value.m_Count);
                 m_Count = value.m_Count;
             }
             else
@@ -381,21 +431,21 @@ void CGXBigInteger::Sub(CGXBigInteger& value)
                 uint32_t pos;
                 for (pos = 0; pos != value.m_Count; ++pos)
                 {
-                    tmp = Data[pos];
+                    tmp = m_Data[pos];
                     tmp += 0x100000000;
-                    tmp -= value.Data[pos];
+                    tmp -= value.m_Data[pos];
                     tmp -= borrow;
-                    Data[pos] = (uint32_t)tmp;
+                    m_Data[pos] = (uint32_t)tmp;
                     borrow = (unsigned char)((tmp < 0x100000000) ? 1 : 0);
                 }
                 if (borrow != 0)
                 {
                     for (; pos != m_Count; ++pos)
                     {
-                        tmp = Data[pos];
+                        tmp = m_Data[pos];
                         tmp += 0x100000000;
                         tmp -= borrow;
-                        Data[pos] = (uint32_t)tmp;
+                        m_Data[pos] = (uint32_t)tmp;
                         borrow = (unsigned char)((tmp < 0x100000000) ? 1 : 0);
                         if (borrow == 0)
                         {
@@ -404,7 +454,7 @@ void CGXBigInteger::Sub(CGXBigInteger& value)
                     }
                 }
                 //Remove empty last item(s).
-                while (m_Count != 1 && Data[m_Count - 1] == 0)
+                while (m_Count != 1 && m_Data[m_Count - 1] == 0)
                 {
                     --m_Count;
                 }
@@ -422,6 +472,7 @@ void CGXBigInteger::Multiply(CGXBigInteger& value)
     else if (!value.IsOne())
     {
         uint16_t lenght = 1 + value.m_Count + m_Count;
+        Capacity(lenght);
         uint32_t* ret = new uint32_t[lenght];
         memset(ret, 0, lenght * sizeof(uint32_t));
         uint32_t overflow = 0;
@@ -431,8 +482,8 @@ void CGXBigInteger::Multiply(CGXBigInteger& value)
             overflow = 0;
             for (uint32_t j = 0; j != m_Count; ++j)
             {
-                uint64_t result = value.Data[i];
-                result *= Data[j];
+                uint64_t result = value.m_Data[i];
+                result *= m_Data[j];
                 result += overflow;
                 overflow = (uint32_t)(result >> 32);
                 index = i + j;
@@ -449,7 +500,7 @@ void CGXBigInteger::Multiply(CGXBigInteger& value)
             --index;
         }
         ++index;
-        memcpy(Data, ret, index * sizeof(uint32_t));
+        memcpy(m_Data, ret, index * sizeof(uint32_t));
         delete[] ret;
         m_Count = index;
     }
@@ -491,14 +542,14 @@ int CGXBigInteger::Compare(CGXBigInteger& value)
         int cntA = (int)m_Count;
         cntA -= 1;
         //Skip zero values.
-        while (cntA != -1 && Data[cntA] == 0)
+        while (cntA != -1 && m_Data[cntA] == 0)
         {
             --cntA;
         }
         int cntB = (int)value.m_Count;
         cntB -= 1;
         //Skip zero values.
-        while (cntB != -1 && value.Data[cntB] == 0)
+        while (cntB != -1 && value.m_Data[cntB] == 0)
         {
             --cntB;
         }
@@ -514,12 +565,12 @@ int CGXBigInteger::Compare(CGXBigInteger& value)
         {
             do
             {
-                if (Data[cntA] > value.Data[cntA])
+                if (m_Data[cntA] > value.m_Data[cntA])
                 {
                     ret = 1;
                     break;
                 }
-                else if (Data[cntA] < value.Data[cntA])
+                else if (m_Data[cntA] < value.m_Data[cntA])
                 {
                     ret = -1;
                     break;
@@ -537,11 +588,11 @@ int CGXBigInteger::Compare(uint32_t value)
     {
         return -1;
     }
-    if (Data[0] == value)
+    if (m_Data[0] == value)
     {
         return 0;
     }
-    return Data[0] < value ? -1 : 1;
+    return m_Data[0] < value ? -1 : 1;
 }
 
 void CGXBigInteger::Lshift(uint32_t amount)
@@ -551,10 +602,10 @@ void CGXBigInteger::Lshift(uint32_t amount)
         uint32_t overflow = 0;
         for (uint32_t pos = 0; pos != m_Count; ++pos)
         {
-            uint64_t tmp = Data[pos];
+            uint64_t tmp = m_Data[pos];
             tmp <<= amount;
             tmp |= overflow;
-            Data[pos] = (uint32_t)tmp;
+            m_Data[pos] = (uint32_t)tmp;
             overflow = (uint32_t)(tmp >> 32);
         }
         if (overflow != 0)
@@ -573,12 +624,12 @@ void CGXBigInteger::Rshift(uint32_t amount)
     uint32_t cnt = m_Count - 1;
     for (pos = cnt; pos != -1; --pos)
     {
-        uint64_t tmp = Data[pos];
-        Data[pos] = (uint32_t)((tmp >> amount) | overflow);
+        uint64_t tmp = m_Data[pos];
+        m_Data[pos] = (uint32_t)((tmp >> amount) | overflow);
         overflow = (tmp & mask) << (32 - amount);
     }
     //Remove last item if it's empty.
-    while (m_Count != 1 && Data[cnt] == 0)
+    while (m_Count != 1 && m_Data[cnt] == 0)
     {
         --m_Count;
         --cnt;
@@ -650,16 +701,16 @@ void CGXBigInteger::Div(CGXBigInteger* value)
             current.Rshift(1);
             denom.Rshift(1);
         }
-        memcpy(current.Data, Data, sizeof(Data));
+        memcpy(current.m_Data, m_Data, sizeof(uint32_t) * m_Count);
     }
     SetIsNegative(neq);
-    memcpy(Data, current.Data, sizeof(Data));
+    memcpy(m_Data, current.m_Data, sizeof(uint32_t) * m_Count);
 }
 
 void CGXBigInteger::Mod(CGXBigInteger& mod)
 {
-    CGXBigInteger current = new CGXBigInteger(1);
-    CGXBigInteger denom = new CGXBigInteger(mod);
+    CGXBigInteger current(1);
+    CGXBigInteger denom(mod);
     bool neq = IsNegative();
     SetIsNegative(false);
     // while denom < this.
@@ -734,7 +785,7 @@ void CGXBigInteger::Inv(CGXBigInteger& value)
             hm = lm;
             lm = nm;
         }
-        memcpy(Data, lm.Data, sizeof(uint32_t) * lm.m_Count);
+        memcpy(m_Data, lm.m_Data, sizeof(uint32_t) * lm.m_Count);
         SetIsNegative(lm.IsNegative());
         Mod(value);
     }
@@ -754,9 +805,9 @@ std::string CGXBigInteger::ToString()
         CGXByteBuffer bb;
         for (pos = (int)(m_Count - 1); pos != -1; --pos)
         {
-            bb.SetUInt32(Data[pos]);
+            bb.SetUInt32(m_Data[pos]);
         }
-        for (pos = 0; pos != (int) bb.GetSize(); ++pos)
+        for (pos = 0; pos != (int)bb.GetSize(); ++pos)
         {
             if (bb.GetData()[pos] != 0)
             {

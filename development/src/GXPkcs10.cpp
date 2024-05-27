@@ -240,15 +240,6 @@ int CGXPkcs10::Init(
                                             {
                                                 ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
                                             }
-
-                                            /*
-                                                                                            bb.Set(((GXAsn1Integer)tmp3[0]).Value, ((GXAsn1Integer)tmp3[0]).Value.Length == size ? 0 : 1, size);
-                                                                                            bb.Set(((GXAsn1Integer)tmp3[1]).Value, ((GXAsn1Integer)tmp3[1]).Value.Length == size ? 0 : 1, size);
-                                                                                            if (!e.Verify(bb.Array(), tmp2.SubArray(tmp2.Position, tmp2.Available)))
-                                                                                            {
-                                                                                                throw new ArgumentException("Invalid Signature.");
-                                                                                            }
-                                                                                            */
                                         }
                                         else
                                         {
@@ -287,6 +278,7 @@ int CGXPkcs10::Init(
             ret = DLMS_ERROR_CODE_INVALID_DATA_FORMAT;
         }
     }
+    delete value;
     return ret;
 }
 

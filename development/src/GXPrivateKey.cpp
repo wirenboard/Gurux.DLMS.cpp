@@ -197,6 +197,7 @@ int CGXPrivateKey::FromDer(
                 ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
             }
         }
+        delete value;
     }
     return ret;
 }

@@ -235,6 +235,21 @@ int CGXx509Certificate::UpdateSerialNumber(CGXAsn1Sequence* reqInfo)
             bb.Set(value->GetValue().byteArr, value->GetValue().GetSize());
             m_SerialNumber = CGXBigInteger(bb);
         }
+        else if (CGXAsn1Variant* value = dynamic_cast<CGXAsn1Variant*>(reqInfo->GetValues()->at(1)))
+        {
+            CGXDLMSVariant& variant = value->GetValue();
+            CGXByteBuffer bb;
+            switch (variant.vt)
+            {
+            case DLMS_DATA_TYPE_INT8:
+                bb.Set(&variant.cVal, 1);
+                break;
+            default:
+                bb.Set(value->GetValue().byteArr, variant.GetSize());
+                break;
+            }
+            m_SerialNumber = CGXBigInteger(bb);
+        }
         else
         {
             return DLMS_ERROR_CODE_INVALID_PARAMETER;
@@ -608,6 +623,7 @@ int CGXx509Certificate::Init(CGXByteBuffer& data)
                         (ret = UpdateValidity(reqInfo)) != 0 ||
                         (ret = UpdateStandardExtensions(reqInfo, basicConstraintsExists)) != 0)
                     {
+                        delete value;
                         return ret;
                     }
                     CGXAsn1Sequence* subjectPKInfo = dynamic_cast<CGXAsn1Sequence*>(reqInfo->GetValues()->at(6));
@@ -615,11 +631,13 @@ int CGXx509Certificate::Init(CGXByteBuffer& data)
                     {
                         if ((ret = CGXPublicKey::FromRawBytes(bs->GetValue(), m_PublicKey)) != 0)
                         {
+                            delete value;
                             return ret;
                         }
                         ret = CGXEcdsa::Validate(m_PublicKey);
                         if (ret != 0)
                         {
+                            delete value;
                             return ret;
                         }
                     }
@@ -640,6 +658,7 @@ int CGXx509Certificate::Init(CGXByteBuffer& data)
                                         if (tmp2->GetValue()->ToString().length() != 16)
                                         {
                                             printf("System title is not included in Common Name.");
+                                            delete value;
                                             return DLMS_ERROR_CODE_INVALID_PARAMETER;
                                         }
                                         commonNameFound = true;
@@ -651,29 +670,34 @@ int CGXx509Certificate::Init(CGXByteBuffer& data)
                         if (!commonNameFound)
                         {
                             printf("Common name doesn't exist.\n");
+                            delete value;
                             return DLMS_ERROR_CODE_INVALID_PARAMETER;
                         }
                     }
                     if (m_KeyUsage == DLMS_KEY_USAGE_NONE)
                     {
                         printf("Key usage not present. It's mandotory.\n");
+                        delete value;
                         return DLMS_ERROR_CODE_INVALID_PARAMETER;
                     }
                     if ((m_KeyUsage & (DLMS_KEY_USAGE_KEY_CERT_SIGN | DLMS_KEY_USAGE_CRL_SIGN)) != 0 && !basicConstraintsExists)
                     {
                         printf("Basic Constraints value not present. It's mandotory.");
+                        delete value;
                         return DLMS_ERROR_CODE_INVALID_PARAMETER;
                     }
                     if (m_KeyUsage == (DLMS_KEY_USAGE_DIGITAL_SIGNATURE | DLMS_KEY_USAGE_KEY_AGREEMENT) &&
                         m_ExtendedKeyUsage == DLMS_EXTENDED_KEY_USAGE_NONE)
                     {
                         printf("Extended key usage not present. It's mandotory for TLS.");
+                        delete value;
                         return DLMS_ERROR_CODE_INVALID_PARAMETER;
                     }
                     if (m_ExtendedKeyUsage != DLMS_EXTENDED_KEY_USAGE_NONE &&
                         m_KeyUsage != (DLMS_KEY_USAGE_DIGITAL_SIGNATURE | DLMS_KEY_USAGE_KEY_AGREEMENT))
                     {
                         printf("Extended key usage present. It's used only for TLS.");
+                        delete value;
                         return DLMS_ERROR_CODE_INVALID_PARAMETER;
                     }
                     CGXAsn1Sequence* tmp2 = dynamic_cast<CGXAsn1Sequence*>(seq->GetValues()->at(1));
@@ -684,6 +708,7 @@ int CGXx509Certificate::Init(CGXByteBuffer& data)
                         m_PublicKeyAlgorithm != DLMS_HASH_ALGORITHM_SHA_384_WITH_ECDSA)
                     {
                         printf("DLMS certificate must be signed with ECDSA with SHA256 or SHA384.");
+                        delete value;
                         return DLMS_ERROR_CODE_INVALID_PARAMETER;
                     }
                     /////////////////////////////
@@ -694,25 +719,27 @@ int CGXx509Certificate::Init(CGXByteBuffer& data)
                     }
                     else
                     {
-                        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                        delete value;
+                        ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
                     }
                 }
                 else
                 {
-                    return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                    ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
                 }
             }
             else
             {
-                return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
             }
         }
         else
         {
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+            ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
         }
     }
-    return 0;
+    delete value;
+    return ret;
 }
 
 std::string& CGXx509Certificate::GetSubject()

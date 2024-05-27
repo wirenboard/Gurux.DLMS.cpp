@@ -80,6 +80,21 @@ private:
         CGXDLMSTranslatorStructure* xml,
 #endif //DLMS_IGNORE_XML_TRANSLATOR
         unsigned char tag);
+
+    /**
+    * Code application context name.
+    *
+    * @param settings
+    *            DLMS settings.
+    * @param data
+    *            Byte buffer where data is saved.
+    * @param cipher
+    *            Is ciphering settings.
+    */
+    static int GenerateApplicationContextName(
+        CGXDLMSSettings& settings,
+        CGXByteBuffer& data,
+        CGXCipher* cipher);
 public:
 
     /**
@@ -124,12 +139,12 @@ public:
     static int ParsePDU(CGXDLMSSettings& settings,
         CGXCipher* cipher,
         CGXByteBuffer& buff,
-        DLMS_ASSOCIATION_RESULT &result,
+        DLMS_ASSOCIATION_RESULT& result,
         DLMS_SOURCE_DIAGNOSTIC& diagnostic
 #ifndef DLMS_IGNORE_XML_TRANSLATOR
         , CGXDLMSTranslatorStructure* xml
 #endif //DLMS_IGNORE_XML_TRANSLATOR
-        );
+    );
 
     /**
      * Server generates AARE message.
@@ -140,8 +155,8 @@ public:
         DLMS_ASSOCIATION_RESULT result,
         DLMS_SOURCE_DIAGNOSTIC diagnostic,
         CGXCipher* cipher,
-        CGXByteBuffer *errorData,
-        CGXByteBuffer *encryptedData);
+        CGXByteBuffer* errorData,
+        CGXByteBuffer* encryptedData);
 
     static int GetUserInformation(
         CGXDLMSSettings& settings,
@@ -156,7 +171,7 @@ public:
 #ifndef DLMS_IGNORE_XML_TRANSLATOR
         , CGXDLMSTranslatorStructure* xml
 #endif //DLMS_IGNORE_XML_TRANSLATOR
-        );
+    );
 };
 
 #endif //GXAPDU_H

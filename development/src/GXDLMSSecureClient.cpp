@@ -101,3 +101,28 @@ int CGXDLMSSecureClient::Decrypt(CGXByteBuffer& kek, CGXByteBuffer& data, CGXByt
     }
     return CGXSecure::DecryptAesKeyWrapping(data, kek, reply);
 }
+
+// Optional ECDSA public key certificate that is send in part of AARE.
+CGXx509Certificate& CGXDLMSSecureClient::GetClientPublicKeyCertificate()
+{
+    return m_Settings.GetClientPublicKeyCertificate();
+}
+
+// Optional ECDSA public key certificate that is send in part of AARE.
+void CGXDLMSSecureClient::SetClientPublicKeyCertificate(CGXx509Certificate& value)
+{
+    m_Settings.SetClientPublicKeyCertificate(value);
+}
+
+
+// Optional ECDSA public key certificate that is send in part of AARE.
+CGXx509Certificate& CGXDLMSSecureClient::GetServerPublicKeyCertificate()
+{
+    return m_Settings.GetServerPublicKeyCertificate();
+}
+
+// Optional ECDSA public key certificate that is send in part of AARE.
+void CGXDLMSSecureClient::SetServerPublicKeyCertificate(CGXx509Certificate& value)
+{
+    m_Settings.SetServerPublicKeyCertificate(value);
+}

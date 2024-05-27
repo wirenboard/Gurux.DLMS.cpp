@@ -718,3 +718,24 @@ void CGXDLMSSettings::SetCommandType(unsigned char value)
 {
     m_CommandType = value;
 }
+
+CGXx509Certificate& CGXDLMSSettings::GetClientPublicKeyCertificate()
+{
+    return m_ClientPublicKeyCertificate;
+}
+
+void CGXDLMSSettings::SetClientPublicKeyCertificate(CGXx509Certificate& value)
+{
+    m_ClientPublicKeyCertificate = value;
+}
+
+
+CGXx509Certificate& CGXDLMSSettings::GetServerPublicKeyCertificate()
+{
+    return m_ServerPublicKeyCertificate;
+}
+
+void CGXDLMSSettings::SetServerPublicKeyCertificate(CGXx509Certificate& value)
+{
+    m_ServerPublicKeyCertificate = value;
+}

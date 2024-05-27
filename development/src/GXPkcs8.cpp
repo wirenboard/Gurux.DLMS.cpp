@@ -288,6 +288,7 @@ int CGXPkcs8::Init(CGXByteBuffer& data)
                     if (var->GetValue().vt != DLMS_DATA_TYPE_INT8)
                     {
                         DLMS_PKCS_TYPE type = CGXAsn1Converter::GetCertificateType(data, seq);
+                        delete value;
                         switch (type)
                         {
                         case DLMS_PKCS_TYPE_PKCS10:
@@ -315,6 +316,7 @@ int CGXPkcs8::Init(CGXByteBuffer& data)
 #ifdef _DEBUG
                     printf("Invalid Certificate. This looks more like private key, not PKCS 8.");
 #endif //_DEBUG
+                    delete value;
                     return DLMS_ERROR_CODE_INVALID_PARAMETER;
                 }
                 if (CGXAsn1Sequence* var = dynamic_cast<CGXAsn1Sequence*>(seq->GetValues()->at(2)))
@@ -328,6 +330,7 @@ int CGXPkcs8::Init(CGXByteBuffer& data)
 #ifdef _DEBUG
                             printf("Invalid private key.\n");
 #endif //_DEBUG
+                            delete value;
                             return ret;
                         }
                     }
@@ -356,6 +359,7 @@ int CGXPkcs8::Init(CGXByteBuffer& data)
             }
         }
     }
+    delete value;
     return ret;
 }
 

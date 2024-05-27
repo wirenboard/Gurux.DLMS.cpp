@@ -223,6 +223,12 @@ class CGXDLMSSettings
      * Last executed command type
      */
     unsigned char m_CommandType;
+
+    // Optional ECDSA public key certificate that is send in part of AARQ.
+    CGXx509Certificate m_ClientPublicKeyCertificate;
+
+    // Optional ECDSA public key certificate that is send in part of AARE.
+    CGXx509Certificate m_ServerPublicKeyCertificate;
 public:
     // Constructor.
     CGXDLMSSettings(bool isServer);
@@ -579,6 +585,18 @@ public:
     //Add dynamically allocated objects here so they are released.
     //This is done if object is not in the association view, but might be ex. capture objects.
     void AddAllocateObject(CGXDLMSObject* pObj);
+
+    // Optional ECDSA public key certificate that is send in part of AARQ.
+    CGXx509Certificate& GetClientPublicKeyCertificate();
+
+    // Optional ECDSA public key certificate that is send in part of AARQ.
+    void SetClientPublicKeyCertificate(CGXx509Certificate& cert);
+
+    // Optional ECDSA public key certificate that is send in part of AARE.
+    CGXx509Certificate& GetServerPublicKeyCertificate();
+
+    // Optional ECDSA public key certificate that is send in part of AARE.
+    void SetServerPublicKeyCertificate(CGXx509Certificate& cert);
 };
 
 #endif //GXDLMSSETTINGS_H
