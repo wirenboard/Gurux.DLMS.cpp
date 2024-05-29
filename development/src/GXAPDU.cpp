@@ -156,7 +156,7 @@ int CGXAPDU::GenerateApplicationContextName(
             GXHelpers::SetObjectCount(2 + len, data);
             data.SetUInt8(BER_TYPE_OCTET_STRING);
             //LEN
-            GXHelpers::SetObjectCount(2 + len, data);
+            GXHelpers::SetObjectCount(len, data);
             data.Set(settings.GetClientPublicKeyCertificate().m_RawData.GetData(), len);
         }
     }
@@ -1366,26 +1366,25 @@ int CGXAPDU::GenerateAarq(
     CGXByteBuffer& data)
 {
     int ret;
-    // AARQ APDU Tag
-    data.SetUInt8(BER_TYPE_APPLICATION | BER_TYPE_CONSTRUCTED);
-    // Length is updated later.
-    unsigned long offset = data.GetSize();
-    data.SetUInt8(0);
+    CGXByteBuffer tmp;
     ///////////////////////////////////////////
     // Add Application context name.
-    if ((ret = GenerateApplicationContextName(settings, data, cipher)) != 0)
+    if ((ret = GenerateApplicationContextName(settings, tmp, cipher)) != 0)
     {
         return ret;
     }
-    if ((ret = GetAuthenticationString(settings, data, encryptedData != NULL && encryptedData->GetSize() != 0)) != 0)
+    if ((ret = GetAuthenticationString(settings, tmp, encryptedData != NULL && encryptedData->GetSize() != 0)) != 0)
     {
         return ret;
     }
-    if ((ret = GenerateUserInformation(settings, cipher, encryptedData, data)) != 0)
+    if ((ret = GenerateUserInformation(settings, cipher, encryptedData, tmp)) != 0)
     {
         return ret;
     }
-    data.SetUInt8(offset, (unsigned char)(data.GetSize() - offset - 1));
+    // AARQ APDU Tag
+    data.SetUInt8(BER_TYPE_APPLICATION | BER_TYPE_CONSTRUCTED);
+    GXHelpers::SetObjectCount(tmp.GetSize(), data);
+    data.Set(&tmp);
     return 0;
 }
 

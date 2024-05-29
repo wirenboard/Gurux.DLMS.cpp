@@ -47,6 +47,7 @@ int CGXSecure::GenerateChallenge(
     // Texas Instruments accepts only 16 byte long challenge.
     // For this reason challenge size is 16 bytes at the moment.
     int len = 16;
+    srand((unsigned int)time(NULL));
     if (authentication == DLMS_AUTHENTICATION_HIGH_ECDSA)
     {
         len = rand() % 32 + 32;

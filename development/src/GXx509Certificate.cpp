@@ -231,9 +231,16 @@ int CGXx509Certificate::UpdateSerialNumber(CGXAsn1Sequence* reqInfo)
     {
         if (CGXAsn1Variant* value = dynamic_cast<CGXAsn1Variant*>(reqInfo->GetValues()->at(1)))
         {
-            CGXByteBuffer bb;
-            bb.Set(value->GetValue().byteArr, value->GetValue().GetSize());
-            m_SerialNumber = CGXBigInteger(bb);
+            if (value->GetValue().vt == DLMS_DATA_TYPE_OCTET_STRING)
+            {
+                CGXByteBuffer bb;
+                bb.Set(value->GetValue().byteArr, value->GetValue().GetSize());
+                m_SerialNumber = CGXBigInteger(bb);
+            }
+            else
+            {
+                m_SerialNumber = CGXBigInteger(value->GetValue().ToInteger());
+            }
         }
         else if (CGXAsn1Variant* value = dynamic_cast<CGXAsn1Variant*>(reqInfo->GetValues()->at(1)))
         {
