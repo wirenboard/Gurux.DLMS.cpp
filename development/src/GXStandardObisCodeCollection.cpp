@@ -703,11 +703,11 @@ void CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, std::
 #endif
             GXHelpers::Replace(desc, "$F", buff);
             //Increase value
-            int begin = (int)desc.find("#$");
-            if (begin != -1)
+            size_t begin = desc.find("#$");
+            if (begin != std::string::npos)
             {
-                int start = (int)desc.find('(');
-                int end = (int)desc.find(')');
+                size_t start = desc.find('(');
+                size_t end = desc.find(')');
                 char channel = desc[start + 1];
                 int ch = 0;
                 if (channel == 'A')
@@ -734,8 +734,8 @@ void CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, std::
                 {
                     ch = pObisCode[5];
                 }
-                int plus = (int)desc.find('+');
-                if (plus != -1)
+                size_t plus = desc.find('+');
+                if (plus != std::string::npos)
                 {
                     int value;
 #if _MSC_VER > 1000
@@ -751,14 +751,14 @@ void CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, std::
                 sprintf(buff, "%d", ch);
 #endif
                 desc = desc.substr(0, begin).append(buff);
-                }
+            }
             GXHelpers::Replace(desc, ";", " ");
             GXHelpers::Replace(desc, "  ", " ");
             GXHelpers::rtrim(desc);
             obj->SetDescription(desc);
             list.push_back(obj);
-            }
         }
+    }
     //If invalid OBIS code.
     if (list.size() == 0)
     {
@@ -812,4 +812,4 @@ void CGXStandardObisCodeCollection::Find(unsigned char* pObisCode, int IC, std::
         obj->SetOBIS(obis);
         list.push_back(obj);
     }
-    }
+}
