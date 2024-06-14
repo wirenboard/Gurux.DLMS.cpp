@@ -1725,6 +1725,12 @@ int CGXDLMS::GetHdlcData(
         else if (tmp == HDLC_CONTROL_FRAME_RECEIVE_READY)
         {
             // Get next frame.
+            //Return error if there is already reply data and meter returns RR.
+            if (settings.GetCommand() == DLMS_COMMAND_GET_REQUEST ||
+                settings.GetCommand() == DLMS_COMMAND_GLO_GET_REQUEST)
+            {
+                return DLMS_ERROR_CODE_INVALID_FRAME_NUMBER;
+            }
         }
         // Get Eop if there is no data.
         if (reply.GetPosition() == packetStartID + frameLen + 1)

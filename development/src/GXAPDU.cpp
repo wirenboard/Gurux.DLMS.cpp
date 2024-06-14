@@ -153,7 +153,7 @@ int CGXAPDU::GenerateApplicationContextName(
             //Add calling-AE-qualifier.
             data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AE_QUALIFIER);
             //LEN
-            GXHelpers::SetObjectCount(2 + len, data);
+            GXHelpers::SetObjectCount(1 + GXHelpers::GetObjectCountSizeInBytes(len), data);
             data.SetUInt8(BER_TYPE_OCTET_STRING);
             //LEN
             GXHelpers::SetObjectCount(len, data);
@@ -1487,6 +1487,7 @@ int CGXAPDU::ParsePDU2(
 {
     CGXByteBuffer tmp;
     unsigned char tag, len;
+    unsigned long len2;
     int ret;
     std::string str;
     result = DLMS_ASSOCIATION_RESULT_ACCEPTED;
@@ -1814,7 +1815,7 @@ int CGXAPDU::ParsePDU2(
             break;
             //Client CalledAeInvocationId.
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLED_AE_INVOCATION_ID://0xA5
-            if ((ret = buff.GetUInt8(&len)) != 0)
+            if ((ret = GXHelpers::GetObjectCount(buff, len2)) != 0)
             {
                 return ret;
             }
@@ -1822,14 +1823,14 @@ int CGXAPDU::ParsePDU2(
             {
                 return ret;
             }
-            if ((ret = buff.GetUInt8(&len)) != 0)
+            if ((ret = GXHelpers::GetObjectCount(buff, len2)) != 0)
             {
                 return ret;
             }
             if (tag == BER_TYPE_OCTET_STRING)
             {
                 CGXByteBuffer tmp;
-                tmp.Set(&buff, buff.GetPosition(), len);
+                tmp.Set(&buff, buff.GetPosition(), len2);
                 CGXx509Certificate cert;
                 if ((ret = CGXx509Certificate::FromByteArray(tmp, cert)) != 0)
                 {
@@ -1866,7 +1867,7 @@ int CGXAPDU::ParsePDU2(
             break;
             //Server RespondingAEInvocationId.
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AE_QUALIFIER://0xA7
-            if ((ret = buff.GetUInt8(&len)) != 0)
+            if ((ret = GXHelpers::GetObjectCount(buff, len2)) != 0)
             {
                 return ret;
             }
@@ -1874,7 +1875,7 @@ int CGXAPDU::ParsePDU2(
             {
                 return ret;
             }
-            if ((ret = buff.GetUInt8(&len)) != 0)
+            if ((ret = GXHelpers::GetObjectCount(buff, len2)) != 0)
             {
                 return ret;
             }
@@ -1882,7 +1883,7 @@ int CGXAPDU::ParsePDU2(
             {
                 //If public key certificate is coming part of AARQ.
                 CGXByteBuffer tmp;
-                tmp.Set(&buff, buff.GetPosition(), len);
+                tmp.Set(&buff, buff.GetPosition(), len2);
                 CGXx509Certificate cert;
                 if ((ret = CGXx509Certificate::FromByteArray(tmp, cert)) != 0)
                 {
@@ -2231,7 +2232,7 @@ int CGXAPDU::GenerateAARE(
     {
         unsigned long len = settings.GetServerPublicKeyCertificate().m_RawData.GetSize();
         data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AE_QUALIFIER);
-        GXHelpers::SetObjectCount(4 + len, data);
+        GXHelpers::SetObjectCount(1 + GXHelpers::GetObjectCountSizeInBytes(len), data);
         data.SetUInt8(BER_TYPE_OCTET_STRING);
         GXHelpers::SetObjectCount(len, data);
         data.Set(settings.GetServerPublicKeyCertificate().m_RawData.GetData(), len);
