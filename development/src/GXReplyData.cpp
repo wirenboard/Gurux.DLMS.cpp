@@ -208,12 +208,12 @@ void CGXReplyData::SetPeek(bool value)
     m_Peek = value;
 }
 
-unsigned short CGXReplyData::GetCipherIndex()
+unsigned long CGXReplyData::GetCipherIndex()
 {
     return m_CipherIndex;
 }
 
-void CGXReplyData::SetCipherIndex(unsigned short value)
+void CGXReplyData::SetCipherIndex(unsigned long value)
 {
     m_CipherIndex = value;
 }

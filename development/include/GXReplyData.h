@@ -98,7 +98,7 @@ private:
     /*
      * Cipher index is position where data is decrypted.
      */
-    unsigned short m_CipherIndex;
+    unsigned long m_CipherIndex;
 
     /*
      * Data notification date time.
@@ -280,13 +280,13 @@ public:
     /*
      * @return Cipher index is position where data is decrypted.
      */
-    unsigned short GetCipherIndex();
+    unsigned long GetCipherIndex();
 
     /*
      * @param cipherIndex
      *            Cipher index is position where data is decrypted.
      */
-    void SetCipherIndex(unsigned short value);
+    void SetCipherIndex(unsigned long value);
 
     /*
      * @return Data notification date time.
