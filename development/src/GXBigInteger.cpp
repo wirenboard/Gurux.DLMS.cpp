@@ -103,6 +103,7 @@ CGXBigInteger& CGXBigInteger::operator=(const CGXBigInteger& value)
 {
     Clear();
     AddRange(value.m_Data, value.m_Count);
+    m_IsNegative = value.m_IsNegative;
     return *this;
 }
 
