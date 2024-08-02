@@ -153,7 +153,7 @@ int CGXAPDU::GenerateApplicationContextName(
             //Add calling-AE-qualifier.
             data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AE_QUALIFIER);
             //LEN
-            GXHelpers::SetObjectCount(1 + GXHelpers::GetObjectCountSizeInBytes(len), data);
+            GXHelpers::SetObjectCount(1 + GXHelpers::GetObjectCountSizeInBytes(len) + len, data);
             data.SetUInt8(BER_TYPE_OCTET_STRING);
             //LEN
             GXHelpers::SetObjectCount(len, data);
@@ -2232,7 +2232,7 @@ int CGXAPDU::GenerateAARE(
     {
         unsigned long len = settings.GetServerPublicKeyCertificate().m_RawData.GetSize();
         data.SetUInt8(BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_CALLING_AE_QUALIFIER);
-        GXHelpers::SetObjectCount(1 + GXHelpers::GetObjectCountSizeInBytes(len), data);
+        GXHelpers::SetObjectCount(1 + GXHelpers::GetObjectCountSizeInBytes(len) + len, data);
         data.SetUInt8(BER_TYPE_OCTET_STRING);
         GXHelpers::SetObjectCount(len, data);
         data.Set(settings.GetServerPublicKeyCertificate().m_RawData.GetData(), len);
