@@ -1839,13 +1839,11 @@ int CGXAPDU::ParsePDU2(
                 settings.SetServerPublicKeyCertificate(cert);
                 if ((cert.GetKeyUsage() & DLMS_KEY_USAGE_KEY_CERT_SIGN) != 0)
                 {
-                    std::pair<CGXPublicKey, CGXPrivateKey> kp(cert.GetPublicKey(), settings.GetCipher()->GetKeyAgreementKeyPair().second);
-                    settings.GetCipher()->SetKeyAgreementKeyPair(kp);
+                    settings.GetCipher()->GetKeyAgreementKeyPair().first = cert.GetPublicKey();
                 }
                 if ((cert.GetKeyUsage() & DLMS_KEY_USAGE_DIGITAL_SIGNATURE) != 0)
                 {
-                    std::pair<CGXPublicKey, CGXPrivateKey> kp(cert.GetPublicKey(), settings.GetCipher()->GetSigningKeyPair().second);
-                    settings.GetCipher()->SetSigningKeyPair(kp);
+                    settings.GetCipher()->GetSigningKeyPair().first = cert.GetPublicKey();
                 }
             }
             else

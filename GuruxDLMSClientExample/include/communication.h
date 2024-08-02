@@ -84,9 +84,10 @@ class CGXCommunication
     int             m_hComPort;
 #endif
     uint16_t m_WaitTime;
-    int Read(unsigned char eop, CGXByteBuffer& reply);
+    int Read(unsigned char eop, CGXByteBuffer& reply, uint16_t waitTime = 0);
     /// Read Invocation counter (frame counter) from the meter and update it.
     int UpdateFrameCounter();
+    int InitializeOpticalHead();
 public:
     void WriteValue(GX_TRACE_LEVEL trace, std::string line);
 public:
