@@ -280,6 +280,7 @@ int CGXEcdsa::Sign(CGXByteBuffer& data,
     CGXByteBuffer& signature)
 {
     int ret;
+    unsigned long pos = data.GetPosition();
     if (m_PrivateKey.GetRawValue().GetSize() == 0)
     {
         printf("Invalid private key.");
@@ -340,6 +341,7 @@ int CGXEcdsa::Sign(CGXByteBuffer& data,
     {
         ret = signature.Set(tmp.GetData(), tmp.GetSize());
     }
+    data.SetPosition(pos);
     return ret;
 }
 

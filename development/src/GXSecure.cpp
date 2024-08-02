@@ -208,7 +208,7 @@ int CGXSecure::Secure(
     // Get shared secret
     if (settings.GetAuthentication() == DLMS_AUTHENTICATION_HIGH_ECDSA)
     {
-        challenge.Set(&secret);
+        //Do nothing.
     }
     else if (settings.GetAuthentication() != DLMS_AUTHENTICATION_HIGH_GMAC &&
         settings.GetAuthentication() != DLMS_AUTHENTICATION_HIGH_SHA256)
@@ -259,6 +259,7 @@ int CGXSecure::Secure(
 #ifdef _DEBUG
         printf("Private signed key: %s\n", key.ToHex().c_str());
         printf("Public signed key: %s\n", pub.ToHex().c_str());
+        printf("encrypted data: %s\n", secret.ToHexString().c_str());
 #endif //_DEBUG
         CGXEcdsa sig(key);
         ret = sig.Sign(secret, reply);
