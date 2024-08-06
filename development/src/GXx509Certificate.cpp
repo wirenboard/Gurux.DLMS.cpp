@@ -1030,3 +1030,22 @@ bool CGXx509Certificate::Equals(CGXx509Certificate& cert)
 {
     return m_SerialNumber.Compare(cert.m_SerialNumber) == 0;
 }
+
+int CGXx509Certificate::GetSystemTitle(CGXByteBuffer& value)
+{
+    if (m_Subject.empty())
+    {
+        return DLMS_ERROR_CODE_INVALID_PARAMETER;
+    }
+    std::string tmp;
+    int ret = CGXAsn1Converter::HexSystemTitleFromSubject(m_Subject, tmp);
+    if (ret == 0)
+    {
+        GXHelpers::HexToBytes(tmp, value);
+        if (value.GetSize() != 8)
+        {
+            ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
+    }
+    return ret;
+}

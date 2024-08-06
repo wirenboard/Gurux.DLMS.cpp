@@ -439,6 +439,11 @@ public:
 
     //Is the content of the objects equal.
     bool Equals(CGXx509Certificate& cert);
+
+    /**
+     * Returns system title from the certificate.
+     */
+    int GetSystemTitle(CGXByteBuffer& value);
 };
 
 #endif //GXX509CERTIFICATE_H
