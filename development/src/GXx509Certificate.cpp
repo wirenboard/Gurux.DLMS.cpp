@@ -1033,6 +1033,7 @@ bool CGXx509Certificate::Equals(CGXx509Certificate& cert)
 
 int CGXx509Certificate::GetSystemTitle(CGXByteBuffer& value)
 {
+    value.Clear();
     if (m_Subject.empty())
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;

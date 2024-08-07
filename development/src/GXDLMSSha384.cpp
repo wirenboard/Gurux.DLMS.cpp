@@ -146,6 +146,7 @@ int CGXDLMSSha384::Hash(
     unsigned char block[128];
     unsigned char pos, size = sizeof(block);
     bool bidsAdded = false;
+    bool eofAdded = false;
     while (!bidsAdded)
     {
         if (data.Available() < 128)
@@ -154,12 +155,13 @@ int CGXDLMSSha384::Hash(
         }
         memcpy(block, data.GetData() + data.GetPosition(), size);
         memset(block + size, 0, sizeof(block) - size);
-        if (data.Available() < 128 && size != 0)
+        if (data.Available() < 128 && !eofAdded)
         {
             // Append a bit 1.
             block[size] = 0x80;
+            eofAdded = true;
         }
-        if (data.Available() < 120)
+        if (data.Available() < 112)
         {
             bidsAdded = true;
             //Add bit length to the end of last block.
