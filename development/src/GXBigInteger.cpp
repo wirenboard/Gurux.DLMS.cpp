@@ -306,13 +306,6 @@ int CGXBigInteger::ToArray(CGXByteBuffer& data,
     {
         data.SetSize(zeroIndex * 4);
     }
-    unsigned char ch;
-    while (data.GetSize() > 0 &&
-        (ret = data.GetUInt8(data.GetSize() - 1, &ch)) == 0 &&
-        ch == 0)
-    {
-        data.SetSize(data.GetSize() - 1);
-    }
     data.Reverse(0, data.GetSize());
     return ret;
 }
