@@ -56,66 +56,6 @@ class CGXEcdsa
 
     CGXCurve m_Curve;
 
-    static void Multiply(CGXEccPoint& p,
-        CGXBigInteger n,
-        CGXBigInteger& N,
-        CGXBigInteger& A,
-        CGXBigInteger& P);
-
-    /**
-     Y^2 = X^3 + A*X + B (mod p)
-
-     p
-     q
-     A
-     P Prime number
-    */
-    static void JacobianAdd(CGXEccPoint& p,
-        CGXEccPoint& q,
-        CGXBigInteger& A,
-        CGXBigInteger& P);
-
-    /**
-    Get ECC point from Jacobian coordinates.
-   */
-    static void FromJacobian(
-        CGXEccPoint& p,
-        CGXBigInteger& P);
-
-    /**
-     Multily elliptic curve point and scalar.
-
-
-     Y^2 = X^3 + A*X + B (mod p)
-
-     eccSize
-     p Point to multiply
-     n Scalar to multiply
-     N Elliptic curve order.
-     A
-     P Prime number
-    */
-    static CGXEccPoint JacobianMultiply(
-        CGXEccPoint& p,
-        CGXBigInteger& n,
-        CGXBigInteger& N,
-        CGXBigInteger& A,
-        CGXBigInteger& P);
-
-    /**
-     Convert ECC point to Jacobian.
-
-     p ECC point.
-     A
-     P Prime number.
-     Returns
-    */
-    static int JacobianDouble(
-        CGXEccPoint& p,
-        CGXBigInteger& A,
-        CGXBigInteger& P,
-        CGXEccPoint& value);
-
     /**
      Generate random number.
 

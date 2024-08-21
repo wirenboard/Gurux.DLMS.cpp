@@ -456,6 +456,9 @@
     <ClCompile Include="..\src\GXByteArray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\GXShamirs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\enums.h">
@@ -1044,6 +1047,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\GXPushConfirmationParameter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GXShamirs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

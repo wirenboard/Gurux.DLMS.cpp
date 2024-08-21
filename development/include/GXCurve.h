@@ -44,6 +44,7 @@ class CGXCurve
 private:
     friend class CGXPrivateKey;
     friend class CGXEcdsa;
+    friend class CGXShamirs;
     /**
     * ECC curve a value.
     */

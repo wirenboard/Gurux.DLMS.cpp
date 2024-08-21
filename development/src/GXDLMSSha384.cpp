@@ -60,7 +60,6 @@ const uint64_t sha384_k[] = {
 
 #define SHA2_SHFR(x, n)    (x >> n)
 #define SHA2_ROTR(x, n)   ((x >> n) | (x << ((sizeof(x) << 3) - n)))
-#define SHA2_ROTL(x, n)   ((x << n) | (x >> ((sizeof(x) << 3) - n)))
 #define SHA2_CH(x, y, z)  ((x & y) ^ (~x & z))
 #define SHA2_MAJ(x, y, z) ((x & y) ^ (x & z) ^ (y & z))
 #define SHA364_F1(x) (SHA2_ROTR(x,  28) ^ SHA2_ROTR(x, 34) ^ SHA2_ROTR(x, 39))

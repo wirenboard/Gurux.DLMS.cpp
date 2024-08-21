@@ -36,6 +36,7 @@
 #define GXBIGINTEGER_H
 
 #include "GXBytebuffer.h"
+#include "GXByteArray.h"
 
 class CGXBigInteger
 {
@@ -69,6 +70,7 @@ private:
     @param value
    */
     int FromByteBuffer(CGXByteBuffer& value);
+    int FromByteBuffer(CGXByteArray& value);
 
     void SetIsNegative(bool value);
 
@@ -118,6 +120,13 @@ public:
     */
     CGXBigInteger(CGXByteBuffer& value);
 
+    /**
+     Constructor value.
+
+     @param value Byte array Data in MSB format.
+    */
+    CGXBigInteger(CGXByteArray& value);
+    
     CGXBigInteger(CGXBigInteger* value);
 
     CGXBigInteger(const CGXBigInteger& value);
@@ -187,6 +196,7 @@ public:
     int Add(CGXBigInteger& value);
     void Sub(CGXBigInteger& value);
 
+    void Multiply(int value);
     void Multiply(CGXBigInteger& value);
 
     int Compare(CGXBigInteger& value);
@@ -226,5 +236,17 @@ public:
 
     CGXBigInteger& operator=(
         const CGXBigInteger& value);
+
+    /// <summary>
+    /// Used bits.
+    /// </summary>
+    uint16_t GetUsedBits();
+
+    /// <summary>
+    /// This method checks if the bit is set.
+    /// </summary>
+    /// <param name="index">Bit index.</param>
+    /// <returns></returns>
+    bool IsBitSet(uint16_t index);
 };
 #endif //GXBIGINTEGER_H

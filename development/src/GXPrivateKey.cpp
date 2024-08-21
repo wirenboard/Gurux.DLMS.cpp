@@ -35,6 +35,7 @@
 #include "../include/GXPrivateKey.h"
 #include "../include/GXCurve.h"
 #include "../include/GXEcdsa.h"
+#include "../include/GXShamirs.h"
 
 CGXPrivateKey::CGXPrivateKey()
 {
@@ -302,32 +303,33 @@ int CGXPrivateKey::GetPublicKey(CGXPublicKey& value)
 {
     if (m_PublicKey.GetRawValue().GetSize() == 0)
     {
-        CGXBigInteger bi(1);
-        int ret;
-        CGXBigInteger pk(m_RawValue.m_Data,
-            (uint16_t)m_RawValue.m_Size);
+        //Public key = private key multiple by curve.G.
+        CGXBigInteger pk(m_RawValue);
         CGXCurve curve;
-        curve.Init(m_Scheme);
-        CGXEccPoint p(curve.m_G.X, curve.m_G.Y,
-            bi);
-        p = CGXEcdsa::JacobianMultiply(p, pk, curve.m_N,
-            curve.m_A, curve.m_P);
-        CGXEcdsa::FromJacobian(p, curve.m_P);
-        CGXByteBuffer key(65);
-        //key is un-compressed format.
-        key.SetUInt8(4);
-        CGXByteBuffer tmp;
-        p.X.ToArray(tmp);
-        int size = m_Scheme == ECC_P256 ? 32 : 48;
-        key.Set(&tmp, tmp.GetSize() % size, size);
-        tmp.SetSize(0);
-        p.Y.ToArray(tmp, false);
-        key.Set(&tmp, tmp.GetSize() % size, size);
-        ret = CGXPublicKey::FromRawBytes(key, m_PublicKey);
-        if (ret != 0)
+        int ret2 = curve.Init(m_Scheme);
+        if (ret2 == 0)
         {
-            return ret;
-        }
+            CGXEccPoint ret;
+            ret2 = CGXShamirs::PointMulti(curve, ret, curve.m_G, pk);
+            if (ret2 == 0)
+            {
+                int size = m_Scheme == ECC_P256 ? 32 : 48;
+                CGXByteBuffer key;
+                CGXByteBuffer tmp;
+                //key is un-compressed format.
+                key.SetUInt8(4);
+                ret.X.ToArray(tmp, false);
+                key.Set(&tmp, tmp.GetSize() % size, size);
+                tmp.Clear();
+                ret.Y.ToArray(tmp, false);
+                key.Set(&tmp, tmp.GetSize() % size, size);
+                ret2 = CGXPublicKey::FromRawBytes(key, m_PublicKey);
+                if (ret2 != 0)
+                {
+                    return ret2;
+                }
+            }
+        }     
     }
     value = m_PublicKey;
     return 0;

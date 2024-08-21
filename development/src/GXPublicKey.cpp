@@ -299,7 +299,7 @@ std::string CGXPublicKey::ToString()
         sb += "NIST P-384\n";
     }
     CGXByteBuffer pk;
-    int size = pk.GetSize() / 2;
+    int size = m_RawValue.GetSize() / 2;
     sb += " x coord: ";
     m_RawValue.SubArray(1, size, pk);
     sb += CGXBigInteger(pk).ToString();
