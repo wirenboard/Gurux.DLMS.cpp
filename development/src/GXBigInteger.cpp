@@ -538,7 +538,6 @@ void CGXBigInteger::Multiply(int value)
         memset(ret, 0, lenght * sizeof(uint32_t));
         uint32_t overflow = 0;
         uint32_t index = 0;
-        overflow = 0;
         for (uint32_t j = 0; j != m_Count; ++j)
         {
             uint64_t result = value;

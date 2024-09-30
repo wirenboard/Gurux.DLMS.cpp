@@ -1115,6 +1115,7 @@ int CGXDLMS::GetLNPdu(
                     if (ciphering && p.GetCommand() != DLMS_COMMAND_GENERAL_BLOCK_TRANSFER)
                     {
                         reply.Set(p.GetData());
+                        p.GetData()->SetPosition(0);
                         if ((ret = Cipher0(p, reply)) != 0)
                         {
                             return ret;
@@ -1123,8 +1124,8 @@ int CGXDLMS::GetLNPdu(
                     ciphering = false;
                 }
                 // Get request size can be bigger than PDU size.
-                if (p.GetCommand() != DLMS_COMMAND_GET_REQUEST && len
-                    + reply.GetSize() > p.GetSettings()->GetMaxPduSize())
+                if (p.GetCommand() != DLMS_COMMAND_GET_REQUEST && 
+                    len + reply.GetSize() > p.GetSettings()->GetMaxPduSize())
                 {
                     len = p.GetSettings()->GetMaxPduSize() - reply.GetSize()
                         - p.GetData()->GetPosition();
@@ -1134,7 +1135,7 @@ int CGXDLMS::GetLNPdu(
         }
 
         if (ciphering && reply.GetSize() != 0 && p.GetCommand() != DLMS_COMMAND_RELEASE_REQUEST &&
-            ((p.GetSettings()->GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER) == 0))
+            (!p.IsMultipleBlocks() || (p.GetSettings()->GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER) == 0))
         {
             if ((ret = Cipher0(p, reply)) != 0)
             {
@@ -1142,7 +1143,9 @@ int CGXDLMS::GetLNPdu(
             }
         }
 
-        if (p.GetCommand() == DLMS_COMMAND_GENERAL_BLOCK_TRANSFER || (p.IsMultipleBlocks() && (p.GetSettings()->GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER) != 0))
+        if (p.GetCommand() == DLMS_COMMAND_GENERAL_BLOCK_TRANSFER || 
+            (p.IsMultipleBlocks() && 
+             (p.GetSettings()->GetNegotiatedConformance() & DLMS_CONFORMANCE_GENERAL_BLOCK_TRANSFER) != 0))
         {
             CGXByteBuffer bb;
             bb.Set(&reply);

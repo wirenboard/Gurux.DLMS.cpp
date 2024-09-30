@@ -115,7 +115,7 @@ public:
         CGXByteBuffer& secret);
 
     /**
-     Generate and private key pair.
+     Generates public and private key pair.
 
      Returns
     */

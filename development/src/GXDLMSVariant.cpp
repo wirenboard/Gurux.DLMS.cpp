@@ -1248,15 +1248,21 @@ int CGXDLMSVariant::GetSize(DLMS_DATA_TYPE vt)
     case DLMS_DATA_TYPE_INT8:
     case DLMS_DATA_TYPE_UINT8:
     case DLMS_DATA_TYPE_ENUM:
+    case DLMS_DATA_TYPE_DELTA_INT8:
+    case DLMS_DATA_TYPE_DELTA_UINT8:
         nSize = 1;
         break;
     case DLMS_DATA_TYPE_INT16:
     case DLMS_DATA_TYPE_UINT16:
+    case DLMS_DATA_TYPE_DELTA_INT16:
+    case DLMS_DATA_TYPE_DELTA_UINT16:
         nSize = 2;
         break;
     case DLMS_DATA_TYPE_INT32:
     case DLMS_DATA_TYPE_UINT32:
     case DLMS_DATA_TYPE_FLOAT32:
+    case DLMS_DATA_TYPE_DELTA_INT32:
+    case DLMS_DATA_TYPE_DELTA_UINT32:
         nSize = 4;
         break;
     case DLMS_DATA_TYPE_INT64:

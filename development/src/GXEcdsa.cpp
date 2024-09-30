@@ -165,7 +165,7 @@ int CGXEcdsa::GenerateSecret(
         CGXBigInteger y(bb);
         CGXCurve curve;
         curve.Init(m_PrivateKey.GetScheme());
-        CGXEccPoint p(x, y, x);
+        CGXEccPoint p(x, y);
         CGXEccPoint ret2;
         CGXShamirs::PointMulti(curve, ret2, p, pk);
         //        p = JacobianMultiply(p, pk, m_Curve.m_N, m_Curve.m_A, m_Curve.m_P);
@@ -218,9 +218,13 @@ int CGXEcdsa::Verify(CGXByteBuffer& signature,
     {
         ret = CGXDLMSSha256::Hash(data, bb);
     }
-    else
+    else if (m_PublicKey.GetScheme() == ECC_P384)
     {
         ret = CGXDLMSSha384::Hash(data, bb);
+    }
+    else
+    {
+        ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     if (ret == 0)
     {

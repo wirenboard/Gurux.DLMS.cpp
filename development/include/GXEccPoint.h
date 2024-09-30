@@ -43,8 +43,6 @@ class CGXEccPoint
 public:
     CGXBigInteger X;
     CGXBigInteger Y;
-    CGXBigInteger Z;
-
     /**
      Constructor.
     */
@@ -57,22 +55,19 @@ public:
     */
     CGXEccPoint(
         CGXBigInteger& x,
-        CGXBigInteger& y,
-        CGXBigInteger& z)
+        CGXBigInteger& y)
     {
         X = x;
         Y = y;
-        Z = z;
     }
 
     /**
      Constructor.
     */
-    CGXEccPoint(int x, int y, int z)
+    CGXEccPoint(int x, int y)
     {
         X = CGXBigInteger(x);
         Y = CGXBigInteger(y);
-        Z = CGXBigInteger(z);
     }
 };
 

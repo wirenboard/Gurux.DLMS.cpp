@@ -314,16 +314,16 @@ int CGXPrivateKey::GetPublicKey(CGXPublicKey& value)
             if (ret2 == 0)
             {
                 int size = m_Scheme == ECC_P256 ? 32 : 48;
-                CGXByteBuffer key;
+                CGXByteBuffer bb;
                 CGXByteBuffer tmp;
                 //key is un-compressed format.
-                key.SetUInt8(4);
+                bb.SetUInt8(4);
                 ret.X.ToArray(tmp, false);
-                key.Set(&tmp, tmp.GetSize() % size, size);
+                bb.Set(&tmp, tmp.GetSize() % size, size);
                 tmp.Clear();
                 ret.Y.ToArray(tmp, false);
-                key.Set(&tmp, tmp.GetSize() % size, size);
-                ret2 = CGXPublicKey::FromRawBytes(key, m_PublicKey);
+                bb.Set(&tmp, tmp.GetSize() % size, size);
+                ret2 = CGXPublicKey::FromRawBytes(bb, m_PublicKey);
                 if (ret2 != 0)
                 {
                     return ret2;

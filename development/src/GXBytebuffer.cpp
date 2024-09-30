@@ -403,7 +403,7 @@ int CGXByteBuffer::Set(CGXByteBuffer* data, unsigned long index, unsigned long c
         int ret = CGXByteBuffer::Set(data->m_Data + index, count);
         if (ret == 0)
         {
-            data->m_Position += count;
+            data->SetPosition(data->m_Position + count);
         }
     }
     return 0;

@@ -44,7 +44,7 @@ int CGXShamirs::Trick(CGXCurve& curve,
     CGXByteArray x = pub.GetX(), y = pub.GetY();
     CGXBigInteger x1(x);
     CGXBigInteger y1(y);
-    CGXEccPoint op2(x1, y1, x1);
+    CGXEccPoint op2(x1, y1);
     PointAdd(curve, sum, curve.m_G, op2);
     uint16_t bits1 = u1.GetUsedBits();
     uint16_t bits2 = u2.GetUsedBits();
@@ -135,7 +135,7 @@ int CGXShamirs::PointDouble(CGXCurve& curve,
     CGXBigInteger numer(p1.X);
     numer.Multiply(p1.X);
     numer.Multiply(3);
-    numer.Add(curve.GetA());
+    numer.Add(curve.m_A);
     CGXBigInteger denom(p1.Y);
     denom.Multiply(2);
     denom.Inv(curve.m_P);
@@ -164,7 +164,7 @@ int CGXShamirs::PointMulti(CGXCurve& curve,
 {
     CGXBigInteger x(point.X);
     CGXBigInteger y(point.Y);
-    CGXEccPoint R0(x, y, x);
+    CGXEccPoint R0(x, y);
     CGXEccPoint R1;
     CGXEccPoint tmp;
     PointDouble(curve, R1, point);

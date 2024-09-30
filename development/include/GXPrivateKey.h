@@ -136,11 +136,9 @@ public:
     int ToPem(std::string& value);
 
     /**
-     Get key from private key.
+     Get public key from private key.
 
-     scheme Used scheme.
-     privateKey Private key bytes.
-     Returnskey.
+     Returns Public key.
     */
     int GetPublicKey(CGXPublicKey& value);
 

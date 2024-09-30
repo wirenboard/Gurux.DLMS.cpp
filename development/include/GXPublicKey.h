@@ -49,7 +49,7 @@ private:
     */
     ECC m_Scheme;
     /**
-     Private key raw value.
+     Public key raw value.
     */
     CGXByteArray m_RawValue;
     /**

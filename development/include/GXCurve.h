@@ -119,8 +119,7 @@ private:
             m_A.AddRange(INIT_A, sizeof(INIT_A) / sizeof(uint32_t));
             CGXBigInteger g1(INIT_G1, sizeof(INIT_G1) / sizeof(uint32_t));
             CGXBigInteger g2(INIT_G2, sizeof(INIT_G2) / sizeof(uint32_t));
-            CGXBigInteger bi(1);
-            m_G = CGXEccPoint(g1, g2, bi);
+            m_G = CGXEccPoint(g1, g2);
             m_N.AddRange(INIT_N, sizeof(INIT_N) / sizeof(uint32_t));
             m_P.AddRange(INIT_P, sizeof(INIT_P) / sizeof(uint32_t));
             m_B.AddRange(INIT_B, sizeof(INIT_B) / sizeof(uint32_t));
@@ -179,8 +178,7 @@ private:
             CGXBigInteger g1(INIT_G1, sizeof(INIT_G1) / sizeof(uint32_t));
             CGXBigInteger g2(INIT_G2, sizeof(INIT_G2) / sizeof(uint32_t));
             m_A.AddRange(INIT_A, sizeof(INIT_A) / sizeof(uint32_t));
-            CGXBigInteger bi(1);
-            m_G = CGXEccPoint(g1, g2, bi);
+            m_G = CGXEccPoint(g1, g2);
             m_N.AddRange(INIT_N, sizeof(INIT_N) / sizeof(uint32_t));
             m_P.AddRange(INIT_P, sizeof(INIT_P) / sizeof(uint32_t));
             m_B.AddRange(INIT_B, sizeof(INIT_B) / sizeof(uint32_t));

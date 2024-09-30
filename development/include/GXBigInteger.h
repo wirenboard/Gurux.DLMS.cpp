@@ -202,7 +202,7 @@ public:
     int Compare(CGXBigInteger& value);
 
     /**
-     Compare value to UInt32eger value.
+     Compare value to UInt32 integer value.
 
      @param value Returns 1 is compared value is bigger, -1 if smaller and 0 if values are equals.
      @return
