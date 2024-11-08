@@ -706,7 +706,6 @@ int CGXAsn1Converter::FromByteArray(
     {
         if ((ret = GetValue(data, &objects, false)) != 0)
         {
-            value = objects.at(0);
             return ret;
         }
     }

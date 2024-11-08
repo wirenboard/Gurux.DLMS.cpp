@@ -349,21 +349,8 @@ int CGXx509Certificate::UpdateSubjectKeyIdentifier(CGXAsn1Base* value)
     int ret;
     if (CGXAsn1Variant* s = dynamic_cast<CGXAsn1Variant*>(value))
     {
-        CGXByteBuffer bb;
-        CGXAsn1Base* tmp = NULL;
-        if ((ret = bb.Set(s->GetValue().byteArr, s->GetValue().size)) == 0 &&
-            (ret = CGXAsn1Converter::FromByteArray(bb, tmp)) == 0)
-        {
-            if (CGXAsn1Variant* s2 = dynamic_cast<CGXAsn1Variant*>(tmp))
-            {
-                m_AuthorityKeyIdentifier.Set(s2->GetValue().byteArr, s2->GetValue().size);
-            }
-            else
-            {
-                ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
-            }
-            delete tmp;
-        }
+        m_SubjectKeyIdentifier.Clear();
+        ret = m_SubjectKeyIdentifier.Set(s->GetValue().byteArr, s->GetValue().size);
     }
     else
     {
