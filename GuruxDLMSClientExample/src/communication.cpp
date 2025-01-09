@@ -697,6 +697,7 @@ int CGXCommunication::InitializeOpticalHead()
 #else
         //Some meters need this sleep. Do not remove.
         usleep(200000);
+        struct termios options;
         // 8n1, see termios.h for more information
         options.c_cflag = CS8 | CREAD | CLOCAL;
         //Set Baud Rates
