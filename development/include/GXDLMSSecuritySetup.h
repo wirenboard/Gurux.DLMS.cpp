@@ -240,7 +240,7 @@ public:
     */
     int KeyAgreement(
         CGXDLMSSecureClient* client,
-        std::vector<std::pair<DLMS_GLOBAL_KEY_TYPE, CGXByteBuffer>> list,
+        std::vector<std::pair<DLMS_GLOBAL_KEY_TYPE, CGXByteBuffer> > list,
         std::vector<CGXByteBuffer>& reply);
    
     /**

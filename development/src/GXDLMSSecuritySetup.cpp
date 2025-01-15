@@ -177,7 +177,7 @@ int CGXDLMSSecuritySetup::GlobalKeyTransfer(
 */
 int CGXDLMSSecuritySetup::KeyAgreement(
     CGXDLMSSecureClient* client,
-    std::vector<std::pair<DLMS_GLOBAL_KEY_TYPE, CGXByteBuffer>> list,
+    std::vector<std::pair<DLMS_GLOBAL_KEY_TYPE, CGXByteBuffer> > list,
     std::vector<CGXByteBuffer>& reply)
 {
     if (list.size() == 0)
@@ -187,7 +187,7 @@ int CGXDLMSSecuritySetup::KeyAgreement(
     CGXByteBuffer bb;
     bb.SetUInt8(DLMS_DATA_TYPE_ARRAY);
     bb.SetUInt8((unsigned char)list.size());
-    for (std::vector<std::pair<DLMS_GLOBAL_KEY_TYPE, CGXByteBuffer>>::iterator it = list.begin();
+    for (std::vector<std::pair<DLMS_GLOBAL_KEY_TYPE, CGXByteBuffer> >::iterator it = list.begin();
         it != list.end(); ++it)
     {
         bb.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
@@ -682,7 +682,7 @@ int CGXDLMSSecuritySetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
                 }
                 if (CGXAsn1Integer* tmp = dynamic_cast<CGXAsn1Integer*>(value))
                 {
-                    tmp->GetValue().Reverse(0, tmp->GetValue().GetSize());                    
+                    tmp->GetValue().Reverse(0, tmp->GetValue().GetSize());
                     CGXBigInteger bi = tmp->ToBigInteger();
                     info->SetSerialNumber(bi);
                     delete value;
