@@ -499,7 +499,9 @@ int CGXx509Certificate::UpdateAuthorityKeyIdentifier(CGXAsn1Base* value)
                     }
                     break;
                 default:
-                    printf("Invalid context." + a->GetIndex());
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+                    printf("Invalid context %d.\r\n" + a->GetIndex());
+#endif//defined(_WIN32) || defined(_WIN64) || defined(__linux__)
                     return DLMS_ERROR_CODE_INVALID_PARAMETER;
                 }
             }
