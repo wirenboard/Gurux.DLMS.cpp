@@ -238,7 +238,7 @@ public:
         std::pair<CGXPublicKey, CGXPrivateKey>& kp,
         std::string& subject,
         CGXPkcs10& pkc10);
-    
+
     /**
      * Ask Gurux certificate server to generate the new certificate.
      *
@@ -250,6 +250,7 @@ public:
         std::vector<CGXCertificateRequest>& certifications,
         std::vector <CGXx509Certificate>& certificates);
 
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
     /**
     * Load Certificate Signing Request from the PEM file.
     *
@@ -283,6 +284,7 @@ public:
      * path: File path.
      */
     int Save(const char* path);
+#endif //defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 
     /**
      * Returns Certificate Signing Request in PEM format.

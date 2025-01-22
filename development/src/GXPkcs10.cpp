@@ -749,6 +749,7 @@ int CGXPkcs10::GetCertificate(
     return ret;
 }
 
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 int CGXPkcs10::Load(std::string& path,
     CGXPkcs10& cert)
 {
@@ -784,6 +785,7 @@ int CGXPkcs10::Save(const char* path)
     std::string tmp = path;
     return Save(tmp);
 }
+#endif //defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 
 int CGXPkcs10::ToPem(std::string& value)
 {
