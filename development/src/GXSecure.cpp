@@ -193,7 +193,7 @@ int CGXSecure::Secure(
                 len += (16 - (secret.GetSize() % 16));
             }
         }
-        s.Set(&secret);
+        s.Set(secret.GetData(), secret.GetSize());
         s.Zero(s.GetSize(), len - s.GetSize());
         reply.Set(&data);
         reply.Zero(reply.GetSize(), len - reply.GetSize());
