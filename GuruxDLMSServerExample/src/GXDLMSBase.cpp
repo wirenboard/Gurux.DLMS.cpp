@@ -421,7 +421,8 @@ void AddActivityCalendar(CGXDLMSObjectCollection& items)
 {
     CGXDLMSActivityCalendar* pActivity = new CGXDLMSActivityCalendar();
     pActivity->SetCalendarNameActive("Active");
-    pActivity->GetSeasonProfileActive().push_back(new CGXDLMSSeasonProfile("Summer time", CGXDateTime(-1, 3, 31, 0, 0, 0, 0), ""));
+    CGXDateTime dstStart(-1, 3, 31, 0, 0, 0, 0);
+    pActivity->GetSeasonProfileActive().push_back(new CGXDLMSSeasonProfile("Summer time", dstStart, ""));
     pActivity->GetWeekProfileTableActive().push_back(new CGXDLMSWeekProfile("Monday", 1, 1, 1, 1, 1, 1, 1));
     CGXDLMSDayProfile* aDp = new CGXDLMSDayProfile();
     aDp->SetDayId(1);
@@ -430,7 +431,8 @@ void AddActivityCalendar(CGXDLMSObjectCollection& items)
     aDp->GetDaySchedules().push_back(new CGXDLMSDayProfileAction(time, "test", 1));
     pActivity->GetDayProfileTableActive().push_back(aDp);
     pActivity->SetCalendarNamePassive("Passive");
-    pActivity->GetSeasonProfilePassive().push_back(new CGXDLMSSeasonProfile("Winter time", CGXDateTime(-1, 10, 30, 0, 0, 0, 0), ""));
+    CGXDateTime dstEnd(-1, 10, 30, 0, 0, 0, 0);
+    pActivity->GetSeasonProfilePassive().push_back(new CGXDLMSSeasonProfile("Winter time", dstEnd, ""));
     pActivity->GetWeekProfileTablePassive().push_back(new CGXDLMSWeekProfile("Tuesday", 1, 1, 1, 1, 1, 1, 1));
 
     CGXDLMSDayProfile* passive = new CGXDLMSDayProfile();
@@ -464,12 +466,13 @@ void AddOpticalPortSetup(CGXDLMSObjectCollection& items)
 */
 void AddDemandRegister(CGXDLMSObjectCollection& items)
 {
+    CGXDateTime now = CGXDateTime::Now();
     CGXDLMSDemandRegister* pDr = new CGXDLMSDemandRegister("1.0.31.4.0.255");
     pDr->SetCurrentAverageValue(10);
     pDr->SetLastAverageValue(20);
     pDr->SetStatus(1);
-    pDr->SetStartTimeCurrent(CGXDateTime::Now());
-    pDr->SetCaptureTime(CGXDateTime::Now());
+    pDr->SetStartTimeCurrent(now);
+    pDr->SetCaptureTime(now);
     pDr->SetPeriod(10);
     pDr->SetNumberOfPeriods(1);
     items.push_back(pDr);
