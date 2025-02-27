@@ -38,6 +38,9 @@
 #include <string>
 #include "errorcodes.h"
 #include "enums.h"
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+#include <cstdint>
+#endif//defined(_WIN32) || defined(_WIN64) || defined(__linux__)
 
 const unsigned char VECTOR_CAPACITY = 50;
 class CGXByteBuffer
