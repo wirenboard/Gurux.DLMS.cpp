@@ -261,7 +261,8 @@ int CGXDLMSObjectCollection::Load(const char* fileName)
                 if (type == DLMS_OBJECT_TYPE_NONE)
                 {
                     //Invalid object type.
-                    return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                    ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
+                    break;
                 }
                 reader.Read();
                 obj = CGXDLMSObjectFactory::CreateObject(type);
