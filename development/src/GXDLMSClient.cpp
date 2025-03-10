@@ -1567,6 +1567,10 @@ int CGXDLMSClient::Write(
             {
                 return ret;
             }
+            if (type == DLMS_DATA_TYPE_NONE)
+            {
+                type = value.vt;
+            }
             if ((ret = GXHelpers::SetData(&m_Settings, data, type, value)) != 0)
             {
                 return ret;
@@ -1699,8 +1703,6 @@ int CGXDLMSClient::Write(CGXDLMSVariant& name,
             // Add data.
             bb.Set(parameters->GetData(), parameters->GetSize());
         }
-        // Access selection is not used.
-        bb.SetUInt8(0);
         CGXDLMSLNParameters p(&m_Settings, 0,
             DLMS_COMMAND_SET_REQUEST, DLMS_SET_COMMAND_TYPE_NORMAL,
             &bb, &value, 0xff, DLMS_COMMAND_NONE);
