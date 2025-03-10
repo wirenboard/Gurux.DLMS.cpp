@@ -149,7 +149,7 @@ int CGXBigInteger::FromByteBuffer(CGXByteArray& value)
     unsigned char ch;
     unsigned short ival;
     Clear();
-    Capacity(value.GetSize() / 4);
+    Capacity((uint16_t) (value.GetSize() / 4));
     unsigned long index = 0;
     for (int pos = value.GetSize() - 4; pos > -1; pos = pos - 4)
     {
@@ -211,7 +211,7 @@ int CGXBigInteger::FromByteBuffer(CGXByteBuffer& value)
     unsigned char ch;
     unsigned short ival;
     Clear();
-    Capacity(value.GetSize() / 4);
+    Capacity((uint16_t)(value.GetSize() / 4));
     for (int pos = value.GetSize() - 4; pos > -1; pos = pos - 4)
     {
         ret = value.GetUInt32(pos, &tmp);

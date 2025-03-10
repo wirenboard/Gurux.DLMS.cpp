@@ -1243,7 +1243,10 @@ int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int a
     return Read(name, objectType, attributeOrdinal, NULL, reply);
 }
 
-int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int attributeOrdinal, CGXByteBuffer* data,
+int CGXDLMSClient::Read(CGXDLMSVariant& name, 
+    DLMS_OBJECT_TYPE objectType, 
+    int attributeOrdinal, 
+    CGXByteBuffer* parameters,
     std::vector<CGXByteBuffer>& reply)
 {
     int ret;
@@ -1264,7 +1267,7 @@ int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int a
         attributeDescriptor.Set(ln, 6);
         // Attribute ID.
         attributeDescriptor.SetUInt8(attributeOrdinal);
-        if (data == NULL || data->GetSize() == 0)
+        if (parameters == NULL || parameters->GetSize() == 0)
         {
             // Access selection is not used.
             attributeDescriptor.SetUInt8(0);
@@ -1274,11 +1277,11 @@ int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int a
             // Access selection is used.
             attributeDescriptor.SetUInt8(1);
             // Add data.
-            attributeDescriptor.Set(data, 0, data->GetSize());
+            attributeDescriptor.Set(parameters, 0, parameters->GetSize());
         }
         CGXDLMSLNParameters p(&m_Settings, 0,
             DLMS_COMMAND_GET_REQUEST, DLMS_GET_COMMAND_TYPE_NORMAL,
-            &attributeDescriptor, data, 0xFF, DLMS_COMMAND_NONE);
+            &attributeDescriptor, parameters, 0xFF, DLMS_COMMAND_NONE);
         ret = CGXDLMS::GetLnMessages(p, reply);
     }
     else
@@ -1288,7 +1291,7 @@ int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int a
         sn += (attributeOrdinal - 1) * 8;
         attributeDescriptor.SetUInt16(sn);
         // Add Selector.
-        if (data != NULL && data->GetSize() != 0)
+        if (parameters != NULL && parameters->GetSize() != 0)
         {
             requestType = DLMS_VARIABLE_ACCESS_SPECIFICATION_PARAMETERISED_ACCESS;
         }
@@ -1297,7 +1300,7 @@ int CGXDLMSClient::Read(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType, int a
             requestType = DLMS_VARIABLE_ACCESS_SPECIFICATION_VARIABLE_NAME;
         }
         CGXDLMSSNParameters p(&m_Settings, DLMS_COMMAND_READ_REQUEST, 1,
-            requestType, &attributeDescriptor, data);
+            requestType, &attributeDescriptor, parameters);
         ret = CGXDLMS::GetSnMessages(p, reply);
     }
     return ret;
@@ -1605,7 +1608,6 @@ int CGXDLMSClient::Write(
     return ret;
 }
 
-
 int CGXDLMSClient::Write(CGXDLMSObject* pObject,
     int index,
     CGXDLMSVariant& data,
@@ -1615,22 +1617,66 @@ int CGXDLMSClient::Write(CGXDLMSObject* pObject,
     return Write(name, pObject->GetObjectType(), index, data, reply);
 }
 
-int CGXDLMSClient::Write(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType,
-    int index, CGXDLMSVariant& value, std::vector<CGXByteBuffer>& reply)
+int CGXDLMSClient::Write(CGXDLMSVariant& name,
+    DLMS_OBJECT_TYPE objectType,
+    int index,
+    CGXDLMSVariant& value,
+    std::vector<CGXByteBuffer>& reply)
 {
+    return Write(name, objectType, index, value, NULL, reply);
+}
+
+int CGXDLMSClient::Write(CGXDLMSVariant& name,
+    DLMS_OBJECT_TYPE objectType,
+    int index,
+    CGXDLMSVariant& value,
+    CGXByteBuffer* parameters,
+    std::vector<CGXByteBuffer>& reply)
+{
+    int ret;
+    CGXByteBuffer data;
+    if ((ret = GXHelpers::SetData(&m_Settings, data, value.vt, value)) != 0)
+    {
+        return ret;
+    }
+    return Write(name, objectType, index, data, parameters, reply);
+}
+
+int CGXDLMSClient::Write(CGXDLMSVariant& name,
+    DLMS_OBJECT_TYPE objectType,
+    int index,
+    CGXDLMSVariant& value,
+    CGXDLMSVariant& parameters,
+    std::vector<CGXByteBuffer>& reply)
+{
+    int ret;
+    CGXByteBuffer data, param;
+    if ((ret = GXHelpers::SetData(&m_Settings, data, value.vt, value)) != 0)
+    {
+        return ret;
+    }
+    if ((ret = GXHelpers::SetData(&m_Settings, param, parameters.vt, parameters)) != 0)
+    {
+        return ret;
+    }
+    return Write(name, objectType, index, data, &param, reply);
+}
+
+int CGXDLMSClient::Write(CGXDLMSVariant& name, 
+    DLMS_OBJECT_TYPE objectType,
+    int index, 
+    CGXByteBuffer& value,
+    CGXByteBuffer* parameters,
+    std::vector<CGXByteBuffer>& reply)
+{
+    int ret;
+    CGXByteBuffer bb;
     if (index < 1)
     {
         //Invalid parameter
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
-    int ret;
     m_Settings.ResetBlockIndex();
-    CGXByteBuffer bb, data;
-    if ((ret = GXHelpers::SetData(&m_Settings, data, value.vt, value)) != 0)
-    {
-        return ret;
-    }
-
     if (GetUseLogicalNameReferencing())
     {
         // Add CI.
@@ -1641,11 +1687,23 @@ int CGXDLMSClient::Write(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType,
         bb.Set(ln, 6);
         // Attribute ID.
         bb.SetUInt8(index);
+        if (parameters == NULL || parameters->GetSize() == 0)
+        {
+            // Access selection is not used.
+            bb.SetUInt8(0);
+        }
+        else
+        {
+            // Access selection is used.
+            bb.SetUInt8(1);
+            // Add data.
+            bb.Set(parameters->GetData(), parameters->GetSize());
+        }
         // Access selection is not used.
         bb.SetUInt8(0);
         CGXDLMSLNParameters p(&m_Settings, 0,
             DLMS_COMMAND_SET_REQUEST, DLMS_SET_COMMAND_TYPE_NORMAL,
-            &bb, &data, 0xff, DLMS_COMMAND_NONE);
+            &bb, &value, 0xff, DLMS_COMMAND_NONE);
         ret = CGXDLMS::GetLnMessages(p, reply);
     }
     else
@@ -1659,7 +1717,7 @@ int CGXDLMSClient::Write(CGXDLMSVariant& name, DLMS_OBJECT_TYPE objectType,
         CGXDLMSSNParameters p(&m_Settings,
             DLMS_COMMAND_WRITE_REQUEST, 1,
             DLMS_VARIABLE_ACCESS_SPECIFICATION_VARIABLE_NAME,
-            &bb, &data);
+            &bb, &value);
         ret = CGXDLMS::GetSnMessages(p, reply);
     }
     return ret;

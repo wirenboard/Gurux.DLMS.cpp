@@ -104,7 +104,7 @@ private:
     * name : Short or Logical Name.
     * objectType : COSEM object type.
     * attributeOrdinal : Attribute index of the object.
-    * data : Read data parameter.
+    * data : Read selective access parameter.
     * reply : Generated read message(s).
     * Returns error status.
     */
@@ -112,7 +112,7 @@ private:
         CGXDLMSVariant& name,
         DLMS_OBJECT_TYPE objectType,
         int attributeOrdinal,
-        CGXByteBuffer* data,
+        CGXByteBuffer* parameters,
         std::vector<CGXByteBuffer>& reply);
 
 public:
@@ -612,6 +612,80 @@ public:
         DLMS_OBJECT_TYPE objectType,
         int index,
         CGXDLMSVariant& data,
+        std::vector<CGXByteBuffer>& reply);
+
+   /**
+   * Generates a write message.
+   *
+   * @param name
+   *            Short or Logical Name.
+   * @param objectType
+   *            Object type.
+   * @param index
+   *            Attribute index where data is write.
+   * @param value
+   *            Data to Write.
+   * @param parameters
+   *            Selective access parameters.
+   * @param reply
+   *             Generated write message(s).
+   * Returns error status.
+   */
+    int Write(
+        CGXDLMSVariant& name,
+        DLMS_OBJECT_TYPE objectType,
+        int index,
+        CGXDLMSVariant& data,
+        CGXByteBuffer* parameters,
+        std::vector<CGXByteBuffer>& reply);
+
+    /**
+  * Generates a write message.
+  *
+  * @param name
+  *            Short or Logical Name.
+  * @param objectType
+  *            Object type.
+  * @param index
+  *            Attribute index where data is write.
+  * @param value
+  *            Data to Write.
+  * @param parameters
+  *            Selective access parameters.
+  * @param reply
+  *             Generated write message(s).
+  * Returns error status.
+  */
+    int Write(
+        CGXDLMSVariant& name,
+        DLMS_OBJECT_TYPE objectType,
+        int index,
+        CGXDLMSVariant& data,
+        CGXDLMSVariant& parameters,
+        std::vector<CGXByteBuffer>& reply);
+    /**
+    * Generates a write message.
+    *
+    * @param name
+    *            Short or Logical Name.
+    * @param objectType
+    *            Object type.
+    * @param index
+    *            Attribute index where data is write.
+    * @param value
+    *            Data to Write.
+    * @param parameters
+    *            Selective access parameters.
+    * @param reply
+    *             Generated write message(s).
+    * Returns error status.
+    */
+    int Write(
+        CGXDLMSVariant& name,
+        DLMS_OBJECT_TYPE objectType,
+        int index,
+        CGXByteBuffer& data,
+        CGXByteBuffer* parameters,
         std::vector<CGXByteBuffer>& reply);
 
     /**
