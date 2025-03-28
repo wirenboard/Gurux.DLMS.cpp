@@ -38,6 +38,7 @@
 #include <string>
 #include "errorcodes.h"
 #include "enums.h"
+#include <cstdint>
 
 const unsigned char VECTOR_CAPACITY = 50;
 class CGXByteBuffer
