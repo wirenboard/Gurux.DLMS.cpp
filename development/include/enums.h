@@ -209,6 +209,11 @@ enum DLMS_CONTROL_MODE
      * Reconnection: Remote (d), manual (e), local (h)
      */
     DLMS_CONTROL_MODE_MODE_6,
+    /*
+         * Disconnection: Remote(b, c), manual(-), local(g)
+         * Reconnection: Remote (a, i), manual (e), local (h)
+         */
+    DLMS_CONTROL_MODE_MODE_7,
 };
 
 //Is logican name assosiated.
