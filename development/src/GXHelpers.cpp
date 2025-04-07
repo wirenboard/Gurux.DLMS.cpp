@@ -968,15 +968,18 @@ void GXHelpers::Replace(std::string& str, std::string oldString, std::string new
 
 std::string& GXHelpers::ltrim(std::string& s)
 {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
-        std::not1(std::ptr_fun<int, int>(std::isspace))));
+    s.erase(s.begin(),
+        std::find_if(s.begin(), s.end(), [](int c)
+            {return !std::isspace(c);
+            }));
     return s;
 }
 
 std::string& GXHelpers::rtrim(std::string& s)
 {
-    s.erase(std::find_if(s.rbegin(), s.rend(),
-        std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+        }).base(), s.end());
     return s;
 }
 
@@ -1050,7 +1053,7 @@ int GetUtfString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMS
         buff.Get((unsigned char*)tmp, len);
         value.vt = DLMS_DATA_TYPE_STRING_UTF8;
         value.strVal.append(tmp, len);
-        delete tmp;
+        delete[] tmp;
 #ifndef DLMS_IGNORE_XML_TRANSLATOR
         if (info.GetXml() != NULL)
         {
@@ -1210,11 +1213,11 @@ int GetString(CGXByteBuffer& buff, CGXDataInfo& info, bool knownType, CGXDLMSVar
         tmp[len] = '\0';
         if ((ret = buff.Get((unsigned char*)tmp, len)) != 0)
         {
-            delete tmp;
+            delete[] tmp;
             return ret;
         }
         value = tmp;
-        delete tmp;
+        delete[] tmp;
     }
     else
     {

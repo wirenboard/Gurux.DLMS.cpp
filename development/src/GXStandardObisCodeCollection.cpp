@@ -564,6 +564,9 @@ static const char* GetN1CDescription(std::string& str)
     case 49:
         tmp = "Density of air";
         break;
+    default:
+        tmp = "Unknown";
+        break;
     }
     return tmp;
 }
