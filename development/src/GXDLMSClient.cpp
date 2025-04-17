@@ -78,6 +78,12 @@ CGXDLMSClient::CGXDLMSClient(bool UseLogicalNameReferencing,
     }
     m_Settings.GetPlcSettings().Reset();
     SetManufacturerId(NULL);
+
+    m_InitializeMaxInfoTX = CGXHdlcSettings::DEFAULT_MAX_INFO_TX;
+    m_InitializeMaxInfoRX = CGXHdlcSettings::DEFAULT_MAX_INFO_RX;
+    m_InitializeWindowSizeTX = CGXHdlcSettings::DEFAULT_WINDOWS_SIZE_TX;
+    m_InitializeWindowSizeRX = CGXHdlcSettings::DEFAULT_WINDOWS_SIZE_RX;
+    m_InitializePduSize = 0xFFFF;
 }
 
 CGXDLMSClient::~CGXDLMSClient()
