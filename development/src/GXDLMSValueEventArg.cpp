@@ -103,7 +103,9 @@ void CGXDLMSValueEventArg::Init(
     int selector)
 {
     m_Server = server;
-    m_Settings = &server->GetSettings();
+    if (server) {
+        m_Settings = &server->GetSettings();
+    }
     m_Handled = false;
     SetTarget(target);
     SetIndex(index);
