@@ -237,7 +237,7 @@ int CGXSecure::Secure(
             DLMS_COUNT_TYPE_TAG, ic, 0, secret, key, data, true);
         if (ret == 0)
         {
-            reply.SetUInt8(DLMS_SECURITY_AUTHENTICATION | cipher->GetSecuritySuite());
+            reply.SetUInt8(static_cast<int>(DLMS_SECURITY_AUTHENTICATION) | static_cast<int>(cipher->GetSecuritySuite()));
             reply.SetUInt32(ic);
             reply.Set(&data);
         }

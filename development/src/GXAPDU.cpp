@@ -49,13 +49,13 @@ int GetAuthenticationString(
         (!ignoreAcse && settings.GetCipher() != NULL && settings.GetCipher()->GetSecurity() != DLMS_SECURITY_NONE))
     {
         // Add sender ACSE-requirements field component.
-        data.SetUInt8(BER_TYPE_CONTEXT
-            | PDU_TYPE_SENDER_ACSE_REQUIREMENTS);
+        data.SetUInt8(static_cast<int>(BER_TYPE_CONTEXT)
+            | static_cast<int>(PDU_TYPE_SENDER_ACSE_REQUIREMENTS));
         data.SetUInt8(2);
         data.SetUInt8(BER_TYPE_BIT_STRING
             | BER_TYPE_OCTET_STRING);
         data.SetUInt8(0x80);
-        data.SetUInt8(BER_TYPE_CONTEXT | PDU_TYPE_MECHANISM_NAME);
+        data.SetUInt8(static_cast<int>(BER_TYPE_CONTEXT) | static_cast<int>(PDU_TYPE_MECHANISM_NAME));
         // Len
         data.SetUInt8(7);
         // OBJECT IDENTIFIER
@@ -99,7 +99,7 @@ int CGXAPDU::GenerateApplicationContextName(
     //ProtocolVersion
     if (settings.GetProtocolVersion() != NULL)
     {
-        data.SetUInt8(BER_TYPE_CONTEXT | PDU_TYPE_PROTOCOL_VERSION);
+        data.SetUInt8(static_cast<int>(BER_TYPE_CONTEXT) | static_cast<int>(PDU_TYPE_PROTOCOL_VERSION));
         data.SetUInt8(2);
         data.SetUInt8((unsigned char)(8 - strlen(settings.GetProtocolVersion())));
         CGXDLMSVariant tmp = settings.GetProtocolVersion();
@@ -1958,8 +1958,8 @@ int CGXAPDU::ParsePDU2(
 #endif //DLMS_IGNORE_XML_TRANSLATOR
             break;
             //  0x8A or 0x88
-        case BER_TYPE_CONTEXT | PDU_TYPE_SENDER_ACSE_REQUIREMENTS:
-        case BER_TYPE_CONTEXT | PDU_TYPE_CALLING_AP_INVOCATION_ID:
+        case static_cast<int>(BER_TYPE_CONTEXT) | static_cast<int>(PDU_TYPE_SENDER_ACSE_REQUIREMENTS):
+        case static_cast<int>(BER_TYPE_CONTEXT) | static_cast<int>(PDU_TYPE_CALLING_AP_INVOCATION_ID):
             // Get sender ACSE-requirements field component.
             if ((ret = buff.GetUInt8(&len)) != 0)
             {
@@ -1992,8 +1992,8 @@ int CGXAPDU::ParsePDU2(
 #endif //DLMS_IGNORE_XML_TRANSLATOR
             break;
             //  0x8B or 0x89
-        case BER_TYPE_CONTEXT | PDU_TYPE_MECHANISM_NAME:
-        case BER_TYPE_CONTEXT | PDU_TYPE_CALLING_AE_INVOCATION_ID:
+        case static_cast<int>(BER_TYPE_CONTEXT) | static_cast<int>(PDU_TYPE_MECHANISM_NAME):
+        case static_cast<int>(BER_TYPE_CONTEXT) | static_cast<int>(PDU_TYPE_CALLING_AE_INVOCATION_ID):
             if ((ret = UpdateAuthentication(settings, buff)) != 0)
             {
                 return ret;

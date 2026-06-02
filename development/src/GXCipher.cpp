@@ -610,7 +610,7 @@ int CGXCipher::Encrypt(
     {
         input.Move(input.m_Position, offset, input.Available());
         input.m_Position = 0;
-        input.SetUInt8(0, security | suite);
+        input.SetUInt8(0, static_cast<int>(security) | static_cast<int>(suite));
         memcpy(input.m_Data + 1, m_AuthenticationKey.m_Data, m_AuthenticationKey.GetSize());
         AesGcmGhash(H, input.m_Data, input.m_Size, input.m_Data, 0, S);
         if (type == DLMS_COUNT_TYPE_TAG)
@@ -649,7 +649,7 @@ int CGXCipher::Encrypt(
         //Count authentication.
         input.Move(input.m_Position, offset, input.Available());
         input.m_Position = 0;
-        input.SetUInt8(0, security | suite);
+        input.SetUInt8(0, static_cast<int>(security) | static_cast<int>(suite));
         memcpy(input.m_Data + 1, m_AuthenticationKey.m_Data, m_AuthenticationKey.GetSize());
         AesGcmGhash(H, input.m_Data, offset, input.m_Data + offset, input.m_Size - offset, S);
         input.Move(offset, 0, input.m_Size - offset);
@@ -688,7 +688,7 @@ int CGXCipher::Encrypt(
                 nonse.Set(systemTitle.GetData(), 8);
             }
             GXHelpers::SetObjectCount(5 + input.GetSize(), nonse);
-            if ((ret = nonse.SetUInt8(security | suite)) == 0 &&
+            if ((ret = nonse.SetUInt8(static_cast<int>(security) | static_cast<int>(suite))) == 0 &&
                 (ret = nonse.SetUInt32(frameCounter)) == 0)
             {
                 input.Move(0, nonse.GetSize(), input.GetSize());
